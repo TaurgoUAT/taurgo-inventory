@@ -1,0 +1,543 @@
+import 'dart:async';
+import 'package:flutter/material.dart';
+import 'package:taurgo_inventory/constants/UrlConstants.dart';
+import 'package:taurgo_inventory/pages/add_property_details_page.dart';
+import 'package:taurgo_inventory/pages/property_details_view_page.dart';
+import '../constants/AppColors.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
+class LandingScreen extends StatefulWidget {
+  const LandingScreen({super.key});
+
+  @override
+  State<LandingScreen> createState() => _LandingScreenState();
+}
+
+class _LandingScreenState extends State<LandingScreen> {
+  List<Map<String, dynamic>> completedProperties = [];
+  List<Map<String, dynamic>> pendingProperties = [];
+  bool isLoading = true;
+  String filterOption = 'All'; // Initial filter option
+  List<Map<String, dynamic>> filteredProperties = [];
+  List<Map<String, dynamic>> properties = [];
+
+  @override
+  void initState() {
+    super.initState();
+    fetchProperties();
+  }
+
+  Future<void> fetchProperties() async {
+    try {
+      final response = await http.get(Uri.parse('$baseURL/property/getProps'));
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = json.decode(response.body);
+        if (mounted) {
+          setState(() {
+            properties =
+                data.map((item) => item as Map<String, dynamic>).toList();
+            filteredProperties = properties;
+            isLoading = false;
+          });
+        }
+      } else {
+        print("Failed to load properties: ${response.statusCode}");
+        if (mounted) {
+          setState(() {
+            isLoading = false;
+          });
+        }
+      }
+    } catch (e) {
+      print("Error fetching properties: $e");
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    }
+  }
+
+  void _showFilterOptions(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          color: bWhite,
+          padding: EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                "Filter Options",
+                style: TextStyle(
+                  fontSize: 18.0,
+                  fontWeight: FontWeight.w700,
+                  color: kPrimaryColor,
+                ),
+              ),
+              Divider(),
+              ListTile(
+                title: Text("Active"),
+                onTap: () {
+                  // applyFilter('Completed');
+                  // Navigator.pop(context);
+                },
+              ),
+              ListTile(
+                title: Text("Completed"),
+                onTap: () {
+                  // applyFilter('Pending');
+                  // Navigator.pop(context);
+                },
+              ),
+              ListTile(
+                title: Text("All"),
+                onTap: () {
+                  // applyFilter('All');
+                  // Navigator.pop(context);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Abishan',
+                  style: TextStyle(
+                    color: kPrimaryColor,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    fontFamily: "Inter",
+                  ),
+                ),
+                SizedBox(height: 2),
+                // Adjust the spacing between the text and the location row
+                Row(
+                  children: [
+                    Icon(
+                      Icons.location_on,
+                      color: kPrimaryColor,
+                      size: 11, // Adjust the icon size
+                    ),
+                    SizedBox(width: 4),
+                    // Space between the icon and the location text
+                    Text(
+                      'Vavuniya', // Replace with the actual location
+                      style: TextStyle(
+                        color: kPrimaryColor,
+                        fontSize: 11, // Adjust the font size
+                        fontFamily: "Inter",
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ],
+        ),
+        centerTitle: true,
+        backgroundColor: bWhite,
+        leading: GestureDetector(
+          onTap: () {
+            // Navigator.pushReplacement(
+            //   context,
+            //   MaterialPageRoute(
+            //       builder: (context) =>
+            //           Homepage()), // Replace HomePage with your home page widget
+            // );
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Image.asset(
+              'assets/logo/Taurgo Logo.png', // Path to your company icon
+            ),
+          ),
+        ),
+        actions: [
+          IconButton(
+            icon: Icon(
+              Icons.help_outline,
+              color: kPrimaryColor,
+            ),
+            onPressed: () {
+              // Navigator.pushReplacement(
+              //   context,
+              //   MaterialPageRoute(
+              //       builder: (context) =>
+              //           Helpandsupportpage()), // Replace HomePage with your home page widget
+              // );
+            },
+          ),
+        ],
+      ),
+      body: Container(
+        color: bWhite,
+        child: Padding(
+          padding: EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(
+                height: 20,
+              ),
+
+              //Search bar
+              Padding(
+                padding: const EdgeInsets.all(0.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: double.maxFinite,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: bWhite,
+                        border: Border.all(
+                          color: kSecondaryButtonBorderColor,
+                          // Replace with your desired
+                          // border color
+                          width: 2.0, // Adjust the border width as needed
+                        ), // Background color of the search bar
+                        borderRadius: BorderRadius.circular(30.0),
+
+                        // boxShadow: [
+                        //   BoxShadow(
+                        //     color: Colors.grey.withOpacity(0.5),
+                        //     spreadRadius: 2,
+                        //     blurRadius: 5,
+                        //     offset: Offset(0, 3),
+                        //   ),
+                        // ],
+                      ),
+                      child: Row(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Icon(Icons.search,
+                                color:
+                                    kSecondaryButtonBorderColor), // Search icon
+                          ),
+                          Expanded(
+                            child: TextField(
+                              cursorColor: kPrimaryColor,
+                              decoration: InputDecoration(
+                                hintText: 'Search',
+                                hintStyle: TextStyle(
+                                    color: kSecondaryButtonBorderColor),
+                                border: InputBorder.none,
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Icon(Icons.mic,
+                                color: kSecondaryButtonBorderColor), // Mic icon
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              SizedBox(
+                height: 20,
+              ),
+
+              //Filter Options
+              Padding(
+                padding: EdgeInsets.all(0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Text(
+                      "Your Properties",
+                      style: TextStyle(
+                        fontSize: 20.0,
+                        fontWeight: FontWeight.w700,
+                        color: kPrimaryColor,
+                      ),
+                    ),
+                    Row(
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            _showFilterOptions(context);
+                          },
+                          child: Text(
+                            "Filter",
+                            style: TextStyle(
+                              fontSize: 12.0,
+                              fontWeight: FontWeight.w700,
+                              color: kSecondaryTextColourTwo,
+                            ),
+                          ),
+                        ),
+                        IconButton(
+                          icon: Icon(
+                            Icons.filter_alt_outlined,
+                            size: 24,
+                            color: kSecondaryTextColourTwo,
+                          ),
+                          onPressed: () {
+                            _showFilterOptions(context);
+                          },
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+
+              Expanded(
+                child: ListView.builder(
+                  itemCount: filteredProperties.length,
+                  itemBuilder: (context, index) {
+                    int reversedIndex = filteredProperties.length - 1 - index;
+                    final property = filteredProperties[reversedIndex];
+                    return propertyContainer(
+                        property['status'] ?? '',
+                        property['addressLineOne'] ?? '',
+                        property['addressLineTwo'] ?? '',
+                        property['city'] ?? '',
+                        property['postalCode'] ?? '',
+                        property['country'] ?? '',
+                        property['noOfBeds'] ?? '',
+                        property['noOfBaths'] ?? '');
+                  },
+                ),
+              ),
+              //Container for Listing
+
+              //Floating Button with
+            ],
+          ),
+        ),
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          // Navigate to the new page
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => AddPropertyDetailsPage()),
+          );
+        },
+        label: Icon(
+          Icons.add,
+          color: bWhite,
+          size: 48,
+        ),
+        // Icon for the button
+        backgroundColor: kPrimaryColor,
+        hoverColor: kPrimaryColor.withOpacity(0.4),
+        // Hover color of the button
+        shape: CircleBorder(
+          side: BorderSide(
+            color: Colors.white, // Color of the border
+            width: 2.0, // Width of the border
+          ),
+        ),
+        elevation: 3.0,
+      ),
+    );
+  }
+
+  Widget propertyContainer(
+    String status,
+    String addressLineOne,
+    String addressLineTwo,
+    String city,
+    String postalCode,
+    String country,
+    String noOfBeds,
+    String noOfBaths,
+// Add status as a parameter
+  ) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (context) =>
+                  PropertyDetailsViewPage(status: status, addressLineOne: addressLineOne, addressLineTwo: addressLineTwo, city: city, country: country, postalCode: postalCode, noOfBeds: noOfBeds, noOfBaths: noOfBaths, keyLocation: "keyLocation", duration: "duration", message: "message")), // Replace HomePage with your home page widget
+        );
+      },
+      child: Container(
+        height: 305,
+        margin: EdgeInsets.only(bottom: 16.0, top: 16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(10.0),
+          border: Border.all(color: Colors.black, width: 1),
+          // Add border color and width
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 4.0,
+              spreadRadius: 2.0,
+              offset: Offset(4.0, 4.0),
+            ),
+          ],
+        ),
+        child: Stack(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Text(
+                        "Inventory & Schedule of Condition",
+                        style: TextStyle(
+                          fontSize: 10.0,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.black,
+                        ),
+                      ),
+                      Container(
+                        height: 30,
+                        width: 100,
+                        margin: EdgeInsets.only(bottom: 0.0, top: 0),
+                        decoration: BoxDecoration(
+                          color: kPrimaryColor,
+                          borderRadius: BorderRadius.circular(25.0),
+                        ),
+                        child: Center(
+                          child: Text(
+                            status,
+                            // The text you want to display
+                            style: TextStyle(
+                              color: Colors.white, // Text color
+                              fontSize: 11.0, // Font size
+                              fontWeight: FontWeight.bold, // Font weight
+                            ),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                  SizedBox(height: 12.0),
+                  Text(
+                    addressLineOne,
+                    style: TextStyle(
+                      fontSize: 14.0,
+                      fontWeight: FontWeight.bold,
+                      color: allBlack,
+                    ),
+                  ),
+                  Text(
+                    addressLineTwo,
+                    style: TextStyle(
+                      fontSize: 11.0,
+                      color: kPrimaryTextColourTwo,
+                    ),
+                  ),
+                  Text(
+                    city,
+                    style: TextStyle(
+                      fontSize: 11.0,
+                      color: kPrimaryTextColourTwo,
+                    ),
+                  ),
+
+                  Text(
+                    country,
+                    style: TextStyle(
+                      fontSize: 11.0,
+                      color: kPrimaryTextColourTwo,
+                    ),
+                  ),
+
+                  Text(
+                    postalCode,
+                    style: TextStyle(
+                      fontSize: 11.0,
+                      color: kPrimaryTextColourTwo,
+                    ),
+                  ),
+                  SizedBox(height: 12.0),
+                  Text(
+                    "Fri 26th August 2024",
+                    style: TextStyle(
+                      fontSize: 14.0,
+                      fontWeight: FontWeight.w500,
+                      color: allBlack,
+                    ),
+                  ),
+                  SizedBox(height: 12.0),
+                  Row(
+                    children: <Widget>[
+                      Icon(Icons.bed, size: 20.0, color: kPrimaryColor),
+                      SizedBox(width: 4.0),
+                      Text(
+                        noOfBeds,
+                        style: TextStyle(fontSize: 14.0, color: kPrimaryColor),
+                      ),
+                      SizedBox(width: 16.0),
+                      Icon(Icons.bathtub, size: 20.0, color: kPrimaryColor),
+                      SizedBox(width: 4.0),
+                      Text(
+                        noOfBaths,
+                        style: TextStyle(fontSize: 14.0, color: kPrimaryColor),
+                      ),
+                    ],
+                  ),
+                  Spacer(),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Divider(thickness: 1, color: Color(0xFFC2C2C2)),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      IconButton(
+                        icon: Icon(Icons.delete, color: Colors.red),
+                        onPressed: () {
+                          // Add delete button action here
+                        },
+                      ),
+                      ElevatedButton(
+                        onPressed: () {},
+                        child: Padding(
+                          padding: const EdgeInsets.all(7.5),
+                          child: Text('Sync', style: TextStyle(fontSize: 18)),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: kPrimaryColor,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(50),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
