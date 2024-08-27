@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="NONE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="9cfeb956-5354-4366-ab84-34804ef25cb7" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Dart_Packages.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Dart_SDK.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Flutter_Plugins.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/taurgo_inventory/assets/icon/icon.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/taurgo_inventory/assets/images/circle-logo.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/taurgo_inventory/assets/images/house.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/taurgo_inventory/assets/images/no-img.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/taurgo_inventory/assets/images/onboarding2.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/taurgo_inventory/assets/images/onboarding3.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/taurgo_inventory/assets/images/onboardingnew.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/taurgo_inventory/assets/images/prop-img-2.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/taurgo_inventory/assets/images/prop-img.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/taurgo_inventory/assets/images/splash-screen-background.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/taurgo_inventory/assets/logo/Taurgo Logo.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/taurgo_inventory/assets/logo/logo.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/taurgo_inventory/assets/logo/textLogo.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/taurgo_inventory/assets/pdf/Privacy Policy.pdf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/taurgo_inventory/assets/pdf/Taurgo App Terms and Conditions.pdf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/taurgo_inventory/ios/Podfile" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/taurgo_inventory/lib/constants/AppColors.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/taurgo_inventory/lib/constants/UrlConstants.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/taurgo_inventory/lib/constants/status.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/add_property_details_page.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/add_property_details_page_second.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/edit_report_page.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/landing_screen.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/property_details_view_page.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/schedule_of-condition.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/taurgo_inventory/macos/Podfile" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Dart File" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectId" id="2l8Xq5RWjmoIUpb82cewteh42hF" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;com.google.services.firebase.aqiPopupShown&quot;: &quot;true&quot;,
+    &quot;dart.analysis.tool.window.visible&quot;: &quot;false&quot;,
+    &quot;io.flutter.reload.alreadyRun&quot;: &quot;true&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.lookFeel&quot;,
+    &quot;show.migrate.to.gradle.popup&quot;: &quot;false&quot;
+  }
+}</component>
+  <component name="RunManager">
+    <configuration name="main.dart" type="FlutterRunConfigurationType" factoryName="Flutter">
+      <option name="filePath" value="$PROJECT_DIR$/taurgo_inventory/lib/main.dart" />
+      <method v="2" />
+    </configuration>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="9cfeb956-5354-4366-ab84-34804ef25cb7" name="Changes" comment="" />
+      <created>1724562868072</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1724562868072</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="Dart">
+          <url>file://$PROJECT_DIR$/taurgo_inventory/lib/pages/add_property_details_page.dart</url>
+          <line>33</line>
+          <option name="timeStamp" value="2" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="Dart">
+          <url>file://$PROJECT_DIR$/taurgo_inventory/lib/pages/add_property_details_page.dart</url>
+          <line>341</line>
+          <option name="timeStamp" value="5" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+</project>
