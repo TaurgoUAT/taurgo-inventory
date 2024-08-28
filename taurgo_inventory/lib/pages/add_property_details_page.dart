@@ -12,7 +12,8 @@ class AddPropertyDetailsPage extends StatefulWidget {
 }
 
 class _AddPropertyDetailsPageState extends State<AddPropertyDetailsPage> {
-  int selectedBedNumber = 1;
+  int selectedBedNumber = 0;
+  int selectedBathsNumber = 0;
 
   bool parkingSelected = false;
   bool garageSelected = false;
@@ -21,14 +22,63 @@ class _AddPropertyDetailsPageState extends State<AddPropertyDetailsPage> {
   var addressLineOneController = TextEditingController();
   var addressLineTwoController = TextEditingController();
   var cityController = TextEditingController();
+  var stateController = TextEditingController();
   var countryController = TextEditingController();
   var postCodeController = TextEditingController();
 
-  // var typeController = TextEditingController();
-  // var addressLineTwoController = TextEditingController();
-  // var cityController = TextEditingController();
-  // var countryController = TextEditingController();
-  // var postCodeController = TextEditingController();
+  var referenceController = TextEditingController();
+  var clientController = TextEditingController();
+  var notesController = TextEditingController();
+
+  String? selectedFurnishing; // Variable to hold the selected furnishing option
+  String? selectedType;
+
+
+  final List<String> furnishing = [
+    'Unfurnished',
+    'Partially Unfurnished',
+    'Fully Unfurnished',
+
+  ];
+
+  final List<String> type = [
+    'Apartment',
+    'Bedsit',
+    'Bungalow',
+    'Cottage',
+    'House',
+    'House',
+    'Maisonette',
+    'Mansion',
+    'Flat - Purpose Buile',
+    'Flat - Converted',
+    'Studio Apartment',
+    'Tenement',
+    'Commercial',
+    'Condominium',
+    'Duplex',
+    'Retail',
+    'Industrial',
+    'Office',
+    'Room',
+    'HMO',
+    'Barn',
+    'Restaurant',
+    'Bar',
+    'Warehouse',
+    'Storage',
+    'Government',
+    'Public Space',
+    'Multi-Unit Building',
+    'Mobile Home',
+    'Other',
+
+
+
+
+
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -131,8 +181,9 @@ class _AddPropertyDetailsPageState extends State<AddPropertyDetailsPage> {
                   decoration: InputDecoration(
                     labelText: "Line 1",
                     labelStyle: TextStyle(
-                      color: kSecondaryTextColourTwo,
-                      fontSize: 11,
+                      fontSize: 14.0,
+                      fontWeight: FontWeight.w700,
+                      color: kPrimaryTextColourTwo,
                     ),
                     border: UnderlineInputBorder(
                       borderSide: BorderSide(color: kPrimaryColor),
@@ -150,12 +201,13 @@ class _AddPropertyDetailsPageState extends State<AddPropertyDetailsPage> {
                 padding: EdgeInsets.all(0.0),
                 child: TextField(
                   cursorColor: kPrimaryColor,
-                  controller: addressLineOneController,
+                  controller: addressLineTwoController,
                   decoration: InputDecoration(
                     labelText: "Line 2",
                     labelStyle: TextStyle(
-                      color: kSecondaryTextColourTwo,
-                      fontSize: 11,
+                      fontSize: 14.0,
+                      fontWeight: FontWeight.w700,
+                      color: kPrimaryTextColourTwo,
                     ),
                     border: UnderlineInputBorder(
                       borderSide: BorderSide(color: kPrimaryColor),
@@ -173,12 +225,13 @@ class _AddPropertyDetailsPageState extends State<AddPropertyDetailsPage> {
                 padding: EdgeInsets.all(0.0),
                 child: TextField(
                   cursorColor: kPrimaryColor,
-                  controller: addressLineOneController,
+                  controller: cityController,
                   decoration: InputDecoration(
                     labelText: "City",
                     labelStyle: TextStyle(
-                      color: kSecondaryTextColourTwo,
-                      fontSize: 11,
+                      fontSize: 14.0,
+                      fontWeight: FontWeight.w700,
+                      color: kPrimaryTextColourTwo,
                     ),
                     border: UnderlineInputBorder(
                       borderSide: BorderSide(color: kPrimaryColor),
@@ -191,17 +244,41 @@ class _AddPropertyDetailsPageState extends State<AddPropertyDetailsPage> {
                 ),
               ),
 
+              //State
+              Padding(
+                padding: EdgeInsets.all(0.0),
+                child: TextField(
+                  cursorColor: kPrimaryColor,
+                  controller: stateController,
+                  decoration: InputDecoration(
+                    labelText: "State",
+                    labelStyle: TextStyle(
+                      fontSize: 14.0,
+                      fontWeight: FontWeight.w700,
+                      color: kPrimaryTextColourTwo,
+                    ),
+                    border: UnderlineInputBorder(
+                      borderSide: BorderSide(color: kPrimaryColor),
+                    ),
+                    focusedBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: kPrimaryColor),
+                    ),
+                    contentPadding: EdgeInsets.symmetric(horizontal: 0.0),
+                  ),
+                ),
+              ),
               //Country
               Padding(
                 padding: EdgeInsets.all(0.0),
                 child: TextField(
                   cursorColor: kPrimaryColor,
-                  controller: addressLineOneController,
+                  controller: countryController,
                   decoration: InputDecoration(
                     labelText: "Country",
                     labelStyle: TextStyle(
-                      color: kSecondaryTextColourTwo,
-                      fontSize: 11,
+                      fontSize: 14.0,
+                      fontWeight: FontWeight.w700,
+                      color: kPrimaryTextColourTwo,
                     ),
                     border: UnderlineInputBorder(
                       borderSide: BorderSide(color: kPrimaryColor),
@@ -219,12 +296,13 @@ class _AddPropertyDetailsPageState extends State<AddPropertyDetailsPage> {
                 padding: EdgeInsets.all(0.0),
                 child: TextField(
                   cursorColor: kPrimaryColor,
-                  controller: addressLineOneController,
+                  controller: postCodeController,
                   decoration: InputDecoration(
                     labelText: "Postal Code",
                     labelStyle: TextStyle(
-                      color: kSecondaryTextColourTwo,
-                      fontSize: 11,
+                      fontSize: 14.0,
+                      fontWeight: FontWeight.w700,
+                      color: kPrimaryTextColourTwo,
                     ),
                     border: UnderlineInputBorder(
                       borderSide: BorderSide(color: kPrimaryColor),
@@ -242,7 +320,7 @@ class _AddPropertyDetailsPageState extends State<AddPropertyDetailsPage> {
               Padding(
                 padding: EdgeInsets.all(0),
                 child: Text(
-                  "Address",
+                  "Details",
                   style: TextStyle(
                     fontSize: 16.0,
                     fontWeight: FontWeight.w700,
@@ -255,18 +333,18 @@ class _AddPropertyDetailsPageState extends State<AddPropertyDetailsPage> {
                 padding: const EdgeInsets.symmetric(horizontal: 0.0),
                 child: Divider(thickness: 1, color: Color(0xFFC2C2C2)),
               ),
-              SizedBox(height: 12.0),
               //Refernece
               Padding(
                 padding: EdgeInsets.all(0.0),
                 child: TextField(
                   cursorColor: kPrimaryColor,
-                  controller: addressLineOneController,
+                  controller: referenceController,
                   decoration: InputDecoration(
                     labelText: "Referenece",
                     labelStyle: TextStyle(
-                      color: kSecondaryTextColourTwo,
-                      fontSize: 11,
+                      fontSize: 14.0,
+                      fontWeight: FontWeight.w700,
+                      color: kPrimaryTextColourTwo,
                     ),
                     border: UnderlineInputBorder(
                       borderSide: BorderSide(color: kPrimaryColor),
@@ -284,12 +362,13 @@ class _AddPropertyDetailsPageState extends State<AddPropertyDetailsPage> {
                 padding: EdgeInsets.all(0.0),
                 child: TextField(
                   cursorColor: kPrimaryColor,
-                  controller: addressLineOneController,
+                  controller: clientController,
                   decoration: InputDecoration(
                     labelText: "Client",
                     labelStyle: TextStyle(
-                      color: kSecondaryTextColourTwo,
-                      fontSize: 11,
+                      fontSize: 14.0,
+                      fontWeight: FontWeight.w700,
+                      color: kPrimaryTextColourTwo,
                     ),
                     border: UnderlineInputBorder(
                       borderSide: BorderSide(color: kPrimaryColor),
@@ -302,29 +381,164 @@ class _AddPropertyDetailsPageState extends State<AddPropertyDetailsPage> {
                 ),
               ),
 
-              //Type
+              SizedBox(height: 12.0),
+              //Type Text
               Padding(
-                padding: EdgeInsets.all(0.0),
-                child: TextField(
-                  cursorColor: kPrimaryColor,
-                  controller: addressLineOneController,
-                  decoration: InputDecoration(
-                    labelText: "Type",
-                    labelStyle: TextStyle(
-                      color: kSecondaryTextColourTwo,
-                      fontSize: 11,
-                    ),
-                    border: UnderlineInputBorder(
-                      borderSide: BorderSide(color: kPrimaryColor),
-                    ),
-                    focusedBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: kPrimaryColor),
-                    ),
-                    contentPadding: EdgeInsets.symmetric(horizontal: 0.0),
+                padding: EdgeInsets.all(0),
+                child: Text(
+                  "Type",
+                  style: TextStyle(
+                    fontSize: 14.0,
+                    fontWeight: FontWeight.w700,
+                    color: kPrimaryTextColourTwo,
                   ),
                 ),
               ),
 
+              SizedBox(height: 12.0),
+
+              Padding(
+                padding: EdgeInsets.all(0),
+                child:  DropdownButtonFormField<String>(
+                  dropdownColor: bWhite,
+                  value: selectedType,
+                  hint: Text('Select Property Type'),
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                      borderSide: BorderSide(
+                        color: kPrimaryColor,
+                        width: 1.5,
+                      ),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                      borderSide: BorderSide(
+                        color: kPrimaryColor,
+                        width: 1.5,
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                      borderSide: BorderSide(
+                        color: kPrimaryColor,
+                        width: 2.0,
+                      ),
+                    ),
+                    contentPadding: EdgeInsets.all(5
+                    ),
+                  ),
+                  icon: Icon(
+                    Icons.arrow_drop_down,
+                    color: kPrimaryColor,
+                  ),
+                  items: type.map((String type) {
+                    return DropdownMenuItem<String>(
+                      value: type,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            type,
+                            style: TextStyle(
+                              color: kPrimaryTextColour,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              fontFamily: "Inter",
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      selectedType = newValue;
+                    });
+                  },
+                ),
+              ),
+
+              //Furnishing
+              SizedBox(height: 12.0),
+              //Type Text
+              Padding(
+                padding: EdgeInsets.all(0),
+                child: Text(
+                  "Furnishing",
+                  style: TextStyle(
+                    fontSize: 14.0,
+                    fontWeight: FontWeight.w700,
+                    color: kPrimaryTextColourTwo,
+                  ),
+                ),
+              ),
+
+              SizedBox(height: 12.0),
+
+              Padding(
+                padding: EdgeInsets.all(0),
+                child:  DropdownButtonFormField<String>(
+                  dropdownColor: bWhite,
+                  value: selectedFurnishing,
+                  hint: Text('Furnishing'),
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                      borderSide: BorderSide(
+                        color: kPrimaryColor,
+                        width: 1.5,
+                      ),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                      borderSide: BorderSide(
+                        color: kPrimaryColor,
+                        width: 1.5,
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                      borderSide: BorderSide(
+                        color: kPrimaryColor,
+                        width: 2.0,
+                      ),
+                    ),
+                    contentPadding: EdgeInsets.all(5
+                    ),
+                  ),
+                  icon: Icon(
+                    Icons.arrow_drop_down,
+                    color: kPrimaryColor,
+                  ),
+                  items: furnishing.map((String type) {
+                    return DropdownMenuItem<String>(
+                      value: type,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            type,
+                            style: TextStyle(
+                              color: kPrimaryTextColour,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              fontFamily: "Inter",
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      selectedFurnishing = newValue;
+                    });
+                  },
+                ),
+              ),
               //Beds
               Padding(
                 padding: EdgeInsets.all(0),
@@ -332,26 +546,29 @@ class _AddPropertyDetailsPageState extends State<AddPropertyDetailsPage> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
                     Text(
-                      "Beds",
+                      "Baths",
                       style: TextStyle(
-                        fontSize: 11.0,
+                        fontSize: 14.0,
                         fontWeight: FontWeight.w700,
-                        color: kSecondaryTextColourTwo,
+                        color: kPrimaryTextColourTwo,
                       ),
                     ),
                     DropdownButton<int>(
                       iconSize: 24,
                       dropdownColor: bWhite,
                       style: TextStyle(color: Colors.black, fontSize: 16),
-                      value: selectedBedNumber, // the selected value
-                      items: List.generate(10, (index) {
+                      value: selectedBedNumber, // Ensure this value exists in the items list
+                      items: List.generate(11, (index) {
                         return DropdownMenuItem<int>(
-                          value: index + 1,
-                          child: Text('${index + 1}', style: TextStyle(
-                            color: kPrimaryColor
-                          ),),
+                          value: index, // No duplicates in this list
+                          child: Text(
+                            '$index',
+                            style: TextStyle(
+                              color: kPrimaryColor,
+                            ),
+                          ),
                         );
-                      }).toList(),
+                      }),
                       onChanged: (int? newValue) {
                         setState(() {
                           selectedBedNumber = newValue!;
@@ -371,33 +588,38 @@ class _AddPropertyDetailsPageState extends State<AddPropertyDetailsPage> {
                     Text(
                       "Baths",
                       style: TextStyle(
-                        fontSize: 11.0,
+                        fontSize: 14.0,
                         fontWeight: FontWeight.w700,
-                        color: kSecondaryTextColourTwo,
+                        color: kPrimaryTextColourTwo,
                       ),
                     ),
                     DropdownButton<int>(
                       iconSize: 24,
                       dropdownColor: bWhite,
                       style: TextStyle(color: Colors.black, fontSize: 16),
-                      value: selectedBedNumber, // the selected value
-                      items: List.generate(10, (index) {
+                      value: selectedBathsNumber, // Ensure this value exists in the items list
+                      items: List.generate(11, (index) {
                         return DropdownMenuItem<int>(
-                          value: index + 1,
-                          child: Text('${index + 1}', style: TextStyle(
-                              color: kPrimaryColor
-                          ),),
+                          value: index, // No duplicates in this list
+                          child: Text(
+                            '$index',
+                            style: TextStyle(
+                              color: kPrimaryColor,
+                            ),
+                          ),
                         );
-                      }).toList(),
+                      }),
                       onChanged: (int? newValue) {
                         setState(() {
-                          selectedBedNumber = newValue!;
+                          selectedBathsNumber = newValue!;
                         });
                       },
                     ),
                   ],
                 ),
               ),
+
+
 
               // Garage
               Padding(
@@ -408,9 +630,9 @@ class _AddPropertyDetailsPageState extends State<AddPropertyDetailsPage> {
                     Text(
                       'Garage',
                       style: TextStyle(
-                        fontSize: 11.0,
+                        fontSize: 14.0,
                         fontWeight: FontWeight.w700,
-                        color: kSecondaryTextColourTwo,
+                        color: kPrimaryTextColourTwo,
                       ),
                     ),
                     Switch(
@@ -437,9 +659,9 @@ class _AddPropertyDetailsPageState extends State<AddPropertyDetailsPage> {
                     Text(
                       'Parking',
                       style: TextStyle(
-                        fontSize: 11.0,
+                        fontSize: 14.0,
                         fontWeight: FontWeight.w700,
-                        color: kSecondaryTextColourTwo,
+                        color: kPrimaryTextColourTwo,
                       ),
                     ),
                     Switch(
@@ -463,12 +685,13 @@ class _AddPropertyDetailsPageState extends State<AddPropertyDetailsPage> {
                 padding: EdgeInsets.all(0.0),
                 child: TextField(
                   cursorColor: kPrimaryColor,
-                  controller: addressLineOneController,
+                  controller: notesController,
                   decoration: InputDecoration(
                     labelText: "Notes",
                     labelStyle: TextStyle(
-                      color: kSecondaryTextColourTwo,
-                      fontSize: 11,
+                      fontSize: 14.0,
+                      fontWeight: FontWeight.w700,
+                      color: kPrimaryTextColourTwo,
                     ),
                     border: UnderlineInputBorder(
                       borderSide: BorderSide(color: kPrimaryColor),

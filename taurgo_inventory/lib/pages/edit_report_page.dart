@@ -1,9 +1,15 @@
-import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:taurgo_inventory/pages/reportPages/schedule_of-condition.dart';
+import 'package:taurgo_inventory/pages/reportPages/ev_charger.dart';
+import 'package:taurgo_inventory/pages/reportPages/front_garden.dart';
+import 'package:taurgo_inventory/pages/reportPages/garage.dart';
+import 'package:taurgo_inventory/pages/reportPages/health_and_safety.dart';
+import 'package:taurgo_inventory/pages/reportPages/key_handed_over.dart';
+import 'package:taurgo_inventory/pages/reportPages/keys.dart';
+import 'package:taurgo_inventory/pages/reportPages/meter_reading.dart';
+import 'package:taurgo_inventory/pages/reportPages/schedule_of_condition.dart';
+// Import other pages here
 import '../constants/AppColors.dart';
-import 'package:intl/intl.dart';
 
 import 'landing_screen.dart';
 
@@ -15,9 +21,8 @@ class EditReportPage extends StatefulWidget {
 }
 
 class _EditReportPageState extends State<EditReportPage> {
-
   String? selectedType;
-  Map<String, String>? selectedPackage;
+
   final List<String> types = [
     'Schedule of Condition',
     'EV Charger',
@@ -43,6 +48,23 @@ class _EditReportPageState extends State<EditReportPage> {
     'Manuals/ Certificates',
     'Property Receipts'
   ];
+
+  // Map of types to their corresponding pages
+  final Map<String, Widget> typeToPageMap = {
+    'Schedule of Condition': ScheduleOfCondition(),
+    'EV Charger': EvCharger(),
+    'Meter Reading': MeterReading(),
+    'Keys': Keys(),
+    "Keys Handed Over At Check In": KeyHandedOver(),
+    'Health & Safety | Smoke & Carbon Monoxide': HealthAndSafety(),
+    'Front Garden': FrontGarden(),
+    'Garage': Garage(),
+    // Add more mappings here
+    // 'EV Charger': EVChargerPage(),
+    // 'Meter Reading': MeterReadingPage(),
+    // ...
+  };
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -62,8 +84,7 @@ class _EditReportPageState extends State<EditReportPage> {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                  builder: (context) =>
-                      LandingScreen()), // Replace HomePage with your home page widget
+                  builder: (context) => LandingScreen()), // Replace HomePage with your home page widget
             );
           },
           child: Icon(
@@ -88,7 +109,6 @@ class _EditReportPageState extends State<EditReportPage> {
           )
         ],
       ),
-
       body: Container(
         child: Padding(
           padding: EdgeInsets.all(16),
@@ -115,26 +135,32 @@ class _EditReportPageState extends State<EditReportPage> {
                             selectedType = types[index];
                           });
 
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) =>
-                                    ScheduleOfCondition()), // Replace HomePage with your
-                            // home
-                            // page widget
-                          );
+                          // Navigate to the corresponding page based on the type
+                          if (typeToPageMap.containsKey(selectedType)) {
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                  typeToPageMap[selectedType]!),
+                            );
+                          } else {
+                            // Handle the case where the page is not mapped
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Page for $selectedType not yet implemented.'),
+                              ),
+                            );
+                          }
                         },
                       ),
                     );
                   },
-                )
-                ,
+                ),
               ),
             ],
           ),
         ),
       ),
-
     );
   }
 }

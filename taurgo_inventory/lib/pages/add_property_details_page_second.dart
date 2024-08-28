@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:taurgo_inventory/pages/deatails_confirmation_page.dart';
 import '../constants/AppColors.dart';
 import 'package:intl/intl.dart';
 
@@ -17,6 +18,8 @@ class _AddPropertyDetailsPageSecondState extends State<AddPropertyDetailsPageSec
 
   DateTime? _currentdate;
   String? selectedType;
+  String? keysIwth;
+
   Map<String, String>? selectedPackage;
   final List<String> types = [
     'Inventory & Schedule of Condition',
@@ -28,6 +31,14 @@ class _AddPropertyDetailsPageSecondState extends State<AddPropertyDetailsPageSec
     'Risk Assessment',
     'Midterm Inventory',
     'Self Service Inspection'
+  ];
+
+  final List<String> keys = [
+    'With Inspector',
+    'With Agent',
+    'With Landlord',
+    'With Tenant',
+    'At property'
   ];
 
   bool parkingSelected = true;
@@ -187,6 +198,12 @@ class _AddPropertyDetailsPageSecondState extends State<AddPropertyDetailsPageSec
         ),
         actions: [
           GestureDetector(
+            onTap: (){
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => DetailsConfirmationPage()),
+              );
+            },
             child: Container(
               margin: EdgeInsets.all(16),
               child: Text(
@@ -225,7 +242,6 @@ class _AddPropertyDetailsPageSecondState extends State<AddPropertyDetailsPageSec
               SizedBox(height: 12.0),
 
 
-              SizedBox(height: 12.0),
 
 
 
@@ -242,14 +258,15 @@ class _AddPropertyDetailsPageSecondState extends State<AddPropertyDetailsPageSec
                 ),
               ),
 
-              SizedBox(height: 6.0),
+              SizedBox(height: 12.0),
+
               //Type
               Padding(
                 padding: EdgeInsets.all(0),
                 child:  DropdownButtonFormField<String>(
                   dropdownColor: bWhite,
                   value: selectedType,
-                  hint: Text('Select a package type'),
+                  hint: Text('Select Type'),
                   decoration: InputDecoration(
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10.0),
@@ -307,167 +324,167 @@ class _AddPropertyDetailsPageSecondState extends State<AddPropertyDetailsPageSec
                   },
                 ),
               ),
-              SizedBox(height: 12.0),
+              // SizedBox(height: 12.0),
 
-              //Title Text
-              Padding(
-                padding: EdgeInsets.all(0),
-                child: Text(
-                  "Title",
-                  style: TextStyle(
-                    fontSize: 14.0,
-                    fontWeight: FontWeight.w700,
-                    color: kPrimaryTextColourTwo,
-                  ),
-                ),
-              ),
+              // //Title Text
+              // Padding(
+              //   padding: EdgeInsets.all(0),
+              //   child: Text(
+              //     "Title",
+              //     style: TextStyle(
+              //       fontSize: 14.0,
+              //       fontWeight: FontWeight.w700,
+              //       color: kPrimaryTextColourTwo,
+              //     ),
+              //   ),
+              // ),
+              //
+              // SizedBox(height: 12.0),
+              //
+              // //Title
+              // Padding(
+              //   padding: EdgeInsets.all(0),
+              //   child:  DropdownButtonFormField<String>(
+              //     dropdownColor: bWhite,
+              //     value: selectedType,
+              //     hint: Text('Select a package type'),
+              //     decoration: InputDecoration(
+              //       border: OutlineInputBorder(
+              //         borderRadius: BorderRadius.circular(10.0),
+              //         borderSide: BorderSide(
+              //           color: kPrimaryColor,
+              //           width: 1.5,
+              //         ),
+              //       ),
+              //       enabledBorder: OutlineInputBorder(
+              //         borderRadius: BorderRadius.circular(10.0),
+              //         borderSide: BorderSide(
+              //           color: kPrimaryColor,
+              //           width: 1.5,
+              //         ),
+              //       ),
+              //       focusedBorder: OutlineInputBorder(
+              //         borderRadius: BorderRadius.circular(10.0),
+              //         borderSide: BorderSide(
+              //           color: kPrimaryColor,
+              //           width: 2.0,
+              //         ),
+              //       ),
+              //       contentPadding: EdgeInsets.all(5
+              //       ),
+              //     ),
+              //     icon: Icon(
+              //       Icons.arrow_drop_down,
+              //       color: kPrimaryColor,
+              //     ),
+              //     items: types.map((String type) {
+              //       return DropdownMenuItem<String>(
+              //         value: type,
+              //         child: Padding(
+              //           padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              //           child: Align(
+              //             alignment: Alignment.centerLeft,
+              //             child: Text(
+              //               type,
+              //               style: TextStyle(
+              //                 color: kPrimaryTextColour,
+              //                 fontSize: 14,
+              //                 fontWeight: FontWeight.w500,
+              //                 fontFamily: "Inter",
+              //               ),
+              //             ),
+              //           ),
+              //         ),
+              //       );
+              //     }).toList(),
+              //     onChanged: (String? newValue) {
+              //       setState(() {
+              //         selectedType = newValue;
+              //         selectedPackage = null; // Reset the selected package
+              //       });
+              //     },
+              //   ),
+              // ),
 
-              SizedBox(height: 6.0),
-              //Title
-              Padding(
-                padding: EdgeInsets.all(0),
-                child:  DropdownButtonFormField<String>(
-                  dropdownColor: bWhite,
-                  value: selectedType,
-                  hint: Text('Select a package type'),
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                      borderSide: BorderSide(
-                        color: kPrimaryColor,
-                        width: 1.5,
-                      ),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                      borderSide: BorderSide(
-                        color: kPrimaryColor,
-                        width: 1.5,
-                      ),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                      borderSide: BorderSide(
-                        color: kPrimaryColor,
-                        width: 2.0,
-                      ),
-                    ),
-                    contentPadding: EdgeInsets.all(5
-                    ),
-                  ),
-                  icon: Icon(
-                    Icons.arrow_drop_down,
-                    color: kPrimaryColor,
-                  ),
-                  items: types.map((String type) {
-                    return DropdownMenuItem<String>(
-                      value: type,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                        child: Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            type,
-                            style: TextStyle(
-                              color: kPrimaryTextColour,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              fontFamily: "Inter",
-                            ),
-                          ),
-                        ),
-                      ),
-                    );
-                  }).toList(),
-                  onChanged: (String? newValue) {
-                    setState(() {
-                      selectedType = newValue;
-                      selectedPackage = null; // Reset the selected package
-                    });
-                  },
-                ),
-              ),
-
-              SizedBox(height: 12.0),
 
               //Template Texrt
-              Padding(
-                padding: EdgeInsets.all(0),
-                child: Text(
-                  "Template",
-                  style: TextStyle(
-                    fontSize: 14.0,
-                    fontWeight: FontWeight.w700,
-                    color: kPrimaryTextColourTwo,
-                  ),
-                ),
-              ),
-
-              SizedBox(height: 6.0),
-              //Template
-              Padding(
-                padding: EdgeInsets.all(0),
-                child:  DropdownButtonFormField<String>(
-                  dropdownColor: bWhite,
-                  value: selectedType,
-                  hint: Text('Select a package type'),
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                      borderSide: BorderSide(
-                        color: kPrimaryColor,
-                        width: 1.5,
-                      ),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                      borderSide: BorderSide(
-                        color: kPrimaryColor,
-                        width: 1.5,
-                      ),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                      borderSide: BorderSide(
-                        color: kPrimaryColor,
-                        width: 2.0,
-                      ),
-                    ),
-                    contentPadding: EdgeInsets.all(5
-                    ),
-                  ),
-                  icon: Icon(
-                    Icons.arrow_drop_down,
-                    color: kPrimaryColor,
-                  ),
-                  items: types.map((String type) {
-                    return DropdownMenuItem<String>(
-                      value: type,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                        child: Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            type,
-                            style: TextStyle(
-                              color: kPrimaryTextColour,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              fontFamily: "Inter",
-                            ),
-                          ),
-                        ),
-                      ),
-                    );
-                  }).toList(),
-                  onChanged: (String? newValue) {
-                    setState(() {
-                      selectedType = newValue;
-                      selectedPackage = null; // Reset the selected package
-                    });
-                  },
-                ),
-              ),
+              // Padding(
+              //   padding: EdgeInsets.all(0),
+              //   child: Text(
+              //     "Template",
+              //     style: TextStyle(
+              //       fontSize: 14.0,
+              //       fontWeight: FontWeight.w700,
+              //       color: kPrimaryTextColourTwo,
+              //     ),
+              //   ),
+              // ),
+              //
+              // SizedBox(height: 6.0),
+              // //Template
+              // Padding(
+              //   padding: EdgeInsets.all(0),
+              //   child:  DropdownButtonFormField<String>(
+              //     dropdownColor: bWhite,
+              //     value: selectedType,
+              //     hint: Text('Select a package type'),
+              //     decoration: InputDecoration(
+              //       border: OutlineInputBorder(
+              //         borderRadius: BorderRadius.circular(10.0),
+              //         borderSide: BorderSide(
+              //           color: kPrimaryColor,
+              //           width: 1.5,
+              //         ),
+              //       ),
+              //       enabledBorder: OutlineInputBorder(
+              //         borderRadius: BorderRadius.circular(10.0),
+              //         borderSide: BorderSide(
+              //           color: kPrimaryColor,
+              //           width: 1.5,
+              //         ),
+              //       ),
+              //       focusedBorder: OutlineInputBorder(
+              //         borderRadius: BorderRadius.circular(10.0),
+              //         borderSide: BorderSide(
+              //           color: kPrimaryColor,
+              //           width: 2.0,
+              //         ),
+              //       ),
+              //       contentPadding: EdgeInsets.all(5
+              //       ),
+              //     ),
+              //     icon: Icon(
+              //       Icons.arrow_drop_down,
+              //       color: kPrimaryColor,
+              //     ),
+              //     items: types.map((String type) {
+              //       return DropdownMenuItem<String>(
+              //         value: type,
+              //         child: Padding(
+              //           padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              //           child: Align(
+              //             alignment: Alignment.centerLeft,
+              //             child: Text(
+              //               type,
+              //               style: TextStyle(
+              //                 color: kPrimaryTextColour,
+              //                 fontSize: 14,
+              //                 fontWeight: FontWeight.w500,
+              //                 fontFamily: "Inter",
+              //               ),
+              //             ),
+              //           ),
+              //         ),
+              //       );
+              //     }).toList(),
+              //     onChanged: (String? newValue) {
+              //       setState(() {
+              //         selectedType = newValue;
+              //         selectedPackage = null; // Reset the selected package
+              //       });
+              //     },
+              //   ),
+              // ),
               SizedBox(height: 12.0),
 
 
@@ -538,14 +555,15 @@ class _AddPropertyDetailsPageSecondState extends State<AddPropertyDetailsPageSec
                   ),
                 ),
               ),
-              SizedBox(height: 6.0),
+              SizedBox(height: 12.0),
+
               //Keys
               Padding(
                 padding: EdgeInsets.all(0),
                 child:  DropdownButtonFormField<String>(
                   dropdownColor: bWhite,
-                  value: selectedType,
-                  hint: Text('Select a package type'),
+                  value: keysIwth,
+                  hint: Text('Key Location'),
                   decoration: InputDecoration(
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10.0),
@@ -575,7 +593,7 @@ class _AddPropertyDetailsPageSecondState extends State<AddPropertyDetailsPageSec
                     Icons.arrow_drop_down,
                     color: kPrimaryColor,
                   ),
-                  items: types.map((String type) {
+                  items: keys.map((String type) {
                     return DropdownMenuItem<String>(
                       value: type,
                       child: Padding(
@@ -597,8 +615,7 @@ class _AddPropertyDetailsPageSecondState extends State<AddPropertyDetailsPageSec
                   }).toList(),
                   onChanged: (String? newValue) {
                     setState(() {
-                      selectedType = newValue;
-                      selectedPackage = null; // Reset the selected package
+                      keysIwth = newValue;
                     });
                   },
                 ),
@@ -615,8 +632,9 @@ class _AddPropertyDetailsPageSecondState extends State<AddPropertyDetailsPageSec
                   decoration: InputDecoration(
                     labelText: "Reference",
                     labelStyle: TextStyle(
-                      color: kSecondaryTextColourTwo,
-                      fontSize: 11,
+                      fontSize: 14.0,
+                      fontWeight: FontWeight.w700,
+                      color: kPrimaryTextColourTwo,
                     ),
                     border: UnderlineInputBorder(
                       borderSide: BorderSide(color: kPrimaryColor),
@@ -638,8 +656,9 @@ class _AddPropertyDetailsPageSecondState extends State<AddPropertyDetailsPageSec
                   decoration: InputDecoration(
                     labelText: "Internal Notes",
                     labelStyle: TextStyle(
-                      color: kSecondaryTextColourTwo,
-                      fontSize: 11,
+                      fontSize: 14.0,
+                      fontWeight: FontWeight.w700,
+                      color: kPrimaryTextColourTwo,
                     ),
                     border: UnderlineInputBorder(
                       borderSide: BorderSide(color: kPrimaryColor),
