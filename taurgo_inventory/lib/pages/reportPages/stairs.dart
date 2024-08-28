@@ -10,16 +10,16 @@ import '../../constants/AppColors.dart';
 import '../../widgets/add_action.dart';
 import '../camera_preview_page.dart';
 
-class MeterReading extends StatefulWidget {
+class Stairs extends StatefulWidget {
   final List<File>? capturedImages;
 
-  const MeterReading({super.key, this.capturedImages});
+  const Stairs({super.key, this.capturedImages});
 
   @override
-  State<MeterReading> createState() => _MeterReadingState();
+  State<Stairs> createState() => _StairsState();
 }
 
-class _MeterReadingState extends State<MeterReading> {
+class _StairsState extends State<Stairs> {
   String? gasMeter;
   String? electricMeter;
   String? waterMeter;
@@ -37,7 +37,7 @@ class _MeterReadingState extends State<MeterReading> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Meter Reading',
+          'Stairs',
           style: TextStyle(
             color: kPrimaryColor,
             fontSize: 14,
@@ -62,63 +62,63 @@ class _MeterReadingState extends State<MeterReading> {
           ),
         ),
       ),
-        body: SingleChildScrollView(
-          child: Padding(
-            padding: EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
 
-                //Gas Meter
-                ConditionItem(
-                  name: "Gas Meter",
-                  selectedCondition: gasMeter,
-                  onConditionSelected: (condition) {
-                    setState(() {
-                      gasMeter = condition;
-                    });
-                  },
-                ),
+              //Gas Meter
+              ConditionItem(
+                name: "Gas Meter",
+                selectedCondition: gasMeter,
+                onConditionSelected: (condition) {
+                  setState(() {
+                    gasMeter = condition;
+                  });
+                },
+              ),
 
-                //Electric Meter
-                ConditionItem(
-                  name: "Electric Meter",
-                  selectedCondition: electricMeter,
-                  onConditionSelected: (condition) {
-                    setState(() {
-                      electricMeter = condition;
-                    });
-                  },
-                ),
+              //Electric Meter
+              ConditionItem(
+                name: "Electric Meter",
+                selectedCondition: electricMeter,
+                onConditionSelected: (condition) {
+                  setState(() {
+                    electricMeter = condition;
+                  });
+                },
+              ),
 
-                //Water Meter
-                ConditionItem(
-                  name: "Water Meter",
-                  selectedCondition: waterMeter,
-                  onConditionSelected: (condition) {
-                    setState(() {
-                      waterMeter = condition;
-                    });
-                  },
-                ),
+              //Water Meter
+              ConditionItem(
+                name: "Water Meter",
+                selectedCondition: waterMeter,
+                onConditionSelected: (condition) {
+                  setState(() {
+                    waterMeter = condition;
+                  });
+                },
+              ),
 
-                //Oil Meter
-                ConditionItem(
-                  name: "Oil Meter",
-                  selectedCondition: oilMeter,
-                  onConditionSelected: (condition) {
-                    setState(() {
-                      oilMeter = condition;
-                    });
-                  },
-                ),
+              //Oil Meter
+              ConditionItem(
+                name: "Oil Meter",
+                selectedCondition: oilMeter,
+                onConditionSelected: (condition) {
+                  setState(() {
+                    oilMeter = condition;
+                  });
+                },
+              ),
 
 
-                // Add more ConditionItem widgets as needed
-              ],
-            ),
+              // Add more ConditionItem widgets as needed
+            ],
           ),
         ),
+      ),
     );
   }
 }

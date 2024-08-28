@@ -134,36 +134,36 @@ class _ConditionDetailsState extends State<ConditionDetails> {
               ),
             ),
             SizedBox(height: 6.0),
-            DropdownButton<String>(
-              value: selectedCondition,
-              items: getConditions().map((String condition) {
-                return DropdownMenuItem<String>(
-                  value: condition,
-                  child: Text(condition),
-                );
-              }).toList(),
-              onChanged: (String? newValue) {
-                setState(() {
-                  selectedCondition = newValue!;
-                  _detailsController.text = newValue;
-                });
-              },
-              isExpanded: true,
-              underline: Container(
-                height: 1,
-                color: kPrimaryColor,
-              ),
-              dropdownColor: Colors.white,
-            ),
+            // DropdownButton<String>(
+            //   value: selectedCondition,
+            //   items: getConditions().map((String condition) {
+            //     return DropdownMenuItem<String>(
+            //       value: condition,
+            //       child: Text(condition),
+            //     );
+            //   }).toList(),
+            //   onChanged: (String? newValue) {
+            //     setState(() {
+            //       selectedCondition = newValue!;
+            //       _detailsController.text = newValue;
+            //     });
+            //   },
+            //   isExpanded: true,
+            //   underline: Container(
+            //     height: 1,
+            //     color: kPrimaryColor,
+            //   ),
+            //   dropdownColor: Colors.white,
+            // ),
             SizedBox(height: 12.0),
-            Text(
-              'Additional Details:',
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-                color: kPrimaryTextColourTwo,
-              ),
-            ),
+            // Text(
+            //   'Additional Details:',
+            //   style: TextStyle(
+            //     fontSize: 14,
+            //     fontWeight: FontWeight.bold,
+            //     color: kPrimaryTextColourTwo,
+            //   ),
+            // ),
             SizedBox(height: 6),
             TextFormField(
               controller: _detailsController,
@@ -172,6 +172,15 @@ class _ConditionDetailsState extends State<ConditionDetails> {
                 hintText: 'Enter any additional details here...',
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color: kPrimaryColor), // Default border color
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color: kPrimaryColor), // Border color when focused
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color: kPrimaryColor), // Border color when enabled
                 ),
               ),
             ),

@@ -5,10 +5,22 @@ import 'package:intl/intl.dart';
 import 'package:taurgo_inventory/pages/conditions/condition_details.dart';
 import 'package:taurgo_inventory/pages/edit_report_page.dart';
 import '../../constants/AppColors.dart';
-
+import 'dart:async';
+import 'dart:io';
+import 'package:camera/camera.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:taurgo_inventory/pages/conditions/condition_details.dart';
+import 'package:taurgo_inventory/pages/edit_report_page.dart';
+import '../../constants/AppColors.dart';
+import '../../widgets/add_action.dart';
+import '../camera_preview_page.dart';
 
 class KeyHandedOver extends StatefulWidget {
-  const KeyHandedOver({super.key});
+  final List<File>? capturedImages;
+
+  const KeyHandedOver({super.key, this.capturedImages});
 
   @override
   State<KeyHandedOver> createState() => _KeyHandedOverState();
@@ -19,6 +31,14 @@ class _KeyHandedOverState extends State<KeyHandedOver> {
   String? yale;
   String? mortice;
   String? other;
+
+  late List<File> capturedImages;
+
+  @override
+  void initState() {
+    super.initState();
+    capturedImages = widget.capturedImages ?? [];
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -159,7 +179,12 @@ class ConditionItem extends StatelessWidget {
                       color: kAccentColor,
                     ),
                     onPressed: () {
-                      // Handle warning icon action
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => AddAction(),
+                        ),
+                      );
                     },
                   ),
                   IconButton(
@@ -168,8 +193,25 @@ class ConditionItem extends StatelessWidget {
                       size: 24,
                       color: kSecondaryTextColourTwo,
                     ),
-                    onPressed: () {
-                      // Handle camera icon action
+                    onPressed: ()  async{
+                      // Initialize the camera when the button is pressed
+                      final cameras = await availableCameras();
+                      if (cameras.isNotEmpty) {
+                        print("${cameras.toString()}");
+                        final cameraController = CameraController(
+                          cameras.first,
+                          ResolutionPreset.high,
+                        );
+                        await cameraController.initialize();
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => CameraPreviewPage(
+                              cameraController: cameraController,
+                            ),
+                          ),
+                        );
+                      }
                     },
                   ),
                 ],

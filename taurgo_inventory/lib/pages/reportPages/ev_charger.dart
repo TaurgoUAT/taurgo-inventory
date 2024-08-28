@@ -1,14 +1,10 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:flutter/cupertino.dart';
+import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:intl/intl.dart';
-import 'package:taurgo_inventory/pages/conditions/condition_details.dart';
-import 'package:taurgo_inventory/pages/edit_report_page.dart';
 import '../../constants/AppColors.dart';
 import '../../widgets/DottedBorderPainter.dart';
-
 
 class EvCharger extends StatefulWidget {
   const EvCharger({super.key});
@@ -21,30 +17,44 @@ class _EvChargerState extends State<EvCharger> {
   List<File> images = []; // List to store selected images
   List<String> imageNames = []; // List to hold image names
 
-  List<File> imagesToUpload = [];
+  late CameraController _cameraController;
+  late Future<void> _initializeControllerFuture;
+  List<File> capturedImages = [];
 
-  List<File> logoUpload = [];
+  @override
+  void initState() {
+    super.initState();
+    _initializeCamera();
+  }
 
-  List<File> floorPlansUpload = [];
-  Future<void> selectFromGalleryForPanorama(BuildContext context) async {
+  Future<void> _initializeCamera() async {
+    final cameras = await availableCameras();
+    final firstCamera = cameras.first;
+
+    _cameraController = CameraController(
+      firstCamera,
+      ResolutionPreset.high,
+    );
+
+    _initializeControllerFuture = _cameraController.initialize();
+  }
+
+  Future<void> _captureImage(BuildContext context) async {
     try {
-      final List<XFile>? pickedFiles = await ImagePicker().pickMultiImage();
-
-      if (pickedFiles == null || pickedFiles.isEmpty) return;
+      await _initializeControllerFuture;
+      final image = await _cameraController.takePicture();
 
       setState(() {
-        for (var pickedFile in pickedFiles) {
-          final imageTemp = File(pickedFile.path);
-          images.add(imageTemp);
-          imageNames
-              .add('Panoramas'); // Ensure this is consistent with the image
-        }
+        final imageTemp = File(image.path);
+        capturedImages.add(imageTemp);
+        images.add(imageTemp);
+        imageNames.add('Camera'); // Ensure this is consistent with the image
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             backgroundColor: kPrimaryColor,
-            content: Text('Panorama images have been selected',
+            content: Text('Image captured successfully',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 12,
@@ -64,6 +74,12 @@ class _EvChargerState extends State<EvCharger> {
                 ))),
       );
     }
+  }
+
+  @override
+  void dispose() {
+    _cameraController.dispose();
+    super.dispose();
   }
 
   @override
@@ -91,7 +107,6 @@ class _EvChargerState extends State<EvCharger> {
           ),
         ),
       ),
-
       body: Container(
         color: bWhite,
         child: Padding(
@@ -111,14 +126,13 @@ class _EvChargerState extends State<EvCharger> {
                   child: Center(
                     child: GestureDetector(
                       onTap: () {
-                        selectFromGalleryForPanorama(context);
+                        _captureImage(context);
                       },
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Icon(Icons.add, color: kPrimaryColor, size: 32),
                           SizedBox(height: 8),
-                          // Add spacing between the icon and the text
                           Text(
                             'Camera',
                             style: TextStyle(
@@ -138,7 +152,7 @@ class _EvChargerState extends State<EvCharger> {
               Center(
                 child: GestureDetector(
                   onTap: () {
-                    // // Save the selected condition and details
+                    // Save the selected condition and details
                     // Navigator.pop(context, _detailsController.text);
                   },
                   child: Container(

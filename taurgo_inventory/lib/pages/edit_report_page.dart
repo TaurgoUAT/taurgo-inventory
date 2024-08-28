@@ -1,13 +1,28 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:taurgo_inventory/pages/reportPages/ExteriorFront.dart';
+import 'package:taurgo_inventory/pages/reportPages/bathroom.dart';
+import 'package:taurgo_inventory/pages/reportPages/bedroom.dart';
+import 'package:taurgo_inventory/pages/reportPages/dining_room.dart';
+import 'package:taurgo_inventory/pages/reportPages/ensuite.dart';
+import 'package:taurgo_inventory/pages/reportPages/entrance_hallway.dart';
 import 'package:taurgo_inventory/pages/reportPages/ev_charger.dart';
 import 'package:taurgo_inventory/pages/reportPages/front_garden.dart';
 import 'package:taurgo_inventory/pages/reportPages/garage.dart';
 import 'package:taurgo_inventory/pages/reportPages/health_and_safety.dart';
 import 'package:taurgo_inventory/pages/reportPages/key_handed_over.dart';
 import 'package:taurgo_inventory/pages/reportPages/keys.dart';
+import 'package:taurgo_inventory/pages/reportPages/kitchen_page.dart';
+import 'package:taurgo_inventory/pages/reportPages/landing.dart';
+import 'package:taurgo_inventory/pages/reportPages/lounge.dart';
+import 'package:taurgo_inventory/pages/reportPages/manuals.dart';
 import 'package:taurgo_inventory/pages/reportPages/meter_reading.dart';
+import 'package:taurgo_inventory/pages/reportPages/rear_garden.dart';
+import 'package:taurgo_inventory/pages/reportPages/receripts.dart';
 import 'package:taurgo_inventory/pages/reportPages/schedule_of_condition.dart';
+import 'package:taurgo_inventory/pages/reportPages/stairs.dart';
+import 'package:taurgo_inventory/pages/reportPages/toilet.dart';
+import 'package:taurgo_inventory/pages/reportPages/utility_room.dart';
 // Import other pages here
 import '../constants/AppColors.dart';
 
@@ -59,6 +74,21 @@ class _EditReportPageState extends State<EditReportPage> {
     'Health & Safety | Smoke & Carbon Monoxide': HealthAndSafety(),
     'Front Garden': FrontGarden(),
     'Garage': Garage(),
+    'Exterior Front': Exteriorfront(),
+    'Entrance / Hallway': EntranceHallway(),
+    'Toilet': Toilet(),
+    'Lounge': Lounge(),
+    'Dining Room': DiningRoom(),
+    'Kitchen': KitchenPage(),
+    'Utility Room / Area': UtilityRoom(),
+    'Stairs': Stairs(),
+    'Landing': Landing(),
+    'Bedroom 1': Bedroom(),
+    'En Suite': Ensuite(),
+    'Bathroom': Bathroom(),
+    'Rear Garden': RearGarden(),
+    'Manuals/ Certificates': Manuals(),
+    'Property Receipts': Receripts(),
     // Add more mappings here
     // 'EV Charger': EVChargerPage(),
     // 'Meter Reading': MeterReadingPage(),
