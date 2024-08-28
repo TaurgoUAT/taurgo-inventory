@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>API_KEY</key>
+	<string>AIzaSyC_PCKO6J5verJvZhANDN8CGh7EUqkze0I</string>
+	<key>GCM_SENDER_ID</key>
+	<string>568871054473</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.taurgo360.taurgoinventory</string>
+	<key>PROJECT_ID</key>
+	<string>taurgo-inventory</string>
+	<key>STORAGE_BUCKET</key>
+	<string>taurgo-inventory.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:568871054473:ios:cb3a3056044fb92a512a58</string>
+</dict>
+</plist>

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "568871054473",
+    "project_id": "taurgo-inventory",
+    "storage_bucket": "taurgo-inventory.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:568871054473:android:6a1486bc0ac223bf512a58",
+        "android_client_info": {
+          "package_name": "com.taurgo360.taurgoinventory"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCsJUluWZbo8rCE3OyPBEXezUSk3OSR3BM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
