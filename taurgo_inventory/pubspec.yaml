@@ -69,6 +69,8 @@ dependencies:
 #  shared_preferences: ^2.3.1
 #  flutter_paypal_checkout: ^1.0.1
   share_plus: ^10.0.0
+  flutter_riverpod: ^2.5.1
+  riverpod_annotation: ^2.3.5
 
 
 

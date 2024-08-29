@@ -5,6 +5,7 @@ import 'package:taurgo_inventory/pages/landing_screen.dart';
 import '../constants/AppColors.dart';
 
 class PropertyDetailsViewPage extends StatefulWidget {
+  final String? status;
   final String? lineOneAddress;
   final String? lineTwoAddress;
   final String? city;
@@ -28,7 +29,8 @@ class PropertyDetailsViewPage extends StatefulWidget {
   final String? referenceForKey;
   final String? internalNotes;
   const PropertyDetailsViewPage(
-      {super.key, this.lineOneAddress, this.lineTwoAddress, this.city, this.state, this.country, this.postalCode, this.reference, this.client, this.type, this.furnishing, this.noOfBeds, this.noOfBaths, this.garage, this.parking, this.notes, this.selectedType, this.date, this.time, this.keyLocation, this.referenceForKey, this.internalNotes,});
+      {super.key, this.status,this.lineOneAddress, this.lineTwoAddress, this.city,
+        this.state, this.country, this.postalCode, this.reference, this.client, this.type, this.furnishing, this.noOfBeds, this.noOfBaths, this.garage, this.parking, this.notes, this.selectedType, this.date, this.time, this.keyLocation, this.referenceForKey, this.internalNotes,});
 
   @override
   State<PropertyDetailsViewPage> createState() =>
@@ -148,7 +150,7 @@ class _PropertyDetailsViewPageState extends State<PropertyDetailsViewPage> {
                               width: 10,
                             ),
                             Text(
-                              "Active",
+                              widget.status ?? "N/A",
                               style: TextStyle(
                                 fontSize: 12.0,
                                 fontWeight: FontWeight.w700,
@@ -169,7 +171,7 @@ class _PropertyDetailsViewPageState extends State<PropertyDetailsViewPage> {
                     ),
                     ElevatedButton(
                       onPressed: () {
-                        Navigator.pushReplacement(
+                        Navigator.push(
                           context,
                           MaterialPageRoute(
                               builder: (context) =>

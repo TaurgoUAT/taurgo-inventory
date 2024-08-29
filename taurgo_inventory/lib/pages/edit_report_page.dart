@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:taurgo_inventory/pages/property_details_view_page.dart';
 import 'package:taurgo_inventory/pages/reportPages/ExteriorFront.dart';
 import 'package:taurgo_inventory/pages/reportPages/bathroom.dart';
 import 'package:taurgo_inventory/pages/reportPages/bedroom.dart';
@@ -111,10 +112,12 @@ class _EditReportPageState extends State<EditReportPage> {
         backgroundColor: bWhite,
         leading: GestureDetector(
           onTap: () {
-            Navigator.pushReplacement(
+            Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => LandingScreen()), // Replace HomePage with your home page widget
+                  builder: (context) => PropertyDetailsViewPage()), // Replace HomePage with
+              // your
+              // home page widget
             );
           },
           child: Icon(

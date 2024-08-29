@@ -158,27 +158,26 @@ class _LandingScreenState extends State<LandingScreen> {
         ),
         centerTitle: true,
         backgroundColor: bWhite,
-        leading: GestureDetector(
-          onTap: () {
-            // Navigator.pushReplacement(
-            //   context,
-            //   MaterialPageRoute(
-            //       builder: (context) =>
-            //           Homepage()), // Replace HomePage with your home page widget
-            // );
-          },
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Image.asset(
-              'assets/logo/Taurgo Logo.png', // Path to your company icon
-            ),
+        leading: IconButton(
+          icon: Icon(
+            Icons.checklist_rtl_rounded,
+            color: kPrimaryColor,
           ),
+          onPressed: () {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                  builder: (context) =>
+                      LandingScreen()), // Replace HomePage with your home page
+              // widget
+            );
+          },
         ),
         actions: [
           IconButton(
             icon: Icon(
-              Icons.help_outline,
-              color: kPrimaryColor,
+              Icons.logout_outlined,
+              color: Colors.red,
             ),
             onPressed: () {
               // Navigator.pushReplacement(
@@ -409,6 +408,7 @@ class _LandingScreenState extends State<LandingScreen> {
             context,
             MaterialPageRoute(
               builder: (context) => PropertyDetailsViewPage(
+                status: "Active",
                 lineOneAddress: addressLineOne,
                 lineTwoAddress: addressLineTwo,
                 city: city,
