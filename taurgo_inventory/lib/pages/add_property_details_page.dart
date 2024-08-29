@@ -72,12 +72,19 @@ class _AddPropertyDetailsPageState extends State<AddPropertyDetailsPage> {
     'Multi-Unit Building',
     'Mobile Home',
     'Other',
-
-
-
-
-
   ];
+
+  bool _validateInputs() {
+    if (addressLineOneController.text.isEmpty ||
+        cityController.text.isEmpty ||
+        stateController.text.isEmpty ||
+        countryController.text.isEmpty ||
+        postCodeController.text.isEmpty) {
+      return false;
+    }
+    return true;
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -109,27 +116,105 @@ class _AddPropertyDetailsPageState extends State<AddPropertyDetailsPage> {
             ),
           ),
         ),
-        actions: [
-          GestureDetector(
-            onTap: (){
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => AddPropertyDetailsPageSecond()),
-              );
-            },
-            child: Container(
-              margin: EdgeInsets.all(16),
-              child: Text(
-                'Next', // Replace with the actual location
-                style: TextStyle(
-                  color: kPrimaryColor,
-                  fontSize: 14, // Adjust the font size
-                  fontFamily: "Inter",
+          actions: [
+            GestureDetector(
+              onTap: (){
+                if (_validateInputs()) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => AddPropertyDetailsPageSecond(
+                      lineOneAddress: addressLineOneController.text,
+                      lineTwoAddress: addressLineTwoController.text,
+                      city: cityController.text,
+                      state: stateController.text,
+                      country: countryController.text,
+                      postalCode: postCodeController.text,
+                      reference: referenceController.text,
+                      client: clientController.text,
+                      type: selectedType.toString(),
+                      furnishing: selectedFurnishing.toString(),
+                      noOfBeds: selectedBedNumber.toString(),
+                      noOfBaths: selectedBathsNumber.toString(),
+                      garage: garageSelected,
+                      parking: parkingSelected,
+                      notes: notesController.text,
+                    )),
+                  );
+                } else {
+
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        elevation: 10,
+                        backgroundColor: Colors.white,
+                        title: Row(
+                          children: [
+                            Icon(Icons.info_outline, color: kPrimaryColor),
+                            SizedBox(width: 10),
+                            Text(
+                              'Missing Information',
+                              style: TextStyle(
+                                color: kPrimaryColor,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                        content: Text(
+                          'Please fill in all mandatory fields before proceeding.',
+                          style: TextStyle(
+                            color: Colors.grey[800],
+                            fontSize: 14,
+                            fontWeight: FontWeight.w400,
+                            height: 1.5,
+                          ),
+                        ),
+                        actions: [
+
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pop(context); // Close the dialog
+
+                            },
+                            style: TextButton.styleFrom(
+                              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                              backgroundColor: kPrimaryColor,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                            child: Text(
+                              'OK',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                }
+              },
+              child: Container(
+                margin: EdgeInsets.all(16),
+                child: Text(
+                  'Next', // Replace with the actual location
+                  style: TextStyle(
+                    color: kPrimaryColor,
+                    fontSize: 14, // Adjust the font size
+                    fontFamily: "Inter",
+                  ),
                 ),
               ),
-            ),
-          )
-        ],
+            )
+          ]
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -172,6 +257,18 @@ class _AddPropertyDetailsPageState extends State<AddPropertyDetailsPage> {
               ),
               SizedBox(height: 12.0),
 
+              // Padding(
+              //   padding: EdgeInsets.all(0),
+              //   child: Text(
+              //     "* Required Filds",
+              //     style: TextStyle(
+              //       fontSize: 11.0,
+              //       fontWeight: FontWeight.w700,
+              //       color: kPrimaryColor,
+              //     ),
+              //   ),
+              // ),
+
               //Line One
               Padding(
                 padding: EdgeInsets.all(0.0),
@@ -179,7 +276,7 @@ class _AddPropertyDetailsPageState extends State<AddPropertyDetailsPage> {
                   cursorColor: kPrimaryColor,
                   controller: addressLineOneController,
                   decoration: InputDecoration(
-                    labelText: "Line 1",
+                    labelText: "Line 1 *",
                     labelStyle: TextStyle(
                       fontSize: 14.0,
                       fontWeight: FontWeight.w700,
@@ -227,7 +324,7 @@ class _AddPropertyDetailsPageState extends State<AddPropertyDetailsPage> {
                   cursorColor: kPrimaryColor,
                   controller: cityController,
                   decoration: InputDecoration(
-                    labelText: "City",
+                    labelText: "City *",
                     labelStyle: TextStyle(
                       fontSize: 14.0,
                       fontWeight: FontWeight.w700,
@@ -251,7 +348,7 @@ class _AddPropertyDetailsPageState extends State<AddPropertyDetailsPage> {
                   cursorColor: kPrimaryColor,
                   controller: stateController,
                   decoration: InputDecoration(
-                    labelText: "State",
+                    labelText: "State *",
                     labelStyle: TextStyle(
                       fontSize: 14.0,
                       fontWeight: FontWeight.w700,
@@ -274,7 +371,7 @@ class _AddPropertyDetailsPageState extends State<AddPropertyDetailsPage> {
                   cursorColor: kPrimaryColor,
                   controller: countryController,
                   decoration: InputDecoration(
-                    labelText: "Country",
+                    labelText: "Country *",
                     labelStyle: TextStyle(
                       fontSize: 14.0,
                       fontWeight: FontWeight.w700,
@@ -298,7 +395,7 @@ class _AddPropertyDetailsPageState extends State<AddPropertyDetailsPage> {
                   cursorColor: kPrimaryColor,
                   controller: postCodeController,
                   decoration: InputDecoration(
-                    labelText: "Postal Code",
+                    labelText: "Postal Code *",
                     labelStyle: TextStyle(
                       fontSize: 14.0,
                       fontWeight: FontWeight.w700,
@@ -386,7 +483,7 @@ class _AddPropertyDetailsPageState extends State<AddPropertyDetailsPage> {
               Padding(
                 padding: EdgeInsets.all(0),
                 child: Text(
-                  "Type",
+                  "Type *",
                   style: TextStyle(
                     fontSize: 14.0,
                     fontWeight: FontWeight.w700,
@@ -546,7 +643,7 @@ class _AddPropertyDetailsPageState extends State<AddPropertyDetailsPage> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
                     Text(
-                      "Baths",
+                      "Beds",
                       style: TextStyle(
                         fontSize: 14.0,
                         fontWeight: FontWeight.w700,

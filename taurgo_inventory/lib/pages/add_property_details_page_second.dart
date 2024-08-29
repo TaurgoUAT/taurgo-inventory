@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ffi';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:taurgo_inventory/pages/deatails_confirmation_page.dart';
@@ -7,7 +8,24 @@ import 'package:intl/intl.dart';
 
 import 'landing_screen.dart';
 class AddPropertyDetailsPageSecond extends StatefulWidget {
-  const AddPropertyDetailsPageSecond({super.key});
+
+  final String? lineOneAddress;
+  final String? lineTwoAddress;
+  final String? city;
+  final String? state;
+  final String? country;
+  final String? postalCode;
+  final String? reference;
+  final String? client;
+  final String? type;
+  final String? furnishing;
+  final String? noOfBeds;
+  final String? noOfBaths;
+  final bool? garage;
+  final bool? parking;
+  final String? notes;
+
+  const AddPropertyDetailsPageSecond({super.key, this.lineOneAddress, this.lineTwoAddress, this.city, this.state, this.country, this.postalCode, this.reference, this.client, this.type, this.furnishing, this.noOfBeds, this.noOfBaths, this.garage, this.parking, this.notes, });
 
   @override
   State<AddPropertyDetailsPageSecond> createState() => _AddPropertyDetailsPageSecondState();
@@ -16,7 +34,12 @@ class AddPropertyDetailsPageSecond extends StatefulWidget {
 class _AddPropertyDetailsPageSecondState extends State<AddPropertyDetailsPageSecond> {
   int selectedBedNumber = 1;
 
-  DateTime? _currentdate;
+  DateTime? _currentDate;
+  DateTime? _currentTime;
+
+  late String selectedTime;
+
+  late String selectedDate;
   String? selectedType;
   String? keysIwth;
 
@@ -45,20 +68,11 @@ class _AddPropertyDetailsPageSecondState extends State<AddPropertyDetailsPageSec
   bool garageSelected = true;
   bool locationEnabled = false;
 
-  var addressLineOneController = TextEditingController();
-  var addressLineTwoController = TextEditingController();
-  var cityController = TextEditingController();
-  var countryController = TextEditingController();
-  var postCodeController = TextEditingController();
-
-  // var typeController = TextEditingController();
-  // var addressLineTwoController = TextEditingController();
-  // var cityController = TextEditingController();
-  // var countryController = TextEditingController();
-  // var postCodeController = TextEditingController();
+  var referenceController = TextEditingController();
+  var internalNotesController = TextEditingController();
 
   void _showCalendar(BuildContext context) {
-    DateTime tempPickedDate = _currentdate ?? DateTime.now();
+    DateTime tempPickedDate = _currentDate ?? DateTime.now();
 
     showModalBottomSheet(
       context: context,
@@ -74,13 +88,16 @@ class _AddPropertyDetailsPageSecondState extends State<AddPropertyDetailsPageSec
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      DateFormat('MMM, dd yyyy').format(tempPickedDate),
+                      DateFormat('dd:MM:yyyy').format(tempPickedDate), // Updated date format
                       style: TextStyle(color: Colors.blue, fontSize: 17),
                     ),
                     TextButton(
                       onPressed: () {
                         setState(() {
-                          _currentdate = tempPickedDate;
+                          _currentDate = tempPickedDate;
+                          selectedDate = DateFormat('dd:MM:yyyy').format
+                            (tempPickedDate);
+                          print(_currentDate.toString());
                         });
                         Navigator.pop(context);
                       },
@@ -95,17 +112,15 @@ class _AddPropertyDetailsPageSecondState extends State<AddPropertyDetailsPageSec
               Expanded(
                 child: CupertinoDatePicker(
                   initialDateTime: tempPickedDate,
-                  onDateTimeChanged: (DateTime newdate) {
+                  onDateTimeChanged: (DateTime newDate) {
                     setState(() {
-                      tempPickedDate = newdate;
+                      tempPickedDate = newDate;
                     });
                   },
-                  use24hFormat: true, // This is not necessary for date-only mode, but kept here for completeness
                   maximumDate: DateTime(2050, 12, 30),
                   minimumYear: 2024,
                   maximumYear: 2050,
-                  minuteInterval: 1, // This is not used in date-only mode but kept here for completeness
-                  mode: CupertinoDatePickerMode.date, // Change mode to date-only
+                  mode: CupertinoDatePickerMode.date,
                 ),
               ),
             ],
@@ -116,7 +131,8 @@ class _AddPropertyDetailsPageSecondState extends State<AddPropertyDetailsPageSec
   }
 
   void _showTimePicker(BuildContext context) {
-    DateTime tempPickedDate = _currentdate ?? DateTime.now();
+    DateTime tempPickedTime = _currentTime ?? DateTime.now();
+
 
     showModalBottomSheet(
       context: context,
@@ -132,13 +148,21 @@ class _AddPropertyDetailsPageSecondState extends State<AddPropertyDetailsPageSec
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      DateFormat('MMM, dd yyyy').format(tempPickedDate),
+                      DateFormat('HH:mm').format(tempPickedTime), // Displaying time in HH:mm format
                       style: TextStyle(color: Colors.blue, fontSize: 17),
                     ),
                     TextButton(
                       onPressed: () {
                         setState(() {
-                          _currentdate = tempPickedDate;
+                          _currentTime = tempPickedTime;
+                          selectedTime = DateFormat('HH:mm').format
+                            (tempPickedTime);
+                          print(selectedTime);
+
+                          print(DateFormat('HH:mm').format(tempPickedTime));
+                          // print(DateFormat('HH:mm').format(_currentTime));
+                          print(tempPickedTime.toString());
+                          print(_currentTime.toString());
                         });
                         Navigator.pop(context);
                       },
@@ -152,13 +176,13 @@ class _AddPropertyDetailsPageSecondState extends State<AddPropertyDetailsPageSec
               ),
               Expanded(
                 child: CupertinoDatePicker(
-                  initialDateTime: tempPickedDate,
-                  onDateTimeChanged: (DateTime newdate) {
+                  initialDateTime: tempPickedTime,
+                  onDateTimeChanged: (DateTime newTime) {
                     setState(() {
-                      tempPickedDate = newdate;
+                      tempPickedTime = newTime;
                     });
                   },
-                  mode: CupertinoDatePickerMode.time, // Set mode to time-only
+                  mode: CupertinoDatePickerMode.time, // Time-only mode
                 ),
               ),
             ],
@@ -167,6 +191,7 @@ class _AddPropertyDetailsPageSecondState extends State<AddPropertyDetailsPageSec
       },
     );
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -201,7 +226,29 @@ class _AddPropertyDetailsPageSecondState extends State<AddPropertyDetailsPageSec
             onTap: (){
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => DetailsConfirmationPage()),
+                MaterialPageRoute(builder: (context) => DetailsConfirmationPage(
+                  lineOneAddress: widget.lineOneAddress,
+                  lineTwoAddress: widget.lineTwoAddress,
+                  city: widget.city,
+                  state: widget.state,
+                  country: widget.country,
+                  postalCode: widget.postalCode,
+                  reference: widget.reference,
+                  client: widget.client,
+                  type: widget.type,
+                  furnishing: widget.furnishing,
+                  noOfBeds: widget.noOfBeds,
+                  noOfBaths: widget.noOfBaths,
+                  garage: garageSelected,
+                  parking: parkingSelected,
+                  notes: widget.notes,
+                  selectedType: selectedType.toString(),
+                  date: selectedDate,
+                  time: selectedTime,
+                  keyLocation: keysIwth.toString(),
+                  referenceForKey: referenceController.text,
+                  internalNotes: internalNotesController.text,
+                )),
               );
             },
             child: Container(
@@ -324,167 +371,7 @@ class _AddPropertyDetailsPageSecondState extends State<AddPropertyDetailsPageSec
                   },
                 ),
               ),
-              // SizedBox(height: 12.0),
 
-              // //Title Text
-              // Padding(
-              //   padding: EdgeInsets.all(0),
-              //   child: Text(
-              //     "Title",
-              //     style: TextStyle(
-              //       fontSize: 14.0,
-              //       fontWeight: FontWeight.w700,
-              //       color: kPrimaryTextColourTwo,
-              //     ),
-              //   ),
-              // ),
-              //
-              // SizedBox(height: 12.0),
-              //
-              // //Title
-              // Padding(
-              //   padding: EdgeInsets.all(0),
-              //   child:  DropdownButtonFormField<String>(
-              //     dropdownColor: bWhite,
-              //     value: selectedType,
-              //     hint: Text('Select a package type'),
-              //     decoration: InputDecoration(
-              //       border: OutlineInputBorder(
-              //         borderRadius: BorderRadius.circular(10.0),
-              //         borderSide: BorderSide(
-              //           color: kPrimaryColor,
-              //           width: 1.5,
-              //         ),
-              //       ),
-              //       enabledBorder: OutlineInputBorder(
-              //         borderRadius: BorderRadius.circular(10.0),
-              //         borderSide: BorderSide(
-              //           color: kPrimaryColor,
-              //           width: 1.5,
-              //         ),
-              //       ),
-              //       focusedBorder: OutlineInputBorder(
-              //         borderRadius: BorderRadius.circular(10.0),
-              //         borderSide: BorderSide(
-              //           color: kPrimaryColor,
-              //           width: 2.0,
-              //         ),
-              //       ),
-              //       contentPadding: EdgeInsets.all(5
-              //       ),
-              //     ),
-              //     icon: Icon(
-              //       Icons.arrow_drop_down,
-              //       color: kPrimaryColor,
-              //     ),
-              //     items: types.map((String type) {
-              //       return DropdownMenuItem<String>(
-              //         value: type,
-              //         child: Padding(
-              //           padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              //           child: Align(
-              //             alignment: Alignment.centerLeft,
-              //             child: Text(
-              //               type,
-              //               style: TextStyle(
-              //                 color: kPrimaryTextColour,
-              //                 fontSize: 14,
-              //                 fontWeight: FontWeight.w500,
-              //                 fontFamily: "Inter",
-              //               ),
-              //             ),
-              //           ),
-              //         ),
-              //       );
-              //     }).toList(),
-              //     onChanged: (String? newValue) {
-              //       setState(() {
-              //         selectedType = newValue;
-              //         selectedPackage = null; // Reset the selected package
-              //       });
-              //     },
-              //   ),
-              // ),
-
-
-              //Template Texrt
-              // Padding(
-              //   padding: EdgeInsets.all(0),
-              //   child: Text(
-              //     "Template",
-              //     style: TextStyle(
-              //       fontSize: 14.0,
-              //       fontWeight: FontWeight.w700,
-              //       color: kPrimaryTextColourTwo,
-              //     ),
-              //   ),
-              // ),
-              //
-              // SizedBox(height: 6.0),
-              // //Template
-              // Padding(
-              //   padding: EdgeInsets.all(0),
-              //   child:  DropdownButtonFormField<String>(
-              //     dropdownColor: bWhite,
-              //     value: selectedType,
-              //     hint: Text('Select a package type'),
-              //     decoration: InputDecoration(
-              //       border: OutlineInputBorder(
-              //         borderRadius: BorderRadius.circular(10.0),
-              //         borderSide: BorderSide(
-              //           color: kPrimaryColor,
-              //           width: 1.5,
-              //         ),
-              //       ),
-              //       enabledBorder: OutlineInputBorder(
-              //         borderRadius: BorderRadius.circular(10.0),
-              //         borderSide: BorderSide(
-              //           color: kPrimaryColor,
-              //           width: 1.5,
-              //         ),
-              //       ),
-              //       focusedBorder: OutlineInputBorder(
-              //         borderRadius: BorderRadius.circular(10.0),
-              //         borderSide: BorderSide(
-              //           color: kPrimaryColor,
-              //           width: 2.0,
-              //         ),
-              //       ),
-              //       contentPadding: EdgeInsets.all(5
-              //       ),
-              //     ),
-              //     icon: Icon(
-              //       Icons.arrow_drop_down,
-              //       color: kPrimaryColor,
-              //     ),
-              //     items: types.map((String type) {
-              //       return DropdownMenuItem<String>(
-              //         value: type,
-              //         child: Padding(
-              //           padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              //           child: Align(
-              //             alignment: Alignment.centerLeft,
-              //             child: Text(
-              //               type,
-              //               style: TextStyle(
-              //                 color: kPrimaryTextColour,
-              //                 fontSize: 14,
-              //                 fontWeight: FontWeight.w500,
-              //                 fontFamily: "Inter",
-              //               ),
-              //             ),
-              //           ),
-              //         ),
-              //       );
-              //     }).toList(),
-              //     onChanged: (String? newValue) {
-              //       setState(() {
-              //         selectedType = newValue;
-              //         selectedPackage = null; // Reset the selected package
-              //       });
-              //     },
-              //   ),
-              // ),
               SizedBox(height: 12.0),
 
 
@@ -628,7 +515,7 @@ class _AddPropertyDetailsPageSecondState extends State<AddPropertyDetailsPageSec
                 padding: EdgeInsets.all(0.0),
                 child: TextField(
                   cursorColor: kPrimaryColor,
-                  controller: addressLineOneController,
+                  controller: referenceController,
                   decoration: InputDecoration(
                     labelText: "Reference",
                     labelStyle: TextStyle(
@@ -652,7 +539,7 @@ class _AddPropertyDetailsPageSecondState extends State<AddPropertyDetailsPageSec
                 padding: EdgeInsets.all(0.0),
                 child: TextField(
                   cursorColor: kPrimaryColor,
-                  controller: addressLineOneController,
+                  controller: internalNotesController,
                   decoration: InputDecoration(
                     labelText: "Internal Notes",
                     labelStyle: TextStyle(

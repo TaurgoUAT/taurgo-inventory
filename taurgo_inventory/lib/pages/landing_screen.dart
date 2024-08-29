@@ -48,6 +48,10 @@ class _LandingScreenState extends State<LandingScreen> {
           setState(() {
             isLoading = false;
           });
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+                content: Text("Failed to load properties. Please try again.")),
+          );
         }
       }
     } catch (e) {
@@ -313,14 +317,29 @@ class _LandingScreenState extends State<LandingScreen> {
                     int reversedIndex = filteredProperties.length - 1 - index;
                     final property = filteredProperties[reversedIndex];
                     return propertyContainer(
-                        property['status'] ?? '',
-                        property['addressLineOne'] ?? '',
-                        property['addressLineTwo'] ?? '',
-                        property['city'] ?? '',
-                        property['postalCode'] ?? '',
-                        property['country'] ?? '',
-                        property['noOfBeds'] ?? '',
-                        property['noOfBaths'] ?? '');
+                      property['status'] ?? '',
+                      property['addressLineOne'] ?? '',
+                      property['addressLineTwo'] ?? '',
+                      property['city'] ?? '',
+                      property['state'] ?? '',
+                      property['country'] ?? '',
+                      property['postalCode'] ?? '',
+                      property['ref'] ?? '',
+                      property['client'] ?? '',
+                      property['type'] ?? '',
+                      property['furnishing'] ?? '',
+                      property['noOfBeds'] ?? '',
+                      property['noOfBaths'] ?? '',
+                      property['garage'] ?? '',
+                      property['parking'] ?? '',
+                      property['notes'] ?? '',
+                      property['inspectionType'] ?? '',
+                      property['date'] ?? '',
+                      property['time'] ?? '',
+                      property['keyLocation'] ?? '',
+                      property['referneceKey'] ?? '',
+                      property['internalNotes'] ?? '',
+                    );
                   },
                 ),
               ),
@@ -364,20 +383,50 @@ class _LandingScreenState extends State<LandingScreen> {
     String addressLineOne,
     String addressLineTwo,
     String city,
-    String postalCode,
+    String state,
     String country,
+    String postalCode,
+    String ref,
+    String client,
+    String type,
+    String furnishing,
     String noOfBeds,
     String noOfBaths,
+    String garage,
+    String parking,
+    String notes,
+    String inspectionType,
+    String date,
+    String time,
+    String keyLocation,
+    String referneceKey,
+    String internalNotes,
 // Add status as a parameter
   ) {
     return GestureDetector(
       onTap: () {
         Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-              builder: (context) =>
-                  PropertyDetailsViewPage(status: status, addressLineOne: addressLineOne, addressLineTwo: addressLineTwo, city: city, country: country, postalCode: postalCode, noOfBeds: noOfBeds, noOfBaths: noOfBaths, keyLocation: "keyLocation", duration: "duration", message: "message")), // Replace HomePage with your home page widget
-        );
+            context,
+            MaterialPageRoute(
+              builder: (context) => PropertyDetailsViewPage(
+                lineOneAddress: addressLineOne,
+                lineTwoAddress: addressLineTwo,
+                city: city,
+                state: state,
+                country: country,
+                postalCode: postalCode,
+                reference: ref,
+                client: client,
+                type: type,
+                noOfBeds: noOfBeds,
+                noOfBaths: noOfBaths,
+                selectedType: inspectionType,
+                date: date,
+                time: time,
+                keyLocation: keyLocation,
+                internalNotes: internalNotes,
+              ),
+            ));
       },
       child: Container(
         height: 305,
@@ -459,7 +508,6 @@ class _LandingScreenState extends State<LandingScreen> {
                       color: kPrimaryTextColourTwo,
                     ),
                   ),
-
                   Text(
                     country,
                     style: TextStyle(
@@ -467,7 +515,6 @@ class _LandingScreenState extends State<LandingScreen> {
                       color: kPrimaryTextColourTwo,
                     ),
                   ),
-
                   Text(
                     postalCode,
                     style: TextStyle(

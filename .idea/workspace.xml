@@ -10,31 +10,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9cfeb956-5354-4366-ab84-34804ef25cb7" name="Changes" comment="Reporting Pages Added">
-      <change afterPath="$PROJECT_DIR$/taurgo_inventory/android/app/google-services.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/GoogleService-Info.plist" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/authentication/Widgets/SignInBoard.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/authentication/Widgets/SignUpBoard.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/authentication/Widgets/SignUpButton.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/authentication/Widgets/signInButton.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/authentication/controller/authController.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/authentication/signInPage.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/authentication/signUpPage.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/libraries/Dart_Packages.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/Dart_Packages.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/libraries/Flutter_Plugins.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/Flutter_Plugins.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/android/app/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/android/app/build.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/android/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/android/build.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/ios/Podfile" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/ios/Podfile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/ios/Podfile.lock" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/ios/Podfile.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/ios/Runner.xcodeproj/project.pbxproj" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/ios/Runner.xcodeproj/project.pbxproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/main.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/main.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/linux/flutter/generated_plugin_registrant.cc" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/linux/flutter/generated_plugin_registrant.cc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/linux/flutter/generated_plugins.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/linux/flutter/generated_plugins.cmake" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/macos/Flutter/GeneratedPluginRegistrant.swift" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/macos/Flutter/GeneratedPluginRegistrant.swift" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/pubspec.lock" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/pubspec.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/pubspec.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/pubspec.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/windows/flutter/generated_plugin_registrant.cc" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/windows/flutter/generated_plugin_registrant.cc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/windows/flutter/generated_plugins.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/windows/flutter/generated_plugins.cmake" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/constants/UrlConstants.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/constants/UrlConstants.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/add_property_details_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/add_property_details_page.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/add_property_details_page_second.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/add_property_details_page_second.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/deatails_confirmation_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/deatails_confirmation_page.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/landing_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/landing_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/property_details_view_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/property_details_view_page.dart" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -128,7 +112,14 @@
       <option name="project" value="LOCAL" />
       <updated>1724840483067</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="Reporting Pages Added">
+      <created>1724862014356</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1724862014356</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -142,24 +133,39 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="Dart">
-          <url>file://$PROJECT_DIR$/taurgo_inventory/lib/pages/add_property_details_page.dart</url>
-          <line>83</line>
-          <option name="timeStamp" value="2" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="Dart">
           <url>file://$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/keys.dart</url>
           <line>73</line>
           <option name="timeStamp" value="7" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="Dart">
-          <url>file://$PROJECT_DIR$/taurgo_inventory/lib/pages/add_property_details_page_second.dart</url>
-          <line>546</line>
-          <option name="timeStamp" value="8" />
+          <url>file://$PROJECT_DIR$/taurgo_inventory/lib/pages/deatails_confirmation_page.dart</url>
+          <line>667</line>
+          <option name="timeStamp" value="9" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="Dart">
           <url>file://$PROJECT_DIR$/taurgo_inventory/lib/pages/deatails_confirmation_page.dart</url>
-          <line>590</line>
-          <option name="timeStamp" value="9" />
+          <line>65</line>
+          <option name="timeStamp" value="10" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="Dart">
+          <url>file://$PROJECT_DIR$/taurgo_inventory/lib/pages/deatails_confirmation_page.dart</url>
+          <line>68</line>
+          <option name="timeStamp" value="11" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="Dart">
+          <url>file://$PROJECT_DIR$/taurgo_inventory/lib/pages/deatails_confirmation_page.dart</url>
+          <line>100</line>
+          <option name="timeStamp" value="12" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="Dart">
+          <url>file://$PROJECT_DIR$/taurgo_inventory/lib/pages/deatails_confirmation_page.dart</url>
+          <line>104</line>
+          <option name="timeStamp" value="13" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="Dart">
+          <url>file://$PROJECT_DIR$/taurgo_inventory/lib/pages/deatails_confirmation_page.dart</url>
+          <line>102</line>
+          <option name="timeStamp" value="14" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

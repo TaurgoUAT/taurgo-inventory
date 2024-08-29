@@ -2,20 +2,178 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:taurgo_inventory/constants/UrlConstants.dart';
 import 'package:taurgo_inventory/pages/conditions/condition_details.dart';
 import 'package:taurgo_inventory/pages/edit_report_page.dart';
 import 'package:taurgo_inventory/pages/landing_screen.dart';
 import '../../constants/AppColors.dart';
-
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class DetailsConfirmationPage extends StatefulWidget {
-  const DetailsConfirmationPage({super.key});
+
+  final String? lineOneAddress;
+  final String? lineTwoAddress;
+  final String? city;
+  final String? state;
+  final String? country;
+  final String? postalCode;
+  final String? reference;
+  final String? client;
+  final String? type;
+  final String? furnishing;
+  final String? noOfBeds;
+  final String? noOfBaths;
+  final bool? garage;
+  final bool? parking;
+  final String? notes;
+
+  final String? selectedType;
+  final String? date;
+  final String? time;
+  final String? keyLocation;
+  final String? referenceForKey;
+  final String? internalNotes;
+
+  const DetailsConfirmationPage({super.key, this.lineOneAddress, this.lineTwoAddress, this.city, this.state, this.country, this.postalCode, this.reference, this.client, this.type, this.furnishing, this.noOfBeds, this.noOfBaths, this.garage, this.parking, this.notes, this.selectedType, this.date, this.time, this.keyLocation, this.referenceForKey, this.internalNotes});
 
   @override
   State<DetailsConfirmationPage> createState() => _DetailsConfirmationPageState();
 }
 
 class _DetailsConfirmationPageState extends State<DetailsConfirmationPage> {
+  Future<void> _saveDetails() async {
+
+    // Show loading indicator
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Center(
+          child: SizedBox(
+            width: 60.0,
+            height: 60.0,
+            child: CircularProgressIndicator(
+              color: kPrimaryColor,
+              strokeWidth: 3.0,
+              strokeCap: StrokeCap.square,
+            ),
+          ),
+        );
+      },
+    );
+
+    try {
+      var uri = Uri.parse('$baseURL/property/addProps');
+      // var uri = Uri.parse('http://192.168.1.18:9090/partner/add-partner');
+
+      final request = http.MultipartRequest('POST', uri)
+
+      //Address
+        ..fields['addressLineOne'] = widget.lineOneAddress ?? 'N/A'
+        ..fields['addressLineTwo'] = widget.lineTwoAddress ?? 'N/A'
+        ..fields['city'] = widget.city ?? 'N/A'
+        ..fields['state'] = widget.state ?? 'N/A'
+        ..fields['country'] = widget.country ?? 'N/A'
+        ..fields['postalCode'] = widget.postalCode ?? 'N/A'
+
+
+      //Details
+        ..fields['ref'] = widget.reference ?? 'N/A'
+        ..fields['client'] = widget.client ?? 'N/A'
+        ..fields['type'] = widget.type ?? 'N/A'
+        ..fields['furnishing'] = widget.furnishing ?? 'N/A'
+        ..fields['noOfBeds'] = widget.noOfBeds ?? 'N/A'
+        ..fields['noOfBaths'] = widget.noOfBaths ?? 'N/A'
+        ..fields['garage'] = widget.garage.toString() ?? 'N/A'
+        ..fields['parking'] = widget.parking.toString() ?? 'N/A'
+        ..fields['notes'] = widget.parking.toString() ?? 'N/A'
+
+        ..fields['inspectionType'] = widget.selectedType ?? 'N/A'
+        ..fields['date'] = widget.date ?? 'N/A'
+        ..fields['time'] = widget.time ?? 'N/A'
+        ..fields['keyLocation'] = widget.keyLocation ?? 'N/A'
+        ..fields['referneceKey'] = widget.referenceForKey ?? 'N/A'
+        ..fields['internalNotes'] = widget.internalNotes ?? 'N/A';
+
+      // ..fields['status'] = false as String
+      // ..fields['referenceCode'] = amount;
+
+      var response = await request.send();
+
+      print('Response status: ${response.statusCode}');
+
+      if (response.statusCode == 200) {
+        print('Property Updated, Please start uploading your tours');
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: kPrimaryColor,
+            content: Text(
+              'Request Succesfull, you can continue to taking pictures',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                fontFamily: "Inter",
+              ),
+            ),
+          ),
+        );
+
+
+
+        // Hide the loading indicator
+        Navigator.of(context).pop();
+
+        // Navigate to the confirmation page
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) =>LandingScreen(),
+            ),
+          );
+        });
+      } else {
+        print('Failed to Upload the Property Details ${response.statusCode}');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: Colors.redAccent,
+            content: Text(
+              'Failed to Upload the Property Details: ${response.statusCode}',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                fontFamily: "Inter",
+              ),
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      print('Network error: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: Colors.redAccent,
+          content: Text(
+            'Network error: $e',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+              fontFamily: "Inter",
+            ),
+          ),
+        ),
+      );
+    } finally {
+      // Ensure the dialog is dismissed
+      Navigator.of(context).pop();
+    }
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -76,91 +234,6 @@ class _DetailsConfirmationPageState extends State<DetailsConfirmationPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
 
-
-              // Padding(
-              //   padding: EdgeInsets.all(0),
-              //   child: Row(
-              //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              //     children: <Widget>[
-              //
-              //       Column(
-              //         crossAxisAlignment: CrossAxisAlignment.start,
-              //         children: [
-              //           Text(
-              //             "Inspection state",
-              //             style: TextStyle(
-              //               fontSize: 12.0,
-              //               fontWeight: FontWeight.w700,
-              //               color: kPrimaryTextColourTwo,
-              //             ),
-              //           ),
-              //           SizedBox(height: 3.0),
-              //           Row(
-              //             children: [
-              //               Container(
-              //                 width: 12,
-              //                 height: 12,
-              //                 decoration: BoxDecoration(
-              //                   shape: BoxShape.circle,
-              //                   color: kActiveButtonColour,
-              //                 ),
-              //                 padding: EdgeInsets.all(16.0),
-              //               ),
-              //
-              //               SizedBox(width: 10,),
-              //               Text(
-              //                 "Active",
-              //                 style: TextStyle(
-              //                   fontSize: 12.0,
-              //                   fontWeight: FontWeight.w700,
-              //                   color: kSecondaryTextColourTwo,
-              //                 ),
-              //               ),
-              //             ],
-              //           )
-              //         ],
-              //       ),
-              //
-              //       Padding(
-              //         padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              //         child: Container(
-              //           width: 2, // Thickness of the divider
-              //           height: 30, // Adjust the height as needed
-              //           color: Color(0xFFC2C2C2), // Divider color
-              //         ),
-              //       ),
-              //       ElevatedButton(
-              //         onPressed: () {
-              //           Navigator.pushReplacement(
-              //             context,
-              //             MaterialPageRoute(
-              //                 builder: (context) =>
-              //                     EditReportPage()), // Replace HomePage with your home
-              //             // page widget
-              //           );
-              //         },
-              //         child: Padding(
-              //           padding: const EdgeInsets.all(7.5),
-              //           child: Text('Edit Report', style: TextStyle(fontSize:
-              //           12)),
-              //         ),
-              //         style: ElevatedButton.styleFrom(
-              //           backgroundColor: kPrimaryColor,
-              //           foregroundColor: Colors.white,
-              //           shape: RoundedRectangleBorder(
-              //             borderRadius: BorderRadius.circular(50),
-              //           ),
-              //         ),
-              //       )
-              //     ],
-              //   ),
-              // ),
-              //
-              // Padding(
-              //   padding: const EdgeInsets.symmetric(horizontal: 0.0),
-              //   child: Divider(thickness: 1, color: Color(0xFFC2C2C2)),
-              // ),
-
               Padding(
                 padding: EdgeInsets.all(0),
                 child: Text(
@@ -195,7 +268,7 @@ class _DetailsConfirmationPageState extends State<DetailsConfirmationPage> {
                         ),
                         SizedBox(height: 3.0),
                         Text(
-                          "Temple Road",
+                          widget.lineOneAddress ?? "",
                           style: TextStyle(
                             fontSize: 12.0,
                             fontWeight: FontWeight.w700,
@@ -203,7 +276,7 @@ class _DetailsConfirmationPageState extends State<DetailsConfirmationPage> {
                           ),
                         ),
                         Text(
-                          "Kurumankandu",
+                          widget.lineTwoAddress ?? "",
                           style: TextStyle(
                             fontSize: 12.0,
                             fontWeight: FontWeight.w700,
@@ -215,7 +288,7 @@ class _DetailsConfirmationPageState extends State<DetailsConfirmationPage> {
                         Row(
                           children: [
                             Text(
-                              "Vavuniya",
+                              widget.city ?? "",
                               style: TextStyle(
                                 fontSize: 12.0,
                                 fontWeight: FontWeight.w700,
@@ -232,7 +305,7 @@ class _DetailsConfirmationPageState extends State<DetailsConfirmationPage> {
                             ),
                             SizedBox(width: 2,),
                             Text(
-                              "Northern",
+                              widget.state ?? "",
                               style: TextStyle(
                                 fontSize: 12.0,
                                 fontWeight: FontWeight.w700,
@@ -242,7 +315,7 @@ class _DetailsConfirmationPageState extends State<DetailsConfirmationPage> {
                           ],
                         ),
                         Text(
-                          "Sri Lanka",
+                          widget.country ?? "",
                           style: TextStyle(
                             fontSize: 12.0,
                             fontWeight: FontWeight.w700,
@@ -252,7 +325,7 @@ class _DetailsConfirmationPageState extends State<DetailsConfirmationPage> {
 
 
                         Text(
-                          "43000",
+                          widget.postalCode ?? "",
                           style: TextStyle(
                             fontSize: 12.0,
                             fontWeight: FontWeight.w700,
@@ -289,8 +362,7 @@ class _DetailsConfirmationPageState extends State<DetailsConfirmationPage> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
-
-                    Column(
+                    Expanded(child:  Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
@@ -303,7 +375,7 @@ class _DetailsConfirmationPageState extends State<DetailsConfirmationPage> {
                         ),
                         SizedBox(height: 3.0),
                         Text(
-                          "30 Aug 2024",
+                          widget.date ?? "N/A",
                           style: TextStyle(
                             fontSize: 12.0,
                             fontWeight: FontWeight.w700,
@@ -311,7 +383,7 @@ class _DetailsConfirmationPageState extends State<DetailsConfirmationPage> {
                           ),
                         ),
                       ],
-                    ),
+                    ),),
 
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -321,11 +393,11 @@ class _DetailsConfirmationPageState extends State<DetailsConfirmationPage> {
                         color: Color(0xFFC2C2C2), // Divider color
                       ),
                     ),
-                    Column(
+                    Expanded(child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "Inspection Type",
+                          "Inspection Time",
                           style: TextStyle(
                             fontSize: 14.0,
                             fontWeight: FontWeight.w700,
@@ -334,7 +406,7 @@ class _DetailsConfirmationPageState extends State<DetailsConfirmationPage> {
                         ),
                         SizedBox(height: 3.0),
                         Text(
-                          "Inventory & Check In",
+                          widget.time ?? "N/A",
                           style: TextStyle(
                             fontSize: 12.0,
                             fontWeight: FontWeight.w700,
@@ -342,7 +414,7 @@ class _DetailsConfirmationPageState extends State<DetailsConfirmationPage> {
                           ),
                         ),
                       ],
-                    ),
+                    ),)
                   ],
                 ),
               ),
@@ -358,41 +430,6 @@ class _DetailsConfirmationPageState extends State<DetailsConfirmationPage> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
-
-                    Expanded(
-                      child:  Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Inspection Date",
-                            style: TextStyle(
-                              fontSize: 14.0,
-                              fontWeight: FontWeight.w700,
-                              color: kPrimaryTextColourTwo,
-                            ),
-                          ),
-                          SizedBox(height: 3.0),
-                          Text(
-                            "30 Aug 2024",
-                            style: TextStyle(
-                              fontSize: 12.0,
-                              fontWeight: FontWeight.w700,
-                              color: kSecondaryTextColourTwo,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-
-
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      child: Container(
-                        width: 2, // Thickness of the divider
-                        height: 30, // Adjust the height as needed
-                        color: Color(0xFFC2C2C2), // Divider color
-                      ),
-                    ),
                     Expanded(child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -406,7 +443,7 @@ class _DetailsConfirmationPageState extends State<DetailsConfirmationPage> {
                         ),
                         SizedBox(height: 3.0),
                         Text(
-                          "Inventory & Check In",
+                          widget.selectedType ?? "N/A",
                           style: TextStyle(
                             fontSize: 12.0,
                             fontWeight: FontWeight.w700,
@@ -414,7 +451,48 @@ class _DetailsConfirmationPageState extends State<DetailsConfirmationPage> {
                           ),
                         ),
                       ],
-                    ),)
+                    ),),
+
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: Container(
+                        width: 2, // Thickness of the divider
+                        height: 30, // Adjust the height as needed
+                        color: Color(0xFFC2C2C2), // Divider color
+                      ),
+                    ),
+
+                    Expanded(child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "General",
+                          style: TextStyle(
+                            fontSize: 14.0,
+                            fontWeight: FontWeight.w700,
+                            color: kPrimaryTextColourTwo,
+                          ),
+                        ),
+                        SizedBox(height: 3.0),
+                        Row(
+                          children: <Widget>[
+                            Icon(Icons.bed, size: 20.0, color: kPrimaryColor),
+                            SizedBox(width: 4.0),
+                            Text(
+                              widget.noOfBeds ?? "N/A",
+                              style: TextStyle(fontSize: 14.0, color: kPrimaryColor),
+                            ),
+                            SizedBox(width: 16.0),
+                            Icon(Icons.bathtub, size: 20.0, color: kPrimaryColor),
+                            SizedBox(width: 4.0),
+                            Text(
+                              widget.noOfBaths ?? "N/A",
+                              style: TextStyle(fontSize: 14.0, color: kPrimaryColor),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),),
                   ],
                 ),
               ),
@@ -444,7 +522,7 @@ class _DetailsConfirmationPageState extends State<DetailsConfirmationPage> {
                           ),
                           SizedBox(height: 3.0),
                           Text(
-                            "Taurgo",
+                            widget.client ?? "N/A",
                             style: TextStyle(
                               fontSize: 12.0,
                               fontWeight: FontWeight.w700,
@@ -462,9 +540,7 @@ class _DetailsConfirmationPageState extends State<DetailsConfirmationPage> {
                         color: Color(0xFFC2C2C2), // Divider color
                       ),
                     ),
-                    SizedBox(
-                      width: 10,
-                    ),
+                    
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -479,7 +555,7 @@ class _DetailsConfirmationPageState extends State<DetailsConfirmationPage> {
                           ),
                           SizedBox(height: 3.0),
                           Text(
-                            "With Agent",
+                            widget.keyLocation ?? "N/A",
                             style: TextStyle(
                               fontSize: 12.0,
                               fontWeight: FontWeight.w700,
@@ -502,6 +578,7 @@ class _DetailsConfirmationPageState extends State<DetailsConfirmationPage> {
 
               Center(
                 child: GestureDetector(
+                  onTap: _saveDetails,
                   child: Container(
                     height: 50,
                     width: double.infinity,

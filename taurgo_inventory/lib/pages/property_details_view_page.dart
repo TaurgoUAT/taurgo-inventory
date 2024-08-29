@@ -4,24 +4,35 @@ import 'package:taurgo_inventory/pages/edit_report_page.dart';
 import 'package:taurgo_inventory/pages/landing_screen.dart';
 import '../constants/AppColors.dart';
 
-
 class PropertyDetailsViewPage extends StatefulWidget {
-  final String status;
-  final String addressLineOne;
-  final String addressLineTwo;
-  final String city;
-  final String country;
-  final String postalCode;
-  final String noOfBeds;
-  final String noOfBaths;
-  final String keyLocation;
-  final String duration;
-  final String message;
+  final String? lineOneAddress;
+  final String? lineTwoAddress;
+  final String? city;
+  final String? state;
+  final String? country;
+  final String? postalCode;
+  final String? reference;
+  final String? client;
+  final String? type;
+  final String? furnishing;
+  final String? noOfBeds;
+  final String? noOfBaths;
+  final String? garage;
+  final String? parking;
+  final String? notes;
 
-  const PropertyDetailsViewPage({super.key, required this.status, required this.addressLineOne, required this.addressLineTwo, required this.city, required this.country, required this.postalCode, required this.noOfBeds, required this.noOfBaths, required this.keyLocation, required this.duration, required this.message});
+  final String? selectedType;
+  final String? date;
+  final String? time;
+  final String? keyLocation;
+  final String? referenceForKey;
+  final String? internalNotes;
+  const PropertyDetailsViewPage(
+      {super.key, this.lineOneAddress, this.lineTwoAddress, this.city, this.state, this.country, this.postalCode, this.reference, this.client, this.type, this.furnishing, this.noOfBeds, this.noOfBaths, this.garage, this.parking, this.notes, this.selectedType, this.date, this.time, this.keyLocation, this.referenceForKey, this.internalNotes,});
 
   @override
-  State<PropertyDetailsViewPage> createState() => _PropertyDetailsViewPageState();
+  State<PropertyDetailsViewPage> createState() =>
+      _PropertyDetailsViewPageState();
 }
 
 class _PropertyDetailsViewPageState extends State<PropertyDetailsViewPage> {
@@ -84,7 +95,6 @@ class _PropertyDetailsViewPageState extends State<PropertyDetailsViewPage> {
           ),
         ],
       ),
-
       body: Container(
         color: bWhite,
         child: Padding(
@@ -92,15 +102,15 @@ class _PropertyDetailsViewPageState extends State<PropertyDetailsViewPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-
               //Image
               Padding(
                 padding: const EdgeInsets.all(0.0),
                 child: Image.asset(
                   'assets/images/prop-img.png', // Replace with your image path
                   width: double.maxFinite, // Adjust the width as needed
-                  height: 250, // Adjust the height as needed
-                  fit: BoxFit.cover, // Adjust the fit as needed (e.g., BoxFit.contain, BoxFit.fill)
+                  height: 220, // Adjust the height as needed
+                  fit: BoxFit
+                      .cover, // Adjust the fit as needed (e.g., BoxFit.contain, BoxFit.fill)
                 ),
               ),
 
@@ -111,7 +121,6 @@ class _PropertyDetailsViewPageState extends State<PropertyDetailsViewPage> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
-
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -135,8 +144,9 @@ class _PropertyDetailsViewPageState extends State<PropertyDetailsViewPage> {
                               ),
                               padding: EdgeInsets.all(16.0),
                             ),
-
-                            SizedBox(width: 10,),
+                            SizedBox(
+                              width: 10,
+                            ),
                             Text(
                               "Active",
                               style: TextStyle(
@@ -149,7 +159,6 @@ class _PropertyDetailsViewPageState extends State<PropertyDetailsViewPage> {
                         )
                       ],
                     ),
-
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8.0),
                       child: Container(
@@ -170,8 +179,8 @@ class _PropertyDetailsViewPageState extends State<PropertyDetailsViewPage> {
                       },
                       child: Padding(
                         padding: const EdgeInsets.all(7.5),
-                        child: Text('Edit Report', style: TextStyle(fontSize:
-                        12)),
+                        child:
+                            Text('Edit Report', style: TextStyle(fontSize: 12)),
                       ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: kPrimaryColor,
@@ -190,8 +199,7 @@ class _PropertyDetailsViewPageState extends State<PropertyDetailsViewPage> {
                 child: Divider(thickness: 1, color: Color(0xFFC2C2C2)),
               ),
 
-
-              //Address
+//Address
               Padding(
                 padding: EdgeInsets.all(0),
                 child: Row(
@@ -204,14 +212,14 @@ class _PropertyDetailsViewPageState extends State<PropertyDetailsViewPage> {
                         Text(
                           "Address",
                           style: TextStyle(
-                            fontSize: 12.0,
+                            fontSize: 14.0,
                             fontWeight: FontWeight.w700,
                             color: kPrimaryTextColourTwo,
                           ),
                         ),
                         SizedBox(height: 3.0),
                         Text(
-                          "Kurumankandu",
+                          widget.lineOneAddress ?? "",
                           style: TextStyle(
                             fontSize: 12.0,
                             fontWeight: FontWeight.w700,
@@ -219,23 +227,56 @@ class _PropertyDetailsViewPageState extends State<PropertyDetailsViewPage> {
                           ),
                         ),
                         Text(
-                          "Vavuniya",
+                          widget.lineTwoAddress ?? "",
                           style: TextStyle(
                             fontSize: 12.0,
                             fontWeight: FontWeight.w700,
                             color: kSecondaryTextColourTwo,
                           ),
                         ),
+
+
+                        Row(
+                          children: [
+                            Text(
+                              widget.city ?? "",
+                              style: TextStyle(
+                                fontSize: 12.0,
+                                fontWeight: FontWeight.w700,
+                                color: kSecondaryTextColourTwo,
+                              ),
+                            ),
+                            Text(
+                              ",",
+                              style: TextStyle(
+                                fontSize: 12.0,
+                                fontWeight: FontWeight.w700,
+                                color: kSecondaryTextColourTwo,
+                              ),
+                            ),
+                            SizedBox(width: 2,),
+                            Text(
+                              widget.state ?? "",
+                              style: TextStyle(
+                                fontSize: 12.0,
+                                fontWeight: FontWeight.w700,
+                                color: kSecondaryTextColourTwo,
+                              ),
+                            ),
+                          ],
+                        ),
                         Text(
-                          "Sri Lanka",
+                          widget.country ?? "",
                           style: TextStyle(
                             fontSize: 12.0,
                             fontWeight: FontWeight.w700,
                             color: kSecondaryTextColourTwo,
                           ),
                         ),
+
+
                         Text(
-                          "43000",
+                          widget.postalCode ?? "",
                           style: TextStyle(
                             fontSize: 12.0,
                             fontWeight: FontWeight.w700,
@@ -272,21 +313,20 @@ class _PropertyDetailsViewPageState extends State<PropertyDetailsViewPage> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
-
-                    Column(
+                    Expanded(child:  Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           "Inspection Date",
                           style: TextStyle(
-                            fontSize: 12.0,
+                            fontSize: 14.0,
                             fontWeight: FontWeight.w700,
                             color: kPrimaryTextColourTwo,
                           ),
                         ),
                         SizedBox(height: 3.0),
                         Text(
-                          "30 Aug 2024",
+                          widget.date ?? "N/A",
                           style: TextStyle(
                             fontSize: 12.0,
                             fontWeight: FontWeight.w700,
@@ -294,7 +334,7 @@ class _PropertyDetailsViewPageState extends State<PropertyDetailsViewPage> {
                           ),
                         ),
                       ],
-                    ),
+                    ),),
 
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -304,20 +344,20 @@ class _PropertyDetailsViewPageState extends State<PropertyDetailsViewPage> {
                         color: Color(0xFFC2C2C2), // Divider color
                       ),
                     ),
-                    Column(
+                    Expanded(child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "Inspection Type",
+                          "Inspection Time",
                           style: TextStyle(
-                            fontSize: 12.0,
+                            fontSize: 14.0,
                             fontWeight: FontWeight.w700,
                             color: kPrimaryTextColourTwo,
                           ),
                         ),
                         SizedBox(height: 3.0),
                         Text(
-                          "Inventory & Check In",
+                          widget.time ?? "N/A",
                           style: TextStyle(
                             fontSize: 12.0,
                             fontWeight: FontWeight.w700,
@@ -325,7 +365,7 @@ class _PropertyDetailsViewPageState extends State<PropertyDetailsViewPage> {
                           ),
                         ),
                       ],
-                    ),
+                    ),)
                   ],
                 ),
               ),
@@ -341,32 +381,28 @@ class _PropertyDetailsViewPageState extends State<PropertyDetailsViewPage> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
-
-                   Expanded(
-                     child:  Column(
-                       crossAxisAlignment: CrossAxisAlignment.start,
-                       children: [
-                         Text(
-                           "Inspection Date",
-                           style: TextStyle(
-                             fontSize: 12.0,
-                             fontWeight: FontWeight.w700,
-                             color: kPrimaryTextColourTwo,
-                           ),
-                         ),
-                         SizedBox(height: 3.0),
-                         Text(
-                           "30 Aug 2024",
-                           style: TextStyle(
-                             fontSize: 12.0,
-                             fontWeight: FontWeight.w700,
-                             color: kSecondaryTextColourTwo,
-                           ),
-                         ),
-                       ],
-                     ),
-                   ),
-                    
+                    Expanded(child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Inspection Type",
+                          style: TextStyle(
+                            fontSize: 14.0,
+                            fontWeight: FontWeight.w700,
+                            color: kPrimaryTextColourTwo,
+                          ),
+                        ),
+                        SizedBox(height: 3.0),
+                        Text(
+                          widget.selectedType ?? "N/A",
+                          style: TextStyle(
+                            fontSize: 12.0,
+                            fontWeight: FontWeight.w700,
+                            color: kSecondaryTextColourTwo,
+                          ),
+                        ),
+                      ],
+                    ),),
 
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -376,28 +412,38 @@ class _PropertyDetailsViewPageState extends State<PropertyDetailsViewPage> {
                         color: Color(0xFFC2C2C2), // Divider color
                       ),
                     ),
+
                     Expanded(child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "Inspection Type",
+                          "General",
                           style: TextStyle(
-                            fontSize: 12.0,
+                            fontSize: 14.0,
                             fontWeight: FontWeight.w700,
                             color: kPrimaryTextColourTwo,
                           ),
                         ),
                         SizedBox(height: 3.0),
-                        Text(
-                          "Inventory & Check In",
-                          style: TextStyle(
-                            fontSize: 12.0,
-                            fontWeight: FontWeight.w700,
-                            color: kSecondaryTextColourTwo,
-                          ),
+                        Row(
+                          children: <Widget>[
+                            Icon(Icons.bed, size: 20.0, color: kPrimaryColor),
+                            SizedBox(width: 4.0),
+                            Text(
+                              widget.noOfBeds ?? "N/A",
+                              style: TextStyle(fontSize: 14.0, color: kPrimaryColor),
+                            ),
+                            SizedBox(width: 16.0),
+                            Icon(Icons.bathtub, size: 20.0, color: kPrimaryColor),
+                            SizedBox(width: 4.0),
+                            Text(
+                              widget.noOfBaths ?? "N/A",
+                              style: TextStyle(fontSize: 14.0, color: kPrimaryColor),
+                            ),
+                          ],
                         ),
                       ],
-                    ),)
+                    ),),
                   ],
                 ),
               ),
@@ -420,14 +466,14 @@ class _PropertyDetailsViewPageState extends State<PropertyDetailsViewPage> {
                           Text(
                             "Client",
                             style: TextStyle(
-                              fontSize: 12.0,
+                              fontSize: 14.0,
                               fontWeight: FontWeight.w700,
                               color: kPrimaryTextColourTwo,
                             ),
                           ),
                           SizedBox(height: 3.0),
                           Text(
-                            "Taurgo",
+                            widget.client ?? "N/A",
                             style: TextStyle(
                               fontSize: 12.0,
                               fontWeight: FontWeight.w700,
@@ -445,9 +491,7 @@ class _PropertyDetailsViewPageState extends State<PropertyDetailsViewPage> {
                         color: Color(0xFFC2C2C2), // Divider color
                       ),
                     ),
-                    SizedBox(
-                      width: 10,
-                    ),
+
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -455,14 +499,14 @@ class _PropertyDetailsViewPageState extends State<PropertyDetailsViewPage> {
                           Text(
                             "Location of Keys",
                             style: TextStyle(
-                              fontSize: 12.0,
+                              fontSize: 14.0,
                               fontWeight: FontWeight.w700,
                               color: kPrimaryTextColourTwo,
                             ),
                           ),
                           SizedBox(height: 3.0),
                           Text(
-                            "With Agent",
+                            widget.keyLocation ?? "N/A",
                             style: TextStyle(
                               fontSize: 12.0,
                               fontWeight: FontWeight.w700,
@@ -480,7 +524,6 @@ class _PropertyDetailsViewPageState extends State<PropertyDetailsViewPage> {
                 padding: const EdgeInsets.symmetric(horizontal: 0.0),
                 child: Divider(thickness: 1, color: Color(0xFFC2C2C2)),
               ),
-
               Spacer(),
 
               Center(
@@ -507,10 +550,6 @@ class _PropertyDetailsViewPageState extends State<PropertyDetailsViewPage> {
                   ),
                 ),
               )
-
-
-
-
             ],
           ),
         ),
