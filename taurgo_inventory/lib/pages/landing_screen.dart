@@ -64,6 +64,29 @@ class _LandingScreenState extends State<LandingScreen> {
     }
   }
 
+  Future<void> deletePropertyById(String propertyId) async {
+    print(propertyId);
+    final url = '$baseURL/property/$propertyId';
+    // Replace with your actual
+    // API endpoint
+
+    final response = await http.delete(
+      Uri.parse(url),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      // Deletion was successful
+      print('Property deleted successfully');
+      fetchProperties();
+    } else {
+      // Deletion failed
+      throw Exception('Failed to delete property');
+    }
+  }
+
   void _showFilterOptions(BuildContext context) {
     showModalBottomSheet(
       context: context,
@@ -317,6 +340,7 @@ class _LandingScreenState extends State<LandingScreen> {
                     final property = filteredProperties[reversedIndex];
                     return propertyContainer(
                       property['status'] ?? '',
+                      property['propertyId'] ?? '',
                       property['addressLineOne'] ?? '',
                       property['addressLineTwo'] ?? '',
                       property['city'] ?? '',
@@ -379,6 +403,7 @@ class _LandingScreenState extends State<LandingScreen> {
 
   Widget propertyContainer(
     String status,
+      String propertyId,
     String addressLineOne,
     String addressLineTwo,
     String city,
@@ -456,7 +481,7 @@ class _LandingScreenState extends State<LandingScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
                       Text(
-                        "Inventory & Schedule of Condition",
+                        inspectionType,
                         style: TextStyle(
                           fontSize: 10.0,
                           fontWeight: FontWeight.w700,
@@ -524,7 +549,7 @@ class _LandingScreenState extends State<LandingScreen> {
                   ),
                   SizedBox(height: 12.0),
                   Text(
-                    "Fri 26th August 2024",
+                    date,
                     style: TextStyle(
                       fontSize: 14.0,
                       fontWeight: FontWeight.w500,
@@ -560,9 +585,90 @@ class _LandingScreenState extends State<LandingScreen> {
                       IconButton(
                         icon: Icon(Icons.delete, color: Colors.red),
                         onPressed: () {
-                          // Add delete button action here
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                elevation: 10,
+                                backgroundColor: Colors.white,
+                                title: Row(
+                                  children: [
+                                    Icon(Icons.info_outline, color: kPrimaryColor),
+                                    SizedBox(width: 10),
+                                    Text(
+                                      'Confirm Deletion',
+                                      style: TextStyle(
+                                        color: kPrimaryColor,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                content: Text(
+                                  'Are you sure you want to delete this item?',
+                                  style: TextStyle(
+                                    color: Colors.grey[800],
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w400,
+                                    height: 1.5,
+                                  ),
+                                ),
+                                actions: <Widget>[
+                                  TextButton(
+                                    child: Text('Cancel',
+                                      style: TextStyle(
+                                      color: kPrimaryColor,
+                                      fontSize: 16,
+                                    ),
+                                    ),
+                                    onPressed: () {
+                                      Navigator.of(context).pop(); // Close the dialog
+                                    },
+                                  ),
+                                  TextButton(
+                                    onPressed: () async {
+                                      try {
+                                        await deletePropertyById(propertyId); // Call the delete function with propertyId
+                                        Navigator.of(context).pop(); // Close the dialog
+                                        // Optionally, refresh the list or perform additional actions here
+                                      } catch (e) {
+                                        // Handle errors if needed
+                                        print('Error: $e');
+                                      }
+                                    },
+                                    style: TextButton.styleFrom(
+                                      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                      backgroundColor: Colors.red,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                    ),
+                                    child: Text(
+                                      'Delete',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                  ),
+                                  // TextButton(
+                                  //   child: Text('Delete'),
+                                  //   onPressed: () {
+                                  //     // Add delete action here
+                                  //     Navigator.of(context).pop(); // Close the dialog
+                                  //   },
+                                  // ),
+                                ],
+                              );
+                            },
+                          );
                         },
                       ),
+
                       ElevatedButton(
                         onPressed: () {},
                         child: Padding(
