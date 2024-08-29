@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+
 class ScheduleOfCondition extends StatefulWidget {
   final List<File>? capturedImages;
 
@@ -51,251 +52,408 @@ class _ScheduleOfConditionState extends State<ScheduleOfCondition> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => CapturedImagesPage(images:capturedImages),
+        builder: (context) => CapturedImagesPage(images: capturedImages),
       ),
     );
   }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Schedule of Condition',
-          style: TextStyle(
-            color: kPrimaryColor,
-            fontSize: 14,
-            fontFamily: "Inter",
-          ),
-        ),
-        centerTitle: true,
-        backgroundColor: bWhite,
-        leading: GestureDetector(
-          onTap: () {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (context) => EditReportPage(),
+    return PopScope(
+        canPop: false,
+        child: Scaffold(
+          appBar: AppBar(
+            title: Text(
+              'Schedule of Condition',
+              style: TextStyle(
+                color: kPrimaryColor,
+                fontSize: 14,
+                fontFamily: "Inter",
               ),
-            );
-          },
-          child: Icon(
-            Icons.arrow_back_ios_new,
-            color: kPrimaryColor,
-            size: 24,
-          ),
-        ),
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-
-              //Over View
-              // ConditionItem(
-              //   name: "Overview",
-              //   selectedCondition: overview,
-              //   onConditionSelected: (condition) {
-              //     setState(() {
-              //       overview = condition;
-              //     });
-              //   },
-              //   cameraController: _cameraController,
-              //   initializeControllerFuture: _initializeControllerFuture,
-              // ),
-
-              ConditionItem(
-                name: "Overview",
-                selectedCondition: overview,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    overview = condition;
-                  });
+            ),
+            centerTitle: true,
+            backgroundColor: bWhite,
+            leading: GestureDetector(
+              onTap: () {
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      elevation: 10,
+                      backgroundColor: Colors.white,
+                      title: Row(
+                        children: [
+                          Icon(Icons.info_outline, color: kPrimaryColor),
+                          SizedBox(width: 10),
+                          Text(
+                            'Do you want to Exit',
+                            style: TextStyle(
+                              color: kPrimaryColor,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                      content: Text(
+                        'Your process will not be saved if you exit the process',
+                        style: TextStyle(
+                          color: Colors.grey[800],
+                          fontSize: 14,
+                          fontWeight: FontWeight.w400,
+                          height: 1.5,
+                        ),
+                      ),
+                      actions: <Widget>[
+                        TextButton(
+                          child: Text(
+                            'Cancel',
+                            style: TextStyle(
+                              color: kPrimaryColor,
+                              fontSize: 16,
+                            ),
+                          ),
+                          onPressed: () {
+                            Navigator.of(context).pop(); // Close the dialog
+                          },
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      EditReportPage()), // Replace HomePage with your home
+                              // page
+                              // widget
+                            ); // Close the dialog
+                          },
+                          style: TextButton.styleFrom(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 8),
+                            backgroundColor: kPrimaryColor,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          child: Text(
+                            'Exit',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
+              child: Icon(
+                Icons.arrow_back_ios_new,
+                color: kPrimaryColor,
+                size: 24,
+              ),
+            ),
+            actions: [
+              GestureDetector(
+                onTap: () {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        elevation: 10,
+                        backgroundColor: Colors.white,
+                        title: Row(
+                          children: [
+                            Icon(Icons.info_outline, color: kPrimaryColor),
+                            SizedBox(width: 10),
+                            Text(
+                              'Save and Continue',
+                              style: TextStyle(
+                                color: kPrimaryColor,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                        content: Text(
+                          'Please Make Sure You Have Entered all the Details before'
+                          ' Saving',
+                          style: TextStyle(
+                            color: Colors.grey[800],
+                            fontSize: 14,
+                            fontWeight: FontWeight.w400,
+                            height: 1.5,
+                          ),
+                        ),
+                        actions: <Widget>[
+                          TextButton(
+                            child: Text(
+                              'Cancel',
+                              style: TextStyle(
+                                color: kPrimaryColor,
+                                fontSize: 16,
+                              ),
+                            ),
+                            onPressed: () {
+                              Navigator.of(context).pop(); // Close the dialog
+                            },
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        EditReportPage()), // Replace HomePage with your home page
+                                // widget
+                              ); // Close the dialog
+                            },
+                            style: TextButton.styleFrom(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 8),
+                              backgroundColor: kPrimaryColor,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                            child: Text(
+                              'Save',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  );
                 },
-              ),
-
-              //Accessort - Cleanliness
-              ConditionItem(
-                name: "Accessory - Cleanliness",
-                selectedCondition: accessoryCleanliness,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    accessoryCleanliness = condition;
-                  });
-                },
-              ),
-
-              //Window Sill
-              ConditionItem(
-                name: "Window Sill",
-                selectedCondition: windowSill,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    windowSill = condition;
-                  });
-                },
-              ),
-
-
-              //Carpets
-              ConditionItem(
-                name: "Carpets",
-                selectedCondition: carpets,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    carpets = condition;
-                  });
-                },
-              ),
-
-              //Ceilings
-              ConditionItem(
-                name: "Ceilings",
-                selectedCondition: ceilings,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    ceilings = condition;
-                  });
-                },
-              ),
-
-              //Curtains
-              ConditionItem(
-                name: "Curtains",
-                selectedCondition: curtains,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    curtains = condition;
-                  });
-                },
-              ),
-
-              //Hard Floopring
-              ConditionItem(
-                name: "Hard Flooring",
-                selectedCondition: hardFlooring,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    hardFlooring = condition;
-                  });
-                },
-              ),
-
-              //Kitchen Area
-              ConditionItem(
-                name: "Kitchen Area",
-                selectedCondition: kitchenArea,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    kitchenArea = condition;
-                  });
-                },
-              ),
-
-              //Oven
-              ConditionItem(
-                name: "Oven",
-                selectedCondition: oven,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    oven = condition;
-                  });
-                },
-              ),
-
-
-              //Mattress
-              ConditionItem(
-                name: "Mattress",
-                selectedCondition: mattress,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    mattress = condition;
-                  });
-                },
-              ),
-
-              //Upholstery
-              ConditionItem(
-                name: "Upholstery",
-                selectedCondition: upholstrey,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    upholstrey = condition;
-                  });
-                },
-              ),
-
-              //Window(s)"
-              ConditionItem(
-                name: "Window(s)",
-                selectedCondition: window,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    window = condition;
-                  });
-                },
-              ),
-
-              //Wall
-              ConditionItem(
-                name: "Wall(s)",
-                selectedCondition: wall,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    wall = condition;
-                  });
-                },
-              ),
-
-              //Wall
-              ConditionItem(
-                name: "Woodwork",
-                selectedCondition: woodwork,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    woodwork = condition;
-                  });
-                },
-              ),
-
-
-              // Add more ConditionItem widgets as needed
+                child: Container(
+                  margin: EdgeInsets.all(16),
+                  child: Text(
+                    'Save', // Replace with the actual location
+                    style: TextStyle(
+                      color: kPrimaryColor,
+                      fontSize: 14, // Adjust the font size
+                      fontFamily: "Inter",
+                    ),
+                  ),
+                ),
+              )
             ],
           ),
-        ),
-      ),
-      // floatingActionButton: FloatingActionButton.extended(
-      //   onPressed: _showCapturedImages, // Show captured images when clicked
-      //   label: Icon(
-      //     Icons.image_outlined,
-      //     color: bWhite,
-      //     size: 24,
-      //   ),
-      //   backgroundColor: kPrimaryColor,
-      //   hoverColor: kPrimaryColor.withOpacity(0.4),
-      //   shape: CircleBorder(
-      //     side: BorderSide(
-      //       color: Colors.white,
-      //       width: 2.0,
-      //     ),
-      //   ),
-      //   elevation: 3.0,
-      // ),
+          body: SingleChildScrollView(
+            child: Padding(
+              padding: EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  //Over View
+                  // ConditionItem(
+                  //   name: "Overview",
+                  //   selectedCondition: overview,
+                  //   onConditionSelected: (condition) {
+                  //     setState(() {
+                  //       overview = condition;
+                  //     });
+                  //   },
+                  //   cameraController: _cameraController,
+                  //   initializeControllerFuture: _initializeControllerFuture,
+                  // ),
 
+                  ConditionItem(
+                    name: "Overview",
+                    selectedCondition: overview,
+                    onConditionSelected: (condition) {
+                      setState(() {
+                        overview = condition;
+                      });
+                    },
+                  ),
 
-    );
+                  //Accessort - Cleanliness
+                  ConditionItem(
+                    name: "Accessory - Cleanliness",
+                    selectedCondition: accessoryCleanliness,
+                    onConditionSelected: (condition) {
+                      setState(() {
+                        accessoryCleanliness = condition;
+                      });
+                    },
+                  ),
+
+                  //Window Sill
+                  ConditionItem(
+                    name: "Window Sill",
+                    selectedCondition: windowSill,
+                    onConditionSelected: (condition) {
+                      setState(() {
+                        windowSill = condition;
+                      });
+                    },
+                  ),
+
+                  //Carpets
+                  ConditionItem(
+                    name: "Carpets",
+                    selectedCondition: carpets,
+                    onConditionSelected: (condition) {
+                      setState(() {
+                        carpets = condition;
+                      });
+                    },
+                  ),
+
+                  //Ceilings
+                  ConditionItem(
+                    name: "Ceilings",
+                    selectedCondition: ceilings,
+                    onConditionSelected: (condition) {
+                      setState(() {
+                        ceilings = condition;
+                      });
+                    },
+                  ),
+
+                  //Curtains
+                  ConditionItem(
+                    name: "Curtains",
+                    selectedCondition: curtains,
+                    onConditionSelected: (condition) {
+                      setState(() {
+                        curtains = condition;
+                      });
+                    },
+                  ),
+
+                  //Hard Floopring
+                  ConditionItem(
+                    name: "Hard Flooring",
+                    selectedCondition: hardFlooring,
+                    onConditionSelected: (condition) {
+                      setState(() {
+                        hardFlooring = condition;
+                      });
+                    },
+                  ),
+
+                  //Kitchen Area
+                  ConditionItem(
+                    name: "Kitchen Area",
+                    selectedCondition: kitchenArea,
+                    onConditionSelected: (condition) {
+                      setState(() {
+                        kitchenArea = condition;
+                      });
+                    },
+                  ),
+
+                  //Oven
+                  ConditionItem(
+                    name: "Oven",
+                    selectedCondition: oven,
+                    onConditionSelected: (condition) {
+                      setState(() {
+                        oven = condition;
+                      });
+                    },
+                  ),
+
+                  //Mattress
+                  ConditionItem(
+                    name: "Mattress",
+                    selectedCondition: mattress,
+                    onConditionSelected: (condition) {
+                      setState(() {
+                        mattress = condition;
+                      });
+                    },
+                  ),
+
+                  //Upholstery
+                  ConditionItem(
+                    name: "Upholstery",
+                    selectedCondition: upholstrey,
+                    onConditionSelected: (condition) {
+                      setState(() {
+                        upholstrey = condition;
+                      });
+                    },
+                  ),
+
+                  //Window(s)"
+                  ConditionItem(
+                    name: "Window(s)",
+                    selectedCondition: window,
+                    onConditionSelected: (condition) {
+                      setState(() {
+                        window = condition;
+                      });
+                    },
+                  ),
+
+                  //Wall
+                  ConditionItem(
+                    name: "Wall(s)",
+                    selectedCondition: wall,
+                    onConditionSelected: (condition) {
+                      setState(() {
+                        wall = condition;
+                      });
+                    },
+                  ),
+
+                  //Wall
+                  ConditionItem(
+                    name: "Woodwork",
+                    selectedCondition: woodwork,
+                    onConditionSelected: (condition) {
+                      setState(() {
+                        woodwork = condition;
+                      });
+                    },
+                  ),
+
+                  // Add more ConditionItem widgets as needed
+                ],
+              ),
+            ),
+          ),
+          // floatingActionButton: FloatingActionButton.extended(
+          //   onPressed: _showCapturedImages, // Show captured images when clicked
+          //   label: Icon(
+          //     Icons.image_outlined,
+          //     color: bWhite,
+          //     size: 24,
+          //   ),
+          //   backgroundColor: kPrimaryColor,
+          //   hoverColor: kPrimaryColor.withOpacity(0.4),
+          //   shape: CircleBorder(
+          //     side: BorderSide(
+          //       color: Colors.white,
+          //       width: 2.0,
+          //     ),
+          //   ),
+          //   elevation: 3.0,
+          // ),
+        ));
   }
-
 }
-
 
 class ConditionItem extends StatelessWidget {
   final String name;
   final String? selectedCondition;
   final Function(String?) onConditionSelected;
-
 
   const ConditionItem({
     Key? key,
@@ -353,7 +511,6 @@ class ConditionItem extends StatelessWidget {
                         ),
                       );
                     },
-
                   ),
                   IconButton(
                     icon: Icon(
@@ -361,7 +518,7 @@ class ConditionItem extends StatelessWidget {
                       size: 24,
                       color: kSecondaryTextColourTwo,
                     ),
-                    onPressed: ()  async{
+                    onPressed: () async {
                       // Initialize the camera when the button is pressed
                       final cameras = await availableCameras();
                       if (cameras.isNotEmpty) {
@@ -381,14 +538,14 @@ class ConditionItem extends StatelessWidget {
                         );
                       }
                     },
-
                   ),
                 ],
               ),
             ],
           ),
-
-          SizedBox(height: 6,),
+          SizedBox(
+            height: 6,
+          ),
           GestureDetector(
             onTap: () async {
               if (Navigator.canPop(context)) {
@@ -421,8 +578,6 @@ class ConditionItem extends StatelessWidget {
       ),
     );
   }
-
-
 }
 
 class CapturedImagesPage extends StatelessWidget {
