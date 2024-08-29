@@ -239,12 +239,82 @@ class _PropertyDetailsViewPageState extends State<PropertyDetailsViewPage> {
                       ),
                       ElevatedButton(
                         onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) =>
-                                    EditReportPage()), // Replace HomePage with your home
-                            // page widget
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                elevation: 10,
+                                backgroundColor: Colors.white,
+                                title: Row(
+                                  children: [
+                                    Icon(Icons.info_outline, color: kPrimaryColor),
+                                    SizedBox(width: 10),
+                                    Text(
+                                      'Sync information',
+                                      style: TextStyle(
+                                        color: kPrimaryColor,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                content: Text(
+                                  'Please Make Sure you have stable internet before continue, Your process will not be saved if you exit the Process',
+                                  textAlign: TextAlign.left,
+                                  style: TextStyle(
+                                    color: Colors.grey[800],
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w400,
+                                    height: 1.5,
+
+                                  ),
+                                ),
+                                actions: <Widget>[
+                                  TextButton(
+                                    child: Text('Cancel',
+                                      style: TextStyle(
+                                        color: kPrimaryColor,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                    onPressed: () {
+                                      Navigator.of(context).pop(); // Close the dialog
+                                    },
+                                  ),
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.pushReplacement(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                EditReportPage()), // Replace HomePage
+                                        // with your home page
+                                        // widget
+                                      ); // Close the dialog
+                                    },
+                                    style: TextButton.styleFrom(
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 16, vertical: 8),
+                                      backgroundColor: kPrimaryColor,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                    ),
+                                    child: Text(
+                                      'Agree',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
                           );
                         },
                         child: Padding(
