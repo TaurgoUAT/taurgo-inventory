@@ -136,269 +136,271 @@ class _LandingScreenState extends State<LandingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
+    return PopScope(
+      canPop: false,
+        child: Scaffold(
+          appBar: AppBar(
+            title: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(
-                  'Abishan',
-                  style: TextStyle(
-                    color: kPrimaryColor,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    fontFamily: "Inter",
-                  ),
-                ),
-                SizedBox(height: 2),
-                // Adjust the spacing between the text and the location row
-                Row(
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(
-                      Icons.location_on,
-                      color: kPrimaryColor,
-                      size: 11, // Adjust the icon size
-                    ),
-                    SizedBox(width: 4),
-                    // Space between the icon and the location text
                     Text(
-                      'Vavuniya', // Replace with the actual location
+                      'Abishan',
                       style: TextStyle(
                         color: kPrimaryColor,
-                        fontSize: 11, // Adjust the font size
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
                         fontFamily: "Inter",
                       ),
                     ),
-                  ],
-                ),
-              ],
-            ),
-          ],
-        ),
-        centerTitle: true,
-        backgroundColor: bWhite,
-        leading: IconButton(
-          icon: Icon(
-            Icons.checklist_rtl_rounded,
-            color: kPrimaryColor,
-          ),
-          onPressed: () {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                  builder: (context) =>
-                      LandingScreen()), // Replace HomePage with your home page
-              // widget
-            );
-          },
-        ),
-        actions: [
-          IconButton(
-            icon: Icon(
-              Icons.logout_outlined,
-              color: Colors.red,
-            ),
-            onPressed: () {
-              // Navigator.pushReplacement(
-              //   context,
-              //   MaterialPageRoute(
-              //       builder: (context) =>
-              //           Helpandsupportpage()), // Replace HomePage with your home page widget
-              // );
-            },
-          ),
-        ],
-      ),
-      body: Container(
-        color: bWhite,
-        child: Padding(
-          padding: EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(
-                height: 20,
-              ),
-
-              //Search bar
-              Padding(
-                padding: const EdgeInsets.all(0.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      width: double.maxFinite,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: bWhite,
-                        border: Border.all(
-                          color: kSecondaryButtonBorderColor,
-                          // Replace with your desired
-                          // border color
-                          width: 2.0, // Adjust the border width as needed
-                        ), // Background color of the search bar
-                        borderRadius: BorderRadius.circular(30.0),
-
-                        // boxShadow: [
-                        //   BoxShadow(
-                        //     color: Colors.grey.withOpacity(0.5),
-                        //     spreadRadius: 2,
-                        //     blurRadius: 5,
-                        //     offset: Offset(0, 3),
-                        //   ),
-                        // ],
-                      ),
-                      child: Row(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Icon(Icons.search,
-                                color:
-                                    kSecondaryButtonBorderColor), // Search icon
-                          ),
-                          Expanded(
-                            child: TextField(
-                              cursorColor: kPrimaryColor,
-                              decoration: InputDecoration(
-                                hintText: 'Search',
-                                hintStyle: TextStyle(
-                                    color: kSecondaryButtonBorderColor),
-                                border: InputBorder.none,
-                              ),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Icon(Icons.mic,
-                                color: kSecondaryButtonBorderColor), // Mic icon
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              SizedBox(
-                height: 20,
-              ),
-
-              //Filter Options
-              Padding(
-                padding: EdgeInsets.all(0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    Text(
-                      "Your Properties",
-                      style: TextStyle(
-                        fontSize: 20.0,
-                        fontWeight: FontWeight.w700,
-                        color: kPrimaryColor,
-                      ),
-                    ),
+                    SizedBox(height: 2),
+                    // Adjust the spacing between the text and the location row
                     Row(
                       children: [
-                        GestureDetector(
-                          onTap: () {
-                            _showFilterOptions(context);
-                          },
-                          child: Text(
-                            "Filter",
-                            style: TextStyle(
-                              fontSize: 12.0,
-                              fontWeight: FontWeight.w700,
-                              color: kSecondaryTextColourTwo,
-                            ),
-                          ),
+                        Icon(
+                          Icons.location_on,
+                          color: kPrimaryColor,
+                          size: 11, // Adjust the icon size
                         ),
-                        IconButton(
-                          icon: Icon(
-                            Icons.filter_alt_outlined,
-                            size: 24,
-                            color: kSecondaryTextColourTwo,
+                        SizedBox(width: 4),
+                        // Space between the icon and the location text
+                        Text(
+                          'Vavuniya', // Replace with the actual location
+                          style: TextStyle(
+                            color: kPrimaryColor,
+                            fontSize: 11, // Adjust the font size
+                            fontFamily: "Inter",
                           ),
-                          onPressed: () {
-                            _showFilterOptions(context);
-                          },
                         ),
                       ],
                     ),
                   ],
                 ),
+              ],
+            ),
+            centerTitle: true,
+            backgroundColor: bWhite,
+            leading: IconButton(
+              icon: Icon(
+                Icons.checklist_rtl_rounded,
+                color: kPrimaryColor,
               ),
-
-              Expanded(
-                child: ListView.builder(
-                  itemCount: filteredProperties.length,
-                  itemBuilder: (context, index) {
-                    int reversedIndex = filteredProperties.length - 1 - index;
-                    final property = filteredProperties[reversedIndex];
-                    return propertyContainer(
-                      property['status'] ?? '',
-                      property['propertyId'] ?? '',
-                      property['addressLineOne'] ?? '',
-                      property['addressLineTwo'] ?? '',
-                      property['city'] ?? '',
-                      property['state'] ?? '',
-                      property['country'] ?? '',
-                      property['postalCode'] ?? '',
-                      property['ref'] ?? '',
-                      property['client'] ?? '',
-                      property['type'] ?? '',
-                      property['furnishing'] ?? '',
-                      property['noOfBeds'] ?? '',
-                      property['noOfBaths'] ?? '',
-                      property['garage'] ?? '',
-                      property['parking'] ?? '',
-                      property['notes'] ?? '',
-                      property['inspectionType'] ?? '',
-                      property['date'] ?? '',
-                      property['time'] ?? '',
-                      property['keyLocation'] ?? '',
-                      property['referneceKey'] ?? '',
-                      property['internalNotes'] ?? '',
-                    );
-                  },
+              onPressed: () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          LandingScreen()), // Replace HomePage with your home page
+                  // widget
+                );
+              },
+            ),
+            actions: [
+              IconButton(
+                icon: Icon(
+                  Icons.logout_outlined,
+                  color: Colors.red,
                 ),
+                onPressed: () {
+                  // Navigator.pushReplacement(
+                  //   context,
+                  //   MaterialPageRoute(
+                  //       builder: (context) =>
+                  //           Helpandsupportpage()), // Replace HomePage with your home page widget
+                  // );
+                },
               ),
-              //Container for Listing
-
-              //Floating Button with
             ],
           ),
-        ),
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          // Navigate to the new page
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => AddPropertyDetailsPage()),
-          );
-        },
-        label: Icon(
-          Icons.add,
-          color: bWhite,
-          size: 48,
-        ),
-        // Icon for the button
-        backgroundColor: kPrimaryColor,
-        hoverColor: kPrimaryColor.withOpacity(0.4),
-        // Hover color of the button
-        shape: CircleBorder(
-          side: BorderSide(
-            color: Colors.white, // Color of the border
-            width: 2.0, // Width of the border
+          body: Container(
+            color: bWhite,
+            child: Padding(
+              padding: EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    height: 20,
+                  ),
+
+                  //Search bar
+                  Padding(
+                    padding: const EdgeInsets.all(0.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          width: double.maxFinite,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: bWhite,
+                            border: Border.all(
+                              color: kSecondaryButtonBorderColor,
+                              // Replace with your desired
+                              // border color
+                              width: 2.0, // Adjust the border width as needed
+                            ), // Background color of the search bar
+                            borderRadius: BorderRadius.circular(30.0),
+
+                            // boxShadow: [
+                            //   BoxShadow(
+                            //     color: Colors.grey.withOpacity(0.5),
+                            //     spreadRadius: 2,
+                            //     blurRadius: 5,
+                            //     offset: Offset(0, 3),
+                            //   ),
+                            // ],
+                          ),
+                          child: Row(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Icon(Icons.search,
+                                    color:
+                                    kSecondaryButtonBorderColor), // Search icon
+                              ),
+                              Expanded(
+                                child: TextField(
+                                  cursorColor: kPrimaryColor,
+                                  decoration: InputDecoration(
+                                    hintText: 'Search',
+                                    hintStyle: TextStyle(
+                                        color: kSecondaryButtonBorderColor),
+                                    border: InputBorder.none,
+                                  ),
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Icon(Icons.mic,
+                                    color: kSecondaryButtonBorderColor), // Mic icon
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  SizedBox(
+                    height: 20,
+                  ),
+
+                  //Filter Options
+                  Padding(
+                    padding: EdgeInsets.all(0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Text(
+                          "Your Properties",
+                          style: TextStyle(
+                            fontSize: 20.0,
+                            fontWeight: FontWeight.w700,
+                            color: kPrimaryColor,
+                          ),
+                        ),
+                        Row(
+                          children: [
+                            GestureDetector(
+                              onTap: () {
+                                _showFilterOptions(context);
+                              },
+                              child: Text(
+                                "Filter",
+                                style: TextStyle(
+                                  fontSize: 12.0,
+                                  fontWeight: FontWeight.w700,
+                                  color: kSecondaryTextColourTwo,
+                                ),
+                              ),
+                            ),
+                            IconButton(
+                              icon: Icon(
+                                Icons.filter_alt_outlined,
+                                size: 24,
+                                color: kSecondaryTextColourTwo,
+                              ),
+                              onPressed: () {
+                                _showFilterOptions(context);
+                              },
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: filteredProperties.length,
+                      itemBuilder: (context, index) {
+                        int reversedIndex = filteredProperties.length - 1 - index;
+                        final property = filteredProperties[reversedIndex];
+                        return propertyContainer(
+                          property['status'] ?? '',
+                          property['propertyId'] ?? '',
+                          property['addressLineOne'] ?? '',
+                          property['addressLineTwo'] ?? '',
+                          property['city'] ?? '',
+                          property['state'] ?? '',
+                          property['country'] ?? '',
+                          property['postalCode'] ?? '',
+                          property['ref'] ?? '',
+                          property['client'] ?? '',
+                          property['type'] ?? '',
+                          property['furnishing'] ?? '',
+                          property['noOfBeds'] ?? '',
+                          property['noOfBaths'] ?? '',
+                          property['garage'] ?? '',
+                          property['parking'] ?? '',
+                          property['notes'] ?? '',
+                          property['inspectionType'] ?? '',
+                          property['date'] ?? '',
+                          property['time'] ?? '',
+                          property['keyLocation'] ?? '',
+                          property['referneceKey'] ?? '',
+                          property['internalNotes'] ?? '',
+                        );
+                      },
+                    ),
+                  ),
+                  //Container for Listing
+
+                  //Floating Button with
+                ],
+              ),
+            ),
           ),
-        ),
-        elevation: 3.0,
-      ),
-    );
+          floatingActionButton: FloatingActionButton.extended(
+            onPressed: () {
+              // Navigate to the new page
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => AddPropertyDetailsPage()),
+              );
+            },
+            label: Icon(
+              Icons.add,
+              color: bWhite,
+              size: 48,
+            ),
+            // Icon for the button
+            backgroundColor: kPrimaryColor,
+            hoverColor: kPrimaryColor.withOpacity(0.4),
+            // Hover color of the button
+            shape: CircleBorder(
+              side: BorderSide(
+                color: Colors.white, // Color of the border
+                width: 2.0, // Width of the border
+              ),
+            ),
+            elevation: 3.0,
+          ),
+        ));
   }
 
   Widget propertyContainer(
@@ -433,7 +435,8 @@ class _LandingScreenState extends State<LandingScreen> {
             context,
             MaterialPageRoute(
               builder: (context) => PropertyDetailsViewPage(
-                status: "Active",
+                status: status,
+                propertyId:propertyId,
                 lineOneAddress: addressLineOne,
                 lineTwoAddress: addressLineTwo,
                 city: city,

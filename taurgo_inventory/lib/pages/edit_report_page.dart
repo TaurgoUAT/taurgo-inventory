@@ -98,7 +98,9 @@ class _EditReportPageState extends State<EditReportPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return PopScope(
+      canPop: false,
+        child: Scaffold(
       appBar: AppBar(
         title: Text(
           'Report', // Replace with the actual location
@@ -194,6 +196,6 @@ class _EditReportPageState extends State<EditReportPage> {
           ),
         ),
       ),
-    );
+    ));
   }
 }
