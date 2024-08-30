@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:taurgo_inventory/pages/edit_report_page.dart';
+import 'package:taurgo_inventory/pages/home_page.dart';
 import 'package:taurgo_inventory/pages/landing_screen.dart';
 import '../constants/AppColors.dart';
 import '../constants/AppColors.dart';
@@ -141,7 +142,7 @@ class _PropertyDetailsViewPageState extends State<PropertyDetailsViewPage> {
                     context,
                     MaterialPageRoute(
                         builder: (context) =>
-                            LandingScreen()), // Replace HomePage with your home page
+                            HomePage()), // Replace HomePage with your home page
                     // widget
                   );
                 },

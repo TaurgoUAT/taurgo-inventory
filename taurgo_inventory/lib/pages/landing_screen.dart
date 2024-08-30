@@ -232,7 +232,34 @@ class _LandingScreenState extends State<LandingScreen> {
               ),
             ],
           ),
-          body: Container(
+          body: isLoading
+              ? Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(
+                  width: 60.0,
+                  height: 60.0,
+                  child: CircularProgressIndicator(
+                    color: kPrimaryColor, // Set the color to your primary color
+                    strokeWidth: 3.0,
+                    strokeCap: StrokeCap.square, // Set the stroke width
+                  ),
+                ),
+                SizedBox(height: 16.0), // Add some space between the progress indicator and the text
+                Text(
+                  "Loading...",
+                  style: TextStyle(
+                    color: kPrimaryColor, // You can set the text color to match your theme
+                    fontSize: 14.0,
+                    fontWeight: FontWeight.w500,
+                    fontFamily: "Inter",
+                  ),
+                ),
+              ],
+            ),
+          )
+              : Container(
             color: bWhite,
             child: Padding(
               padding: EdgeInsets.all(16),
@@ -417,53 +444,7 @@ class _LandingScreenState extends State<LandingScreen> {
             ),
             elevation: 3.0,
           ),
-          drawer: Drawer(
-        // Add a ListView to the drawer. This ensures the user can scroll
-        // through the options in the drawer if there isn't enough vertical
-        // space to fit everything.
-        child: ListView(
-        // Important: Remove any padding from the ListView.
-        padding: EdgeInsets.zero,
-          children: [
-            const DrawerHeader(
-              decoration: BoxDecoration(
-                color: Colors.blue,
-              ),
-              child: Text('Drawer Header'),
-            ),
-            ListTile(
-              title: const Text('Home'),
-              selected: _selectedIndex == 0,
-              onTap: () {
-                // Update the state of the app
-                _onItemTapped(0);
-                // Then close the drawer
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              title: const Text('Business'),
-              selected: _selectedIndex == 1,
-              onTap: () {
-                // Update the state of the app
-                _onItemTapped(1);
-                // Then close the drawer
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              title: const Text('School'),
-              selected: _selectedIndex == 2,
-              onTap: () {
-                // Update the state of the app
-                _onItemTapped(2);
-                // Then close the drawer
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        ),
-    ),
+
         ));
   }
 

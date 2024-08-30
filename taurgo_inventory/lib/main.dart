@@ -1,6 +1,7 @@
 // import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:taurgo_inventory/pages/authentication/controller/authController.dart';
+import 'package:taurgo_inventory/pages/home_page.dart';
 import 'package:taurgo_inventory/pages/landing_screen.dart';
 
 import 'constants/AppColors.dart';
@@ -27,7 +28,7 @@ class MyApp extends StatelessWidget {
           IconThemeData(color: kPrimaryColor),
         ),
       ),
-      home: const LandingScreen(),
+      home: const HomePage(),
       // home: const Homepage(),
     );
   }
