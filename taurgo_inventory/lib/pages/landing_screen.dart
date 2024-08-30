@@ -206,14 +206,20 @@ class _LandingScreenState extends State<LandingScreen> {
             ),
             centerTitle: true,
             backgroundColor: bWhite,
-            leading: IconButton(
-              icon: Icon(
-                Icons.checklist_rtl_rounded,
-                color: kPrimaryColor,
-              ),
-              onPressed: () {
-                Scaffold.of(context).openDrawer();
+            leading: GestureDetector(
+              onTap: (){
+
               },
+              // onTap: () {
+              //   Navigator.pushReplacement(
+              //     context,
+              //     MaterialPageRoute(builder: (context) => Homepage()),
+              //   );
+              // },
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Image.asset('assets/logo/Taurgo Logo.png'),
+              ),
             ),
             actions: [
               IconButton(
