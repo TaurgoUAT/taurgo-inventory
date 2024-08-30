@@ -6,6 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:taurgo_inventory/pages/conditions/condition_details.dart';
 import 'package:taurgo_inventory/pages/edit_report_page.dart';
+import 'package:taurgo_inventory/pages/profile-pages/edit_profile.dart';
+import 'package:taurgo_inventory/pages/profile-pages/faq_page.dart';
+import 'package:taurgo_inventory/pages/profile-pages/setting_page.dart';
 import '../../constants/AppColors.dart';
 import '../../widgets/add_action.dart';
 
@@ -99,7 +102,7 @@ class _AccountPageState extends State<AccountPage> {
                   child: Text(
                     "General",
                     style: TextStyle(
-                      fontSize: 12.0,
+                      fontSize: 14.0,
                       fontWeight: FontWeight.w700,
                       color: kPrimaryTextColourTwo,
                     ),
@@ -139,7 +142,12 @@ class _AccountPageState extends State<AccountPage> {
                                   size: 30,
                                 ),
                                 onPressed: () {
-                                  // Your onPressed function here
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => EditProfile(),
+                                    ),
+                                  );
                                 },
                               ),
                             ),
@@ -161,13 +169,12 @@ class _AccountPageState extends State<AccountPage> {
                           color: kPrimaryColor,
                         ),
                         onPressed: () {
-                          // Navigator.pushReplacement(
-                          //   context,
-                          //   MaterialPageRoute(
-                          //       builder: (context) =>
-                          //           HomePage()), // Replace HomePage with your home page
-                          //   // widget
-                          // );
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => EditProfile(),
+                            ),
+                          );
                         },
                       ),
 
@@ -208,7 +215,12 @@ class _AccountPageState extends State<AccountPage> {
                                   size: 30,
                                 ),
                                 onPressed: () {
-                                  // Your onPressed function here
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => SettingPage(),
+                                    ),
+                                  );
                                 },
                               ),
                             ),
@@ -230,13 +242,12 @@ class _AccountPageState extends State<AccountPage> {
                             color: kPrimaryColor,
                           ),
                           onPressed: () {
-                            // Navigator.pushReplacement(
-                            //   context,
-                            //   MaterialPageRoute(
-                            //       builder: (context) =>
-                            //           HomePage()), // Replace HomePage with your home page
-                            //   // widget
-                            // );
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => SettingPage(),
+                              ),
+                            );
                           },
                         ),
 
@@ -277,7 +288,12 @@ class _AccountPageState extends State<AccountPage> {
                                   size: 30,
                                 ),
                                 onPressed: () {
-                                  // Your onPressed function here
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => FaqPage(),
+                                    ),
+                                  );
                                 },
                               ),
                             ),
@@ -299,13 +315,12 @@ class _AccountPageState extends State<AccountPage> {
                             color: kPrimaryColor,
                           ),
                           onPressed: () {
-                            // Navigator.pushReplacement(
-                            //   context,
-                            //   MaterialPageRoute(
-                            //       builder: (context) =>
-                            //           HomePage()), // Replace HomePage with your home page
-                            //   // widget
-                            // );
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => FaqPage(),
+                              ),
+                            );
                           },
                         ),
 

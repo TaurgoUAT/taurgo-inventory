@@ -6,6 +6,8 @@ import 'package:taurgo_inventory/pages/account_page.dart';
 import 'package:taurgo_inventory/pages/landing_screen.dart';
 
 class HomePage extends StatefulWidget {
+  static final GlobalKey<_HomePageState> homePageKey = GlobalKey<_HomePageState>();
+
   const HomePage({super.key});
 
   @override
@@ -21,7 +23,12 @@ class _HomePageState extends State<HomePage> {
     controller.dispose();
     super.dispose();
   }
-
+  void navigateToPage(int index) {
+    setState(() {
+      selected = index;
+      controller.jumpToPage(index);
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,10 +39,7 @@ class _HomePageState extends State<HomePage> {
             selected = index;
           });
         },
-        children: [
-          LandingScreen(),
-          AccountPage()
-        ],
+        children: [LandingScreen(), AccountPage()],
       ),
       bottomNavigationBar: StylishBottomBar(
         option: BubbleBarOptions(
@@ -46,7 +50,10 @@ class _HomePageState extends State<HomePage> {
         iconSpace: 24.0,
         items: [
           BottomBarItem(
-            icon: const Icon(Icons.home, color: kPrimaryColor,),
+            icon: const Icon(
+              Icons.home,
+              color: kPrimaryColor,
+            ),
             title: const Text('Home'),
             backgroundColor: kPrimaryColor,
             selectedIcon: const Icon(Icons.home_outlined),
@@ -55,7 +62,10 @@ class _HomePageState extends State<HomePage> {
             // showBadge: true,
           ),
           BottomBarItem(
-            icon: const Icon(Icons.person, color: kPrimaryColor,),
+            icon: const Icon(
+              Icons.person,
+              color: kPrimaryColor,
+            ),
             title: const Text('Account'),
             backgroundColor: kPrimaryColor,
             selectedIcon: const Icon(Icons.perm_identity_rounded),
