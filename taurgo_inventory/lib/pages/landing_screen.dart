@@ -7,6 +7,8 @@ import '../constants/AppColors.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import 'authentication/controller/authController.dart';
+
 class LandingScreen extends StatefulWidget {
   const LandingScreen({super.key});
 
@@ -228,12 +230,7 @@ class _LandingScreenState extends State<LandingScreen> {
                   color: Colors.red,
                 ),
                 onPressed: () {
-                  // Navigator.pushReplacement(
-                  //   context,
-                  //   MaterialPageRoute(
-                  //       builder: (context) =>
-                  //           Helpandsupportpage()), // Replace HomePage with your home page widget
-                  // );
+                  AuthController.instance.logOut();
                 },
               ),
             ],

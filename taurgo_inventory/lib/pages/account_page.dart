@@ -11,6 +11,7 @@ import 'package:taurgo_inventory/pages/profile-pages/faq_page.dart';
 import 'package:taurgo_inventory/pages/profile-pages/setting_page.dart';
 import '../../constants/AppColors.dart';
 import '../../widgets/add_action.dart';
+import 'authentication/controller/authController.dart';
 
 class AccountPage extends StatefulWidget {
   const AccountPage({super.key});
@@ -329,40 +330,45 @@ class _AccountPageState extends State<AccountPage> {
                 ),
                 Spacer(),
                 Center(
-                  child: Container(
-                    width: double.maxFinite,
-                    decoration: BoxDecoration(
-                      color: Colors.red.withOpacity(0.8), // Background color of the container
-                      borderRadius: BorderRadius.circular(30.0), // Rounded
-                      // corners
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.1), // Shadow color
-                          spreadRadius: 2,
-                          blurRadius: 5,
-                          offset: Offset(0, 3), // Shadow position
-                        ),
-                      ],
-                    ),
-                    padding: EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0), // Padding inside the container
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.logout,
-                          color: Colors.white, // Customize the icon color
-                        ),
-                        SizedBox(width: 8.0), // Space between the icon and the text
-                        Text(
-                          "Logout", // Customize the text
-                          style: TextStyle(
-                            color: Colors.white, // Text color
-                            fontSize: 16.0, // Font size
-                            fontWeight: FontWeight.bold, // Font weight
+                  child: GestureDetector(
+                    onTap: (){
+                      AuthController.instance.logOut();
+                    },
+                    child: Container(
+                      width: double.maxFinite,
+                      decoration: BoxDecoration(
+                        color: Colors.red.withOpacity(0.8), // Background color of the container
+                        borderRadius: BorderRadius.circular(30.0), // Rounded
+                        // corners
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1), // Shadow color
+                            spreadRadius: 2,
+                            blurRadius: 5,
+                            offset: Offset(0, 3), // Shadow position
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
+                      padding: EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0), // Padding inside the container
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.logout,
+                            color: Colors.white, // Customize the icon color
+                          ),
+                          SizedBox(width: 8.0), // Space between the icon and the text
+                          Text(
+                            "Logout", // Customize the text
+                            style: TextStyle(
+                              color: Colors.white, // Text color
+                              fontSize: 16.0, // Font size
+                              fontWeight: FontWeight.bold, // Font weight
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 )

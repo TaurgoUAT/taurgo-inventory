@@ -9,11 +9,25 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9cfeb956-5354-4366-ab84-34804ef25cb7" name="Changes" comment="Profile Page Modified">
-      <change afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/profile-pages/edit_profile.dart" afterDir="false" />
+    <list default="true" id="9cfeb956-5354-4366-ab84-34804ef25cb7" name="Changes" comment="Profile Pages added">
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Dart_Packages.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/Dart_Packages.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Flutter_Plugins.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/Flutter_Plugins.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/taurgo_inventory/ios/Podfile.lock" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/ios/Podfile.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/constants/UrlConstants.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/constants/UrlConstants.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/main.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/main.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/account_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/account_page.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/home_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/home_page.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/authentication/Widgets/SignInBoard.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/authentication/Widgets/SignInBoard.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/authentication/Widgets/SignUpBoard.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/authentication/Widgets/SignUpBoard.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/authentication/controller/authController.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/authentication/controller/authController.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/authentication/signInPage.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/authentication/signInPage.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/authentication/signUpPage.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/authentication/signUpPage.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/landing_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/landing_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/taurgo_inventory/macos/Flutter/GeneratedPluginRegistrant.swift" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/macos/Flutter/GeneratedPluginRegistrant.swift" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/taurgo_inventory/pubspec.lock" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/pubspec.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/taurgo_inventory/pubspec.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/pubspec.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/taurgo_inventory/windows/flutter/generated_plugin_registrant.cc" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/windows/flutter/generated_plugin_registrant.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/taurgo_inventory/windows/flutter/generated_plugins.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/windows/flutter/generated_plugins.cmake" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -170,7 +184,14 @@
       <option name="project" value="LOCAL" />
       <updated>1724988079518</updated>
     </task>
-    <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00014" summary="Profile Pages added">
+      <created>1724988907323</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1724988907323</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -183,7 +204,8 @@
     <MESSAGE value="Gesture Navigation Disabled" />
     <MESSAGE value="Bottom Nav BAr Added" />
     <MESSAGE value="Profile Page Modified" />
-    <option name="LAST_COMMIT_MESSAGE" value="Profile Page Modified" />
+    <MESSAGE value="Profile Pages added" />
+    <option name="LAST_COMMIT_MESSAGE" value="Profile Pages added" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -225,7 +247,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="Dart">
           <url>file://$PROJECT_DIR$/taurgo_inventory/lib/pages/landing_screen.dart</url>
-          <line>88</line>
+          <line>90</line>
           <option name="timeStamp" value="15" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="Dart">
