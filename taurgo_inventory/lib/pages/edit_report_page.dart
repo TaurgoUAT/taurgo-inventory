@@ -26,7 +26,6 @@ import 'package:taurgo_inventory/pages/reportPages/toilet.dart';
 import 'package:taurgo_inventory/pages/reportPages/utility_room.dart';
 // Import other pages here
 import '../constants/AppColors.dart';
-
 import 'landing_screen.dart';
 
 class EditReportPage extends StatefulWidget {
@@ -38,6 +37,7 @@ class EditReportPage extends StatefulWidget {
 
 class _EditReportPageState extends State<EditReportPage> {
   String? selectedType;
+  final Set<String> visitedPages = {}; // Track visited pages
 
   final List<String> types = [
     'Schedule of Condition',
@@ -115,7 +115,6 @@ class _EditReportPageState extends State<EditReportPage> {
     'Manuals/ Certificates': Icons.book,
     'Property Receipts': Icons.receipt,
   };
-
 
   @override
   Widget build(BuildContext context) {
@@ -209,93 +208,71 @@ class _EditReportPageState extends State<EditReportPage> {
               );
             },
             child: Icon(
-              Icons.arrow_back_ios_new,
+              Icons.arrow_back_ios_new_rounded,
+              size: 20,
               color: kPrimaryColor,
-              size: 24,
             ),
           ),
         ),
-        body: Padding(
-          padding: EdgeInsets.all(16),
-          child: GridView.builder(
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2, // Number of columns
-              crossAxisSpacing: 16, // Horizontal spacing
-              mainAxisSpacing: 16, // Vertical spacing
-              childAspectRatio: 0.99, // Adjust the aspect ratio
-            ),
-            itemCount: types.length,
-            itemBuilder: (context, index) {
-              String type = types[index];
-              IconData icon = typeToIconMap[type] ?? Icons.edit_note; // Default icon if not found
-
-              return GestureDetector(
-                onTap: () {
-                  setState(() {
-                    selectedType = type;
-                  });
-
-                  // Navigate to the corresponding page based on the type
-                  if (typeToPageMap.containsKey(selectedType)) {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) =>
-                          typeToPageMap[selectedType]!),
-                    );
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Page for $selectedType not yet implemented.'),
-                      ),
-                    );
-                  }
-                },
-                child: Container(
-                  width: 150, // Adjust the width as needed
-                  height: 350, // Adjust the height as needed
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    border: Border.all(color: kPrimaryColor),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Flexible(
-                          child: IconButton(
-                            icon: Icon(
-                              icon,
-                              color: kPrimaryColor,
-                              size: 24,
-                            ),
-                            onPressed: () {
-                              // Your onPressed functionality here
-                            },
-                          ),
-                        ),
-                        SizedBox(height: 12),
-                        Flexible(
-                          child: Text(
-                            types[index],
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w200,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-
-              );
-            },
-
+        body: GridView.builder(
+          padding: EdgeInsets.all(1),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            crossAxisSpacing: 10,
+            mainAxisSpacing: 10,
           ),
+          itemCount: types.length,
+          itemBuilder: (context, index) {
+            final type = types[index];
+            return GestureDetector(
+              onTap: () {
+                if (!visitedPages.contains(type)) {
+                  visitedPages.add(type);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => typeToPageMap[type]!,
+                    ),
+                  ).then((_) {
+                    setState(() {}); // Update the grid view after returning
+                  });
+                }
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.3),
+                      spreadRadius: 2,
+                      blurRadius: 5,
+                      offset: Offset(4, 4),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      typeToIconMap[type],
+                      size: 50,
+                      color: kPrimaryColor,
+                    ),
+                    SizedBox(height: 10),
+                    Text(
+                      type,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: kPrimaryColor,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
         ),
       ),
     );
