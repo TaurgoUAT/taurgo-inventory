@@ -14,6 +14,7 @@ import 'package:mailer/mailer.dart';
 import 'package:mailer/smtp_server/gmail.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
+import 'package:taurgo_inventory/constants/UrlConstants.dart';
 import 'package:taurgo_inventory/pages/authentication/signInPage.dart';
 import 'package:taurgo_inventory/pages/home_page.dart';
 import 'package:taurgo_inventory/pages/landing_screen.dart';
@@ -58,16 +59,40 @@ class AuthController extends GetxController {
     }
   }
 
-  void registerUser(String email, password, String name) async {
+  void registerUser(String email, password, String userName,String firstName,
+      lastName, String location) async {
     try {
       UserCredential userCredential = await auth.createUserWithEmailAndPassword(
           email: email, password: password);
 
       User? user = userCredential.user;
       print(user?.email);
-      print(name);
+      // print(name);
       print(user?.email);
       // Get.to(() => SubscriptionPage());
+
+      var uri = Uri.parse('$baseURL/user/new-user');
+      final request = http.MultipartRequest('POST', uri)
+        ..fields['firebaseId'] = user!.uid
+        ..fields['firstName'] = firstName
+        ..fields['lastName'] = lastName
+        ..fields['userName'] = userName
+        ..fields['email'] = email
+        ..fields['location'] = location;
+
+      var response = await request.send();
+      print('Response status: ${response.statusCode}');
+
+      if (response.statusCode == 200) {
+        print('Request successful');
+      }
+      else{
+        print('${response.statusCode}');
+      }
+      print(userName);
+      print(user?.email);
+      // Get.to(() => SubscriptionPage());
+
 
     } catch (e) {
       Get.snackbar("About User", "User Message",

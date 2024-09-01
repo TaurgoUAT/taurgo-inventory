@@ -196,7 +196,10 @@ class _SignUpPageState extends State<SignUpPage> {
                       AuthController.instance.registerUser(
                           emailController.text.trim(),
                           passwordController.text.trim(),
-                          nameController.text.trim());
+                          nameController.text.trim(),
+                      firstNameController.text.trim(),
+                      lastNameController.text.trim(),
+                      locationController.text.trim());
                     },
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
