@@ -207,7 +207,14 @@
       <option name="project" value="LOCAL" />
       <updated>1725198903178</updated>
     </task>
-    <option name="localTasksCounter" value="20" />
+    <task id="LOCAL-00020" summary="Version One Completed">
+      <created>1725199547788</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1725199547788</updated>
+    </task>
+    <option name="localTasksCounter" value="21" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -237,32 +244,32 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="Dart">
           <url>file://$PROJECT_DIR$/taurgo_inventory/lib/pages/deatails_confirmation_page.dart</url>
-          <line>667</line>
+          <line>668</line>
           <option name="timeStamp" value="9" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="Dart">
           <url>file://$PROJECT_DIR$/taurgo_inventory/lib/pages/deatails_confirmation_page.dart</url>
-          <line>65</line>
+          <line>66</line>
           <option name="timeStamp" value="10" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="Dart">
           <url>file://$PROJECT_DIR$/taurgo_inventory/lib/pages/deatails_confirmation_page.dart</url>
-          <line>68</line>
+          <line>69</line>
           <option name="timeStamp" value="11" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="Dart">
           <url>file://$PROJECT_DIR$/taurgo_inventory/lib/pages/deatails_confirmation_page.dart</url>
-          <line>100</line>
+          <line>101</line>
           <option name="timeStamp" value="12" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="Dart">
           <url>file://$PROJECT_DIR$/taurgo_inventory/lib/pages/deatails_confirmation_page.dart</url>
-          <line>104</line>
+          <line>105</line>
           <option name="timeStamp" value="13" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="Dart">
           <url>file://$PROJECT_DIR$/taurgo_inventory/lib/pages/deatails_confirmation_page.dart</url>
-          <line>102</line>
+          <line>103</line>
           <option name="timeStamp" value="14" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="Dart">
