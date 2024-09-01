@@ -19,6 +19,8 @@ import 'package:taurgo_inventory/pages/authentication/signInPage.dart';
 import 'package:taurgo_inventory/pages/home_page.dart';
 import 'package:taurgo_inventory/pages/landing_screen.dart';
 
+import '../../../constants/AppColors.dart';
+
 class AuthController extends GetxController {
   //Where should I need this Auth Controller
   //
@@ -82,6 +84,30 @@ class AuthController extends GetxController {
 
       var response = await request.send();
       print('Response status: ${response.statusCode}');
+      Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          SizedBox(
+            width: 60.0,
+            height: 60.0,
+            child: CircularProgressIndicator(
+              color: kPrimaryColor, // Set the color to your primary color
+              strokeWidth: 3.0,
+              strokeCap: StrokeCap.square, // Set the stroke width
+            ),
+          ),
+          SizedBox(height: 16.0), // Add some space between the progress indicator and the text
+          Text(
+            "Loading...",
+            style: TextStyle(
+              color: kPrimaryColor, // You can set the text color to match your theme
+              fontSize: 14.0,
+              fontWeight: FontWeight.w500,
+              fontFamily: "Inter",
+            ),
+          ),
+        ],
+      );
 
       if (response.statusCode == 200) {
         print('Request successful');
@@ -109,6 +135,30 @@ class AuthController extends GetxController {
 
   void logInUser(String email, password) async {
     try {
+      Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          SizedBox(
+            width: 60.0,
+            height: 60.0,
+            child: CircularProgressIndicator(
+              color: kPrimaryColor, // Set the color to your primary color
+              strokeWidth: 3.0,
+              strokeCap: StrokeCap.square, // Set the stroke width
+            ),
+          ),
+          SizedBox(height: 16.0), // Add some space between the progress indicator and the text
+          Text(
+            "Loading...",
+            style: TextStyle(
+              color: kPrimaryColor, // You can set the text color to match your theme
+              fontSize: 14.0,
+              fontWeight: FontWeight.w500,
+              fontFamily: "Inter",
+            ),
+          ),
+        ],
+      );
       await auth.signInWithEmailAndPassword(email: email, password: password);
     } catch (e) {
       Get.snackbar("About Login", "User Message",
@@ -124,6 +174,30 @@ class AuthController extends GetxController {
   }
 
   void logOut() async {
+    Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        SizedBox(
+          width: 60.0,
+          height: 60.0,
+          child: CircularProgressIndicator(
+            color: kPrimaryColor, // Set the color to your primary color
+            strokeWidth: 3.0,
+            strokeCap: StrokeCap.square, // Set the stroke width
+          ),
+        ),
+        SizedBox(height: 16.0), // Add some space between the progress indicator and the text
+        Text(
+          "Loading...",
+          style: TextStyle(
+            color: kPrimaryColor, // You can set the text color to match your theme
+            fontSize: 14.0,
+            fontWeight: FontWeight.w500,
+            fontFamily: "Inter",
+          ),
+        ),
+      ],
+    );
     await auth.signOut();
   }
 

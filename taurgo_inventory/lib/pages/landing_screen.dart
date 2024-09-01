@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:taurgo_inventory/constants/UrlConstants.dart';
 import 'package:taurgo_inventory/pages/add_property_details_page.dart';
@@ -6,6 +7,8 @@ import 'package:taurgo_inventory/pages/property_details_view_page.dart';
 import '../constants/AppColors.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 
 import 'authentication/controller/authController.dart';
 
@@ -23,10 +26,19 @@ class _LandingScreenState extends State<LandingScreen> {
   String filterOption = 'All'; // Initial filter option
   List<Map<String, dynamic>> filteredProperties = [];
   List<Map<String, dynamic>> properties = [];
+  List<Map<String, dynamic>> userDetails= [];
+  User? user;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  // List<Map<String, dynamic>> userDetails = [];
+
+
+
 
   @override
   void initState() {
     super.initState();
+    getFirebaseUserId();
     fetchProperties();
   }
 
@@ -65,7 +77,65 @@ class _LandingScreenState extends State<LandingScreen> {
       }
     }
   }
+  late String firebaseId;
 
+  Future<void> getFirebaseUserId() async {
+    try {
+      user = FirebaseAuth.instance.currentUser;
+
+      if (user != null) {
+        setState(() {
+          firebaseId = user!.uid;
+        });
+        fetchUserDetails();
+      } else {
+        print("No user is currently signed in.");
+      }
+    } catch (e) {
+      print("Error getting user UID: $e");
+    }
+  }
+
+  Future<void> fetchUserDetails() async {
+    try {
+      final response = await http.get(Uri.parse
+        ('$baseURL/user/firebaseId/$firebaseId'));
+
+      if (response.statusCode == 200) {
+        print(response.statusCode);
+        final List<dynamic>userData = json.decode(response.body);
+
+        if (mounted) {
+          setState(() {
+            // Assuming you have a userDetails map to store user information
+            userDetails =
+                userData.map((item) => item as Map<String, dynamic>).toList();
+            print(userDetails.length);
+            isLoading = false;
+          });
+        }
+      } else {
+        print("Failed to load user data: ${response.statusCode}");
+        if (mounted) {
+          setState(() {
+            isLoading = false;
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text("Failed to load user data. Please try again."),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      print("Error fetching user data: $e");
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    }
+  }
   Future<void> deletePropertyById(String propertyId) async {
     print(propertyId);
     final url = '$baseURL/property/$propertyId';
@@ -173,7 +243,8 @@ class _LandingScreenState extends State<LandingScreen> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      'Abishan',
+                      userDetails.isNotEmpty ? userDetails[0]['userName'] ?? ''
+                          'Abishan' : 'Abishan',
                       style: TextStyle(
                         color: kPrimaryColor,
                         fontSize: 16,
@@ -193,7 +264,9 @@ class _LandingScreenState extends State<LandingScreen> {
                         SizedBox(width: 4),
                         // Space between the icon and the location text
                         Text(
-                          'Vavuniya', // Replace with the actual location
+                          userDetails.isNotEmpty ? userDetails[0]['location']
+                              ?? ''
+                              'UK' : 'UK',
                           style: TextStyle(
                             color: kPrimaryColor,
                             fontSize: 11, // Adjust the font size

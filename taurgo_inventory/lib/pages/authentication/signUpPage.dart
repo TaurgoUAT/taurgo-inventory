@@ -34,9 +34,8 @@ class _SignUpPageState extends State<SignUpPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: false,
-      body: Container(
-        color: bWhite,
+      body: SingleChildScrollView(
+        // color: bWhite,
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
@@ -183,7 +182,6 @@ class _SignUpPageState extends State<SignUpPage> {
                   ),
                   contentPadding: EdgeInsets.symmetric(horizontal: 16.0),
                 ),
-                obscureText: true,
               ),
 
               SizedBox(height: 40),

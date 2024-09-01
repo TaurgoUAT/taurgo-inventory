@@ -12,6 +12,17 @@ import 'package:taurgo_inventory/pages/profile-pages/setting_page.dart';
 import '../../constants/AppColors.dart';
 import '../../widgets/add_action.dart';
 import 'authentication/controller/authController.dart';
+import 'dart:async';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:taurgo_inventory/constants/UrlConstants.dart';
+import 'package:taurgo_inventory/pages/add_property_details_page.dart';
+import 'package:taurgo_inventory/pages/property_details_view_page.dart';
+import '../constants/AppColors.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 
 class AccountPage extends StatefulWidget {
   const AccountPage({super.key});
@@ -21,6 +32,83 @@ class AccountPage extends StatefulWidget {
 }
 
 class _AccountPageState extends State<AccountPage> {
+
+
+  List<Map<String, dynamic>> completedProperties = [];
+  List<Map<String, dynamic>> pendingProperties = [];
+  bool isLoading = true;
+  String filterOption = 'All'; // Initial filter option
+  List<Map<String, dynamic>> filteredProperties = [];
+  List<Map<String, dynamic>> properties = [];
+  List<Map<String, dynamic>> userDetails= [];
+  User? user;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  @override
+  void initState() {
+    super.initState();
+    getFirebaseUserId();
+  }
+  late String firebaseId;
+
+  Future<void> getFirebaseUserId() async {
+    try {
+      user = FirebaseAuth.instance.currentUser;
+
+      if (user != null) {
+        setState(() {
+          firebaseId = user!.uid;
+        });
+        fetchUserDetails();
+      } else {
+        print("No user is currently signed in.");
+      }
+    } catch (e) {
+      print("Error getting user UID: $e");
+    }
+  }
+  Future<void> fetchUserDetails() async {
+    try {
+      final response = await http.get(Uri.parse
+        ('$baseURL/user/firebaseId/$firebaseId'));
+
+      if (response.statusCode == 200) {
+        print(response.statusCode);
+        final List<dynamic>userData = json.decode(response.body);
+
+        if (mounted) {
+          setState(() {
+            // Assuming you have a userDetails map to store user information
+            userDetails =
+                userData.map((item) => item as Map<String, dynamic>).toList();
+            print(userDetails.length);
+            isLoading = false;
+          });
+        }
+      } else {
+        print("Failed to load user data: ${response.statusCode}");
+        if (mounted) {
+          setState(() {
+            isLoading = false;
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text("Failed to load user data. Please try again."),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      print("Error fetching user data: $e");
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    }
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return PopScope(
@@ -78,7 +166,8 @@ class _AccountPageState extends State<AccountPage> {
                 SizedBox(height: 15.0),
                 Center(
                   child: Text(
-                    "Abishan Parameswran",
+                    userDetails.isNotEmpty ? userDetails[0]['firstName'] ?? ''
+                        'Abishan' : 'Abishan',
                     style: TextStyle(
                       fontSize: 16.0,
                       fontWeight: FontWeight.w700,
@@ -89,7 +178,8 @@ class _AccountPageState extends State<AccountPage> {
                 SizedBox(height: 2.0),
                 Center(
                   child: Text(
-                    "highoncode09@gmail.com",
+                    userDetails.isNotEmpty ? userDetails[0]['email'] ?? ''
+                        'Abishan' : 'Abishan',
                     style: TextStyle(
                       fontSize: 11.0,
                       fontWeight: FontWeight.w700,
