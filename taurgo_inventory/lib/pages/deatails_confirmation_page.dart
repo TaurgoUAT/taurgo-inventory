@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:taurgo_inventory/constants/UrlConstants.dart';
 import 'package:taurgo_inventory/pages/conditions/condition_details.dart';
 import 'package:taurgo_inventory/pages/edit_report_page.dart';
+import 'package:taurgo_inventory/pages/home_page.dart';
 import 'package:taurgo_inventory/pages/landing_screen.dart';
 import '../../constants/AppColors.dart';
 import 'package:http/http.dart' as http;
@@ -130,7 +131,7 @@ class _DetailsConfirmationPageState extends State<DetailsConfirmationPage> {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-              builder: (context) =>LandingScreen(),
+              builder: (context) =>HomePage(),
             ),
           );
         });

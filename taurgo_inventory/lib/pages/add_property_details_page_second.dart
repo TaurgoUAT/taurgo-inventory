@@ -89,7 +89,7 @@ class _AddPropertyDetailsPageSecondState extends State<AddPropertyDetailsPageSec
                   children: [
                     Text(
                       DateFormat('dd:MM:yyyy').format(tempPickedDate), // Updated date format
-                      style: TextStyle(color: Colors.blue, fontSize: 17),
+                      style: TextStyle(color: kPrimaryColor, fontSize: 17),
                     ),
                     TextButton(
                       onPressed: () {
@@ -103,7 +103,7 @@ class _AddPropertyDetailsPageSecondState extends State<AddPropertyDetailsPageSec
                       },
                       child: Text(
                         'Done',
-                        style: TextStyle(color: Colors.blue, fontSize: 17),
+                        style: TextStyle(color: kPrimaryColor, fontSize: 17),
                       ),
                     ),
                   ],
@@ -149,7 +149,7 @@ class _AddPropertyDetailsPageSecondState extends State<AddPropertyDetailsPageSec
                   children: [
                     Text(
                       DateFormat('HH:mm').format(tempPickedTime), // Displaying time in HH:mm format
-                      style: TextStyle(color: Colors.blue, fontSize: 17),
+                      style: TextStyle(color: kPrimaryColor, fontSize: 17),
                     ),
                     TextButton(
                       onPressed: () {
@@ -168,7 +168,7 @@ class _AddPropertyDetailsPageSecondState extends State<AddPropertyDetailsPageSec
                       },
                       child: Text(
                         'Done',
-                        style: TextStyle(color: Colors.blue, fontSize: 17),
+                        style: TextStyle(color: kPrimaryColor, fontSize: 17),
                       ),
                     ),
                   ],
@@ -375,7 +375,7 @@ class _AddPropertyDetailsPageSecondState extends State<AddPropertyDetailsPageSec
                             ),
                           ),
                           child: Text(
-                            'Exit',
+                            'Continue',
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 16,
