@@ -9,15 +9,17 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9cfeb956-5354-4366-ab84-34804ef25cb7" name="Changes" comment="Shared Prefernces Added">
-      <change afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/inspection_confimation_page.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Dart_Packages.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/Dart_Packages.xml" afterDir="false" />
+    <list default="true" id="9cfeb956-5354-4366-ab84-34804ef25cb7" name="Changes" comment="Summary Screen Added">
+      <change afterPath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/Assets.xcassets/AppIcon.appiconset/100 1.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/Assets.xcassets/AppIcon.appiconset/120 1.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/Assets.xcassets/AppIcon.appiconset/40 1.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/Assets.xcassets/AppIcon.appiconset/58 1.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/Assets.xcassets/AppIcon.appiconset/58 2.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/Assets.xcassets/AppIcon.appiconset/80 1.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/Assets.xcassets/AppIcon.appiconset/80 2.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/Assets.xcassets/AppIcon.appiconset/87 1.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/add_property_details_page_second.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/add_property_details_page_second.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/edit_report_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/edit_report_page.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/landing_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/landing_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/pubspec.lock" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/pubspec.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/pubspec.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/pubspec.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/Assets.xcassets/AppIcon.appiconset/Contents.json" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/Assets.xcassets/AppIcon.appiconset/Contents.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -237,7 +239,14 @@
       <option name="project" value="LOCAL" />
       <updated>1725265688442</updated>
     </task>
-    <option name="localTasksCounter" value="23" />
+    <task id="LOCAL-00023" summary="Summary Screen Added">
+      <created>1725362616781</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1725362616781</updated>
+    </task>
+    <option name="localTasksCounter" value="24" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -267,7 +276,8 @@
     <MESSAGE value="Authentication Backend Integrated" />
     <MESSAGE value="Version One Completed" />
     <MESSAGE value="Shared Prefernces Added" />
-    <option name="LAST_COMMIT_MESSAGE" value="Shared Prefernces Added" />
+    <MESSAGE value="Summary Screen Added" />
+    <option name="LAST_COMMIT_MESSAGE" value="Summary Screen Added" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
