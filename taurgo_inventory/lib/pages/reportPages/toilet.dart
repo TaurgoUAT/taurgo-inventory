@@ -3,7 +3,7 @@ import 'dart:io';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart'; // Add this import for SharedPreferences
+import 'package:shared_preferences/shared_preferences.dart'; // Import shared_preferences
 import 'package:taurgo_inventory/pages/conditions/condition_details.dart';
 import 'package:taurgo_inventory/pages/edit_report_page.dart';
 
@@ -21,66 +21,107 @@ class Toilet extends StatefulWidget {
 }
 
 class _ToiletState extends State<Toilet> {
-  String? door;
-  String? doorFrame;
-  String? ceiling;
-  String? extractorFan;
-  String? lighting;
-  String? walls;
-  String? skirting;
-  String? windowSill;
-  String? curtains;
-  String? blinds;
-  String? toilet;
-  String? basin;
-  String? showerCubicle;
-  String? bath;
-  String? switchBoard;
-  String? socket;
-  String? heating;
-  String? accessories;
-  String? flooring;
-  String? additionItems;
+  String? doorCondition;
+  String? doorDescription;
+  String? doorFrameCondition;
+  String? doorFrameDescription;
+  String? ceilingCondition;
+  String? ceilingDescription;
+  String? extractorFanCondition;
+  String? extractorFanDescription;
+  String? lightingCondition;
+  String? lightingDescription;
+  String? wallsCondition;
+  String? wallsDescription;
+  String? skirtingCondition;
+  String? skirtingDescription;
+  String? windowSillCondition;
+  String? windowSillDescription;
+  String? curtainsCondition;
+  String? curtainsDescription;
+  String? blindsCondition;
+  String? blindsDescription;
+  String? toiletCondition;
+  String? toiletDescription;
+  String? basinCondition;
+  String? basinDescription;
+  String? showerCubicleCondition;
+  String? showerCubicleDescription;
+  String? bathCondition;
+  String? bathDescription;
+  String? switchBoardCondition;
+  String? switchBoardDescription;
+  String? socketCondition;
+  String? socketDescription;
+  String? heatingCondition;
+  String? heatingDescription;
+  String? accessoriesCondition;
+  String? accessoriesDescription;
+  String? flooringCondition;
+  String? flooringDescription;
+  String? additionalItemsCondition;
+  String? additionalItemsDescription;
   late List<File> capturedImages;
 
   @override
   void initState() {
     super.initState();
     capturedImages = widget.capturedImages ?? [];
-    _loadPreferences(); // Load preferences on init
+    _loadPreferences(); // Load the saved preferences when the state is initialized
   }
 
-  // Load saved preferences
+  // Function to load preferences
   Future<void> _loadPreferences() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final prefs = await SharedPreferences.getInstance();
     setState(() {
-      door = prefs.getString('door');
-      doorFrame = prefs.getString('doorFrame');
-      ceiling = prefs.getString('ceiling');
-      extractorFan = prefs.getString('extractorFan');
-      lighting = prefs.getString('lighting');
-      walls = prefs.getString('walls');
-      skirting = prefs.getString('skirting');
-      windowSill = prefs.getString('windowSill');
-      curtains = prefs.getString('curtains');
-      blinds = prefs.getString('blinds');
-      toilet = prefs.getString('toilet');
-      basin = prefs.getString('basin');
-      showerCubicle = prefs.getString('showerCubicle');
-      bath = prefs.getString('bath');
-      switchBoard = prefs.getString('switchBoard');
-      socket = prefs.getString('socket');
-      heating = prefs.getString('heating');
-      accessories = prefs.getString('accessories');
-      flooring = prefs.getString('flooring');
-      additionItems = prefs.getString('additionItems');
+      doorCondition = prefs.getString('doorCondition');
+      doorDescription = prefs.getString('doorDescription');
+      doorFrameCondition = prefs.getString('doorFrameCondition');
+      doorFrameDescription = prefs.getString('doorFrameDescription');
+      ceilingCondition = prefs.getString('ceilingCondition');
+      ceilingDescription = prefs.getString('ceilingDescription');
+      extractorFanCondition = prefs.getString('extractorFanCondition');
+      extractorFanDescription = prefs.getString('extractorFanDescription');
+      lightingCondition = prefs.getString('lightingCondition');
+      lightingDescription = prefs.getString('lightingDescription');
+      wallsCondition = prefs.getString('wallsCondition');
+      wallsDescription = prefs.getString('wallsDescription');
+      skirtingCondition = prefs.getString('skirtingCondition');
+      skirtingDescription = prefs.getString('skirtingDescription');
+      windowSillCondition = prefs.getString('windowSillCondition');
+      windowSillDescription = prefs.getString('windowSillDescription');
+      curtainsCondition = prefs.getString('curtainsCondition');
+      curtainsDescription = prefs.getString('curtainsDescription');
+      blindsCondition = prefs.getString('blindsCondition');
+      blindsDescription = prefs.getString('blindsDescription');
+      toiletCondition = prefs.getString('toiletCondition');
+      toiletDescription = prefs.getString('toiletDescription');
+      basinCondition = prefs.getString('basinCondition');
+      basinDescription = prefs.getString('basinDescription');
+      showerCubicleCondition = prefs.getString('showerCubicleCondition');
+      showerCubicleDescription = prefs.getString('showerCubicleDescription');
+      bathCondition = prefs.getString('bathCondition');
+      bathDescription = prefs.getString('bathDescription');
+      switchBoardCondition = prefs.getString('switchBoardCondition');
+      switchBoardDescription = prefs.getString('switchBoardDescription');
+      socketCondition = prefs.getString('socketCondition');
+      socketDescription = prefs.getString('socketDescription');
+      heatingCondition = prefs.getString('heatingCondition');
+      heatingDescription = prefs.getString('heatingDescription');
+      accessoriesCondition = prefs.getString('accessoriesCondition');
+      accessoriesDescription = prefs.getString('accessoriesDescription');
+      flooringCondition = prefs.getString('flooringCondition');
+      flooringDescription = prefs.getString('flooringDescription');
+      additionalItemsCondition = prefs.getString('additionalItemsCondition');
+      additionalItemsDescription =
+          prefs.getString('additionalItemsDescription');
     });
   }
 
-  // Save preferences when a condition is selected
+  // Function to save a preference
   Future<void> _savePreference(String key, String? value) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString(key, value ?? '');
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setString(key, value ?? '');
   }
 
   @override
@@ -88,7 +129,7 @@ class _ToiletState extends State<Toilet> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Bath Room',
+          'Toilet',
           style: TextStyle(
             color: kPrimaryColor,
             fontSize: 14,
@@ -122,240 +163,420 @@ class _ToiletState extends State<Toilet> {
               // Door
               ConditionItem(
                 name: "Door",
-                selectedCondition: door,
+                condition: doorCondition,
+                description: doorDescription,
                 onConditionSelected: (condition) {
                   setState(() {
-                    door = condition;
+                    doorCondition = condition;
                   });
-                  _savePreference('door', condition);
+                  _savePreference(
+                      'doorCondition', condition); // Save preference
+                },
+                onDescriptionSelected: (description) {
+                  setState(() {
+                    doorDescription = description;
+                  });
+                  _savePreference(
+                      'doorDescription', description); // Save preference
                 },
               ),
 
-              // Electric Meter
+              // Door Frame
               ConditionItem(
                 name: "Door Frame",
-                selectedCondition: doorFrame,
+                condition: doorFrameCondition,
+                description: doorFrameDescription,
                 onConditionSelected: (condition) {
                   setState(() {
-                    doorFrame = condition;
+                    doorFrameCondition = condition;
                   });
-                  _savePreference('doorFrame', condition);
+                  _savePreference(
+                      'doorFrameCondition', condition); // Save preference
+                },
+                onDescriptionSelected: (description) {
+                  setState(() {
+                    doorFrameDescription = description;
+                  });
+                  _savePreference(
+                      'doorFrameDescription', description); // Save preference
                 },
               ),
 
-              // Water Meter
+              // Ceiling
               ConditionItem(
                 name: "Ceiling",
-                selectedCondition: ceiling,
+                condition: ceilingCondition,
+                description: ceilingDescription,
                 onConditionSelected: (condition) {
                   setState(() {
-                    ceiling = condition;
+                    ceilingCondition = condition;
                   });
-                  _savePreference('ceiling', condition);
+                  _savePreference(
+                      'ceilingCondition', condition); // Save preference
+                },
+                onDescriptionSelected: (description) {
+                  setState(() {
+                    ceilingDescription = description;
+                  });
+                  _savePreference(
+                      'ceilingDescription', description); // Save preference
                 },
               ),
 
-              // Oil Meter
+              // Extractor Fan
               ConditionItem(
                 name: "Extractor Fan",
-                selectedCondition: extractorFan,
+                condition: extractorFanCondition,
+                description: extractorFanDescription,
                 onConditionSelected: (condition) {
                   setState(() {
-                    extractorFan = condition;
+                    extractorFanCondition = condition;
                   });
-                  _savePreference('extractorFan', condition);
+                  _savePreference(
+                      'extractorFanCondition', condition); // Save preference
+                },
+                onDescriptionSelected: (description) {
+                  setState(() {
+                    extractorFanDescription = description;
+                  });
+                  _savePreference('extractorFanDescription',
+                      description); // Save preference
                 },
               ),
 
-              //Lighting
+              // Lighting
               ConditionItem(
                 name: "Lighting",
-                selectedCondition: lighting,
+                condition: lightingCondition,
+                description: lightingDescription,
                 onConditionSelected: (condition) {
                   setState(() {
-                    lighting = condition;
+                    lightingCondition = condition;
                   });
-                  _savePreference('lighting', condition);
+                  _savePreference(
+                      'lightingCondition', condition); // Save preference
+                },
+                onDescriptionSelected: (description) {
+                  setState(() {
+                    lightingDescription = description;
+                  });
+                  _savePreference(
+                      'lightingDescription', description); // Save preference
                 },
               ),
 
-              //Walls
+              // Walls
               ConditionItem(
                 name: "Walls",
-                selectedCondition: walls,
+                condition: wallsCondition,
+                description: wallsDescription,
                 onConditionSelected: (condition) {
                   setState(() {
-                    walls = condition;
+                    wallsCondition = condition;
                   });
-                  _savePreference('walls', condition);
+                  _savePreference(
+                      'wallsCondition', condition); // Save preference
+                },
+                onDescriptionSelected: (description) {
+                  setState(() {
+                    wallsDescription = description;
+                  });
+                  _savePreference(
+                      'wallsDescription', description); // Save preference
                 },
               ),
 
-              //Skirting
+              // Skirting
               ConditionItem(
                 name: "Skirting",
-                selectedCondition: skirting,
+                condition: skirtingCondition,
+                description: skirtingDescription,
                 onConditionSelected: (condition) {
                   setState(() {
-                    skirting = condition;
+                    skirtingCondition = condition;
                   });
-                  _savePreference('skirting', condition);
+                  _savePreference(
+                      'skirtingCondition', condition); // Save preference
+                },
+                onDescriptionSelected: (description) {
+                  setState(() {
+                    skirtingDescription = description;
+                  });
+                  _savePreference(
+                      'skirtingDescription', description); // Save preference
                 },
               ),
 
-              //Window Sill
+              // Window Sill
               ConditionItem(
                 name: "Window Sill",
-                selectedCondition: windowSill,
+                condition: windowSillCondition,
+                description: windowSillDescription,
                 onConditionSelected: (condition) {
                   setState(() {
-                    windowSill = condition;
+                    windowSillCondition = condition;
                   });
-                  _savePreference('windowSill', condition);
+                  _savePreference(
+                      'windowSillCondition', condition); // Save preference
+                },
+                onDescriptionSelected: (description) {
+                  setState(() {
+                    windowSillDescription = description;
+                  });
+                  _savePreference(
+                      'windowSillDescription', description); // Save preference
                 },
               ),
 
-              //Curtains
+              // Curtains
               ConditionItem(
                 name: "Curtains",
-                selectedCondition: curtains,
+                condition: curtainsCondition,
+                description: curtainsDescription,
                 onConditionSelected: (condition) {
                   setState(() {
-                    curtains = condition;
+                    curtainsCondition = condition;
                   });
-                  _savePreference('curtains', condition);
+                  _savePreference(
+                      'curtainsCondition', condition); // Save preference
+                },
+                onDescriptionSelected: (description) {
+                  setState(() {
+                    curtainsDescription = description;
+                  });
+                  _savePreference(
+                      'curtainsDescription', description); // Save preference
                 },
               ),
 
-              //Blinds
+              // Blinds
               ConditionItem(
                 name: "Blinds",
-                selectedCondition: blinds,
+                condition: blindsCondition,
+                description: blindsDescription,
                 onConditionSelected: (condition) {
                   setState(() {
-                    blinds = condition;
+                    blindsCondition = condition;
                   });
-                  _savePreference('blinds', condition);
+                  _savePreference(
+                      'blindsCondition', condition); // Save preference
+                },
+                onDescriptionSelected: (description) {
+                  setState(() {
+                    blindsDescription = description;
+                  });
+                  _savePreference(
+                      'blindsDescription', description); // Save preference
                 },
               ),
 
-              //Toilet
+              // Toilet
               ConditionItem(
                 name: "Toilet",
-                selectedCondition: toilet,
+                condition: toiletCondition,
+                description: toiletDescription,
                 onConditionSelected: (condition) {
                   setState(() {
-                    toilet = condition;
+                    toiletCondition = condition;
                   });
-                  _savePreference('toilet', condition);
+                  _savePreference(
+                      'toiletCondition', condition); // Save preference
+                },
+                onDescriptionSelected: (description) {
+                  setState(() {
+                    toiletDescription = description;
+                  });
+                  _savePreference(
+                      'toiletDescription', description); // Save preference
                 },
               ),
 
-              //Basin
+              // Basin
               ConditionItem(
                 name: "Basin",
-                selectedCondition: basin,
+                condition: basinCondition,
+                description: basinDescription,
                 onConditionSelected: (condition) {
                   setState(() {
-                    basin = condition;
+                    basinCondition = condition;
                   });
-                  _savePreference('basin', condition);
+                  _savePreference(
+                      'basinCondition', condition); // Save preference
+                },
+                onDescriptionSelected: (description) {
+                  setState(() {
+                    basinDescription = description;
+                  });
+                  _savePreference(
+                      'basinDescription', description); // Save preference
                 },
               ),
 
-              //Shower Cubicle
+              // Shower Cubicle
               ConditionItem(
                 name: "Shower Cubicle",
-                selectedCondition: showerCubicle,
+                condition: showerCubicleCondition,
+                description: showerCubicleDescription,
                 onConditionSelected: (condition) {
                   setState(() {
-                    showerCubicle = condition;
+                    showerCubicleCondition = condition;
                   });
-                  _savePreference('showerCubicle', condition);
+                  _savePreference(
+                      'showerCubicleCondition', condition); // Save preference
+                },
+                onDescriptionSelected: (description) {
+                  setState(() {
+                    showerCubicleDescription = description;
+                  });
+                  _savePreference('showerCubicleDescription',
+                      description); // Save preference
                 },
               ),
 
-              //Bath
+              // Bath
               ConditionItem(
                 name: "Bath",
-                selectedCondition: bath,
+                condition: bathCondition,
+                description: bathDescription,
                 onConditionSelected: (condition) {
                   setState(() {
-                    bath = condition;
+                    bathCondition = condition;
                   });
-                  _savePreference('bath', condition);
+                  _savePreference(
+                      'bathCondition', condition); // Save preference
+                },
+                onDescriptionSelected: (description) {
+                  setState(() {
+                    bathDescription = description;
+                  });
+                  _savePreference(
+                      'bathDescription', description); // Save preference
                 },
               ),
 
-              //Switch Board
+              // Switch Board
               ConditionItem(
                 name: "Switch Board",
-                selectedCondition: switchBoard,
+                condition: switchBoardCondition,
+                description: switchBoardDescription,
                 onConditionSelected: (condition) {
                   setState(() {
-                    switchBoard = condition;
+                    switchBoardCondition = condition;
                   });
-                  _savePreference('switchBoard', condition);
+                  _savePreference(
+                      'switchBoardCondition', condition); // Save preference
+                },
+                onDescriptionSelected: (description) {
+                  setState(() {
+                    switchBoardDescription = description;
+                  });
+                  _savePreference(
+                      'switchBoardDescription', description); // Save preference
                 },
               ),
 
-              //Socket
+              // Socket
               ConditionItem(
                 name: "Socket",
-                selectedCondition: socket,
+                condition: socketCondition,
+                description: socketDescription,
                 onConditionSelected: (condition) {
                   setState(() {
-                    socket = condition;
+                    socketCondition = condition;
                   });
-                  _savePreference('socket', condition);
+                  _savePreference(
+                      'socketCondition', condition); // Save preference
+                },
+                onDescriptionSelected: (description) {
+                  setState(() {
+                    socketDescription = description;
+                  });
+                  _savePreference(
+                      'socketDescription', description); // Save preference
                 },
               ),
 
-              //Heating
+              // Heating
               ConditionItem(
                 name: "Heating",
-                selectedCondition: heating,
+                condition: heatingCondition,
+                description: heatingDescription,
                 onConditionSelected: (condition) {
                   setState(() {
-                    heating = condition;
+                    heatingCondition = condition;
                   });
-                  _savePreference('heating', condition);
+                  _savePreference(
+                      'heatingCondition', condition); // Save preference
+                },
+                onDescriptionSelected: (description) {
+                  setState(() {
+                    heatingDescription = description;
+                  });
+                  _savePreference(
+                      'heatingDescription', description); // Save preference
                 },
               ),
 
-              //Accessories
+              // Accessories
               ConditionItem(
                 name: "Accessories",
-                selectedCondition: accessories,
+                condition: accessoriesCondition,
+                description: accessoriesDescription,
                 onConditionSelected: (condition) {
                   setState(() {
-                    accessories = condition;
+                    accessoriesCondition = condition;
                   });
-                  _savePreference('accessories', condition);
+                  _savePreference(
+                      'accessoriesCondition', condition); // Save preference
+                },
+                onDescriptionSelected: (description) {
+                  setState(() {
+                    accessoriesDescription = description;
+                  });
+                  _savePreference(
+                      'accessoriesDescription', description); // Save preference
                 },
               ),
 
-              //Flooring
+              // Flooring
               ConditionItem(
                 name: "Flooring",
-                selectedCondition: flooring,
+                condition: flooringCondition,
+                description: flooringDescription,
                 onConditionSelected: (condition) {
                   setState(() {
-                    flooring = condition;
+                    flooringCondition = condition;
                   });
-                  _savePreference('flooring', condition);
+                  _savePreference(
+                      'flooringCondition', condition); // Save preference
+                },
+                onDescriptionSelected: (description) {
+                  setState(() {
+                    flooringDescription = description;
+                  });
+                  _savePreference(
+                      'flooringDescription', description); // Save preference
                 },
               ),
 
-              //Addition Items
+              // Additional Items
               ConditionItem(
-                name: "Addition Items",
-                selectedCondition: additionItems,
+                name: "Additional Items",
+                condition: additionalItemsCondition,
+                description: additionalItemsDescription,
                 onConditionSelected: (condition) {
                   setState(() {
-                    additionItems = condition;
+                    additionalItemsCondition = condition;
                   });
-                  _savePreference('additionItems', condition);
+                  _savePreference(
+                      'additionalItemsCondition', condition); // Save preference
+                },
+                onDescriptionSelected: (description) {
+                  setState(() {
+                    additionalItemsDescription = description;
+                  });
+                  _savePreference('additionalItemsDescription',
+                      description); // Save preference
                 },
               ),
 
@@ -370,14 +591,18 @@ class _ToiletState extends State<Toilet> {
 
 class ConditionItem extends StatelessWidget {
   final String name;
-  final String? selectedCondition;
+  final String? condition;
+  final String? description;
   final Function(String?) onConditionSelected;
+  final Function(String?) onDescriptionSelected;
 
   const ConditionItem({
     Key? key,
     required this.name,
-    this.selectedCondition,
+    this.condition,
+    this.description,
     required this.onConditionSelected,
+    required this.onDescriptionSelected,
   }) : super(key: key);
 
   @override
@@ -440,7 +665,6 @@ class ConditionItem extends StatelessWidget {
                       // Initialize the camera when the button is pressed
                       final cameras = await availableCameras();
                       if (cameras.isNotEmpty) {
-                        print("${cameras.toString()}");
                         final cameraController = CameraController(
                           cameras.first,
                           ResolutionPreset.high,
@@ -470,7 +694,7 @@ class ConditionItem extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) => ConditionDetails(
-                    initialCondition: selectedCondition,
+                    initialCondition: condition,
                     type: name,
                   ),
                 ),
@@ -481,7 +705,7 @@ class ConditionItem extends StatelessWidget {
               }
             },
             child: Text(
-              selectedCondition ?? "Location",
+              condition?.isNotEmpty == true ? condition! : "Condition",
               style: TextStyle(
                 fontSize: 12.0,
                 fontWeight: FontWeight.w700,
@@ -499,47 +723,18 @@ class ConditionItem extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) => ConditionDetails(
-                    initialCondition: selectedCondition,
+                    initialCondition: description,
                     type: name,
                   ),
                 ),
               );
 
               if (result != null) {
-                onConditionSelected(result);
+                onDescriptionSelected(result);
               }
             },
             child: Text(
-              selectedCondition ?? "Serial Number",
-              style: TextStyle(
-                fontSize: 12.0,
-                fontWeight: FontWeight.w700,
-                color: kPrimaryTextColourTwo,
-                fontStyle: FontStyle.italic,
-              ),
-            ),
-          ),
-          SizedBox(
-            height: 12,
-          ),
-          GestureDetector(
-            onTap: () async {
-              final result = await Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ConditionDetails(
-                    initialCondition: selectedCondition,
-                    type: name,
-                  ),
-                ),
-              );
-
-              if (result != null) {
-                onConditionSelected(result);
-              }
-            },
-            child: Text(
-              selectedCondition ?? "Reading",
+              description?.isNotEmpty == true ? description! : "Description",
               style: TextStyle(
                 fontSize: 12.0,
                 fontWeight: FontWeight.w700,

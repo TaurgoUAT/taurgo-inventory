@@ -21,9 +21,12 @@ class FrontGarden extends StatefulWidget {
 }
 
 class _FrontGardenState extends State<FrontGarden> {
-  String? driveWay;
-  String? outsideLighting;
-  String? additionalItems;
+  String? driveWayCondition;
+  String? driveWayDescription;
+  String? outsideLightingCondition;
+  String? outsideLightingDescription;
+  String? additionalItemsCondition;
+  String? additionalItemsDescription;
   late List<File> capturedImages;
 
   @override
@@ -37,9 +40,12 @@ class _FrontGardenState extends State<FrontGarden> {
   Future<void> _loadPreferences() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      driveWay = prefs.getString('driveWay');
-      outsideLighting = prefs.getString('outsideLighting');
-      additionalItems = prefs.getString('additionalItems');
+      driveWayCondition = prefs.getString('driveWayCondition');
+      driveWayDescription = prefs.getString('driveWayDescription');
+      outsideLightingCondition = prefs.getString('outsideLightingCondition');
+      outsideLightingDescription = prefs.getString('outsideLightingDescription');
+      additionalItemsCondition = prefs.getString('additionalItemsCondition');
+      additionalItemsDescription = prefs.getString('additionalItemsDescription');
     });
   }
 
@@ -54,7 +60,7 @@ class _FrontGardenState extends State<FrontGarden> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Bed Room',
+          'Front Garden',
           style: TextStyle(
             color: kPrimaryColor,
             fontSize: 14,
@@ -85,41 +91,60 @@ class _FrontGardenState extends State<FrontGarden> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              //Gas Meter
+              // Drive Way
               ConditionItem(
                 name: "Drive Way",
-                selectedCondition: driveWay,
+                condition: driveWayCondition,
+                description: driveWayDescription,
                 onConditionSelected: (condition) {
                   setState(() {
-                    driveWay = condition;
+                    driveWayCondition = condition;
                   });
-                  _savePreference('driveway', condition); // Save preference
+                  _savePreference('driveWayCondition', condition); // Save preference
+                },
+                onDescriptionSelected: (description) {
+                  setState(() {
+                    driveWayDescription = description;
+                  });
+                  _savePreference('driveWayDescription', description); // Save preference
                 },
               ),
 
-              //Electric Meter
+              // Outside Lighting
               ConditionItem(
                 name: "Outside Lighting",
-                selectedCondition: outsideLighting,
+                condition: outsideLightingCondition,
+                description: outsideLightingDescription,
                 onConditionSelected: (condition) {
                   setState(() {
-                    outsideLighting = condition;
+                    outsideLightingCondition = condition;
                   });
-                  _savePreference(
-                      'outsideLighting', condition); // Save preference
+                  _savePreference('outsideLightingCondition', condition); // Save preference
+                },
+                onDescriptionSelected: (description) {
+                  setState(() {
+                    outsideLightingDescription = description;
+                  });
+                  _savePreference('outsideLightingDescription', description); // Save preference
                 },
               ),
 
-              //Additional Items
+              // Additional Items
               ConditionItem(
                 name: "Additional Items",
-                selectedCondition: additionalItems,
+                condition: additionalItemsCondition,
+                description: additionalItemsDescription,
                 onConditionSelected: (condition) {
                   setState(() {
-                    additionalItems = condition;
+                    additionalItemsCondition = condition;
                   });
-                  _savePreference(
-                      'additionalItems', condition); // Save preference
+                  _savePreference('additionalItemsCondition', condition); // Save preference
+                },
+                onDescriptionSelected: (description) {
+                  setState(() {
+                    additionalItemsDescription = description;
+                  });
+                  _savePreference('additionalItemsDescription', description); // Save preference
                 },
               ),
 
@@ -134,14 +159,18 @@ class _FrontGardenState extends State<FrontGarden> {
 
 class ConditionItem extends StatelessWidget {
   final String name;
-  final String? selectedCondition;
+  final String? condition;
+  final String? description;
   final Function(String?) onConditionSelected;
+  final Function(String?) onDescriptionSelected;
 
   const ConditionItem({
     Key? key,
     required this.name,
-    this.selectedCondition,
+    this.condition,
+    this.description,
     required this.onConditionSelected,
+    required this.onDescriptionSelected,
   }) : super(key: key);
 
   @override
@@ -224,16 +253,14 @@ class ConditionItem extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(
-            height: 12,
-          ),
+          SizedBox(height: 12,),
           GestureDetector(
             onTap: () async {
               final result = await Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => ConditionDetails(
-                    initialCondition: selectedCondition,
+                    initialCondition: condition,
                     type: name,
                   ),
                 ),
@@ -244,7 +271,7 @@ class ConditionItem extends StatelessWidget {
               }
             },
             child: Text(
-              selectedCondition ?? "Location",
+              condition?.isNotEmpty == true ? condition! : "Condition",
               style: TextStyle(
                 fontSize: 12.0,
                 fontWeight: FontWeight.w700,
@@ -253,56 +280,25 @@ class ConditionItem extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(
-            height: 12,
-          ),
+          SizedBox(height: 12,),
           GestureDetector(
             onTap: () async {
               final result = await Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => ConditionDetails(
-                    initialCondition: selectedCondition,
+                    initialCondition: description,
                     type: name,
                   ),
                 ),
               );
 
               if (result != null) {
-                onConditionSelected(result);
+                onDescriptionSelected(result);
               }
             },
             child: Text(
-              selectedCondition ?? "Serial Number",
-              style: TextStyle(
-                fontSize: 12.0,
-                fontWeight: FontWeight.w700,
-                color: kPrimaryTextColourTwo,
-                fontStyle: FontStyle.italic,
-              ),
-            ),
-          ),
-          SizedBox(
-            height: 12,
-          ),
-          GestureDetector(
-            onTap: () async {
-              final result = await Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ConditionDetails(
-                    initialCondition: selectedCondition,
-                    type: name,
-                  ),
-                ),
-              );
-
-              if (result != null) {
-                onConditionSelected(result);
-              }
-            },
-            child: Text(
-              selectedCondition ?? "Reading",
+              description?.isNotEmpty == true ? description! : "Description",
               style: TextStyle(
                 fontSize: 12.0,
                 fontWeight: FontWeight.w700,

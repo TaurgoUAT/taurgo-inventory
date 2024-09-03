@@ -58,7 +58,7 @@ class _RearGardenState extends State<RearGarden> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Bed Room',
+          'Rear Garden',
           style: TextStyle(
             color: kPrimaryColor,
             fontSize: 14,
@@ -89,66 +89,98 @@ class _RearGardenState extends State<RearGarden> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              //Garden Description
+              // Garden Description
               ConditionItem(
                 name: "Garden Description",
-                selectedCondition: gardenDescription,
+                condition: gardenDescription,
+                description: gardenDescription,
                 onConditionSelected: (condition) {
                   setState(() {
                     gardenDescription = condition;
                   });
-                  _savePreference(
-                      'gardenDescription', condition); // Save preference
+                  _savePreference('gardenDescription', condition); // Save preference
+                },
+                onDescriptionSelected: (description) {
+                  setState(() {
+                    gardenDescription = description;
+                  });
+                  _savePreference('gardenDescription', description); // Save preference
                 },
               ),
 
-              //Outside Lighting
+              // Outside Lighting
               ConditionItem(
                 name: "Outside Lighting",
-                selectedCondition: outsideLighting,
+                condition: outsideLighting,
+                description: outsideLighting,
                 onConditionSelected: (condition) {
                   setState(() {
                     outsideLighting = condition;
                   });
-                  _savePreference(
-                      'outsideLighting', condition); // Save preference
+                  _savePreference('outsideLighting', condition); // Save preference
+                },
+                onDescriptionSelected: (description) {
+                  setState(() {
+                    outsideLighting = description;
+                  });
+                  _savePreference('outsideLighting', description); // Save preference
                 },
               ),
 
-              //Summer House
+              // Summer House
               ConditionItem(
                 name: "Summer House",
-                selectedCondition: summerHouse,
+                condition: summerHouse,
+                description: summerHouse,
                 onConditionSelected: (condition) {
                   setState(() {
                     summerHouse = condition;
                   });
                   _savePreference('summerHouse', condition); // Save preference
                 },
+                onDescriptionSelected: (description) {
+                  setState(() {
+                    summerHouse = description;
+                  });
+                  _savePreference('summerHouse', description); // Save preference
+                },
               ),
 
-              //Shed
+              // Shed
               ConditionItem(
                 name: "Shed",
-                selectedCondition: shed,
+                condition: shed,
+                description: shed,
                 onConditionSelected: (condition) {
                   setState(() {
                     shed = condition;
                   });
                   _savePreference('shed', condition); // Save preference
                 },
+                onDescriptionSelected: (description) {
+                  setState(() {
+                    shed = description;
+                  });
+                  _savePreference('shed', description); // Save preference
+                },
               ),
 
-              //Additional Information
+              // Additional Information
               ConditionItem(
                 name: "Additional Information",
-                selectedCondition: additionalInformation,
+                condition: additionalInformation,
+                description: additionalInformation,
                 onConditionSelected: (condition) {
                   setState(() {
                     additionalInformation = condition;
                   });
-                  _savePreference(
-                      'additionalInformation', condition); // Save preference
+                  _savePreference('additionalInformation', condition); // Save preference
+                },
+                onDescriptionSelected: (description) {
+                  setState(() {
+                    additionalInformation = description;
+                  });
+                  _savePreference('additionalInformation', description); // Save preference
                 },
               ),
 
@@ -163,14 +195,18 @@ class _RearGardenState extends State<RearGarden> {
 
 class ConditionItem extends StatelessWidget {
   final String name;
-  final String? selectedCondition;
+  final String? condition;
+  final String? description;
   final Function(String?) onConditionSelected;
+  final Function(String?) onDescriptionSelected;
 
   const ConditionItem({
     Key? key,
     required this.name,
-    this.selectedCondition,
+    this.condition,
+    this.description,
     required this.onConditionSelected,
+    required this.onDescriptionSelected,
   }) : super(key: key);
 
   @override
@@ -253,16 +289,14 @@ class ConditionItem extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(
-            height: 12,
-          ),
+          SizedBox(height: 12,),
           GestureDetector(
             onTap: () async {
               final result = await Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => ConditionDetails(
-                    initialCondition: selectedCondition,
+                    initialCondition: condition,
                     type: name,
                   ),
                 ),
@@ -273,7 +307,7 @@ class ConditionItem extends StatelessWidget {
               }
             },
             child: Text(
-              selectedCondition ?? "Location",
+              condition?.isNotEmpty == true ? condition! : "Condition",
               style: TextStyle(
                 fontSize: 12.0,
                 fontWeight: FontWeight.w700,
@@ -282,56 +316,25 @@ class ConditionItem extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(
-            height: 12,
-          ),
+          SizedBox(height: 12,),
           GestureDetector(
             onTap: () async {
               final result = await Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => ConditionDetails(
-                    initialCondition: selectedCondition,
+                    initialCondition: description,
                     type: name,
                   ),
                 ),
               );
 
               if (result != null) {
-                onConditionSelected(result);
+                onDescriptionSelected(result);
               }
             },
             child: Text(
-              selectedCondition ?? "Serial Number",
-              style: TextStyle(
-                fontSize: 12.0,
-                fontWeight: FontWeight.w700,
-                color: kPrimaryTextColourTwo,
-                fontStyle: FontStyle.italic,
-              ),
-            ),
-          ),
-          SizedBox(
-            height: 12,
-          ),
-          GestureDetector(
-            onTap: () async {
-              final result = await Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ConditionDetails(
-                    initialCondition: selectedCondition,
-                    type: name,
-                  ),
-                ),
-              );
-
-              if (result != null) {
-                onConditionSelected(result);
-              }
-            },
-            child: Text(
-              selectedCondition ?? "Reading",
+              description?.isNotEmpty == true ? description! : "Description",
               style: TextStyle(
                 fontSize: 12.0,
                 fontWeight: FontWeight.w700,

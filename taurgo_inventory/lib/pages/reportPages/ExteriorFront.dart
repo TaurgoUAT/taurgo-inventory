@@ -21,10 +21,14 @@ class Exteriorfront extends StatefulWidget {
 }
 
 class _ExteriorfrontState extends State<Exteriorfront> {
-  String? door;
-  String? doorFrame;
-  String? porch;
-  String? additionalItems;
+  String? doorCondition;
+  String? doorDescription;
+  String? doorFrameCondition;
+  String? doorFrameDescription;
+  String? porchCondition;
+  String? porchDescription;
+  String? additionalItemsCondition;
+  String? additionalItemsDescription;
   late List<File> capturedImages;
 
   @override
@@ -38,10 +42,15 @@ class _ExteriorfrontState extends State<Exteriorfront> {
   Future<void> _loadPreferences() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      door = prefs.getString('door');
-      doorFrame = prefs.getString('doorFrame');
-      porch = prefs.getString('porch');
-      additionalItems = prefs.getString('additionalItems');
+      doorCondition = prefs.getString('doorCondition');
+      doorDescription = prefs.getString('doorDescription');
+      doorFrameCondition = prefs.getString('doorFrameCondition');
+      doorFrameDescription = prefs.getString('doorFrameDescription');
+      porchCondition = prefs.getString('porchCondition');
+      porchDescription = prefs.getString('porchDescription');
+      additionalItemsCondition = prefs.getString('additionalItemsCondition');
+      additionalItemsDescription =
+          prefs.getString('additionalItemsDescription');
     });
   }
 
@@ -56,7 +65,7 @@ class _ExteriorfrontState extends State<Exteriorfront> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Bed Room',
+          'Exterior Front',
           style: TextStyle(
             color: kPrimaryColor,
             fontSize: 14,
@@ -87,52 +96,87 @@ class _ExteriorfrontState extends State<Exteriorfront> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              //Gas Meter
+              // Door
               ConditionItem(
                 name: "Door",
-                selectedCondition: door,
+                condition: doorCondition,
+                description: doorDescription,
                 onConditionSelected: (condition) {
                   setState(() {
-                    door = condition;
-                  });
-                  _savePreference('door', condition); // Save preference
-                },
-              ),
-
-              //Electric Meter
-              ConditionItem(
-                name: "Door Frame",
-                selectedCondition: doorFrame,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    doorFrame = condition;
-                  });
-                  _savePreference('doorFrame', condition); // Save preference
-                },
-              ),
-
-              //Water Meter
-              ConditionItem(
-                name: "Porch",
-                selectedCondition: porch,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    porch = condition;
-                  });
-                  _savePreference('porch', condition); // Save preference
-                },
-              ),
-
-              //Additional Items
-              ConditionItem(
-                name: "Additional Items",
-                selectedCondition: additionalItems,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    additionalItems = condition;
+                    doorCondition = condition;
                   });
                   _savePreference(
-                      'additionalItems', condition); // Save preference
+                      'doorCondition', condition); // Save preference
+                },
+                onDescriptionSelected: (description) {
+                  setState(() {
+                    doorDescription = description;
+                  });
+                  _savePreference(
+                      'doorDescription', description); // Save preference
+                },
+              ),
+
+              // Door Frame
+              ConditionItem(
+                name: "Door Frame",
+                condition: doorFrameCondition,
+                description: doorFrameDescription,
+                onConditionSelected: (condition) {
+                  setState(() {
+                    doorFrameCondition = condition;
+                  });
+                  _savePreference(
+                      'doorFrameCondition', condition); // Save preference
+                },
+                onDescriptionSelected: (description) {
+                  setState(() {
+                    doorFrameDescription = description;
+                  });
+                  _savePreference(
+                      'doorFrameDescription', description); // Save preference
+                },
+              ),
+
+              // Porch
+              ConditionItem(
+                name: "Porch",
+                condition: porchCondition,
+                description: porchDescription,
+                onConditionSelected: (condition) {
+                  setState(() {
+                    porchCondition = condition;
+                  });
+                  _savePreference(
+                      'porchCondition', condition); // Save preference
+                },
+                onDescriptionSelected: (description) {
+                  setState(() {
+                    porchDescription = description;
+                  });
+                  _savePreference(
+                      'porchDescription', description); // Save preference
+                },
+              ),
+
+              // Additional Items
+              ConditionItem(
+                name: "Additional Items",
+                condition: additionalItemsCondition,
+                description: additionalItemsDescription,
+                onConditionSelected: (condition) {
+                  setState(() {
+                    additionalItemsCondition = condition;
+                  });
+                  _savePreference(
+                      'additionalItemsCondition', condition); // Save preference
+                },
+                onDescriptionSelected: (description) {
+                  setState(() {
+                    additionalItemsDescription = description;
+                  });
+                  _savePreference('additionalItemsDescription',
+                      description); // Save preference
                 },
               ),
 
@@ -147,14 +191,18 @@ class _ExteriorfrontState extends State<Exteriorfront> {
 
 class ConditionItem extends StatelessWidget {
   final String name;
-  final String? selectedCondition;
+  final String? condition;
+  final String? description;
   final Function(String?) onConditionSelected;
+  final Function(String?) onDescriptionSelected;
 
   const ConditionItem({
     Key? key,
     required this.name,
-    this.selectedCondition,
+    this.condition,
+    this.description,
     required this.onConditionSelected,
+    required this.onDescriptionSelected,
   }) : super(key: key);
 
   @override
@@ -246,7 +294,7 @@ class ConditionItem extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) => ConditionDetails(
-                    initialCondition: selectedCondition,
+                    initialCondition: condition,
                     type: name,
                   ),
                 ),
@@ -257,7 +305,7 @@ class ConditionItem extends StatelessWidget {
               }
             },
             child: Text(
-              selectedCondition ?? "Location",
+              condition?.isNotEmpty == true ? condition! : "Condition",
               style: TextStyle(
                 fontSize: 12.0,
                 fontWeight: FontWeight.w700,
@@ -275,47 +323,18 @@ class ConditionItem extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) => ConditionDetails(
-                    initialCondition: selectedCondition,
+                    initialCondition: description,
                     type: name,
                   ),
                 ),
               );
 
               if (result != null) {
-                onConditionSelected(result);
+                onDescriptionSelected(result);
               }
             },
             child: Text(
-              selectedCondition ?? "Serial Number",
-              style: TextStyle(
-                fontSize: 12.0,
-                fontWeight: FontWeight.w700,
-                color: kPrimaryTextColourTwo,
-                fontStyle: FontStyle.italic,
-              ),
-            ),
-          ),
-          SizedBox(
-            height: 12,
-          ),
-          GestureDetector(
-            onTap: () async {
-              final result = await Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ConditionDetails(
-                    initialCondition: selectedCondition,
-                    type: name,
-                  ),
-                ),
-              );
-
-              if (result != null) {
-                onConditionSelected(result);
-              }
-            },
-            child: Text(
-              selectedCondition ?? "Reading",
+              description?.isNotEmpty == true ? description! : "Description",
               style: TextStyle(
                 fontSize: 12.0,
                 fontWeight: FontWeight.w700,

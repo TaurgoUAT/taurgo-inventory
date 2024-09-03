@@ -21,13 +21,20 @@ class Keys extends StatefulWidget {
 }
 
 class _KeysState extends State<Keys> {
-  String? yale;
-  String? mortice;
-  String? windowLock;
-  String? gasMeter;
-  String? carPass;
-  String? remote;
-  String? other;
+  String? yaleLocation;
+  String? yaleReading;
+  String? morticeLocation;
+  String? morticeReading;
+  String? windowLockLocation;
+  String? windowLockReading;
+  String? gasMeterLocation;
+  String? gasMeterReading;
+  String? carPassLocation;
+  String? carPassReading;
+  String? remoteLocation;
+  String? remoteReading;
+  String? otherLocation;
+  String? otherReading;
   late List<File> capturedImages;
 
   @override
@@ -41,13 +48,20 @@ class _KeysState extends State<Keys> {
   Future<void> _loadPreferences() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      yale = prefs.getString('yale');
-      mortice = prefs.getString('mortice');
-      windowLock = prefs.getString('windowLock');
-      gasMeter = prefs.getString('gasMeter');
-      carPass = prefs.getString('carPass');
-      remote = prefs.getString('remote');
-      other = prefs.getString('other');
+      yaleLocation = prefs.getString('yaleLocation');
+      yaleReading = prefs.getString('yaleReading');
+      morticeLocation = prefs.getString('morticeLocation');
+      morticeReading = prefs.getString('morticeReading');
+      windowLockLocation = prefs.getString('windowLockLocation');
+      windowLockReading = prefs.getString('windowLockReading');
+      gasMeterLocation = prefs.getString('gasMeterLocation');
+      gasMeterReading = prefs.getString('gasMeterReading');
+      carPassLocation = prefs.getString('carPassLocation');
+      carPassReading = prefs.getString('carPassReading');
+      remoteLocation = prefs.getString('remoteLocation');
+      remoteReading = prefs.getString('remoteReading');
+      otherLocation = prefs.getString('otherLocation');
+      otherReading = prefs.getString('otherReading');
     });
   }
 
@@ -62,7 +76,7 @@ class _KeysState extends State<Keys> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Bed Room',
+          'Keys',
           style: TextStyle(
             color: kPrimaryColor,
             fontSize: 14,
@@ -93,87 +107,136 @@ class _KeysState extends State<Keys> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              //Gas Meter
+              // Yale
               ConditionItem(
                 name: "Yale",
-                selectedCondition: yale,
-                onConditionSelected: (condition) {
+                location: yaleLocation,
+                reading: yaleReading,
+                onLocationSelected: (location) {
                   setState(() {
-                    yale = condition;
+                    yaleLocation = location;
                   });
-                  _savePreference('yale', condition); // Save preference
+                  _savePreference('yaleLocation', location); // Save preference
+                },
+                onReadingSelected: (reading) {
+                  setState(() {
+                    yaleReading = reading;
+                  });
+                  _savePreference('yaleReading', reading); // Save preference
                 },
               ),
 
-              //Electric Meter
+              // Mortice
               ConditionItem(
                 name: "Mortice",
-                selectedCondition: mortice,
-                onConditionSelected: (condition) {
+                location: morticeLocation,
+                reading: morticeReading,
+                onLocationSelected: (location) {
                   setState(() {
-                    mortice = condition;
+                    morticeLocation = location;
                   });
-                  _savePreference('mortice', condition); // Save preference
+                  _savePreference('morticeLocation', location); // Save preference
+                },
+                onReadingSelected: (reading) {
+                  setState(() {
+                    morticeReading = reading;
+                  });
+                  _savePreference('morticeReading', reading); // Save preference
                 },
               ),
 
-              //Window Lock
+              // Window Lock
               ConditionItem(
                 name: "Window Lock",
-                selectedCondition: windowLock,
-                onConditionSelected: (condition) {
+                location: windowLockLocation,
+                reading: windowLockReading,
+                onLocationSelected: (location) {
                   setState(() {
-                    windowLock = condition;
+                    windowLockLocation = location;
                   });
-                  _savePreference('windowLock', condition); // Save preference
+                  _savePreference('windowLockLocation', location); // Save preference
+                },
+                onReadingSelected: (reading) {
+                  setState(() {
+                    windowLockReading = reading;
+                  });
+                  _savePreference('windowLockReading', reading); // Save preference
                 },
               ),
 
-              //Gas Meter
+              // Gas Meter
               ConditionItem(
                 name: "Gas Meter",
-                selectedCondition: gasMeter,
-                onConditionSelected: (condition) {
+                location: gasMeterLocation,
+                reading: gasMeterReading,
+                onLocationSelected: (location) {
                   setState(() {
-                    gasMeter = condition;
+                    gasMeterLocation = location;
                   });
-                  _savePreference('gasMeter', condition); // Save preference
+                  _savePreference('gasMeterLocation', location); // Save preference
+                },
+                onReadingSelected: (reading) {
+                  setState(() {
+                    gasMeterReading = reading;
+                  });
+                  _savePreference('gasMeterReading', reading); // Save preference
                 },
               ),
 
-              //Car Pass
+              // Car Pass
               ConditionItem(
                 name: "Car Pass",
-                selectedCondition: carPass,
-                onConditionSelected: (condition) {
+                location: carPassLocation,
+                reading: carPassReading,
+                onLocationSelected: (location) {
                   setState(() {
-                    carPass = condition;
+                    carPassLocation = location;
                   });
-                  _savePreference('carPass', condition); // Save preference
+                  _savePreference('carPassLocation', location); // Save preference
+                },
+                onReadingSelected: (reading) {
+                  setState(() {
+                    carPassReading = reading;
+                  });
+                  _savePreference('carPassReading', reading); // Save preference
                 },
               ),
 
-              //Remote
+              // Remote
               ConditionItem(
                 name: "Remote",
-                selectedCondition: remote,
-                onConditionSelected: (condition) {
+                location: remoteLocation,
+                reading: remoteReading,
+                onLocationSelected: (location) {
                   setState(() {
-                    remote = condition;
+                    remoteLocation = location;
                   });
-                  _savePreference('remote', condition); // Save preference
+                  _savePreference('remoteLocation', location); // Save preference
+                },
+                onReadingSelected: (reading) {
+                  setState(() {
+                    remoteReading = reading;
+                  });
+                  _savePreference('remoteReading', reading); // Save preference
                 },
               ),
 
-              //Additional Items
+              // Other
               ConditionItem(
                 name: "Other",
-                selectedCondition: other,
-                onConditionSelected: (condition) {
+                location: otherLocation,
+                reading: otherReading,
+                onLocationSelected: (location) {
                   setState(() {
-                    other = condition;
+                    otherLocation = location;
                   });
-                  _savePreference('other', condition); // Save preference
+                  _savePreference('otherLocation', location); // Save preference
+                },
+                onReadingSelected: (reading) {
+                  setState(() {
+                    otherReading = reading;
+                  });
+                  _savePreference('otherReading', reading); // Save preference
                 },
               ),
 
@@ -188,14 +251,18 @@ class _KeysState extends State<Keys> {
 
 class ConditionItem extends StatelessWidget {
   final String name;
-  final String? selectedCondition;
-  final Function(String?) onConditionSelected;
+  final String? location;
+  final String? reading;
+  final Function(String?) onLocationSelected;
+  final Function(String?) onReadingSelected;
 
   const ConditionItem({
     Key? key,
     required this.name,
-    this.selectedCondition,
-    required this.onConditionSelected,
+    this.location,
+    this.reading,
+    required this.onLocationSelected,
+    required this.onReadingSelected,
   }) : super(key: key);
 
   @override
@@ -287,18 +354,18 @@ class ConditionItem extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) => ConditionDetails(
-                    initialCondition: selectedCondition,
+                    initialCondition: location,
                     type: name,
                   ),
                 ),
               );
 
               if (result != null) {
-                onConditionSelected(result);
+                onLocationSelected(result);
               }
             },
             child: Text(
-              selectedCondition ?? "Location",
+              location ?? "Location",
               style: TextStyle(
                 fontSize: 12.0,
                 fontWeight: FontWeight.w700,
@@ -316,47 +383,18 @@ class ConditionItem extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) => ConditionDetails(
-                    initialCondition: selectedCondition,
+                    initialCondition: reading,
                     type: name,
                   ),
                 ),
               );
 
               if (result != null) {
-                onConditionSelected(result);
+                onReadingSelected(result);
               }
             },
             child: Text(
-              selectedCondition ?? "Serial Number",
-              style: TextStyle(
-                fontSize: 12.0,
-                fontWeight: FontWeight.w700,
-                color: kPrimaryTextColourTwo,
-                fontStyle: FontStyle.italic,
-              ),
-            ),
-          ),
-          SizedBox(
-            height: 12,
-          ),
-          GestureDetector(
-            onTap: () async {
-              final result = await Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ConditionDetails(
-                    initialCondition: selectedCondition,
-                    type: name,
-                  ),
-                ),
-              );
-
-              if (result != null) {
-                onConditionSelected(result);
-              }
-            },
-            child: Text(
-              selectedCondition ?? "Reading",
+              reading ?? "Comments",
               style: TextStyle(
                 fontSize: 12.0,
                 fontWeight: FontWeight.w700,

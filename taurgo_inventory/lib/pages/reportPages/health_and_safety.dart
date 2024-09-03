@@ -17,13 +17,16 @@ class HealthAndSafety extends StatefulWidget {
   const HealthAndSafety({super.key, this.capturedImages});
 
   @override
-  State<HealthAndSafety> createState() => _HealthAndSafetyState();
+  State<HealthAndSafety> createState() => _KeyHandedOverState();
 }
 
-class _HealthAndSafetyState extends State<HealthAndSafety> {
-  String? smokeAlarm;
-  String? heatSensor;
-  String? carbonMonoxideAlarm;
+class _KeyHandedOverState extends State<HealthAndSafety> {
+  String? yaleCondition;
+  String? yaleDescription;
+  String? morticeCondition;
+  String? morticeDescription;
+  String? otherCondition;
+  String? otherDescription;
   late List<File> capturedImages;
 
   @override
@@ -37,9 +40,12 @@ class _HealthAndSafetyState extends State<HealthAndSafety> {
   Future<void> _loadPreferences() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      smokeAlarm = prefs.getString('smokeAlarm');
-      heatSensor = prefs.getString('heatSensor');
-      carbonMonoxideAlarm = prefs.getString('carbonMonoxideAlarm');
+      yaleCondition = prefs.getString('yaleCondition');
+      yaleDescription = prefs.getString('yaleDescription');
+      morticeCondition = prefs.getString('morticeCondition');
+      morticeDescription = prefs.getString('morticeDescription');
+      otherCondition = prefs.getString('otherCondition');
+      otherDescription = prefs.getString('otherDescription');
     });
   }
 
@@ -54,7 +60,7 @@ class _HealthAndSafetyState extends State<HealthAndSafety> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Bed Room',
+          'Key Handed Over',
           style: TextStyle(
             color: kPrimaryColor,
             fontSize: 14,
@@ -85,40 +91,60 @@ class _HealthAndSafetyState extends State<HealthAndSafety> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              //Gas Meter
+              // Yale
               ConditionItem(
-                name: "Smoke Alarm",
-                selectedCondition: smokeAlarm,
+                name: "Yale",
+                condition: yaleCondition,
+                description: yaleDescription,
                 onConditionSelected: (condition) {
                   setState(() {
-                    smokeAlarm = condition;
+                    yaleCondition = condition;
                   });
-                  _savePreference('smokeAlarm', condition); // Save preference
+                  _savePreference('yaleCondition', condition); // Save preference
+                },
+                onDescriptionSelected: (description) {
+                  setState(() {
+                    yaleDescription = description;
+                  });
+                  _savePreference('yaleDescription', description); // Save preference
                 },
               ),
 
-              //Electric Meter
+              // Mortice
               ConditionItem(
-                name: "Heat Sensor",
-                selectedCondition: heatSensor,
+                name: "Mortice",
+                condition: morticeCondition,
+                description: morticeDescription,
                 onConditionSelected: (condition) {
                   setState(() {
-                    heatSensor = condition;
+                    morticeCondition = condition;
                   });
-                  _savePreference('heatSensor', condition); // Save preference
+                  _savePreference('morticeCondition', condition); // Save preference
+                },
+                onDescriptionSelected: (description) {
+                  setState(() {
+                    morticeDescription = description;
+                  });
+                  _savePreference('morticeDescription', description); // Save preference
                 },
               ),
 
-              //Additional Items
+              // Other
               ConditionItem(
-                name: "Carbon Monoxide Alarm",
-                selectedCondition: carbonMonoxideAlarm,
+                name: "Other",
+                condition: otherCondition,
+                description: otherDescription,
                 onConditionSelected: (condition) {
                   setState(() {
-                    carbonMonoxideAlarm = condition;
+                    otherCondition = condition;
                   });
-                  _savePreference(
-                      'carbonMonoxideAlarm', condition); // Save preference
+                  _savePreference('otherCondition', condition); // Save preference
+                },
+                onDescriptionSelected: (description) {
+                  setState(() {
+                    otherDescription = description;
+                  });
+                  _savePreference('otherDescription', description); // Save preference
                 },
               ),
 
@@ -133,14 +159,18 @@ class _HealthAndSafetyState extends State<HealthAndSafety> {
 
 class ConditionItem extends StatelessWidget {
   final String name;
-  final String? selectedCondition;
+  final String? condition;
+  final String? description;
   final Function(String?) onConditionSelected;
+  final Function(String?) onDescriptionSelected;
 
   const ConditionItem({
     Key? key,
     required this.name,
-    this.selectedCondition,
+    this.condition,
+    this.description,
     required this.onConditionSelected,
+    required this.onDescriptionSelected,
   }) : super(key: key);
 
   @override
@@ -223,16 +253,14 @@ class ConditionItem extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(
-            height: 12,
-          ),
+          SizedBox(height: 12,),
           GestureDetector(
             onTap: () async {
               final result = await Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => ConditionDetails(
-                    initialCondition: selectedCondition,
+                    initialCondition: condition,
                     type: name,
                   ),
                 ),
@@ -243,7 +271,7 @@ class ConditionItem extends StatelessWidget {
               }
             },
             child: Text(
-              selectedCondition ?? "Location",
+              condition?.isNotEmpty == true ? condition! : "Condition",
               style: TextStyle(
                 fontSize: 12.0,
                 fontWeight: FontWeight.w700,
@@ -252,56 +280,25 @@ class ConditionItem extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(
-            height: 12,
-          ),
+          SizedBox(height: 12,),
           GestureDetector(
             onTap: () async {
               final result = await Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => ConditionDetails(
-                    initialCondition: selectedCondition,
+                    initialCondition: description,
                     type: name,
                   ),
                 ),
               );
 
               if (result != null) {
-                onConditionSelected(result);
+                onDescriptionSelected(result);
               }
             },
             child: Text(
-              selectedCondition ?? "Serial Number",
-              style: TextStyle(
-                fontSize: 12.0,
-                fontWeight: FontWeight.w700,
-                color: kPrimaryTextColourTwo,
-                fontStyle: FontStyle.italic,
-              ),
-            ),
-          ),
-          SizedBox(
-            height: 12,
-          ),
-          GestureDetector(
-            onTap: () async {
-              final result = await Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ConditionDetails(
-                    initialCondition: selectedCondition,
-                    type: name,
-                  ),
-                ),
-              );
-
-              if (result != null) {
-                onConditionSelected(result);
-              }
-            },
-            child: Text(
-              selectedCondition ?? "Reading",
+              description?.isNotEmpty == true ? description! : "Description",
               style: TextStyle(
                 fontSize: 12.0,
                 fontWeight: FontWeight.w700,

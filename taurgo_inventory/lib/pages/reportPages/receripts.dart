@@ -21,14 +21,22 @@ class Receripts extends StatefulWidget {
 }
 
 class _ReceriptsState extends State<Receripts> {
-  String? houseApplinceManual;
-  String? kitchenApplinceManual;
-  String? heatingManual;
-  String? landlordGasSafetyCertificate;
-  String? legionellaRiskAssessment;
-  String? electricalSafetyCertificate;
-  String? energyPerformanceCertificate;
-  String? moveInChecklist;
+  String? houseApplinceManualCondition;
+  String? houseApplinceManualDescription;
+  String? kitchenApplinceManualCondition;
+  String? kitchenApplinceManualDescription;
+  String? heatingManualCondition;
+  String? heatingManualDescription;
+  String? landlordGasSafetyCertificateCondition;
+  String? landlordGasSafetyCertificateDescription;
+  String? legionellaRiskAssessmentCondition;
+  String? legionellaRiskAssessmentDescription;
+  String? electricalSafetyCertificateCondition;
+  String? electricalSafetyCertificateDescription;
+  String? energyPerformanceCertificateCondition;
+  String? energyPerformanceCertificateDescription;
+  String? moveInChecklistCondition;
+  String? moveInChecklistDescription;
   late List<File> capturedImages;
 
   @override
@@ -42,17 +50,22 @@ class _ReceriptsState extends State<Receripts> {
   Future<void> _loadPreferences() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      houseApplinceManual = prefs.getString('houseApplinceManual');
-      kitchenApplinceManual = prefs.getString('kitchenApplinceManual');
-      heatingManual = prefs.getString('heatingManual');
-      landlordGasSafetyCertificate =
-          prefs.getString('landlordGasSafetyCertificate');
-      legionellaRiskAssessment = prefs.getString('legionellaRiskAssessment');
-      electricalSafetyCertificate =
-          prefs.getString('electricalSafetyCertificate');
-      energyPerformanceCertificate =
-          prefs.getString('energyPerformanceCertificate');
-      moveInChecklist = prefs.getString('moveInChecklist');
+      houseApplinceManualCondition = prefs.getString('houseApplinceManualCondition');
+      houseApplinceManualDescription = prefs.getString('houseApplinceManualDescription');
+      kitchenApplinceManualCondition = prefs.getString('kitchenApplinceManualCondition');
+      kitchenApplinceManualDescription = prefs.getString('kitchenApplinceManualDescription');
+      heatingManualCondition = prefs.getString('heatingManualCondition');
+      heatingManualDescription = prefs.getString('heatingManualDescription');
+      landlordGasSafetyCertificateCondition = prefs.getString('landlordGasSafetyCertificateCondition');
+      landlordGasSafetyCertificateDescription = prefs.getString('landlordGasSafetyCertificateDescription');
+      legionellaRiskAssessmentCondition = prefs.getString('legionellaRiskAssessmentCondition');
+      legionellaRiskAssessmentDescription = prefs.getString('legionellaRiskAssessmentDescription');
+      electricalSafetyCertificateCondition = prefs.getString('electricalSafetyCertificateCondition');
+      electricalSafetyCertificateDescription = prefs.getString('electricalSafetyCertificateDescription');
+      energyPerformanceCertificateCondition = prefs.getString('energyPerformanceCertificateCondition');
+      energyPerformanceCertificateDescription = prefs.getString('energyPerformanceCertificateDescription');
+      moveInChecklistCondition = prefs.getString('moveInChecklistCondition');
+      moveInChecklistDescription = prefs.getString('moveInChecklistDescription');
     });
   }
 
@@ -67,7 +80,7 @@ class _ReceriptsState extends State<Receripts> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Bed Room',
+          'Receripts',
           style: TextStyle(
             color: kPrimaryColor,
             fontSize: 14,
@@ -98,107 +111,155 @@ class _ReceriptsState extends State<Receripts> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              //House Appliance Manual
+              // House Appliance Manual
               ConditionItem(
                 name: "House Appliance Manual",
-                selectedCondition: houseApplinceManual,
+                condition: houseApplinceManualCondition,
+                description: houseApplinceManualDescription,
                 onConditionSelected: (condition) {
                   setState(() {
-                    houseApplinceManual = condition;
+                    houseApplinceManualCondition = condition;
                   });
-                  _savePreference(
-                      'houseApplinceManual', condition); // Save preference
+                  _savePreference('houseApplinceManualCondition', condition); // Save preference
+                },
+                onDescriptionSelected: (description) {
+                  setState(() {
+                    houseApplinceManualDescription = description;
+                  });
+                  _savePreference('houseApplinceManualDescription', description); // Save preference
                 },
               ),
 
-              //Kitchen Appliance Manual
+              // Kitchen Appliance Manual
               ConditionItem(
                 name: "Kitchen Appliance Manual",
-                selectedCondition: kitchenApplinceManual,
+                condition: kitchenApplinceManualCondition,
+                description: kitchenApplinceManualDescription,
                 onConditionSelected: (condition) {
                   setState(() {
-                    kitchenApplinceManual = condition;
+                    kitchenApplinceManualCondition = condition;
                   });
-                  _savePreference(
-                      'kitchenApplinceManual', condition); // Save preference
+                  _savePreference('kitchenApplinceManualCondition', condition); // Save preference
+                },
+                onDescriptionSelected: (description) {
+                  setState(() {
+                    kitchenApplinceManualDescription = description;
+                  });
+                  _savePreference('kitchenApplinceManualDescription', description); // Save preference
                 },
               ),
 
-              //Heating Manual
+              // Heating Manual
               ConditionItem(
                 name: "Heating Manual",
-                selectedCondition: heatingManual,
+                condition: heatingManualCondition,
+                description: heatingManualDescription,
                 onConditionSelected: (condition) {
                   setState(() {
-                    heatingManual = condition;
+                    heatingManualCondition = condition;
                   });
-                  _savePreference(
-                      'heatingManual', condition); // Save preference
+                  _savePreference('heatingManualCondition', condition); // Save preference
+                },
+                onDescriptionSelected: (description) {
+                  setState(() {
+                    heatingManualDescription = description;
+                  });
+                  _savePreference('heatingManualDescription', description); // Save preference
                 },
               ),
 
-              //Landlord Gas Safety Certificate
+              // Landlord Gas Safety Certificate
               ConditionItem(
                 name: "Landlord Gas Safety Certificate",
-                selectedCondition: landlordGasSafetyCertificate,
+                condition: landlordGasSafetyCertificateCondition,
+                description: landlordGasSafetyCertificateDescription,
                 onConditionSelected: (condition) {
                   setState(() {
-                    landlordGasSafetyCertificate = condition;
+                    landlordGasSafetyCertificateCondition = condition;
                   });
-                  _savePreference('landlordGasSafetyCertificate',
-                      condition); // Save preference
+                  _savePreference('landlordGasSafetyCertificateCondition', condition); // Save preference
+                },
+                onDescriptionSelected: (description) {
+                  setState(() {
+                    landlordGasSafetyCertificateDescription = description;
+                  });
+                  _savePreference('landlordGasSafetyCertificateDescription', description); // Save preference
                 },
               ),
 
-              //Legionella Risk Assessment
+              // Legionella Risk Assessment
               ConditionItem(
                 name: "Legionella Risk Assessment",
-                selectedCondition: legionellaRiskAssessment,
+                condition: legionellaRiskAssessmentCondition,
+                description: legionellaRiskAssessmentDescription,
                 onConditionSelected: (condition) {
                   setState(() {
-                    legionellaRiskAssessment = condition;
+                    legionellaRiskAssessmentCondition = condition;
                   });
-                  _savePreference(
-                      'legionellaRiskAssessment', condition); // Save preference
+                  _savePreference('legionellaRiskAssessmentCondition', condition); // Save preference
+                },
+                onDescriptionSelected: (description) {
+                  setState(() {
+                    legionellaRiskAssessmentDescription = description;
+                  });
+                  _savePreference('legionellaRiskAssessmentDescription', description); // Save preference
                 },
               ),
 
-              //Electrical Safety Certificate
+              // Electrical Safety Certificate
               ConditionItem(
                 name: "Electrical Safety Certificate",
-                selectedCondition: electricalSafetyCertificate,
+                condition: electricalSafetyCertificateCondition,
+                description: electricalSafetyCertificateDescription,
                 onConditionSelected: (condition) {
                   setState(() {
-                    electricalSafetyCertificate = condition;
+                    electricalSafetyCertificateCondition = condition;
                   });
-                  _savePreference('electricalSafetyCertificate',
-                      condition); // Save preference
+                  _savePreference('electricalSafetyCertificateCondition', condition); // Save preference
+                },
+                onDescriptionSelected: (description) {
+                  setState(() {
+                    electricalSafetyCertificateDescription = description;
+                  });
+                  _savePreference('electricalSafetyCertificateDescription', description); // Save preference
                 },
               ),
 
-              //Energy Performance Certificate
+              // Energy Performance Certificate
               ConditionItem(
                 name: "Energy Performance Certificate",
-                selectedCondition: energyPerformanceCertificate,
+                condition: energyPerformanceCertificateCondition,
+                description: energyPerformanceCertificateDescription,
                 onConditionSelected: (condition) {
                   setState(() {
-                    energyPerformanceCertificate = condition;
+                    energyPerformanceCertificateCondition = condition;
                   });
-                  _savePreference('energyPerformanceCertificate',
-                      condition); // Save preference
+                  _savePreference('energyPerformanceCertificateCondition', condition); // Save preference
+                },
+                onDescriptionSelected: (description) {
+                  setState(() {
+                    energyPerformanceCertificateDescription = description;
+                  });
+                  _savePreference('energyPerformanceCertificateDescription', description); // Save preference
                 },
               ),
 
-              //Move In Checklist
+              // Move In Checklist
               ConditionItem(
                 name: "Move In Checklist",
-                selectedCondition: moveInChecklist,
+                condition: moveInChecklistCondition,
+                description: moveInChecklistDescription,
                 onConditionSelected: (condition) {
                   setState(() {
-                    moveInChecklist = condition;
+                    moveInChecklistCondition = condition;
                   });
-                  _savePreference(
-                      'moveInChecklist', condition); // Save preference
+                  _savePreference('moveInChecklistCondition', condition); // Save preference
+                },
+                onDescriptionSelected: (description) {
+                  setState(() {
+                    moveInChecklistDescription = description;
+                  });
+                  _savePreference('moveInChecklistDescription', description); // Save preference
                 },
               ),
 
@@ -213,14 +274,18 @@ class _ReceriptsState extends State<Receripts> {
 
 class ConditionItem extends StatelessWidget {
   final String name;
-  final String? selectedCondition;
+  final String? condition;
+  final String? description;
   final Function(String?) onConditionSelected;
+  final Function(String?) onDescriptionSelected;
 
   const ConditionItem({
     Key? key,
     required this.name,
-    this.selectedCondition,
+    this.condition,
+    this.description,
     required this.onConditionSelected,
+    required this.onDescriptionSelected,
   }) : super(key: key);
 
   @override
@@ -303,16 +368,14 @@ class ConditionItem extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(
-            height: 12,
-          ),
+          SizedBox(height: 12,),
           GestureDetector(
             onTap: () async {
               final result = await Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => ConditionDetails(
-                    initialCondition: selectedCondition,
+                    initialCondition: condition,
                     type: name,
                   ),
                 ),
@@ -323,7 +386,7 @@ class ConditionItem extends StatelessWidget {
               }
             },
             child: Text(
-              selectedCondition ?? "Location",
+              condition?.isNotEmpty == true ? condition! : "Condition",
               style: TextStyle(
                 fontSize: 12.0,
                 fontWeight: FontWeight.w700,
@@ -332,56 +395,25 @@ class ConditionItem extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(
-            height: 12,
-          ),
+          SizedBox(height: 12,),
           GestureDetector(
             onTap: () async {
               final result = await Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => ConditionDetails(
-                    initialCondition: selectedCondition,
+                    initialCondition: description,
                     type: name,
                   ),
                 ),
               );
 
               if (result != null) {
-                onConditionSelected(result);
+                onDescriptionSelected(result);
               }
             },
             child: Text(
-              selectedCondition ?? "Serial Number",
-              style: TextStyle(
-                fontSize: 12.0,
-                fontWeight: FontWeight.w700,
-                color: kPrimaryTextColourTwo,
-                fontStyle: FontStyle.italic,
-              ),
-            ),
-          ),
-          SizedBox(
-            height: 12,
-          ),
-          GestureDetector(
-            onTap: () async {
-              final result = await Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ConditionDetails(
-                    initialCondition: selectedCondition,
-                    type: name,
-                  ),
-                ),
-              );
-
-              if (result != null) {
-                onConditionSelected(result);
-              }
-            },
-            child: Text(
-              selectedCondition ?? "Reading",
+              description?.isNotEmpty == true ? description! : "Description",
               style: TextStyle(
                 fontSize: 12.0,
                 fontWeight: FontWeight.w700,

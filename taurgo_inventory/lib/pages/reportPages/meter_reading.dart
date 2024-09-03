@@ -21,14 +21,30 @@ class MeterReading extends StatefulWidget {
 }
 
 class _MeterReadingState extends State<MeterReading> {
-  String? houseApplinceManual;
-  String? kitchenApplinceManual;
-  String? heatingManual;
-  String? landlordGasSafetyCertificate;
-  String? legionellaRiskAssessment;
-  String? electricalSafetyCertificate;
-  String? energyPerformanceCertificate;
-  String? moveInChecklist;
+  String? houseApplinceManualLocation;
+  String? houseApplinceManualReading;
+  String? houseApplinceManualSerialNumber;
+  String? kitchenApplinceManualLocation;
+  String? kitchenApplinceManualReading;
+  String? kitchenApplinceManualSerialNumber;
+  String? heatingManualLocation;
+  String? heatingManualReading;
+  String? heatingManualSerialNumber;
+  String? landlordGasSafetyCertificateLocation;
+  String? landlordGasSafetyCertificateReading;
+  String? landlordGasSafetyCertificateSerialNumber;
+  String? legionellaRiskAssessmentLocation;
+  String? legionellaRiskAssessmentReading;
+  String? legionellaRiskAssessmentSerialNumber;
+  String? electricalSafetyCertificateLocation;
+  String? electricalSafetyCertificateReading;
+  String? electricalSafetyCertificateSerialNumber;
+  String? energyPerformanceCertificateLocation;
+  String? energyPerformanceCertificateReading;
+  String? energyPerformanceCertificateSerialNumber;
+  String? moveInChecklistLocation;
+  String? moveInChecklistReading;
+  String? moveInChecklistSerialNumber;
   late List<File> capturedImages;
 
   @override
@@ -42,17 +58,30 @@ class _MeterReadingState extends State<MeterReading> {
   Future<void> _loadPreferences() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      houseApplinceManual = prefs.getString('houseApplinceManual');
-      kitchenApplinceManual = prefs.getString('kitchenApplinceManual');
-      heatingManual = prefs.getString('heatingManual');
-      landlordGasSafetyCertificate =
-          prefs.getString('landlordGasSafetyCertificate');
-      legionellaRiskAssessment = prefs.getString('legionellaRiskAssessment');
-      electricalSafetyCertificate =
-          prefs.getString('electricalSafetyCertificate');
-      energyPerformanceCertificate =
-          prefs.getString('energyPerformanceCertificate');
-      moveInChecklist = prefs.getString('moveInChecklist');
+      houseApplinceManualLocation = prefs.getString('houseApplinceManualLocation');
+      houseApplinceManualReading = prefs.getString('houseApplinceManualReading');
+      houseApplinceManualSerialNumber = prefs.getString('houseApplinceManualSerialNumber');
+      kitchenApplinceManualLocation = prefs.getString('kitchenApplinceManualLocation');
+      kitchenApplinceManualReading = prefs.getString('kitchenApplinceManualReading');
+      kitchenApplinceManualSerialNumber = prefs.getString('kitchenApplinceManualSerialNumber');
+      heatingManualLocation = prefs.getString('heatingManualLocation');
+      heatingManualReading = prefs.getString('heatingManualReading');
+      heatingManualSerialNumber = prefs.getString('heatingManualSerialNumber');
+      landlordGasSafetyCertificateLocation = prefs.getString('landlordGasSafetyCertificateLocation');
+      landlordGasSafetyCertificateReading = prefs.getString('landlordGasSafetyCertificateReading');
+      landlordGasSafetyCertificateSerialNumber = prefs.getString('landlordGasSafetyCertificateSerialNumber');
+      legionellaRiskAssessmentLocation = prefs.getString('legionellaRiskAssessmentLocation');
+      legionellaRiskAssessmentReading = prefs.getString('legionellaRiskAssessmentReading');
+      legionellaRiskAssessmentSerialNumber = prefs.getString('legionellaRiskAssessmentSerialNumber');
+      electricalSafetyCertificateLocation = prefs.getString('electricalSafetyCertificateLocation');
+      electricalSafetyCertificateReading = prefs.getString('electricalSafetyCertificateReading');
+      electricalSafetyCertificateSerialNumber = prefs.getString('electricalSafetyCertificateSerialNumber');
+      energyPerformanceCertificateLocation = prefs.getString('energyPerformanceCertificateLocation');
+      energyPerformanceCertificateReading = prefs.getString('energyPerformanceCertificateReading');
+      energyPerformanceCertificateSerialNumber = prefs.getString('energyPerformanceCertificateSerialNumber');
+      moveInChecklistLocation = prefs.getString('moveInChecklistLocation');
+      moveInChecklistReading = prefs.getString('moveInChecklistReading');
+      moveInChecklistSerialNumber = prefs.getString('moveInChecklistSerialNumber');
     });
   }
 
@@ -67,7 +96,7 @@ class _MeterReadingState extends State<MeterReading> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Bed Room',
+          'Meter Reading',
           style: TextStyle(
             color: kPrimaryColor,
             fontSize: 14,
@@ -98,107 +127,211 @@ class _MeterReadingState extends State<MeterReading> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              //House Appliance Manual
+              // House Appliance Manual
               ConditionItem(
                 name: "House Appliance Manual",
-                selectedCondition: houseApplinceManual,
-                onConditionSelected: (condition) {
+                location: houseApplinceManualLocation,
+                reading: houseApplinceManualReading,
+                serialNumber: houseApplinceManualSerialNumber,
+                onLocationSelected: (location) {
                   setState(() {
-                    houseApplinceManual = condition;
+                    houseApplinceManualLocation = location;
                   });
-                  _savePreference(
-                      'houseApplinceManual', condition); // Save preference
+                  _savePreference('houseApplinceManualLocation', location); // Save preference
+                },
+                onReadingSelected: (reading) {
+                  setState(() {
+                    houseApplinceManualReading = reading;
+                  });
+                  _savePreference('houseApplinceManualReading', reading); // Save preference
+                },
+                onSerialNumberSelected: (serialNumber) {
+                  setState(() {
+                    houseApplinceManualSerialNumber = serialNumber;
+                  });
+                  _savePreference('houseApplinceManualSerialNumber', serialNumber); // Save preference
                 },
               ),
 
-              //Kitchen Appliance Manual
+              // Kitchen Appliance Manual
               ConditionItem(
                 name: "Kitchen Appliance Manual",
-                selectedCondition: kitchenApplinceManual,
-                onConditionSelected: (condition) {
+                location: kitchenApplinceManualLocation,
+                reading: kitchenApplinceManualReading,
+                serialNumber: kitchenApplinceManualSerialNumber,
+                onLocationSelected: (location) {
                   setState(() {
-                    kitchenApplinceManual = condition;
+                    kitchenApplinceManualLocation = location;
                   });
-                  _savePreference(
-                      'kitchenApplinceManual', condition); // Save preference
+                  _savePreference('kitchenApplinceManualLocation', location); // Save preference
+                },
+                onReadingSelected: (reading) {
+                  setState(() {
+                    kitchenApplinceManualReading = reading;
+                  });
+                  _savePreference('kitchenApplinceManualReading', reading); // Save preference
+                },
+                onSerialNumberSelected: (serialNumber) {
+                  setState(() {
+                    kitchenApplinceManualSerialNumber = serialNumber;
+                  });
+                  _savePreference('kitchenApplinceManualSerialNumber', serialNumber); // Save preference
                 },
               ),
 
-              //Heating Manual
+              // Heating Manual
               ConditionItem(
                 name: "Heating Manual",
-                selectedCondition: heatingManual,
-                onConditionSelected: (condition) {
+                location: heatingManualLocation,
+                reading: heatingManualReading,
+                serialNumber: heatingManualSerialNumber,
+                onLocationSelected: (location) {
                   setState(() {
-                    heatingManual = condition;
+                    heatingManualLocation = location;
                   });
-                  _savePreference(
-                      'heatingManual', condition); // Save preference
+                  _savePreference('heatingManualLocation', location); // Save preference
+                },
+                onReadingSelected: (reading) {
+                  setState(() {
+                    heatingManualReading = reading;
+                  });
+                  _savePreference('heatingManualReading', reading); // Save preference
+                },
+                onSerialNumberSelected: (serialNumber) {
+                  setState(() {
+                    heatingManualSerialNumber = serialNumber;
+                  });
+                  _savePreference('heatingManualSerialNumber', serialNumber); // Save preference
                 },
               ),
 
-              //Landlord Gas Safety Certificate
+              // Landlord Gas Safety Certificate
               ConditionItem(
                 name: "Landlord Gas Safety Certificate",
-                selectedCondition: landlordGasSafetyCertificate,
-                onConditionSelected: (condition) {
+                location: landlordGasSafetyCertificateLocation,
+                reading: landlordGasSafetyCertificateReading,
+                serialNumber: landlordGasSafetyCertificateSerialNumber,
+                onLocationSelected: (location) {
                   setState(() {
-                    landlordGasSafetyCertificate = condition;
+                    landlordGasSafetyCertificateLocation = location;
                   });
-                  _savePreference('landlordGasSafetyCertificate',
-                      condition); // Save preference
+                  _savePreference('landlordGasSafetyCertificateLocation', location); // Save preference
+                },
+                onReadingSelected: (reading) {
+                  setState(() {
+                    landlordGasSafetyCertificateReading = reading;
+                  });
+                  _savePreference('landlordGasSafetyCertificateReading', reading); // Save preference
+                },
+                onSerialNumberSelected: (serialNumber) {
+                  setState(() {
+                    landlordGasSafetyCertificateSerialNumber = serialNumber;
+                  });
+                  _savePreference('landlordGasSafetyCertificateSerialNumber', serialNumber); // Save preference
                 },
               ),
 
-              //Legionella Risk Assessment
+              // Legionella Risk Assessment
               ConditionItem(
                 name: "Legionella Risk Assessment",
-                selectedCondition: legionellaRiskAssessment,
-                onConditionSelected: (condition) {
+                location: legionellaRiskAssessmentLocation,
+                reading: legionellaRiskAssessmentReading,
+                serialNumber: legionellaRiskAssessmentSerialNumber,
+                onLocationSelected: (location) {
                   setState(() {
-                    legionellaRiskAssessment = condition;
+                    legionellaRiskAssessmentLocation = location;
                   });
-                  _savePreference(
-                      'legionellaRiskAssessment', condition); // Save preference
+                  _savePreference('legionellaRiskAssessmentLocation', location); // Save preference
+                },
+                onReadingSelected: (reading) {
+                  setState(() {
+                    legionellaRiskAssessmentReading = reading;
+                  });
+                  _savePreference('legionellaRiskAssessmentReading', reading); // Save preference
+                },
+                onSerialNumberSelected: (serialNumber) {
+                  setState(() {
+                    legionellaRiskAssessmentSerialNumber = serialNumber;
+                  });
+                  _savePreference('legionellaRiskAssessmentSerialNumber', serialNumber); // Save preference
                 },
               ),
 
-              //Electrical Safety Certificate
+              // Electrical Safety Certificate
               ConditionItem(
                 name: "Electrical Safety Certificate",
-                selectedCondition: electricalSafetyCertificate,
-                onConditionSelected: (condition) {
+                location: electricalSafetyCertificateLocation,
+                reading: electricalSafetyCertificateReading,
+                serialNumber: electricalSafetyCertificateSerialNumber,
+                onLocationSelected: (location) {
                   setState(() {
-                    electricalSafetyCertificate = condition;
+                    electricalSafetyCertificateLocation = location;
                   });
-                  _savePreference('electricalSafetyCertificate',
-                      condition); // Save preference
+                  _savePreference('electricalSafetyCertificateLocation', location); // Save preference
+                },
+                onReadingSelected: (reading) {
+                  setState(() {
+                    electricalSafetyCertificateReading = reading;
+                  });
+                  _savePreference('electricalSafetyCertificateReading', reading); // Save preference
+                },
+                onSerialNumberSelected: (serialNumber) {
+                  setState(() {
+                    electricalSafetyCertificateSerialNumber = serialNumber;
+                  });
+                  _savePreference('electricalSafetyCertificateSerialNumber', serialNumber); // Save preference
                 },
               ),
 
-              //Energy Performance Certificate
+              // Energy Performance Certificate
               ConditionItem(
                 name: "Energy Performance Certificate",
-                selectedCondition: energyPerformanceCertificate,
-                onConditionSelected: (condition) {
+                location: energyPerformanceCertificateLocation,
+                reading: energyPerformanceCertificateReading,
+                serialNumber: energyPerformanceCertificateSerialNumber,
+                onLocationSelected: (location) {
                   setState(() {
-                    energyPerformanceCertificate = condition;
+                    energyPerformanceCertificateLocation = location;
                   });
-                  _savePreference('energyPerformanceCertificate',
-                      condition); // Save preference
+                  _savePreference('energyPerformanceCertificateLocation', location); // Save preference
+                },
+                onReadingSelected: (reading) {
+                  setState(() {
+                    energyPerformanceCertificateReading = reading;
+                  });
+                  _savePreference('energyPerformanceCertificateReading', reading); // Save preference
+                },
+                onSerialNumberSelected: (serialNumber) {
+                  setState(() {
+                    energyPerformanceCertificateSerialNumber = serialNumber;
+                  });
+                  _savePreference('energyPerformanceCertificateSerialNumber', serialNumber); // Save preference
                 },
               ),
 
-              //Move In Checklist
+              // Move In Checklist
               ConditionItem(
                 name: "Move In Checklist",
-                selectedCondition: moveInChecklist,
-                onConditionSelected: (condition) {
+                location: moveInChecklistLocation,
+                reading: moveInChecklistReading,
+                serialNumber: moveInChecklistSerialNumber,
+                onLocationSelected: (location) {
                   setState(() {
-                    moveInChecklist = condition;
+                    moveInChecklistLocation = location;
                   });
-                  _savePreference(
-                      'moveInChecklist', condition); // Save preference
+                  _savePreference('moveInChecklistLocation', location); // Save preference
+                },
+                onReadingSelected: (reading) {
+                  setState(() {
+                    moveInChecklistReading = reading;
+                  });
+                  _savePreference('moveInChecklistReading', reading); // Save preference
+                },
+                onSerialNumberSelected: (serialNumber) {
+                  setState(() {
+                    moveInChecklistSerialNumber = serialNumber;
+                  });
+                  _savePreference('moveInChecklistSerialNumber', serialNumber); // Save preference
                 },
               ),
 
@@ -213,14 +346,22 @@ class _MeterReadingState extends State<MeterReading> {
 
 class ConditionItem extends StatelessWidget {
   final String name;
-  final String? selectedCondition;
-  final Function(String?) onConditionSelected;
+  final String? location;
+  final String? reading;
+  final String? serialNumber;
+  final Function(String?) onLocationSelected;
+  final Function(String?) onReadingSelected;
+  final Function(String?) onSerialNumberSelected;
 
   const ConditionItem({
     Key? key,
     required this.name,
-    this.selectedCondition,
-    required this.onConditionSelected,
+    this.location,
+    this.reading,
+    this.serialNumber,
+    required this.onLocationSelected,
+    required this.onReadingSelected,
+    required this.onSerialNumberSelected,
   }) : super(key: key);
 
   @override
@@ -303,27 +444,25 @@ class ConditionItem extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(
-            height: 12,
-          ),
+          SizedBox(height: 12,),
           GestureDetector(
             onTap: () async {
               final result = await Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => ConditionDetails(
-                    initialCondition: selectedCondition,
+                    initialCondition: location,
                     type: name,
                   ),
                 ),
               );
 
               if (result != null) {
-                onConditionSelected(result);
+                onLocationSelected(result);
               }
             },
             child: Text(
-              selectedCondition ?? "Location",
+              location ?? "Location",
               style: TextStyle(
                 fontSize: 12.0,
                 fontWeight: FontWeight.w700,
@@ -332,27 +471,25 @@ class ConditionItem extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(
-            height: 12,
-          ),
+          SizedBox(height: 12,),
           GestureDetector(
             onTap: () async {
               final result = await Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => ConditionDetails(
-                    initialCondition: selectedCondition,
+                    initialCondition: reading,
                     type: name,
                   ),
                 ),
               );
 
               if (result != null) {
-                onConditionSelected(result);
+                onReadingSelected(result);
               }
             },
             child: Text(
-              selectedCondition ?? "Serial Number",
+              reading ?? "Reading",
               style: TextStyle(
                 fontSize: 12.0,
                 fontWeight: FontWeight.w700,
@@ -361,27 +498,25 @@ class ConditionItem extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(
-            height: 12,
-          ),
+          SizedBox(height: 12,),
           GestureDetector(
             onTap: () async {
               final result = await Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => ConditionDetails(
-                    initialCondition: selectedCondition,
+                    initialCondition: serialNumber,
                     type: name,
                   ),
                 ),
               );
 
               if (result != null) {
-                onConditionSelected(result);
+                onSerialNumberSelected(result);
               }
             },
             child: Text(
-              selectedCondition ?? "Reading",
+              serialNumber ?? "Serial Number",
               style: TextStyle(
                 fontSize: 12.0,
                 fontWeight: FontWeight.w700,

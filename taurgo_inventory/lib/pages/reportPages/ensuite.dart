@@ -21,19 +21,32 @@ class Ensuite extends StatefulWidget {
 }
 
 class _EnsuiteState extends State<Ensuite> {
-  String? door;
-  String? doorFrame;
-  String? ceiling;
-  String? lighting;
-  String? walls;
-  String? skirting;
-  String? windowSill;
-  String? curtains;
-  String? blinds;
-  String? lightSwitches;
-  String? sockets;
-  String? flooring;
-  String? additionalItems;
+  String? doorCondition;
+  String? doorLocation;
+  String? doorFrameCondition;
+  String? doorFrameLocation;
+  String? ceilingCondition;
+  String? ceilingLocation;
+  String? lightingCondition;
+  String? lightingLocation;
+  String? wallsCondition;
+  String? wallsLocation;
+  String? skirtingCondition;
+  String? skirtingLocation;
+  String? windowSillCondition;
+  String? windowSillLocation;
+  String? curtainsCondition;
+  String? curtainsLocation;
+  String? blindsCondition;
+  String? blindsLocation;
+  String? lightSwitchesCondition;
+  String? lightSwitchesLocation;
+  String? socketsCondition;
+  String? socketsLocation;
+  String? flooringCondition;
+  String? flooringLocation;
+  String? additionalItemsCondition;
+  String? additionalItemsLocation;
   late List<File> capturedImages;
 
   @override
@@ -47,19 +60,32 @@ class _EnsuiteState extends State<Ensuite> {
   Future<void> _loadPreferences() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      door = prefs.getString('gasMeter');
-      doorFrame = prefs.getString('electricMeter');
-      ceiling = prefs.getString('waterMeter');
-      lighting = prefs.getString('oilMeter');
-      walls = prefs.getString('other');
-      skirting = prefs.getString('other');
-      windowSill = prefs.getString('other');
-      curtains = prefs.getString('other');
-      blinds = prefs.getString('other');
-      lightSwitches = prefs.getString('other');
-      sockets = prefs.getString('other');
-      flooring = prefs.getString('other');
-      additionalItems = prefs.getString('other');
+      doorCondition = prefs.getString('doorCondition');
+      doorLocation = prefs.getString('doorLocation');
+      doorFrameCondition = prefs.getString('doorFrameCondition');
+      doorFrameLocation = prefs.getString('doorFrameLocation');
+      ceilingCondition = prefs.getString('ceilingCondition');
+      ceilingLocation = prefs.getString('ceilingLocation');
+      lightingCondition = prefs.getString('lightingCondition');
+      lightingLocation = prefs.getString('lightingLocation');
+      wallsCondition = prefs.getString('wallsCondition');
+      wallsLocation = prefs.getString('wallsLocation');
+      skirtingCondition = prefs.getString('skirtingCondition');
+      skirtingLocation = prefs.getString('skirtingLocation');
+      windowSillCondition = prefs.getString('windowSillCondition');
+      windowSillLocation = prefs.getString('windowSillLocation');
+      curtainsCondition = prefs.getString('curtainsCondition');
+      curtainsLocation = prefs.getString('curtainsLocation');
+      blindsCondition = prefs.getString('blindsCondition');
+      blindsLocation = prefs.getString('blindsLocation');
+      lightSwitchesCondition = prefs.getString('lightSwitchesCondition');
+      lightSwitchesLocation = prefs.getString('lightSwitchesLocation');
+      socketsCondition = prefs.getString('socketsCondition');
+      socketsLocation = prefs.getString('socketsLocation');
+      flooringCondition = prefs.getString('flooringCondition');
+      flooringLocation = prefs.getString('flooringLocation');
+      additionalItemsCondition = prefs.getString('additionalItemsCondition');
+      additionalItemsLocation = prefs.getString('additionalItemsLocation');
     });
   }
 
@@ -105,161 +131,250 @@ class _EnsuiteState extends State<Ensuite> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              //Gas Meter
+              // Door
               ConditionItem(
                 name: "Door",
-                selectedCondition: door,
+                condition: doorCondition,
+                location: doorLocation,
                 onConditionSelected: (condition) {
                   setState(() {
-                    door = condition;
+                    doorCondition = condition;
                   });
-                  _savePreference('door', condition); // Save preference
+                  _savePreference('doorCondition', condition); // Save preference
+                },
+                onLocationSelected: (location) {
+                  setState(() {
+                    doorLocation = location;
+                  });
+                  _savePreference('doorLocation', location); // Save preference
                 },
               ),
 
-              //Electric Meter
+              // Door Frame
               ConditionItem(
                 name: "Door Frame",
-                selectedCondition: doorFrame,
+                condition: doorFrameCondition,
+                location: doorFrameLocation,
                 onConditionSelected: (condition) {
                   setState(() {
-                    doorFrame = condition;
+                    doorFrameCondition = condition;
                   });
-                  _savePreference('doorFrame', condition); // Save preference
+                  _savePreference('doorFrameCondition', condition); // Save preference
+                },
+                onLocationSelected: (location) {
+                  setState(() {
+                    doorFrameLocation = location;
+                  });
+                  _savePreference('doorFrameLocation', location); // Save preference
                 },
               ),
 
-              //Water Meter
+              // Ceiling
               ConditionItem(
                 name: "Ceiling",
-                selectedCondition: ceiling,
+                condition: ceilingCondition,
+                location: ceilingLocation,
                 onConditionSelected: (condition) {
                   setState(() {
-                    ceiling = condition;
+                    ceilingCondition = condition;
                   });
-                  _savePreference('ceiling', condition); // Save preference
+                  _savePreference('ceilingCondition', condition); // Save preference
+                },
+                onLocationSelected: (location) {
+                  setState(() {
+                    ceilingLocation = location;
+                  });
+                  _savePreference('ceilingLocation', location); // Save preference
                 },
               ),
 
-              //Oil Meter
+              // Lighting
               ConditionItem(
                 name: "Lighting",
-                selectedCondition: lighting,
+                condition: lightingCondition,
+                location: lightingLocation,
                 onConditionSelected: (condition) {
                   setState(() {
-                    lighting = condition;
+                    lightingCondition = condition;
                   });
-                  _savePreference('lighting', condition); // Save preference
+                  _savePreference('lightingCondition', condition); // Save preference
+                },
+                onLocationSelected: (location) {
+                  setState(() {
+                    lightingLocation = location;
+                  });
+                  _savePreference('lightingLocation', location); // Save preference
                 },
               ),
 
-              //Walls
+              // Walls
               ConditionItem(
                 name: "Walls",
-                selectedCondition: walls,
+                condition: wallsCondition,
+                location: wallsLocation,
                 onConditionSelected: (condition) {
                   setState(() {
-                    walls = condition;
+                    wallsCondition = condition;
                   });
-                  _savePreference('walls', condition); // Save preference
+                  _savePreference('wallsCondition', condition); // Save preference
+                },
+                onLocationSelected: (location) {
+                  setState(() {
+                    wallsLocation = location;
+                  });
+                  _savePreference('wallsLocation', location); // Save preference
                 },
               ),
 
-              //Skirting
+              // Skirting
               ConditionItem(
                 name: "Skirting",
-                selectedCondition: skirting,
+                condition: skirtingCondition,
+                location: skirtingLocation,
                 onConditionSelected: (condition) {
                   setState(() {
-                    skirting = condition;
+                    skirtingCondition = condition;
                   });
-                  _savePreference('skirting', condition); // Save preference
+                  _savePreference('skirtingCondition', condition); // Save preference
+                },
+                onLocationSelected: (location) {
+                  setState(() {
+                    skirtingLocation = location;
+                  });
+                  _savePreference('skirtingLocation', location); // Save preference
                 },
               ),
 
-              //Window Sill
+              // Window Sill
               ConditionItem(
                 name: "Window Sill",
-                selectedCondition: windowSill,
+                condition: windowSillCondition,
+                location: windowSillLocation,
                 onConditionSelected: (condition) {
                   setState(() {
-                    windowSill = condition;
+                    windowSillCondition = condition;
                   });
-                  _savePreference('windowSill', condition); // Save preference
+                  _savePreference('windowSillCondition', condition); // Save preference
+                },
+                onLocationSelected: (location) {
+                  setState(() {
+                    windowSillLocation = location;
+                  });
+                  _savePreference('windowSillLocation', location); // Save preference
                 },
               ),
 
-              //Curtains
+              // Curtains
               ConditionItem(
                 name: "Curtains",
-                selectedCondition: curtains,
+                condition: curtainsCondition,
+                location: curtainsLocation,
                 onConditionSelected: (condition) {
                   setState(() {
-                    curtains = condition;
+                    curtainsCondition = condition;
                   });
-                  _savePreference('curtains', condition); // Save preference
+                  _savePreference('curtainsCondition', condition); // Save preference
+                },
+                onLocationSelected: (location) {
+                  setState(() {
+                    curtainsLocation = location;
+                  });
+                  _savePreference('curtainsLocation', location); // Save preference
                 },
               ),
 
-              //Blinds
+              // Blinds
               ConditionItem(
                 name: "Blinds",
-                selectedCondition: blinds,
+                condition: blindsCondition,
+                location: blindsLocation,
                 onConditionSelected: (condition) {
                   setState(() {
-                    blinds = condition;
+                    blindsCondition = condition;
                   });
-                  _savePreference('blinds', condition); // Save preference
+                  _savePreference('blindsCondition', condition); // Save preference
+                },
+                onLocationSelected: (location) {
+                  setState(() {
+                    blindsLocation = location;
+                  });
+                  _savePreference('blindsLocation', location); // Save preference
                 },
               ),
 
-              //Light Switches
+              // Light Switches
               ConditionItem(
                 name: "Light Switches",
-                selectedCondition: lightSwitches,
+                condition: lightSwitchesCondition,
+                location: lightSwitchesLocation,
                 onConditionSelected: (condition) {
                   setState(() {
-                    lightSwitches = condition;
+                    lightSwitchesCondition = condition;
                   });
-                  _savePreference(
-                      'lightSwitches', condition); // Save preference
+                  _savePreference('lightSwitchesCondition', condition); // Save preference
+                },
+                onLocationSelected: (location) {
+                  setState(() {
+                    lightSwitchesLocation = location;
+                  });
+                  _savePreference('lightSwitchesLocation', location); // Save preference
                 },
               ),
 
-              //Sockets
+              // Sockets
               ConditionItem(
                 name: "Sockets",
-                selectedCondition: sockets,
+                condition: socketsCondition,
+                location: socketsLocation,
                 onConditionSelected: (condition) {
                   setState(() {
-                    sockets = condition;
+                    socketsCondition = condition;
                   });
-                  _savePreference('sockets', condition); // Save preference
+                  _savePreference('socketsCondition', condition); // Save preference
+                },
+                onLocationSelected: (location) {
+                  setState(() {
+                    socketsLocation = location;
+                  });
+                  _savePreference('socketsLocation', location); // Save preference
                 },
               ),
 
-              //Flooring
+              // Flooring
               ConditionItem(
                 name: "Flooring",
-                selectedCondition: flooring,
+                condition: flooringCondition,
+                location: flooringLocation,
                 onConditionSelected: (condition) {
                   setState(() {
-                    flooring = condition;
+                    flooringCondition = condition;
                   });
-                  _savePreference('flooring', condition); // Save preference
+                  _savePreference('flooringCondition', condition); // Save preference
+                },
+                onLocationSelected: (location) {
+                  setState(() {
+                    flooringLocation = location;
+                  });
+                  _savePreference('flooringLocation', location); // Save preference
                 },
               ),
 
-              //Additional Items
+              // Additional Items
               ConditionItem(
                 name: "Additional Items",
-                selectedCondition: additionalItems,
+                condition: additionalItemsCondition,
+                location: additionalItemsLocation,
                 onConditionSelected: (condition) {
                   setState(() {
-                    additionalItems = condition;
+                    additionalItemsCondition = condition;
                   });
-                  _savePreference(
-                      'additionalItems', condition); // Save preference
+                  _savePreference('additionalItemsCondition', condition); // Save preference
+                },
+                onLocationSelected: (location) {
+                  setState(() {
+                    additionalItemsLocation = location;
+                  });
+                  _savePreference('additionalItemsLocation', location); // Save preference
                 },
               ),
             ],
@@ -272,14 +387,18 @@ class _EnsuiteState extends State<Ensuite> {
 
 class ConditionItem extends StatelessWidget {
   final String name;
-  final String? selectedCondition;
+  final String? condition;
+  final String? location;
   final Function(String?) onConditionSelected;
+  final Function(String?) onLocationSelected;
 
   const ConditionItem({
     Key? key,
     required this.name,
-    this.selectedCondition,
+    this.condition,
+    this.location,
     required this.onConditionSelected,
+    required this.onLocationSelected,
   }) : super(key: key);
 
   @override
@@ -362,25 +481,50 @@ class ConditionItem extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: 12),
+          SizedBox(height: 12,),
           GestureDetector(
             onTap: () async {
               final result = await Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => ConditionDetails(
-                    initialCondition: selectedCondition,
+                    initialCondition: location,
                     type: name,
                   ),
                 ),
               );
-
+              if (result != null) {
+                onLocationSelected(result);
+              }
+            },
+            child: Text(
+              location ?? "Location",
+              style: TextStyle(
+                fontSize: 12.0,
+                fontWeight: FontWeight.w700,
+                color: kPrimaryTextColourTwo,
+                fontStyle: FontStyle.italic,
+              ),
+            ),
+          ),
+          SizedBox(height: 12,),
+          GestureDetector(
+            onTap: () async {
+              final result = await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ConditionDetails(
+                    initialCondition: condition,
+                    type: name,
+                  ),
+                ),
+              );
               if (result != null) {
                 onConditionSelected(result);
               }
             },
             child: Text(
-              selectedCondition ?? "Location",
+              condition ?? "Condition",
               style: TextStyle(
                 fontSize: 12.0,
                 fontWeight: FontWeight.w700,

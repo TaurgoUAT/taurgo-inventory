@@ -1,24 +1,13 @@
 import 'dart:async';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:taurgo_inventory/pages/camera_preview_page.dart';
-import 'package:taurgo_inventory/pages/conditions/condition_details.dart';
-import 'package:taurgo_inventory/pages/edit_report_page.dart';
-import 'dart:async';
-import 'dart:convert'; // For JSON encoding/decoding
 import 'dart:io';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:camera/camera.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:taurgo_inventory/pages/camera_preview_page.dart';
+import 'package:camera/camera.dart';
 import 'package:taurgo_inventory/pages/conditions/condition_details.dart';
 import 'package:taurgo_inventory/pages/edit_report_page.dart';
 import 'package:taurgo_inventory/widgets/add_action.dart';
+import 'package:taurgo_inventory/pages/camera_preview_page.dart';
 import '../../constants/AppColors.dart';
-import 'package:flutter/material.dart';
 
 class ScheduleOfCondition extends StatefulWidget {
   final List<File>? capturedImages;
@@ -29,17 +18,7 @@ class ScheduleOfCondition extends StatefulWidget {
   State<ScheduleOfCondition> createState() => _ScheduleOfConditionState();
 }
 
-
-
 class _ScheduleOfConditionState extends State<ScheduleOfCondition> {
-  List<String> filesToJson(List<File> files) {
-    return files.map((file) => file.path).toList();
-  }
-
-  List<File> jsonToFiles(List<String> paths) {
-    return paths.map((path) => File(path)).toList();
-  }
-
   late List<File> capturedImages;
 
   String? overview;
@@ -61,28 +40,12 @@ class _ScheduleOfConditionState extends State<ScheduleOfCondition> {
   void initState() {
     super.initState();
     capturedImages = widget.capturedImages ?? [];
-    _loadConditions(); // Load conditions from SharedPreferences
-    _loadImages(); // Load captured images from SharedPreferences
+    _loadPreferences(); // Load the saved preferences when the state is initialized
   }
 
-  Future<void> _loadImages() async {
+  // Function to load preferences
+  Future<void> _loadPreferences() async {
     final prefs = await SharedPreferences.getInstance();
-    final paths = prefs.getStringList('capturedImages') ?? [];
-    setState(() {
-      capturedImages = jsonToFiles(paths);
-    });
-  }
-
-  Future<void> _saveImages() async {
-    final prefs = await SharedPreferences.getInstance();
-    final paths = filesToJson(capturedImages);
-    await prefs.setStringList('capturedImages', paths);
-    print(paths);
-  }
-
-  Future<void> _loadConditions() async {
-    final prefs = await SharedPreferences.getInstance();
-
     setState(() {
       overview = prefs.getString('overview');
       accessoryCleanliness = prefs.getString('accessoryCleanliness');
@@ -101,23 +64,10 @@ class _ScheduleOfConditionState extends State<ScheduleOfCondition> {
     });
   }
 
-  Future<void> _saveConditions() async {
+  // Function to save a preference
+  Future<void> _savePreference(String key, String? value) async {
     final prefs = await SharedPreferences.getInstance();
-
-    await prefs.setString('overview', overview ?? '');
-    await prefs.setString('accessoryCleanliness', accessoryCleanliness ?? '');
-    await prefs.setString('windowSill', windowSill ?? '');
-    await prefs.setString('carpets', carpets ?? '');
-    await prefs.setString('ceilings', ceilings ?? '');
-    await prefs.setString('curtains', curtains ?? '');
-    await prefs.setString('hardFlooring', hardFlooring ?? '');
-    await prefs.setString('kitchenArea', kitchenArea ?? '');
-    await prefs.setString('oven', oven ?? '');
-    await prefs.setString('mattress', mattress ?? '');
-    await prefs.setString('upholstrey', upholstrey ?? '');
-    await prefs.setString('wall', wall ?? '');
-    await prefs.setString('window', window ?? '');
-    await prefs.setString('woodwork', woodwork ?? '');
+    prefs.setString(key, value ?? '');
   }
 
   void _showCapturedImages() {
@@ -131,376 +81,327 @@ class _ScheduleOfConditionState extends State<ScheduleOfCondition> {
 
   @override
   Widget build(BuildContext context) {
-    return PopScope(
-      canPop: false,
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text(
-            'Schedule of Condition',
-            style: TextStyle(
-              color: kPrimaryColor,
-              fontSize: 14,
-              fontFamily: "Inter",
-            ),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          'Schedule of Condition',
+          style: TextStyle(
+            color: kPrimaryColor,
+            fontSize: 14,
+            fontFamily: "Inter",
           ),
-          centerTitle: true,
-          backgroundColor: bWhite,
-          leading: GestureDetector(
-            onTap: () {
-              showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return AlertDialog(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    elevation: 10,
-                    backgroundColor: Colors.white,
-                    title: Row(
-                      children: [
-                        Icon(Icons.info_outline, color: kPrimaryColor),
-                        SizedBox(width: 10),
-                        Text(
-                          'Do you want to Exit',
-                          style: TextStyle(
-                            color: kPrimaryColor,
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                    content: Text(
-                      'Your process will not be saved if you exit the process',
-                      style: TextStyle(
-                        color: Colors.grey[800],
-                        fontSize: 14,
-                        fontWeight: FontWeight.w400,
-                        height: 1.5,
-                      ),
-                    ),
-                    actions: <Widget>[
-                      TextButton(
-                        child: Text(
-                          'Cancel',
-                          style: TextStyle(
-                            color: kPrimaryColor,
-                            fontSize: 16,
-                          ),
-                        ),
-                        onPressed: () {
-                          Navigator.of(context).pop(); // Close the dialog
-                        },
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) =>
-                                    EditReportPage()), // Replace HomePage with your home page
-                          ); // Close the dialog
-                        },
-                        style: TextButton.styleFrom(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 8),
-                          backgroundColor: kPrimaryColor,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                        child: Text(
-                          'Exit',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                          ),
-                        ),
-                      ),
-                    ],
-                  );
-                },
-              );
-            },
-            child: Icon(
-              Icons.arrow_back_ios_new,
-              color: kPrimaryColor,
-              size: 24,
-            ),
-          ),
-          actions: [
-            GestureDetector(
-              onTap: () {
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return AlertDialog(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      elevation: 10,
-                      backgroundColor: Colors.white,
-                      title: Row(
-                        children: [
-                          Icon(Icons.info_outline, color: kPrimaryColor),
-                          SizedBox(width: 10),
-                          Text(
-                            'Save and Continue',
-                            style: TextStyle(
-                              color: kPrimaryColor,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                      content: Text(
-                        'Please Make Sure You Have Entered all the Details before Saving',
-                        style: TextStyle(
-                          color: Colors.grey[800],
-                          fontSize: 14,
-                          fontWeight: FontWeight.w400,
-                          height: 1.5,
-                        ),
-                      ),
-                      actions: <Widget>[
-                        TextButton(
-                          child: Text(
-                            'Cancel',
-                            style: TextStyle(
-                              color: kPrimaryColor,
-                              fontSize: 16,
-                            ),
-                          ),
-                          onPressed: () {
-                            Navigator.of(context).pop(); // Close the dialog
-                          },
-                        ),
-                        TextButton(
-                          onPressed: () async {
-                            await _saveConditions(); // Save conditions before continuing
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) =>
-                                      EditReportPage()), // Replace HomePage with your home page
-                            ); // Close the dialog
-                          },
-                          style: TextButton.styleFrom(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 16, vertical: 8),
-                            backgroundColor: kPrimaryColor,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
-                          child: Text(
-                            'Save',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                            ),
-                          ),
-                        ),
-                      ],
-                    );
-                  },
-                );
-              },
-              child: Container(
-                margin: EdgeInsets.all(16),
-                child: Text(
-                  'Save', // Replace with the actual location
-                  style: TextStyle(
-                    color: kPrimaryColor,
-                    fontSize: 14, // Adjust the font size
-                    fontFamily: "Inter",
-                  ),
-                ),
+        ),
+        centerTitle: true,
+        backgroundColor: bWhite,
+        leading: GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => EditReportPage(),
               ),
-            )
-          ],
-        ),
-        body: SingleChildScrollView(
-          child: Padding(
-            padding: EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                ConditionItem(
-                  name: "Overview",
-                  selectedCondition: overview,
-                  onConditionSelected: (condition) {
-                    setState(() {
-                      overview = condition;
-                    });
-                  },
-                ),
-                ConditionItem(
-                  name: "Accessory - Cleanliness",
-                  selectedCondition: accessoryCleanliness,
-                  onConditionSelected: (condition) {
-                    setState(() {
-                      accessoryCleanliness = condition;
-                    });
-                  },
-                ),
-                ConditionItem(
-                  name: "Window Sill",
-                  selectedCondition: windowSill,
-                  onConditionSelected: (condition) {
-                    setState(() {
-                      windowSill = condition;
-                    });
-                  },
-                ),
-                ConditionItem(
-                  name: "Carpets",
-                  selectedCondition: carpets,
-                  onConditionSelected: (condition) {
-                    setState(() {
-                      carpets = condition;
-                    });
-                  },
-                ),
-                ConditionItem(
-                  name: "Ceilings",
-                  selectedCondition: ceilings,
-                  onConditionSelected: (condition) {
-                    setState(() {
-                      ceilings = condition;
-                    });
-                  },
-                ),
-                ConditionItem(
-                  name: "Curtains",
-                  selectedCondition: curtains,
-                  onConditionSelected: (condition) {
-                    setState(() {
-                      curtains = condition;
-                    });
-                  },
-                ),
-                ConditionItem(
-                  name: "Hard Flooring",
-                  selectedCondition: hardFlooring,
-                  onConditionSelected: (condition) {
-                    setState(() {
-                      hardFlooring = condition;
-                    });
-                  },
-                ),
-                ConditionItem(
-                  name: "Kitchen Area",
-                  selectedCondition: kitchenArea,
-                  onConditionSelected: (condition) {
-                    setState(() {
-                      kitchenArea = condition;
-                    });
-                  },
-                ),
-                ConditionItem(
-                  name: "Oven",
-                  selectedCondition: oven,
-                  onConditionSelected: (condition) {
-                    setState(() {
-                      oven = condition;
-                    });
-                  },
-                ),
-                ConditionItem(
-                  name: "Mattress",
-                  selectedCondition: mattress,
-                  onConditionSelected: (condition) {
-                    setState(() {
-                      mattress = condition;
-                    });
-                  },
-                ),
-                ConditionItem(
-                  name: "Upholstrey",
-                  selectedCondition: upholstrey,
-                  onConditionSelected: (condition) {
-                    setState(() {
-                      upholstrey = condition;
-                    });
-                  },
-                ),
-                ConditionItem(
-                  name: "Wall",
-                  selectedCondition: wall,
-                  onConditionSelected: (condition) {
-                    setState(() {
-                      wall = condition;
-                    });
-                  },
-                ),
-                ConditionItem(
-                  name: "Window",
-                  selectedCondition: window,
-                  onConditionSelected: (condition) {
-                    setState(() {
-                      window = condition;
-                    });
-                  },
-                ),
-                ConditionItem(
-                  name: "Woodwork",
-                  selectedCondition: woodwork,
-                  onConditionSelected: (condition) {
-                    setState(() {
-                      woodwork = condition;
-                    });
-                  },
-                ),
-                SizedBox(height: 20),
-            Padding(
-              padding: EdgeInsets.symmetric(vertical: 16),
-              child: Column(
-                children: [
-                  ElevatedButton(
-                    onPressed: _showCapturedImages,
-                    child: Text('Show Captured Images'),
-                  ),
-                  SizedBox(width: 16),
-                  ElevatedButton(
-                    onPressed: () async {
-                      await _saveConditions(); // Save conditions
-                      await _saveImages(); // Save images
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) =>
-                                EditReportPage()), // Replace with your home page
-                      );
-                    },
-                    child: Text('Save and Continue'),
-                  ),
-                ],
-              ),),
-                SizedBox(height: 20),
-              ],
-            ),
-          ),
-        ),
-
-        floatingActionButton: FloatingActionButton.extended(
-          onPressed: _showCapturedImages, // Show captured images when clicked
-          label: Icon(
-            Icons.image_outlined,
-            color: bWhite,
+            );
+          },
+          child: Icon(
+            Icons.arrow_back_ios_new,
+            color: kPrimaryColor,
             size: 24,
           ),
-          backgroundColor: kPrimaryColor,
-          hoverColor: kPrimaryColor.withOpacity(0.4),
-          shape: CircleBorder(
-            side: BorderSide(
-              color: Colors.white,
-              width: 2.0,
-            ),
-          ),
-          elevation: 3.0,
         ),
+      ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Overview
+              ConditionItem(
+                name: "Overview",
+                condition: overview,
+                description: overview,
+                onConditionSelected: (condition) {
+                  setState(() {
+                    overview = condition;
+                  });
+                  _savePreference('overview', condition); // Save preference
+                },
+                onDescriptionSelected: (description) {
+                  setState(() {
+                    overview = description;
+                  });
+                  _savePreference('overview', description); // Save preference
+                },
+              ),
+
+              // Accessory Cleanliness
+              ConditionItem(
+                name: "Accessory - Cleanliness",
+                condition: accessoryCleanliness,
+                description: accessoryCleanliness,
+                onConditionSelected: (condition) {
+                  setState(() {
+                    accessoryCleanliness = condition;
+                  });
+                  _savePreference('accessoryCleanliness', condition); // Save preference
+                },
+                onDescriptionSelected: (description) {
+                  setState(() {
+                    accessoryCleanliness = description;
+                  });
+                  _savePreference('accessoryCleanliness', description); // Save preference
+                },
+              ),
+
+              // Window Sill
+              ConditionItem(
+                name: "Window Sill",
+                condition: windowSill,
+                description: windowSill,
+                onConditionSelected: (condition) {
+                  setState(() {
+                    windowSill = condition;
+                  });
+                  _savePreference('windowSill', condition); // Save preference
+                },
+                onDescriptionSelected: (description) {
+                  setState(() {
+                    windowSill = description;
+                  });
+                  _savePreference('windowSill', description); // Save preference
+                },
+              ),
+
+              // Carpets
+              ConditionItem(
+                name: "Carpets",
+                condition: carpets,
+                description: carpets,
+                onConditionSelected: (condition) {
+                  setState(() {
+                    carpets = condition;
+                  });
+                  _savePreference('carpets', condition); // Save preference
+                },
+                onDescriptionSelected: (description) {
+                  setState(() {
+                    carpets = description;
+                  });
+                  _savePreference('carpets', description); // Save preference
+                },
+              ),
+
+              // Ceilings
+              ConditionItem(
+                name: "Ceilings",
+                condition: ceilings,
+                description: ceilings,
+                onConditionSelected: (condition) {
+                  setState(() {
+                    ceilings = condition;
+                  });
+                  _savePreference('ceilings', condition); // Save preference
+                },
+                onDescriptionSelected: (description) {
+                  setState(() {
+                    ceilings = description;
+                  });
+                  _savePreference('ceilings', description); // Save preference
+                },
+              ),
+
+              // Curtains
+              ConditionItem(
+                name: "Curtains",
+                condition: curtains,
+                description: curtains,
+                onConditionSelected: (condition) {
+                  setState(() {
+                    curtains = condition;
+                  });
+                  _savePreference('curtains', condition); // Save preference
+                },
+                onDescriptionSelected: (description) {
+                  setState(() {
+                    curtains = description;
+                  });
+                  _savePreference('curtains', description); // Save preference
+                },
+              ),
+
+              // Hard Flooring
+              ConditionItem(
+                name: "Hard Flooring",
+                condition: hardFlooring,
+                description: hardFlooring,
+                onConditionSelected: (condition) {
+                  setState(() {
+                    hardFlooring = condition;
+                  });
+                  _savePreference('hardFlooring', condition); // Save preference
+                },
+                onDescriptionSelected: (description) {
+                  setState(() {
+                    hardFlooring = description;
+                  });
+                  _savePreference('hardFlooring', description); // Save preference
+                },
+              ),
+
+              // Kitchen Area
+              ConditionItem(
+                name: "Kitchen Area",
+                condition: kitchenArea,
+                description: kitchenArea,
+                onConditionSelected: (condition) {
+                  setState(() {
+                    kitchenArea = condition;
+                  });
+                  _savePreference('kitchenArea', condition); // Save preference
+                },
+                onDescriptionSelected: (description) {
+                  setState(() {
+                    kitchenArea = description;
+                  });
+                  _savePreference('kitchenArea', description); // Save preference
+                },
+              ),
+
+              // Oven
+              ConditionItem(
+                name: "Oven",
+                condition: oven,
+                description: oven,
+                onConditionSelected: (condition) {
+                  setState(() {
+                    oven = condition;
+                  });
+                  _savePreference('oven', condition); // Save preference
+                },
+                onDescriptionSelected: (description) {
+                  setState(() {
+                    oven = description;
+                  });
+                  _savePreference('oven', description); // Save preference
+                },
+              ),
+
+              // Mattress
+              ConditionItem(
+                name: "Mattress",
+                condition: mattress,
+                description: mattress,
+                onConditionSelected: (condition) {
+                  setState(() {
+                    mattress = condition;
+                  });
+                  _savePreference('mattress', condition); // Save preference
+                },
+                onDescriptionSelected: (description) {
+                  setState(() {
+                    mattress = description;
+                  });
+                  _savePreference('mattress', description); // Save preference
+                },
+              ),
+
+              // Upholstrey
+              ConditionItem(
+                name: "Upholstrey",
+                condition: upholstrey,
+                description: upholstrey,
+                onConditionSelected: (condition) {
+                  setState(() {
+                    upholstrey = condition;
+                  });
+                  _savePreference('upholstrey', condition); // Save preference
+                },
+                onDescriptionSelected: (description) {
+                  setState(() {
+                    upholstrey = description;
+                  });
+                  _savePreference('upholstrey', description); // Save preference
+                },
+              ),
+
+              // Wall
+              ConditionItem(
+                name: "Wall",
+                condition: wall,
+                description: wall,
+                onConditionSelected: (condition) {
+                  setState(() {
+                    wall = condition;
+                  });
+                  _savePreference('wall', condition); // Save preference
+                },
+                onDescriptionSelected: (description) {
+                  setState(() {
+                    wall = description;
+                  });
+                  _savePreference('wall', description); // Save preference
+                },
+              ),
+
+              // Window
+              ConditionItem(
+                name: "Window",
+                condition: window,
+                description: window,
+                onConditionSelected: (condition) {
+                  setState(() {
+                    window = condition;
+                  });
+                  _savePreference('window', condition); // Save preference
+                },
+                onDescriptionSelected: (description) {
+                  setState(() {
+                    window = description;
+                  });
+                  _savePreference('window', description); // Save preference
+                },
+              ),
+
+              // Woodwork
+              ConditionItem(
+                name: "Woodwork",
+                condition: woodwork,
+                description: woodwork,
+                onConditionSelected: (condition) {
+                  setState(() {
+                    woodwork = condition;
+                  });
+                  _savePreference('woodwork', condition); // Save preference
+                },
+                onDescriptionSelected: (description) {
+                  setState(() {
+                    woodwork = description;
+                  });
+                  _savePreference('woodwork', description); // Save preference
+                },
+              ),
+
+              // Add more ConditionItem widgets as needed
+            ],
+          ),
+        ),
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: _showCapturedImages, // Show captured images when clicked
+        label: Icon(
+          Icons.image_outlined,
+          color: bWhite,
+          size: 24,
+        ),
+        backgroundColor: kPrimaryColor,
+        hoverColor: kPrimaryColor.withOpacity(0.4),
+        shape: CircleBorder(
+          side: BorderSide(
+            color: Colors.white,
+            width: 2.0,
+          ),
+        ),
+        elevation: 3.0,
       ),
     );
   }
@@ -508,14 +409,18 @@ class _ScheduleOfConditionState extends State<ScheduleOfCondition> {
 
 class ConditionItem extends StatelessWidget {
   final String name;
-  final String? selectedCondition;
+  final String? condition;
+  final String? description;
   final Function(String?) onConditionSelected;
+  final Function(String?) onDescriptionSelected;
 
   const ConditionItem({
     Key? key,
     required this.name,
-    this.selectedCondition,
+    this.condition,
+    this.description,
     required this.onConditionSelected,
+    required this.onDescriptionSelected,
   }) : super(key: key);
 
   @override
@@ -532,7 +437,7 @@ class ConditionItem extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Name",
+                    "Type",
                     style: TextStyle(
                       fontSize: 12.0,
                       fontWeight: FontWeight.w700,
@@ -578,7 +483,6 @@ class ConditionItem extends StatelessWidget {
                       // Initialize the camera when the button is pressed
                       final cameras = await availableCameras();
                       if (cameras.isNotEmpty) {
-                        print("${cameras.toString()}");
                         final cameraController = CameraController(
                           cameras.first,
                           ResolutionPreset.high,
@@ -599,28 +503,25 @@ class ConditionItem extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(
-            height: 6,
-          ),
+          SizedBox(height: 12,),
           GestureDetector(
             onTap: () async {
-              if (Navigator.canPop(context)) {
-                final result = await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ConditionDetails(
-                      initialCondition: selectedCondition,
-                      type: name,
-                    ),
+              final result = await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ConditionDetails(
+                    initialCondition: condition,
+                    type: name,
                   ),
-                );
-                if (result != null) {
-                  onConditionSelected(result);
-                }
+                ),
+              );
+
+              if (result != null) {
+                onConditionSelected(result);
               }
             },
             child: Text(
-              selectedCondition ?? "Condition",
+              condition?.isNotEmpty == true ? condition! : "Condition",
               style: TextStyle(
                 fontSize: 12.0,
                 fontWeight: FontWeight.w700,
@@ -629,14 +530,13 @@ class ConditionItem extends StatelessWidget {
               ),
             ),
           ),
+         
           Divider(thickness: 1, color: Color(0xFFC2C2C2)),
         ],
       ),
     );
   }
 }
-
-
 class CapturedImagesPage extends StatelessWidget {
   final List<File> images;
 
@@ -672,4 +572,3 @@ class CapturedImagesPage extends StatelessWidget {
     );
   }
 }
-

@@ -1,7 +1,9 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart'; // Import shared_preferences
 import 'package:taurgo_inventory/pages/conditions/condition_details.dart';
 import 'package:taurgo_inventory/pages/edit_report_page.dart';
 
@@ -19,17 +21,42 @@ class DiningRoom extends StatefulWidget {
 }
 
 class _DiningRoomState extends State<DiningRoom> {
-  String? gasMeter;
-  String? electricMeter;
-  String? waterMeter;
-  String? oilMeter;
-  String? other;
+  String? gasMeterCondition;
+  String? gasMeterLocation;
+  String? electricMeterCondition;
+  String? electricMeterLocation;
+  String? waterMeterCondition;
+  String? waterMeterLocation;
+  String? oilMeterCondition;
+  String? oilMeterLocation;
   late List<File> capturedImages;
 
   @override
   void initState() {
     super.initState();
     capturedImages = widget.capturedImages ?? [];
+    _loadPreferences(); // Load the saved preferences when the state is initialized
+  }
+
+  // Function to load preferences
+  Future<void> _loadPreferences() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      gasMeterCondition = prefs.getString('gasMeterCondition');
+      gasMeterLocation = prefs.getString('gasMeterLocation');
+      electricMeterCondition = prefs.getString('electricMeterCondition');
+      electricMeterLocation = prefs.getString('electricMeterLocation');
+      waterMeterCondition = prefs.getString('waterMeterCondition');
+      waterMeterLocation = prefs.getString('waterMeterLocation');
+      oilMeterCondition = prefs.getString('oilMeterCondition');
+      oilMeterLocation = prefs.getString('oilMeterLocation');
+    });
+  }
+
+  // Function to save a preference
+  Future<void> _savePreference(String key, String? value) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setString(key, value ?? '');
   }
 
   @override
@@ -71,41 +98,73 @@ class _DiningRoomState extends State<DiningRoom> {
               // Gas Meter
               ConditionItem(
                 name: "Gas Meter",
-                selectedCondition: gasMeter,
+                condition: gasMeterCondition,
+                location: gasMeterLocation,
                 onConditionSelected: (condition) {
                   setState(() {
-                    gasMeter = condition;
+                    gasMeterCondition = condition;
                   });
+                  _savePreference('gasMeterCondition', condition); // Save preference
+                },
+                onLocationSelected: (location) {
+                  setState(() {
+                    gasMeterLocation = location;
+                  });
+                  _savePreference('gasMeterLocation', location); // Save preference
                 },
               ),
               // Electric Meter
               ConditionItem(
                 name: "Electric Meter",
-                selectedCondition: electricMeter,
+                condition: electricMeterCondition,
+                location: electricMeterLocation,
                 onConditionSelected: (condition) {
                   setState(() {
-                    electricMeter = condition;
+                    electricMeterCondition = condition;
                   });
+                  _savePreference('electricMeterCondition', condition); // Save preference
+                },
+                onLocationSelected: (location) {
+                  setState(() {
+                    electricMeterLocation = location;
+                  });
+                  _savePreference('electricMeterLocation', location); // Save preference
                 },
               ),
               // Water Meter
               ConditionItem(
                 name: "Water Meter",
-                selectedCondition: waterMeter,
+                condition: waterMeterCondition,
+                location: waterMeterLocation,
                 onConditionSelected: (condition) {
                   setState(() {
-                    waterMeter = condition;
+                    waterMeterCondition = condition;
                   });
+                  _savePreference('waterMeterCondition', condition); // Save preference
+                },
+                onLocationSelected: (location) {
+                  setState(() {
+                    waterMeterLocation = location;
+                  });
+                  _savePreference('waterMeterLocation', location); // Save preference
                 },
               ),
               // Oil Meter
               ConditionItem(
                 name: "Oil Meter",
-                selectedCondition: oilMeter,
+                condition: oilMeterCondition,
+                location: oilMeterLocation,
                 onConditionSelected: (condition) {
                   setState(() {
-                    oilMeter = condition;
+                    oilMeterCondition = condition;
                   });
+                  _savePreference('oilMeterCondition', condition); // Save preference
+                },
+                onLocationSelected: (location) {
+                  setState(() {
+                    oilMeterLocation = location;
+                  });
+                  _savePreference('oilMeterLocation', location); // Save preference
                 },
               ),
               // Add more ConditionItem widgets as needed
@@ -119,14 +178,18 @@ class _DiningRoomState extends State<DiningRoom> {
 
 class ConditionItem extends StatelessWidget {
   final String name;
-  final String? selectedCondition;
+  final String? condition;
+  final String? location;
   final Function(String?) onConditionSelected;
+  final Function(String?) onLocationSelected;
 
   const ConditionItem({
     Key? key,
     required this.name,
-    this.selectedCondition,
+    this.condition,
+    this.location,
     required this.onConditionSelected,
+    required this.onLocationSelected,
   }) : super(key: key);
 
   @override
@@ -216,7 +279,7 @@ class ConditionItem extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) => ConditionDetails(
-                    initialCondition: selectedCondition,
+                    initialCondition: condition,
                     type: name,
                   ),
                 ),
@@ -226,7 +289,7 @@ class ConditionItem extends StatelessWidget {
               }
             },
             child: Text(
-              selectedCondition ?? "Location",
+              condition?.isNotEmpty == true ? condition! : "Condition",
               style: TextStyle(
                 fontSize: 12.0,
                 fontWeight: FontWeight.w700,
@@ -242,43 +305,17 @@ class ConditionItem extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) => ConditionDetails(
-                    initialCondition: selectedCondition,
+                    initialCondition: location,
                     type: name,
                   ),
                 ),
               );
               if (result != null) {
-                onConditionSelected(result);
+                onLocationSelected(result);
               }
             },
             child: Text(
-              selectedCondition ?? "Serial Number",
-              style: TextStyle(
-                fontSize: 12.0,
-                fontWeight: FontWeight.w700,
-                color: kPrimaryTextColourTwo,
-                fontStyle: FontStyle.italic,
-              ),
-            ),
-          ),
-          SizedBox(height: 12,),
-          GestureDetector(
-            onTap: () async {
-              final result = await Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ConditionDetails(
-                    initialCondition: selectedCondition,
-                    type: name,
-                  ),
-                ),
-              );
-              if (result != null) {
-                onConditionSelected(result);
-              }
-            },
-            child: Text(
-              selectedCondition ?? "Reading",
+              location?.isNotEmpty == true ? location! : "Description",
               style: TextStyle(
                 fontSize: 12.0,
                 fontWeight: FontWeight.w700,
