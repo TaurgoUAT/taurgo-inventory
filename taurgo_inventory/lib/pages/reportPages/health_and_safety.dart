@@ -1,18 +1,12 @@
 import 'dart:async';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:taurgo_inventory/pages/conditions/condition_details.dart';
-import 'package:taurgo_inventory/pages/edit_report_page.dart';
-import '../../constants/AppColors.dart';
-import 'dart:async';
 import 'dart:io';
+
 import 'package:camera/camera.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart'; // Import shared_preferences
 import 'package:taurgo_inventory/pages/conditions/condition_details.dart';
 import 'package:taurgo_inventory/pages/edit_report_page.dart';
+
 import '../../constants/AppColors.dart';
 import '../../widgets/add_action.dart';
 import '../camera_preview_page.dart';
@@ -27,17 +21,32 @@ class HealthAndSafety extends StatefulWidget {
 }
 
 class _HealthAndSafetyState extends State<HealthAndSafety> {
-  String? gasMeter;
-  String? electricMeter;
-  String? waterMeter;
-  String? oilMeter;
-  String? other;
+  String? smokeAlarm;
+  String? heatSensor;
+  String? carbonMonoxideAlarm;
   late List<File> capturedImages;
 
   @override
   void initState() {
     super.initState();
     capturedImages = widget.capturedImages ?? [];
+    _loadPreferences(); // Load the saved preferences when the state is initialized
+  }
+
+  // Function to load preferences
+  Future<void> _loadPreferences() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      smokeAlarm = prefs.getString('smokeAlarm');
+      heatSensor = prefs.getString('heatSensor');
+      carbonMonoxideAlarm = prefs.getString('carbonMonoxideAlarm');
+    });
+  }
+
+  // Function to save a preference
+  Future<void> _savePreference(String key, String? value) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setString(key, value ?? '');
   }
 
   @override
@@ -45,7 +54,7 @@ class _HealthAndSafetyState extends State<HealthAndSafety> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Schedule of Condition',
+          'Bed Room',
           style: TextStyle(
             color: kPrimaryColor,
             fontSize: 14,
@@ -56,7 +65,7 @@ class _HealthAndSafetyState extends State<HealthAndSafety> {
         backgroundColor: bWhite,
         leading: GestureDetector(
           onTap: () {
-            Navigator.pushReplacement(
+            Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) => EditReportPage(),
@@ -76,58 +85,48 @@ class _HealthAndSafetyState extends State<HealthAndSafety> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-
               //Gas Meter
               ConditionItem(
-                name: "Gas Meter",
-                selectedCondition: gasMeter,
+                name: "Smoke Alarm",
+                selectedCondition: smokeAlarm,
                 onConditionSelected: (condition) {
                   setState(() {
-                    gasMeter = condition;
+                    smokeAlarm = condition;
                   });
+                  _savePreference('smokeAlarm', condition); // Save preference
                 },
               ),
 
               //Electric Meter
               ConditionItem(
-                name: "Electric Meter",
-                selectedCondition: electricMeter,
+                name: "Heat Sensor",
+                selectedCondition: heatSensor,
                 onConditionSelected: (condition) {
                   setState(() {
-                    electricMeter = condition;
+                    heatSensor = condition;
                   });
+                  _savePreference('heatSensor', condition); // Save preference
                 },
               ),
 
-              //Water Meter
+              //Additional Items
               ConditionItem(
-                name: "Water Meter",
-                selectedCondition: waterMeter,
+                name: "Carbon Monoxide Alarm",
+                selectedCondition: carbonMonoxideAlarm,
                 onConditionSelected: (condition) {
                   setState(() {
-                    waterMeter = condition;
+                    carbonMonoxideAlarm = condition;
                   });
+                  _savePreference(
+                      'carbonMonoxideAlarm', condition); // Save preference
                 },
               ),
-
-              //Oil Meter
-              ConditionItem(
-                name: "Oil Meter",
-                selectedCondition: oilMeter,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    oilMeter = condition;
-                  });
-                },
-              ),
-
 
               // Add more ConditionItem widgets as needed
             ],
           ),
         ),
       ),
-
     );
   }
 }
@@ -200,11 +199,10 @@ class ConditionItem extends StatelessWidget {
                       size: 24,
                       color: kSecondaryTextColourTwo,
                     ),
-                    onPressed: ()  async{
+                    onPressed: () async {
                       // Initialize the camera when the button is pressed
                       final cameras = await availableCameras();
                       if (cameras.isNotEmpty) {
-                        print("${cameras.toString()}");
                         final cameraController = CameraController(
                           cameras.first,
                           ResolutionPreset.high,
@@ -225,8 +223,9 @@ class ConditionItem extends StatelessWidget {
               ),
             ],
           ),
-
-          SizedBox(height: 12,),
+          SizedBox(
+            height: 12,
+          ),
           GestureDetector(
             onTap: () async {
               final result = await Navigator.push(
@@ -253,7 +252,9 @@ class ConditionItem extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(height: 12,),
+          SizedBox(
+            height: 12,
+          ),
           GestureDetector(
             onTap: () async {
               final result = await Navigator.push(
@@ -280,7 +281,9 @@ class ConditionItem extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(height: 12,),
+          SizedBox(
+            height: 12,
+          ),
           GestureDetector(
             onTap: () async {
               final result = await Navigator.push(
@@ -313,5 +316,3 @@ class ConditionItem extends StatelessWidget {
     );
   }
 }
-
-

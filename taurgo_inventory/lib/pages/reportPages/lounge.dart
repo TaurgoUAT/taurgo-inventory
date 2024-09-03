@@ -1,11 +1,12 @@
 import 'dart:async';
 import 'dart:io';
+
 import 'package:camera/camera.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart'; // Import shared_preferences
 import 'package:taurgo_inventory/pages/conditions/condition_details.dart';
 import 'package:taurgo_inventory/pages/edit_report_page.dart';
+
 import '../../constants/AppColors.dart';
 import '../../widgets/add_action.dart';
 import '../camera_preview_page.dart';
@@ -20,24 +21,60 @@ class Lounge extends StatefulWidget {
 }
 
 class _LoungeState extends State<Lounge> {
-  String? gasMeter;
-  String? electricMeter;
-  String? waterMeter;
-  String? oilMeter;
-  String? other;
+  String? door;
+  String? doorFrame;
+  String? ceiling;
+  String? lighting;
+  String? walls;
+  String? skirting;
+  String? windowSill;
+  String? curtains;
+  String? blinds;
+  String? lightSwitches;
+  String? sockets;
+  String? flooring;
+  String? additionalItems;
   late List<File> capturedImages;
 
   @override
   void initState() {
     super.initState();
     capturedImages = widget.capturedImages ?? [];
+    _loadPreferences(); // Load the saved preferences when the state is initialized
   }
+
+  // Function to load preferences
+  Future<void> _loadPreferences() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      door = prefs.getString('door');
+      doorFrame = prefs.getString('doorFrame');
+      ceiling = prefs.getString('ceiling');
+      lighting = prefs.getString('lighting');
+      walls = prefs.getString('walls');
+      skirting = prefs.getString('skirting');
+      windowSill = prefs.getString('windowSill');
+      curtains = prefs.getString('curtains');
+      blinds = prefs.getString('blinds');
+      lightSwitches = prefs.getString('lightSwitches');
+      sockets = prefs.getString('sockets');
+      flooring = prefs.getString('flooring');
+      additionalItems = prefs.getString('additionalItems');
+    });
+  }
+
+  // Function to save a preference
+  Future<void> _savePreference(String key, String? value) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setString(key, value ?? '');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Lounge',
+          'Bed Room',
           style: TextStyle(
             color: kPrimaryColor,
             fontSize: 14,
@@ -68,51 +105,163 @@ class _LoungeState extends State<Lounge> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-
               //Gas Meter
               ConditionItem(
-                name: "Gas Meter",
-                selectedCondition: gasMeter,
+                name: "Door",
+                selectedCondition: door,
                 onConditionSelected: (condition) {
                   setState(() {
-                    gasMeter = condition;
+                    door = condition;
                   });
+                  _savePreference('door', condition); // Save preference
                 },
               ),
 
               //Electric Meter
               ConditionItem(
-                name: "Electric Meter",
-                selectedCondition: electricMeter,
+                name: "Door Frame",
+                selectedCondition: doorFrame,
                 onConditionSelected: (condition) {
                   setState(() {
-                    electricMeter = condition;
+                    doorFrame = condition;
                   });
+                  _savePreference('doorFrame', condition); // Save preference
                 },
               ),
 
               //Water Meter
               ConditionItem(
-                name: "Water Meter",
-                selectedCondition: waterMeter,
+                name: "Ceiling",
+                selectedCondition: ceiling,
                 onConditionSelected: (condition) {
                   setState(() {
-                    waterMeter = condition;
+                    ceiling = condition;
                   });
+                  _savePreference('ceiling', condition); // Save preference
                 },
               ),
 
               //Oil Meter
               ConditionItem(
-                name: "Oil Meter",
-                selectedCondition: oilMeter,
+                name: "Lighting",
+                selectedCondition: lighting,
                 onConditionSelected: (condition) {
                   setState(() {
-                    oilMeter = condition;
+                    lighting = condition;
                   });
+                  _savePreference('lighting', condition); // Save preference
                 },
               ),
 
+              //Walls
+              ConditionItem(
+                name: "Walls",
+                selectedCondition: walls,
+                onConditionSelected: (condition) {
+                  setState(() {
+                    walls = condition;
+                  });
+                  _savePreference('walls', condition); // Save preference
+                },
+              ),
+
+              //Skirting
+              ConditionItem(
+                name: "Skirting",
+                selectedCondition: skirting,
+                onConditionSelected: (condition) {
+                  setState(() {
+                    skirting = condition;
+                  });
+                  _savePreference('skirting', condition); // Save preference
+                },
+              ),
+
+              //Window Sill
+              ConditionItem(
+                name: "Window Sill",
+                selectedCondition: windowSill,
+                onConditionSelected: (condition) {
+                  setState(() {
+                    windowSill = condition;
+                  });
+                  _savePreference('windowSill', condition); // Save preference
+                },
+              ),
+
+              //Curtains
+              ConditionItem(
+                name: "Curtains",
+                selectedCondition: curtains,
+                onConditionSelected: (condition) {
+                  setState(() {
+                    curtains = condition;
+                  });
+                  _savePreference('curtains', condition); // Save preference
+                },
+              ),
+
+              //Blinds
+              ConditionItem(
+                name: "Blinds",
+                selectedCondition: blinds,
+                onConditionSelected: (condition) {
+                  setState(() {
+                    blinds = condition;
+                  });
+                  _savePreference('blinds', condition); // Save preference
+                },
+              ),
+
+              //Light Switches
+              ConditionItem(
+                name: "Light Switches",
+                selectedCondition: lightSwitches,
+                onConditionSelected: (condition) {
+                  setState(() {
+                    lightSwitches = condition;
+                  });
+                  _savePreference(
+                      'lightSwitches', condition); // Save preference
+                },
+              ),
+
+              //Sockets
+              ConditionItem(
+                name: "Sockets",
+                selectedCondition: sockets,
+                onConditionSelected: (condition) {
+                  setState(() {
+                    sockets = condition;
+                  });
+                  _savePreference('sockets', condition); // Save preference
+                },
+              ),
+
+              //Flooring
+              ConditionItem(
+                name: "Flooring",
+                selectedCondition: flooring,
+                onConditionSelected: (condition) {
+                  setState(() {
+                    flooring = condition;
+                  });
+                  _savePreference('flooring', condition); // Save preference
+                },
+              ),
+
+              //Additional Items
+              ConditionItem(
+                name: "Additional Items",
+                selectedCondition: additionalItems,
+                onConditionSelected: (condition) {
+                  setState(() {
+                    additionalItems = condition;
+                  });
+                  _savePreference(
+                      'additionalItems', condition); // Save preference
+                },
+              ),
 
               // Add more ConditionItem widgets as needed
             ],
@@ -191,11 +340,10 @@ class ConditionItem extends StatelessWidget {
                       size: 24,
                       color: kSecondaryTextColourTwo,
                     ),
-                    onPressed: ()  async{
+                    onPressed: () async {
                       // Initialize the camera when the button is pressed
                       final cameras = await availableCameras();
                       if (cameras.isNotEmpty) {
-                        print("${cameras.toString()}");
                         final cameraController = CameraController(
                           cameras.first,
                           ResolutionPreset.high,
@@ -216,8 +364,9 @@ class ConditionItem extends StatelessWidget {
               ),
             ],
           ),
-
-          SizedBox(height: 12,),
+          SizedBox(
+            height: 12,
+          ),
           GestureDetector(
             onTap: () async {
               final result = await Navigator.push(
@@ -244,7 +393,9 @@ class ConditionItem extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(height: 12,),
+          SizedBox(
+            height: 12,
+          ),
           GestureDetector(
             onTap: () async {
               final result = await Navigator.push(
@@ -271,7 +422,9 @@ class ConditionItem extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(height: 12,),
+          SizedBox(
+            height: 12,
+          ),
           GestureDetector(
             onTap: () async {
               final result = await Navigator.push(
@@ -304,4 +457,3 @@ class ConditionItem extends StatelessWidget {
     );
   }
 }
-

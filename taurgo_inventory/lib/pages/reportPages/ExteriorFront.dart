@@ -1,11 +1,12 @@
 import 'dart:async';
 import 'dart:io';
+
 import 'package:camera/camera.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart'; // Import shared_preferences
 import 'package:taurgo_inventory/pages/conditions/condition_details.dart';
 import 'package:taurgo_inventory/pages/edit_report_page.dart';
+
 import '../../constants/AppColors.dart';
 import '../../widgets/add_action.dart';
 import '../camera_preview_page.dart';
@@ -20,24 +21,42 @@ class Exteriorfront extends StatefulWidget {
 }
 
 class _ExteriorfrontState extends State<Exteriorfront> {
-  String? gasMeter;
-  String? electricMeter;
-  String? waterMeter;
-  String? oilMeter;
-  String? other;
+  String? door;
+  String? doorFrame;
+  String? porch;
+  String? additionalItems;
   late List<File> capturedImages;
 
   @override
   void initState() {
     super.initState();
     capturedImages = widget.capturedImages ?? [];
+    _loadPreferences(); // Load the saved preferences when the state is initialized
   }
+
+  // Function to load preferences
+  Future<void> _loadPreferences() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      door = prefs.getString('door');
+      doorFrame = prefs.getString('doorFrame');
+      porch = prefs.getString('porch');
+      additionalItems = prefs.getString('additionalItems');
+    });
+  }
+
+  // Function to save a preference
+  Future<void> _savePreference(String key, String? value) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setString(key, value ?? '');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Meter Reading',
+          'Bed Room',
           style: TextStyle(
             color: kPrimaryColor,
             fontSize: 14,
@@ -68,51 +87,54 @@ class _ExteriorfrontState extends State<Exteriorfront> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-
               //Gas Meter
               ConditionItem(
-                name: "Gas Meter",
-                selectedCondition: gasMeter,
+                name: "Door",
+                selectedCondition: door,
                 onConditionSelected: (condition) {
                   setState(() {
-                    gasMeter = condition;
+                    door = condition;
                   });
+                  _savePreference('door', condition); // Save preference
                 },
               ),
 
               //Electric Meter
               ConditionItem(
-                name: "Electric Meter",
-                selectedCondition: electricMeter,
+                name: "Door Frame",
+                selectedCondition: doorFrame,
                 onConditionSelected: (condition) {
                   setState(() {
-                    electricMeter = condition;
+                    doorFrame = condition;
                   });
+                  _savePreference('doorFrame', condition); // Save preference
                 },
               ),
 
               //Water Meter
               ConditionItem(
-                name: "Water Meter",
-                selectedCondition: waterMeter,
+                name: "Porch",
+                selectedCondition: porch,
                 onConditionSelected: (condition) {
                   setState(() {
-                    waterMeter = condition;
+                    porch = condition;
                   });
+                  _savePreference('porch', condition); // Save preference
                 },
               ),
 
-              //Oil Meter
+              //Additional Items
               ConditionItem(
-                name: "Oil Meter",
-                selectedCondition: oilMeter,
+                name: "Additional Items",
+                selectedCondition: additionalItems,
                 onConditionSelected: (condition) {
                   setState(() {
-                    oilMeter = condition;
+                    additionalItems = condition;
                   });
+                  _savePreference(
+                      'additionalItems', condition); // Save preference
                 },
               ),
-
 
               // Add more ConditionItem widgets as needed
             ],
@@ -191,11 +213,10 @@ class ConditionItem extends StatelessWidget {
                       size: 24,
                       color: kSecondaryTextColourTwo,
                     ),
-                    onPressed: ()  async{
+                    onPressed: () async {
                       // Initialize the camera when the button is pressed
                       final cameras = await availableCameras();
                       if (cameras.isNotEmpty) {
-                        print("${cameras.toString()}");
                         final cameraController = CameraController(
                           cameras.first,
                           ResolutionPreset.high,
@@ -216,8 +237,9 @@ class ConditionItem extends StatelessWidget {
               ),
             ],
           ),
-
-          SizedBox(height: 12,),
+          SizedBox(
+            height: 12,
+          ),
           GestureDetector(
             onTap: () async {
               final result = await Navigator.push(
@@ -244,7 +266,9 @@ class ConditionItem extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(height: 12,),
+          SizedBox(
+            height: 12,
+          ),
           GestureDetector(
             onTap: () async {
               final result = await Navigator.push(
@@ -271,7 +295,9 @@ class ConditionItem extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(height: 12,),
+          SizedBox(
+            height: 12,
+          ),
           GestureDetector(
             onTap: () async {
               final result = await Navigator.push(
@@ -304,4 +330,3 @@ class ConditionItem extends StatelessWidget {
     );
   }
 }
-

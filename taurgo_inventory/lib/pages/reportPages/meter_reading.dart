@@ -1,11 +1,12 @@
 import 'dart:async';
 import 'dart:io';
+
 import 'package:camera/camera.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart'; // Import shared_preferences
 import 'package:taurgo_inventory/pages/conditions/condition_details.dart';
 import 'package:taurgo_inventory/pages/edit_report_page.dart';
+
 import '../../constants/AppColors.dart';
 import '../../widgets/add_action.dart';
 import '../camera_preview_page.dart';
@@ -20,24 +21,53 @@ class MeterReading extends StatefulWidget {
 }
 
 class _MeterReadingState extends State<MeterReading> {
-  String? gasMeter;
-  String? electricMeter;
-  String? waterMeter;
-  String? oilMeter;
-  String? other;
+  String? houseApplinceManual;
+  String? kitchenApplinceManual;
+  String? heatingManual;
+  String? landlordGasSafetyCertificate;
+  String? legionellaRiskAssessment;
+  String? electricalSafetyCertificate;
+  String? energyPerformanceCertificate;
+  String? moveInChecklist;
   late List<File> capturedImages;
 
   @override
   void initState() {
     super.initState();
     capturedImages = widget.capturedImages ?? [];
+    _loadPreferences(); // Load the saved preferences when the state is initialized
   }
+
+  // Function to load preferences
+  Future<void> _loadPreferences() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      houseApplinceManual = prefs.getString('houseApplinceManual');
+      kitchenApplinceManual = prefs.getString('kitchenApplinceManual');
+      heatingManual = prefs.getString('heatingManual');
+      landlordGasSafetyCertificate =
+          prefs.getString('landlordGasSafetyCertificate');
+      legionellaRiskAssessment = prefs.getString('legionellaRiskAssessment');
+      electricalSafetyCertificate =
+          prefs.getString('electricalSafetyCertificate');
+      energyPerformanceCertificate =
+          prefs.getString('energyPerformanceCertificate');
+      moveInChecklist = prefs.getString('moveInChecklist');
+    });
+  }
+
+  // Function to save a preference
+  Future<void> _savePreference(String key, String? value) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setString(key, value ?? '');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Meter Reading',
+          'Bed Room',
           style: TextStyle(
             color: kPrimaryColor,
             fontSize: 14,
@@ -62,63 +92,121 @@ class _MeterReadingState extends State<MeterReading> {
           ),
         ),
       ),
-        body: SingleChildScrollView(
-          child: Padding(
-            padding: EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              //House Appliance Manual
+              ConditionItem(
+                name: "House Appliance Manual",
+                selectedCondition: houseApplinceManual,
+                onConditionSelected: (condition) {
+                  setState(() {
+                    houseApplinceManual = condition;
+                  });
+                  _savePreference(
+                      'houseApplinceManual', condition); // Save preference
+                },
+              ),
 
-                //Gas Meter
-                ConditionItem(
-                  name: "Gas Meter",
-                  selectedCondition: gasMeter,
-                  onConditionSelected: (condition) {
-                    setState(() {
-                      gasMeter = condition;
-                    });
-                  },
-                ),
+              //Kitchen Appliance Manual
+              ConditionItem(
+                name: "Kitchen Appliance Manual",
+                selectedCondition: kitchenApplinceManual,
+                onConditionSelected: (condition) {
+                  setState(() {
+                    kitchenApplinceManual = condition;
+                  });
+                  _savePreference(
+                      'kitchenApplinceManual', condition); // Save preference
+                },
+              ),
 
-                //Electric Meter
-                ConditionItem(
-                  name: "Electric Meter",
-                  selectedCondition: electricMeter,
-                  onConditionSelected: (condition) {
-                    setState(() {
-                      electricMeter = condition;
-                    });
-                  },
-                ),
+              //Heating Manual
+              ConditionItem(
+                name: "Heating Manual",
+                selectedCondition: heatingManual,
+                onConditionSelected: (condition) {
+                  setState(() {
+                    heatingManual = condition;
+                  });
+                  _savePreference(
+                      'heatingManual', condition); // Save preference
+                },
+              ),
 
-                //Water Meter
-                ConditionItem(
-                  name: "Water Meter",
-                  selectedCondition: waterMeter,
-                  onConditionSelected: (condition) {
-                    setState(() {
-                      waterMeter = condition;
-                    });
-                  },
-                ),
+              //Landlord Gas Safety Certificate
+              ConditionItem(
+                name: "Landlord Gas Safety Certificate",
+                selectedCondition: landlordGasSafetyCertificate,
+                onConditionSelected: (condition) {
+                  setState(() {
+                    landlordGasSafetyCertificate = condition;
+                  });
+                  _savePreference('landlordGasSafetyCertificate',
+                      condition); // Save preference
+                },
+              ),
 
-                //Oil Meter
-                ConditionItem(
-                  name: "Oil Meter",
-                  selectedCondition: oilMeter,
-                  onConditionSelected: (condition) {
-                    setState(() {
-                      oilMeter = condition;
-                    });
-                  },
-                ),
+              //Legionella Risk Assessment
+              ConditionItem(
+                name: "Legionella Risk Assessment",
+                selectedCondition: legionellaRiskAssessment,
+                onConditionSelected: (condition) {
+                  setState(() {
+                    legionellaRiskAssessment = condition;
+                  });
+                  _savePreference(
+                      'legionellaRiskAssessment', condition); // Save preference
+                },
+              ),
 
+              //Electrical Safety Certificate
+              ConditionItem(
+                name: "Electrical Safety Certificate",
+                selectedCondition: electricalSafetyCertificate,
+                onConditionSelected: (condition) {
+                  setState(() {
+                    electricalSafetyCertificate = condition;
+                  });
+                  _savePreference('electricalSafetyCertificate',
+                      condition); // Save preference
+                },
+              ),
 
-                // Add more ConditionItem widgets as needed
-              ],
-            ),
+              //Energy Performance Certificate
+              ConditionItem(
+                name: "Energy Performance Certificate",
+                selectedCondition: energyPerformanceCertificate,
+                onConditionSelected: (condition) {
+                  setState(() {
+                    energyPerformanceCertificate = condition;
+                  });
+                  _savePreference('energyPerformanceCertificate',
+                      condition); // Save preference
+                },
+              ),
+
+              //Move In Checklist
+              ConditionItem(
+                name: "Move In Checklist",
+                selectedCondition: moveInChecklist,
+                onConditionSelected: (condition) {
+                  setState(() {
+                    moveInChecklist = condition;
+                  });
+                  _savePreference(
+                      'moveInChecklist', condition); // Save preference
+                },
+              ),
+
+              // Add more ConditionItem widgets as needed
+            ],
           ),
         ),
+      ),
     );
   }
 }
@@ -191,11 +279,10 @@ class ConditionItem extends StatelessWidget {
                       size: 24,
                       color: kSecondaryTextColourTwo,
                     ),
-                    onPressed: ()  async{
+                    onPressed: () async {
                       // Initialize the camera when the button is pressed
                       final cameras = await availableCameras();
                       if (cameras.isNotEmpty) {
-                        print("${cameras.toString()}");
                         final cameraController = CameraController(
                           cameras.first,
                           ResolutionPreset.high,
@@ -216,8 +303,9 @@ class ConditionItem extends StatelessWidget {
               ),
             ],
           ),
-
-          SizedBox(height: 12,),
+          SizedBox(
+            height: 12,
+          ),
           GestureDetector(
             onTap: () async {
               final result = await Navigator.push(
@@ -244,7 +332,9 @@ class ConditionItem extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(height: 12,),
+          SizedBox(
+            height: 12,
+          ),
           GestureDetector(
             onTap: () async {
               final result = await Navigator.push(
@@ -271,7 +361,9 @@ class ConditionItem extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(height: 12,),
+          SizedBox(
+            height: 12,
+          ),
           GestureDetector(
             onTap: () async {
               final result = await Navigator.push(
@@ -304,4 +396,3 @@ class ConditionItem extends StatelessWidget {
     );
   }
 }
-

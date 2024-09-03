@@ -672,3 +672,4 @@ class CapturedImagesPage extends StatelessWidget {
     );
   }
 }
+

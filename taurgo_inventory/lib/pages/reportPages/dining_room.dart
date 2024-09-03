@@ -1,11 +1,10 @@
-import 'dart:async';
 import 'dart:io';
+
 import 'package:camera/camera.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:taurgo_inventory/pages/conditions/condition_details.dart';
 import 'package:taurgo_inventory/pages/edit_report_page.dart';
+
 import '../../constants/AppColors.dart';
 import '../../widgets/add_action.dart';
 import '../camera_preview_page.dart';
@@ -32,12 +31,13 @@ class _DiningRoomState extends State<DiningRoom> {
     super.initState();
     capturedImages = widget.capturedImages ?? [];
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'DiningRoom',
+          'Dining Room',
           style: TextStyle(
             color: kPrimaryColor,
             fontSize: 14,
@@ -68,8 +68,7 @@ class _DiningRoomState extends State<DiningRoom> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-
-              //Gas Meter
+              // Gas Meter
               ConditionItem(
                 name: "Gas Meter",
                 selectedCondition: gasMeter,
@@ -79,8 +78,7 @@ class _DiningRoomState extends State<DiningRoom> {
                   });
                 },
               ),
-
-              //Electric Meter
+              // Electric Meter
               ConditionItem(
                 name: "Electric Meter",
                 selectedCondition: electricMeter,
@@ -90,8 +88,7 @@ class _DiningRoomState extends State<DiningRoom> {
                   });
                 },
               ),
-
-              //Water Meter
+              // Water Meter
               ConditionItem(
                 name: "Water Meter",
                 selectedCondition: waterMeter,
@@ -101,8 +98,7 @@ class _DiningRoomState extends State<DiningRoom> {
                   });
                 },
               ),
-
-              //Oil Meter
+              // Oil Meter
               ConditionItem(
                 name: "Oil Meter",
                 selectedCondition: oilMeter,
@@ -112,8 +108,6 @@ class _DiningRoomState extends State<DiningRoom> {
                   });
                 },
               ),
-
-
               // Add more ConditionItem widgets as needed
             ],
           ),
@@ -191,11 +185,10 @@ class ConditionItem extends StatelessWidget {
                       size: 24,
                       color: kSecondaryTextColourTwo,
                     ),
-                    onPressed: ()  async{
+                    onPressed: () async {
                       // Initialize the camera when the button is pressed
                       final cameras = await availableCameras();
                       if (cameras.isNotEmpty) {
-                        print("${cameras.toString()}");
                         final cameraController = CameraController(
                           cameras.first,
                           ResolutionPreset.high,
@@ -216,7 +209,6 @@ class ConditionItem extends StatelessWidget {
               ),
             ],
           ),
-
           SizedBox(height: 12,),
           GestureDetector(
             onTap: () async {
@@ -229,7 +221,6 @@ class ConditionItem extends StatelessWidget {
                   ),
                 ),
               );
-
               if (result != null) {
                 onConditionSelected(result);
               }
@@ -256,7 +247,6 @@ class ConditionItem extends StatelessWidget {
                   ),
                 ),
               );
-
               if (result != null) {
                 onConditionSelected(result);
               }
@@ -283,7 +273,6 @@ class ConditionItem extends StatelessWidget {
                   ),
                 ),
               );
-
               if (result != null) {
                 onConditionSelected(result);
               }
@@ -304,4 +293,3 @@ class ConditionItem extends StatelessWidget {
     );
   }
 }
-

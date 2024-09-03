@@ -1,11 +1,12 @@
 import 'dart:async';
 import 'dart:io';
+
 import 'package:camera/camera.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart'; // Import shared_preferences
 import 'package:taurgo_inventory/pages/conditions/condition_details.dart';
 import 'package:taurgo_inventory/pages/edit_report_page.dart';
+
 import '../../constants/AppColors.dart';
 import '../../widgets/add_action.dart';
 import '../camera_preview_page.dart';
@@ -20,24 +21,44 @@ class RearGarden extends StatefulWidget {
 }
 
 class _RearGardenState extends State<RearGarden> {
-  String? gasMeter;
-  String? electricMeter;
-  String? waterMeter;
-  String? oilMeter;
-  String? other;
+  String? gardenDescription;
+  String? outsideLighting;
+  String? summerHouse;
+  String? shed;
+  String? additionalInformation;
   late List<File> capturedImages;
 
   @override
   void initState() {
     super.initState();
     capturedImages = widget.capturedImages ?? [];
+    _loadPreferences(); // Load the saved preferences when the state is initialized
   }
+
+  // Function to load preferences
+  Future<void> _loadPreferences() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      gardenDescription = prefs.getString('gardenDescription');
+      outsideLighting = prefs.getString('outsideLighting');
+      summerHouse = prefs.getString('summerHouse');
+      shed = prefs.getString('shed');
+      additionalInformation = prefs.getString('additionalInformation');
+    });
+  }
+
+  // Function to save a preference
+  Future<void> _savePreference(String key, String? value) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setString(key, value ?? '');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Rear Garden',
+          'Bed Room',
           style: TextStyle(
             color: kPrimaryColor,
             fontSize: 14,
@@ -68,51 +89,68 @@ class _RearGardenState extends State<RearGarden> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-
-              //Gas Meter
+              //Garden Description
               ConditionItem(
-                name: "Gas Meter",
-                selectedCondition: gasMeter,
+                name: "Garden Description",
+                selectedCondition: gardenDescription,
                 onConditionSelected: (condition) {
                   setState(() {
-                    gasMeter = condition;
+                    gardenDescription = condition;
                   });
+                  _savePreference(
+                      'gardenDescription', condition); // Save preference
                 },
               ),
 
-              //Electric Meter
+              //Outside Lighting
               ConditionItem(
-                name: "Electric Meter",
-                selectedCondition: electricMeter,
+                name: "Outside Lighting",
+                selectedCondition: outsideLighting,
                 onConditionSelected: (condition) {
                   setState(() {
-                    electricMeter = condition;
+                    outsideLighting = condition;
                   });
+                  _savePreference(
+                      'outsideLighting', condition); // Save preference
                 },
               ),
 
-              //Water Meter
+              //Summer House
               ConditionItem(
-                name: "Water Meter",
-                selectedCondition: waterMeter,
+                name: "Summer House",
+                selectedCondition: summerHouse,
                 onConditionSelected: (condition) {
                   setState(() {
-                    waterMeter = condition;
+                    summerHouse = condition;
                   });
+                  _savePreference('summerHouse', condition); // Save preference
                 },
               ),
 
-              //Oil Meter
+              //Shed
               ConditionItem(
-                name: "Oil Meter",
-                selectedCondition: oilMeter,
+                name: "Shed",
+                selectedCondition: shed,
                 onConditionSelected: (condition) {
                   setState(() {
-                    oilMeter = condition;
+                    shed = condition;
                   });
+                  _savePreference('shed', condition); // Save preference
                 },
               ),
 
+              //Additional Information
+              ConditionItem(
+                name: "Additional Information",
+                selectedCondition: additionalInformation,
+                onConditionSelected: (condition) {
+                  setState(() {
+                    additionalInformation = condition;
+                  });
+                  _savePreference(
+                      'additionalInformation', condition); // Save preference
+                },
+              ),
 
               // Add more ConditionItem widgets as needed
             ],
@@ -191,11 +229,10 @@ class ConditionItem extends StatelessWidget {
                       size: 24,
                       color: kSecondaryTextColourTwo,
                     ),
-                    onPressed: ()  async{
+                    onPressed: () async {
                       // Initialize the camera when the button is pressed
                       final cameras = await availableCameras();
                       if (cameras.isNotEmpty) {
-                        print("${cameras.toString()}");
                         final cameraController = CameraController(
                           cameras.first,
                           ResolutionPreset.high,
@@ -216,8 +253,9 @@ class ConditionItem extends StatelessWidget {
               ),
             ],
           ),
-
-          SizedBox(height: 12,),
+          SizedBox(
+            height: 12,
+          ),
           GestureDetector(
             onTap: () async {
               final result = await Navigator.push(
@@ -244,7 +282,9 @@ class ConditionItem extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(height: 12,),
+          SizedBox(
+            height: 12,
+          ),
           GestureDetector(
             onTap: () async {
               final result = await Navigator.push(
@@ -271,7 +311,9 @@ class ConditionItem extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(height: 12,),
+          SizedBox(
+            height: 12,
+          ),
           GestureDetector(
             onTap: () async {
               final result = await Navigator.push(
@@ -304,4 +346,3 @@ class ConditionItem extends StatelessWidget {
     );
   }
 }
-
