@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:taurgo_inventory/pages/inspection_confimation_page.dart';
 import 'package:taurgo_inventory/pages/property_details_view_page.dart';
 import 'package:taurgo_inventory/pages/reportPages/ExteriorFront.dart';
 import 'package:taurgo_inventory/pages/reportPages/bathroom.dart';
@@ -213,9 +214,126 @@ class _EditReportPageState extends State<EditReportPage> {
               color: kPrimaryColor,
             ),
           ),
+          actions: [
+            GestureDetector(
+              onTap: (){
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => InspectionConfimationPage(),
+                  ),
+                );
+                // showDialog(
+                //   context: context,
+                //   builder: (BuildContext context) {
+                //     return AlertDialog(
+                //       shape: RoundedRectangleBorder(
+                //         borderRadius: BorderRadius.circular(20),
+                //       ),
+                //       elevation: 10,
+                //       backgroundColor: Colors.white,
+                //       title: Row(
+                //         children: [
+                //           Icon(Icons.info_outline, color: kPrimaryColor),
+                //           SizedBox(width: 10),
+                //           Text(
+                //             'Continue Saving',
+                //             style: TextStyle(
+                //               color: kPrimaryColor,
+                //               fontSize: 18,
+                //               fontWeight: FontWeight.bold,
+                //             ),
+                //           ),
+                //         ],
+                //       ),
+                //       content: Text(
+                //         'You Cannot make any changes after you save the Property',
+                //         style: TextStyle(
+                //           color: Colors.grey[800],
+                //           fontSize: 14,
+                //           fontWeight: FontWeight.w400,
+                //           height: 1.5,
+                //         ),
+                //       ),
+                //       actions: <Widget>[
+                //         TextButton(
+                //           child: Text('Cancel',
+                //             style: TextStyle(
+                //               color: kPrimaryColor,
+                //               fontSize: 16,
+                //             ),
+                //           ),
+                //           onPressed: () {
+                //             Navigator.of(context).pop(); // Close the dialog
+                //           },
+                //         ),
+                //         TextButton(
+                //           onPressed: () {
+                //             Navigator.push(
+                //               context,
+                //               MaterialPageRoute(builder: (context) => DetailsConfirmationPage(
+                //                 lineOneAddress: widget.lineOneAddress,
+                //                 lineTwoAddress: widget.lineTwoAddress,
+                //                 city: widget.city,
+                //                 state: widget.state,
+                //                 country: widget.country,
+                //                 postalCode: widget.postalCode,
+                //                 reference: widget.reference,
+                //                 client: widget.client,
+                //                 type: widget.type,
+                //                 furnishing: widget.furnishing,
+                //                 noOfBeds: widget.noOfBeds,
+                //                 noOfBaths: widget.noOfBaths,
+                //                 garage: garageSelected,
+                //                 parking: parkingSelected,
+                //                 notes: widget.notes,
+                //                 selectedType: selectedType.toString(),
+                //                 date: selectedDate,
+                //                 time: selectedTime,
+                //                 keyLocation: keysIwth.toString(),
+                //                 referenceForKey: referenceController.text,
+                //                 internalNotes: internalNotesController.text,
+                //               )),
+                //             );
+                //           },
+                //           style: TextButton.styleFrom(
+                //             padding: EdgeInsets.symmetric(
+                //                 horizontal: 16, vertical: 8),
+                //             backgroundColor: kPrimaryColor,
+                //             shape: RoundedRectangleBorder(
+                //               borderRadius: BorderRadius.circular(10),
+                //             ),
+                //           ),
+                //           child: Text(
+                //             'Continue',
+                //             style: TextStyle(
+                //               color: Colors.white,
+                //               fontSize: 16,
+                //             ),
+                //           ),
+                //         ),
+                //       ],
+                //     );
+                //   },
+                // );
+
+              },
+              child: Container(
+                margin: EdgeInsets.all(16),
+                child: Text(
+                  'Preview', // Replace with the actual location
+                  style: TextStyle(
+                    color: kPrimaryColor,
+                    fontSize: 14, // Adjust the font size
+                    fontFamily: "Inter",
+                  ),
+                ),
+              ),
+            )
+          ],
         ),
         body: GridView.builder(
-          padding: EdgeInsets.all(1),
+          padding: EdgeInsets.all(16),
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 2,
             crossAxisSpacing: 10,
@@ -244,7 +362,7 @@ class _EditReportPageState extends State<EditReportPage> {
                   borderRadius: BorderRadius.circular(10),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.grey.withOpacity(0.3),
+                      color: Colors.black87.withOpacity(0.3),
                       spreadRadius: 2,
                       blurRadius: 5,
                       offset: Offset(4, 4),

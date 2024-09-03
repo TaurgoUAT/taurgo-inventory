@@ -12,7 +12,7 @@ class AddAction extends StatefulWidget {
 
 class _AddActionState extends State<AddAction> {
   String? _selectedResponsibility;
-  String? _status; // Variable to hold the selected value
+  String? _status;
 
   @override
   Widget build(BuildContext context) {
@@ -162,77 +162,70 @@ class _AddActionState extends State<AddAction> {
               Center(
                 child: GestureDetector(
                   onTap: () {
-                    // Check if both status and responsibility are selected
-                    // if (_status == null || _selectedResponsibility == null) {
-                    //   // Show dialog if not selected
-                    //   showDialog(
-                    //     context: context,
-                    //     builder: (BuildContext context) {
-                    //       return AlertDialog(
-                    //         shape: RoundedRectangleBorder(
-                    //           borderRadius: BorderRadius.circular(20),
-                    //         ),
-                    //         elevation: 10,
-                    //         backgroundColor: Colors.white,
-                    //         title: Row(
-                    //           children: [
-                    //             Icon(Icons.info_outline, color: kPrimaryColor),
-                    //             SizedBox(width: 10),
-                    //             Text(
-                    //               'Selection Required',
-                    //               style: TextStyle(
-                    //                 color: kPrimaryColor,
-                    //                 fontSize: 18,
-                    //                 fontWeight: FontWeight.bold,
-                    //               ),
-                    //             ),
-                    //           ],
-                    //         ),
-                    //         content: Text(
-                    //           'Please select both status and responsibility.',
-                    //           style: TextStyle(
-                    //             color: Colors.grey[800],
-                    //             fontSize: 14,
-                    //             fontWeight: FontWeight.w400,
-                    //             height: 1.5,
-                    //           ),
-                    //         ),
-                    //         actions: [
-                    //
-                    //           TextButton(
-                    //             onPressed: () {
-                    //               Navigator.pop(context); // Close the dialog
-                    //
-                    //             },
-                    //             style: TextButton.styleFrom(
-                    //               padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    //               backgroundColor: kPrimaryColor,
-                    //               shape: RoundedRectangleBorder(
-                    //                 borderRadius: BorderRadius.circular(10),
-                    //               ),
-                    //             ),
-                    //             child: Text(
-                    //               'OK',
-                    //               style: TextStyle(
-                    //                 color: Colors.white,
-                    //                 fontSize: 16,
-                    //               ),
-                    //             ),
-                    //           ),
-                    //         ],
-                    //       );
-                    //     },
-                    //   );
-                    // } else {
-                    //   // Perform save action
-                    //   Navigator.pop(context);
-                    //   print('Selected Status: $_status');
-                    //   print('Selected Responsibility: $_selectedResponsibility');
-                    // }
-
-                    Navigator.pop(context);
-                    print('Selected Status: $_status');
-                    print('Selected Responsibility: $_selectedResponsibility');
+                    if (_status != null && _selectedResponsibility != null) {
+                      Navigator.pop(context, {
+                        'status': _status,
+                        'responsibility': _selectedResponsibility,
+                      });
+                    } else {
+                      // Show a dialog if both status and responsibility are not selected
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            elevation: 10,
+                            backgroundColor: Colors.white,
+                            title: Row(
+                              children: [
+                                Icon(Icons.info_outline, color: kPrimaryColor),
+                                SizedBox(width: 10),
+                                Text(
+                                  'Selection Required',
+                                  style: TextStyle(
+                                    color: kPrimaryColor,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            content: Text(
+                              'Please select both status and responsibility.',
+                              style: TextStyle(
+                                color: Colors.grey[800],
+                                fontSize: 14,
+                                fontWeight: FontWeight.w400,
+                                height: 1.5,
+                              ),
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                style: TextButton.styleFrom(
+                                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                  backgroundColor: kPrimaryColor,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                                child: Text(
+                                  'OK',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    }
                   },
                   child: Container(
                     height: 50,

@@ -7,9 +7,6 @@ import 'package:taurgo_inventory/pages/property_details_view_page.dart';
 import '../constants/AppColors.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
-
 import 'authentication/controller/authController.dart';
 
 class LandingScreen extends StatefulWidget {
@@ -28,12 +25,6 @@ class _LandingScreenState extends State<LandingScreen> {
   List<Map<String, dynamic>> properties = [];
   List<Map<String, dynamic>> userDetails= [];
   User? user;
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-
-  // List<Map<String, dynamic>> userDetails = [];
-
-
-
 
   @override
   void initState() {
@@ -337,163 +328,178 @@ class _LandingScreenState extends State<LandingScreen> {
           )
               : Container(
             color: bWhite,
-            child: Padding(
-              padding: EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(
-                    height: 20,
+            child: properties.isEmpty
+                ? Center(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Text(
+                  'No properties available',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    fontFamily: "Inter",
+                    color: Colors.grey,
                   ),
-
-                  //Search bar
-                  Padding(
-                    padding: const EdgeInsets.all(0.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          width: double.maxFinite,
-                          height: 40,
-                          decoration: BoxDecoration(
-                            color: bWhite,
-                            border: Border.all(
-                              color: kSecondaryButtonBorderColor,
-                              // Replace with your desired
-                              // border color
-                              width: 2.0, // Adjust the border width as needed
-                            ), // Background color of the search bar
-                            borderRadius: BorderRadius.circular(30.0),
-
-                            // boxShadow: [
-                            //   BoxShadow(
-                            //     color: Colors.grey.withOpacity(0.5),
-                            //     spreadRadius: 2,
-                            //     blurRadius: 5,
-                            //     offset: Offset(0, 3),
-                            //   ),
-                            // ],
-                          ),
-                          child: Row(
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Icon(Icons.search,
-                                    color:
-                                    kSecondaryButtonBorderColor), // Search icon
-                              ),
-                              Expanded(
-                                child: TextField(
-                                  cursorColor: kPrimaryColor,
-                                  decoration: InputDecoration(
-                                    hintText: 'Search',
-                                    hintStyle: TextStyle(
-                                        color: kSecondaryButtonBorderColor),
-                                    border: InputBorder.none,
-                                  ),
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Icon(Icons.mic,
-                                    color: kSecondaryButtonBorderColor), // Mic icon
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  SizedBox(
-                    height: 20,
-                  ),
-
-                  //Filter Options
-                  Padding(
-                    padding: EdgeInsets.all(0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Text(
-                          "Your Properties",
-                          style: TextStyle(
-                            fontSize: 20.0,
-                            fontWeight: FontWeight.w700,
-                            color: kPrimaryColor,
-                          ),
-                        ),
-                        Row(
-                          children: [
-                            GestureDetector(
-                              onTap: () {
-                                _showFilterOptions(context);
-                              },
-                              child: Text(
-                                "Filter",
-                                style: TextStyle(
-                                  fontSize: 12.0,
-                                  fontWeight: FontWeight.w700,
-                                  color: kSecondaryTextColourTwo,
-                                ),
-                              ),
-                            ),
-                            IconButton(
-                              icon: Icon(
-                                Icons.filter_alt_outlined,
-                                size: 24,
-                                color: kSecondaryTextColourTwo,
-                              ),
-                              onPressed: () {
-                                _showFilterOptions(context);
-                              },
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  Expanded(
-                    child: ListView.builder(
-                      itemCount: filteredProperties.length,
-                      itemBuilder: (context, index) {
-                        int reversedIndex = filteredProperties.length - 1 - index;
-                        final property = filteredProperties[reversedIndex];
-                        return propertyContainer(
-                          property['status'] ?? '',
-                          property['propertyId'] ?? '',
-                          property['addressLineOne'] ?? '',
-                          property['addressLineTwo'] ?? '',
-                          property['city'] ?? '',
-                          property['state'] ?? '',
-                          property['country'] ?? '',
-                          property['postalCode'] ?? '',
-                          property['ref'] ?? '',
-                          property['client'] ?? '',
-                          property['type'] ?? '',
-                          property['furnishing'] ?? '',
-                          property['noOfBeds'] ?? '',
-                          property['noOfBaths'] ?? '',
-                          property['garage'] ?? '',
-                          property['parking'] ?? '',
-                          property['notes'] ?? '',
-                          property['inspectionType'] ?? '',
-                          property['date'] ?? '',
-                          property['time'] ?? '',
-                          property['keyLocation'] ?? '',
-                          property['referneceKey'] ?? '',
-                          property['internalNotes'] ?? '',
-                        );
-                      },
-                    ),
-                  ),
-                  //Container for Listing
-
-                  //Floating Button with
-                ],
+                ),
               ),
-            ),
+            )
+                : Padding(
+              padding: EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(
+                height: 20,
+              ),
+
+              //Search bar
+              Padding(
+                padding: const EdgeInsets.all(0.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: double.maxFinite,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: bWhite,
+                        border: Border.all(
+                          color: kSecondaryButtonBorderColor,
+                          // Replace with your desired
+                          // border color
+                          width: 2.0, // Adjust the border width as needed
+                        ), // Background color of the search bar
+                        borderRadius: BorderRadius.circular(30.0),
+
+                        // boxShadow: [
+                        //   BoxShadow(
+                        //     color: Colors.grey.withOpacity(0.5),
+                        //     spreadRadius: 2,
+                        //     blurRadius: 5,
+                        //     offset: Offset(0, 3),
+                        //   ),
+                        // ],
+                      ),
+                      child: Row(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Icon(Icons.search,
+                                color:
+                                kSecondaryButtonBorderColor), // Search icon
+                          ),
+                          Expanded(
+                            child: TextField(
+                              cursorColor: kPrimaryColor,
+                              decoration: InputDecoration(
+                                hintText: 'Search',
+                                hintStyle: TextStyle(
+                                    color: kSecondaryButtonBorderColor),
+                                border: InputBorder.none,
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Icon(Icons.mic,
+                                color: kSecondaryButtonBorderColor), // Mic icon
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              SizedBox(
+                height: 20,
+              ),
+
+              //Filter Options
+              Padding(
+                padding: EdgeInsets.all(0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Text(
+                      "Your Properties",
+                      style: TextStyle(
+                        fontSize: 20.0,
+                        fontWeight: FontWeight.w700,
+                        color: kPrimaryColor,
+                      ),
+                    ),
+                    Row(
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            _showFilterOptions(context);
+                          },
+                          child: Text(
+                            "Filter",
+                            style: TextStyle(
+                              fontSize: 12.0,
+                              fontWeight: FontWeight.w700,
+                              color: kSecondaryTextColourTwo,
+                            ),
+                          ),
+                        ),
+                        IconButton(
+                          icon: Icon(
+                            Icons.filter_alt_outlined,
+                            size: 24,
+                            color: kSecondaryTextColourTwo,
+                          ),
+                          onPressed: () {
+                            _showFilterOptions(context);
+                          },
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+
+              Expanded(
+                child: ListView.builder(
+                  itemCount: filteredProperties.length,
+                  itemBuilder: (context, index) {
+                    int reversedIndex = filteredProperties.length - 1 - index;
+                    final property = filteredProperties[reversedIndex];
+                    return propertyContainer(
+                      property['status'] ?? '',
+                      property['propertyId'] ?? '',
+                      property['addressLineOne'] ?? '',
+                      property['addressLineTwo'] ?? '',
+                      property['city'] ?? '',
+                      property['state'] ?? '',
+                      property['country'] ?? '',
+                      property['postalCode'] ?? '',
+                      property['ref'] ?? '',
+                      property['client'] ?? '',
+                      property['type'] ?? '',
+                      property['furnishing'] ?? '',
+                      property['noOfBeds'] ?? '',
+                      property['noOfBaths'] ?? '',
+                      property['garage'] ?? '',
+                      property['parking'] ?? '',
+                      property['notes'] ?? '',
+                      property['inspectionType'] ?? '',
+                      property['date'] ?? '',
+                      property['time'] ?? '',
+                      property['keyLocation'] ?? '',
+                      property['referneceKey'] ?? '',
+                      property['internalNotes'] ?? '',
+                    );
+                  },
+                ),
+              ),
+              //Container for Listing
+
+              //Floating Button with
+            ],
+          ),
+        ),
           ),
           floatingActionButton: FloatingActionButton.extended(
             onPressed: () {
@@ -706,6 +712,8 @@ class _LandingScreenState extends State<LandingScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
+                      
+                      Expanded(child: Container(),),
                       IconButton(
                         icon: Icon(Icons.delete, color: Colors.red),
                         onPressed: () {
@@ -793,20 +801,20 @@ class _LandingScreenState extends State<LandingScreen> {
                         },
                       ),
 
-                      ElevatedButton(
-                        onPressed: () {},
-                        child: Padding(
-                          padding: const EdgeInsets.all(7.5),
-                          child: Text('Sync', style: TextStyle(fontSize: 18)),
-                        ),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: kPrimaryColor,
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(50),
-                          ),
-                        ),
-                      )
+                      // ElevatedButton(
+                      //   onPressed: () {},
+                      //   child: Padding(
+                      //     padding: const EdgeInsets.all(7.5),
+                      //     child: Text('Sync', style: TextStyle(fontSize: 18)),
+                      //   ),
+                      //   style: ElevatedButton.styleFrom(
+                      //     backgroundColor: kPrimaryColor,
+                      //     foregroundColor: Colors.white,
+                      //     shape: RoundedRectangleBorder(
+                      //       borderRadius: BorderRadius.circular(50),
+                      //     ),
+                      //   ),
+                      // )
                     ],
                   ),
                 ],
