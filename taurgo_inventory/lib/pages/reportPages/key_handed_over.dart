@@ -1,18 +1,12 @@
 import 'dart:async';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:taurgo_inventory/pages/conditions/condition_details.dart';
-import 'package:taurgo_inventory/pages/edit_report_page.dart';
-import '../../constants/AppColors.dart';
-import 'dart:async';
 import 'dart:io';
+
 import 'package:camera/camera.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart'; // Import shared_preferences
 import 'package:taurgo_inventory/pages/conditions/condition_details.dart';
 import 'package:taurgo_inventory/pages/edit_report_page.dart';
+
 import '../../constants/AppColors.dart';
 import '../../widgets/add_action.dart';
 import '../camera_preview_page.dart';
@@ -27,24 +21,40 @@ class KeyHandedOver extends StatefulWidget {
 }
 
 class _KeyHandedOverState extends State<KeyHandedOver> {
-
   String? yale;
   String? mortice;
   String? other;
-
   late List<File> capturedImages;
 
   @override
   void initState() {
     super.initState();
     capturedImages = widget.capturedImages ?? [];
+    _loadPreferences(); // Load the saved preferences when the state is initialized
   }
+
+  // Function to load preferences
+  Future<void> _loadPreferences() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      yale = prefs.getString('yale');
+      mortice = prefs.getString('mortice');
+      other = prefs.getString('other');
+    });
+  }
+
+  // Function to save a preference
+  Future<void> _savePreference(String key, String? value) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setString(key, value ?? '');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Keys Handed Over',
+          'Bed Room',
           style: TextStyle(
             color: kPrimaryColor,
             fontSize: 14,
@@ -55,7 +65,7 @@ class _KeyHandedOverState extends State<KeyHandedOver> {
         backgroundColor: bWhite,
         leading: GestureDetector(
           onTap: () {
-            Navigator.pushReplacement(
+            Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) => EditReportPage(),
@@ -69,15 +79,13 @@ class _KeyHandedOverState extends State<KeyHandedOver> {
           ),
         ),
       ),
-
       body: SingleChildScrollView(
         child: Padding(
           padding: EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-
-              //Yale
+              //Gas Meter
               ConditionItem(
                 name: "Yale",
                 selectedCondition: yale,
@@ -85,10 +93,11 @@ class _KeyHandedOverState extends State<KeyHandedOver> {
                   setState(() {
                     yale = condition;
                   });
+                  _savePreference('yale', condition); // Save preference
                 },
               ),
 
-              //Mortice
+              //Electric Meter
               ConditionItem(
                 name: "Mortice",
                 selectedCondition: mortice,
@@ -96,14 +105,11 @@ class _KeyHandedOverState extends State<KeyHandedOver> {
                   setState(() {
                     mortice = condition;
                   });
+                  _savePreference('mortice', condition); // Save preference
                 },
               ),
 
-
-
-
-
-              //Windows Lock
+              //Additional Items
               ConditionItem(
                 name: "Other",
                 selectedCondition: other,
@@ -111,9 +117,9 @@ class _KeyHandedOverState extends State<KeyHandedOver> {
                   setState(() {
                     other = condition;
                   });
+                  _savePreference('other', condition); // Save preference
                 },
               ),
-
 
               // Add more ConditionItem widgets as needed
             ],
@@ -123,7 +129,6 @@ class _KeyHandedOverState extends State<KeyHandedOver> {
     );
   }
 }
-
 
 class ConditionItem extends StatelessWidget {
   final String name;
@@ -151,7 +156,7 @@ class ConditionItem extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Name",
+                    "Type",
                     style: TextStyle(
                       fontSize: 12.0,
                       fontWeight: FontWeight.w700,
@@ -193,11 +198,10 @@ class ConditionItem extends StatelessWidget {
                       size: 24,
                       color: kSecondaryTextColourTwo,
                     ),
-                    onPressed: ()  async{
+                    onPressed: () async {
                       // Initialize the camera when the button is pressed
                       final cameras = await availableCameras();
                       if (cameras.isNotEmpty) {
-                        print("${cameras.toString()}");
                         final cameraController = CameraController(
                           cameras.first,
                           ResolutionPreset.high,
@@ -218,8 +222,9 @@ class ConditionItem extends StatelessWidget {
               ),
             ],
           ),
-
-          SizedBox(height: 12,),
+          SizedBox(
+            height: 12,
+          ),
           GestureDetector(
             onTap: () async {
               final result = await Navigator.push(
@@ -237,7 +242,7 @@ class ConditionItem extends StatelessWidget {
               }
             },
             child: Text(
-              selectedCondition ?? "Key Location & Description",
+              selectedCondition ?? "Location",
               style: TextStyle(
                 fontSize: 12.0,
                 fontWeight: FontWeight.w700,
@@ -246,11 +251,67 @@ class ConditionItem extends StatelessWidget {
               ),
             ),
           ),
+          SizedBox(
+            height: 12,
+          ),
+          GestureDetector(
+            onTap: () async {
+              final result = await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ConditionDetails(
+                    initialCondition: selectedCondition,
+                    type: name,
+                  ),
+                ),
+              );
 
+              if (result != null) {
+                onConditionSelected(result);
+              }
+            },
+            child: Text(
+              selectedCondition ?? "Serial Number",
+              style: TextStyle(
+                fontSize: 12.0,
+                fontWeight: FontWeight.w700,
+                color: kPrimaryTextColourTwo,
+                fontStyle: FontStyle.italic,
+              ),
+            ),
+          ),
+          SizedBox(
+            height: 12,
+          ),
+          GestureDetector(
+            onTap: () async {
+              final result = await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ConditionDetails(
+                    initialCondition: selectedCondition,
+                    type: name,
+                  ),
+                ),
+              );
+
+              if (result != null) {
+                onConditionSelected(result);
+              }
+            },
+            child: Text(
+              selectedCondition ?? "Reading",
+              style: TextStyle(
+                fontSize: 12.0,
+                fontWeight: FontWeight.w700,
+                color: kPrimaryTextColourTwo,
+                fontStyle: FontStyle.italic,
+              ),
+            ),
+          ),
           Divider(thickness: 1, color: Color(0xFFC2C2C2)),
         ],
       ),
     );
   }
 }
-
