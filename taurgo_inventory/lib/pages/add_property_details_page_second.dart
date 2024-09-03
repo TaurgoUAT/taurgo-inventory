@@ -37,9 +37,9 @@ class _AddPropertyDetailsPageSecondState extends State<AddPropertyDetailsPageSec
   DateTime? _currentDate;
   DateTime? _currentTime;
 
-  late String selectedTime;
+  String? selectedDate;
+  String? selectedTime;
 
-  late String selectedDate;
   String? selectedType;
   String? keysIwth;
 
@@ -119,6 +119,7 @@ class _AddPropertyDetailsPageSecondState extends State<AddPropertyDetailsPageSec
                   },
                   maximumDate: DateTime(2050, 12, 30),
                   minimumYear: 2024,
+                  // minimumDate: DateTime(2024, 09, 10),
                   maximumYear: 2050,
                   mode: CupertinoDatePickerMode.date,
                 ),
@@ -411,7 +412,7 @@ class _AddPropertyDetailsPageSecondState extends State<AddPropertyDetailsPageSec
                 Padding(
                   padding: EdgeInsets.all(0),
                   child: Text(
-                    "Address",
+                    "Further Details",
                     style: TextStyle(
                       fontSize: 16.0,
                       fontWeight: FontWeight.w700,
@@ -433,7 +434,7 @@ class _AddPropertyDetailsPageSecondState extends State<AddPropertyDetailsPageSec
                 Padding(
                   padding: EdgeInsets.all(0),
                   child: Text(
-                    "Type",
+                    "Inspection Type",
                     style: TextStyle(
                       fontSize: 14.0,
                       fontWeight: FontWeight.w700,
@@ -526,16 +527,28 @@ class _AddPropertyDetailsPageSecondState extends State<AddPropertyDetailsPageSec
                             color: kPrimaryTextColourTwo,
                           ),
                         ),
-                        IconButton(
-                          icon: Icon(
-                            Icons.calendar_month_outlined,
-                            size: 24,
-                            color: kPrimaryColor,
-                          ),
-                          onPressed: () {
-                            _showCalendar(context);
-                          },
-                        ),
+                        Row(
+                          children: [
+                            Text(
+                              selectedDate ?? 'Select Date',
+                              style: TextStyle(
+                                color: kPrimaryColor,
+                                fontSize: 14.0,
+                              ),
+                            ),
+                            IconButton(
+                              icon: Icon(
+                                Icons.calendar_month_outlined,
+                                size: 24,
+                                color: kPrimaryColor,
+                              ),
+                              onPressed: () {
+                                _showCalendar(context);
+                              },
+                            ),
+
+                        ],)
+
                       ],
                     )
                 ),
@@ -554,16 +567,29 @@ class _AddPropertyDetailsPageSecondState extends State<AddPropertyDetailsPageSec
                             color: kPrimaryTextColourTwo,
                           ),
                         ),
-                        IconButton(
-                          icon: Icon(
-                            Icons.watch_later_outlined,
-                            size: 24,
-                            color: kPrimaryColor,
-                          ),
-                          onPressed: () {
-                            _showTimePicker(context);
-                          },
-                        ),
+                        Row(
+                          children: [
+                            Text(
+                              selectedTime ?? 'Select Time',
+                              style: TextStyle(
+                                color: kPrimaryColor,
+                                fontSize: 14.0,
+                              ),
+                            ),
+
+                            IconButton(
+                              icon: Icon(
+                                Icons.watch_later_outlined,
+                                size: 24,
+                                color: kPrimaryColor,
+                              ),
+                              onPressed: () {
+                                _showTimePicker(context);
+                              },
+                            ),
+                          ],
+                        )
+
                       ],
                     )
                 ),
