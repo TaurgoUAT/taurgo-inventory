@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart'; // Import shared_preferences
 import 'package:taurgo_inventory/pages/conditions/condition_details.dart';
 import 'package:taurgo_inventory/pages/edit_report_page.dart';
+import 'package:taurgo_inventory/pages/reportPages/camera_preview_page.dart' as reportPages;
 
 import '../../constants/AppColors.dart';
 import '../../widgets/add_action.dart';
@@ -17,16 +18,23 @@ class HealthAndSafety extends StatefulWidget {
   const HealthAndSafety({super.key, this.capturedImages});
 
   @override
-  State<HealthAndSafety> createState() => _KeyHandedOverState();
+  _HealthAndSafetyState createState() => _HealthAndSafetyState();
 }
 
-class _KeyHandedOverState extends State<HealthAndSafety> {
-  String? yaleCondition;
-  String? yaleDescription;
-  String? morticeCondition;
-  String? morticeDescription;
-  String? otherCondition;
-  String? otherDescription;
+class _HealthAndSafetyState extends State<HealthAndSafety> {
+  
+  String? smokeAlarmCondition;
+  String? smokeAlarmDescription;
+  String? heatSensorCondition;
+  String? heatSensorDescription;
+  String? carbonMonoxideCondition;
+  String? carbonMonoxideDescription;
+  String? smokeAlarmImagePath;
+  String? heatSensorImagePath;
+  String? carbonMonxideImagePath;
+  List<String> smokeAlarmImages = [];
+  List<String> heatSensorImages = [];
+  List<String> carbonMonxideImages = [];
   late List<File> capturedImages;
 
   @override
@@ -40,12 +48,15 @@ class _KeyHandedOverState extends State<HealthAndSafety> {
   Future<void> _loadPreferences() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      yaleCondition = prefs.getString('yaleCondition');
-      yaleDescription = prefs.getString('yaleDescription');
-      morticeCondition = prefs.getString('morticeCondition');
-      morticeDescription = prefs.getString('morticeDescription');
-      otherCondition = prefs.getString('otherCondition');
-      otherDescription = prefs.getString('otherDescription');
+      heatSensorCondition = prefs.getString('heatSensorCondition');
+      heatSensorDescription = prefs.getString('heatSensorDescription');
+      smokeAlarmCondition = prefs.getString('smokeAlarmCondition');
+      smokeAlarmDescription = prefs.getString('smokeAlarmDescription');
+      carbonMonoxideCondition = prefs.getString('carbonMonoxideCondition');
+      carbonMonoxideDescription = prefs.getString('carbonMonoxideDescription');
+      smokeAlarmImages = prefs.getStringList('smokeAlarmImages') ?? [];
+      heatSensorImages = prefs.getStringList('heatSensorImages') ?? [];
+      carbonMonxideImages = prefs.getStringList('carbonMonxideImages') ?? [];
     });
   }
 
@@ -55,12 +66,18 @@ class _KeyHandedOverState extends State<HealthAndSafety> {
     prefs.setString(key, value ?? '');
   }
 
+  // Function to save a list preference
+  Future<void> _savePreferenceList(String key, List<String> value) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setStringList(key, value);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Key Handed Over',
+          'Health and Safety',
           style: TextStyle(
             color: kPrimaryColor,
             fontSize: 14,
@@ -93,58 +110,88 @@ class _KeyHandedOverState extends State<HealthAndSafety> {
             children: [
               // Yale
               ConditionItem(
-                name: "Yale",
-                condition: yaleCondition,
-                description: yaleDescription,
+                name: "Heat Sensor",
+                condition: heatSensorCondition,
+                description: heatSensorDescription,
+                images: heatSensorImages,
                 onConditionSelected: (condition) {
                   setState(() {
-                    yaleCondition = condition;
+                    heatSensorCondition = condition;
                   });
-                  _savePreference('yaleCondition', condition); // Save preference
+                  _savePreference(
+                      'heatSensorCondition', condition); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
-                    yaleDescription = description;
+                    heatSensorDescription = description;
                   });
-                  _savePreference('yaleDescription', description); // Save preference
+                  _savePreference('heatSensorDescription',
+                      description); // Save preference
+                },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    heatSensorImages.add(imagePath);
+                  });
+                  _savePreferenceList('heatSensorImages',
+                      heatSensorImages); // Save preference
                 },
               ),
 
               // Mortice
               ConditionItem(
-                name: "Mortice",
-                condition: morticeCondition,
-                description: morticeDescription,
+                name: "Smoke Alarm",
+                condition: smokeAlarmCondition,
+                description: smokeAlarmDescription,
+                images: smokeAlarmImages,
                 onConditionSelected: (condition) {
                   setState(() {
-                    morticeCondition = condition;
+                    smokeAlarmCondition = condition;
                   });
-                  _savePreference('morticeCondition', condition); // Save preference
+                  _savePreference(
+                      'smokeAlarmCondition', condition); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
-                    morticeDescription = description;
+                    smokeAlarmDescription = description;
                   });
-                  _savePreference('morticeDescription', description); // Save preference
+                  _savePreference('smokeAlarmDescription',
+                      description); // Save preference
+                },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    smokeAlarmImages.add(imagePath);
+                  });
+                  _savePreferenceList('smokeAlarmImages',
+                      smokeAlarmImages); // Save preference
                 },
               ),
 
               // Other
               ConditionItem(
                 name: "Other",
-                condition: otherCondition,
-                description: otherDescription,
+                condition: carbonMonoxideCondition,
+                description: carbonMonoxideDescription,
+                images: carbonMonxideImages,
                 onConditionSelected: (condition) {
                   setState(() {
-                    otherCondition = condition;
+                    carbonMonoxideCondition = condition;
                   });
-                  _savePreference('otherCondition', condition); // Save preference
+                  _savePreference('carbonMonoxideCondition',
+                      condition); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
-                    otherDescription = description;
+                    carbonMonoxideDescription = description;
                   });
-                  _savePreference('otherDescription', description); // Save preference
+                  _savePreference('carbonMonoxideDescription',
+                      description); // Save preference
+                },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    carbonMonxideImages.add(imagePath);
+                  });
+                  _savePreferenceList('carbonMonxideImages',
+                      carbonMonxideImages); // Save preference
                 },
               ),
 
@@ -161,16 +208,20 @@ class ConditionItem extends StatelessWidget {
   final String name;
   final String? condition;
   final String? description;
+  final List<String> images;
   final Function(String?) onConditionSelected;
   final Function(String?) onDescriptionSelected;
+  final Function(String) onImageAdded;
 
   const ConditionItem({
     Key? key,
     required this.name,
     this.condition,
     this.description,
+    required this.images,
     required this.onConditionSelected,
     required this.onDescriptionSelected,
+    required this.onImageAdded,
   }) : super(key: key);
 
   @override
@@ -230,19 +281,16 @@ class ConditionItem extends StatelessWidget {
                       color: kSecondaryTextColourTwo,
                     ),
                     onPressed: () async {
-                      // Initialize the camera when the button is pressed
                       final cameras = await availableCameras();
                       if (cameras.isNotEmpty) {
-                        final cameraController = CameraController(
-                          cameras.first,
-                          ResolutionPreset.high,
-                        );
-                        await cameraController.initialize();
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => CameraPreviewPage(
-                              cameraController: cameraController,
+                            builder: (context) => reportPages.CameraPreviewPage(
+                              camera: cameras.first,
+                              onPictureTaken: (imagePath) {
+                                onImageAdded(imagePath);
+                              },
                             ),
                           ),
                         );
@@ -253,7 +301,9 @@ class ConditionItem extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: 12,),
+          SizedBox(
+            height: 12,
+          ),
           GestureDetector(
             onTap: () async {
               final result = await Navigator.push(
@@ -280,7 +330,9 @@ class ConditionItem extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(height: 12,),
+          SizedBox(
+            height: 12,
+          ),
           GestureDetector(
             onTap: () async {
               final result = await Navigator.push(
@@ -307,6 +359,31 @@ class ConditionItem extends StatelessWidget {
               ),
             ),
           ),
+          SizedBox(
+            height: 12,
+          ),
+          images.isNotEmpty
+              ? Wrap(
+                  spacing: 8.0,
+                  runSpacing: 8.0,
+                  children: images.map((imagePath) {
+                    return Image.file(
+                      File(imagePath),
+                      width: 100,
+                      height: 100,
+                      fit: BoxFit.cover,
+                    );
+                  }).toList(),
+                )
+              : Text(
+                  "No images selected",
+                  style: TextStyle(
+                    fontSize: 12.0,
+                    fontWeight: FontWeight.w700,
+                    color: kPrimaryTextColourTwo,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
           Divider(thickness: 1, color: Color(0xFFC2C2C2)),
         ],
       ),

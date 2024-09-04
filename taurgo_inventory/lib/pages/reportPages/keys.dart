@@ -6,10 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart'; // Import shared_preferences
 import 'package:taurgo_inventory/pages/conditions/condition_details.dart';
 import 'package:taurgo_inventory/pages/edit_report_page.dart';
+import 'package:taurgo_inventory/pages/reportPages/camera_preview_page.dart';
 
 import '../../constants/AppColors.dart';
 import '../../widgets/add_action.dart';
-import '../camera_preview_page.dart';
 
 class Keys extends StatefulWidget {
   final List<File>? capturedImages;
@@ -35,6 +35,13 @@ class _KeysState extends State<Keys> {
   String? remoteReading;
   String? otherLocation;
   String? otherReading;
+  List<String> yaleImages = [];
+  List<String> morticeImages = [];
+  List<String> windowLockImages = [];
+  List<String> gasMeterImages = [];
+  List<String> carPassImages = [];
+  List<String> remoteImages = [];
+  List<String> otherImages = [];
   late List<File> capturedImages;
 
   @override
@@ -62,6 +69,14 @@ class _KeysState extends State<Keys> {
       remoteReading = prefs.getString('remoteReading');
       otherLocation = prefs.getString('otherLocation');
       otherReading = prefs.getString('otherReading');
+
+      yaleImages = prefs.getStringList('yaleImages') ?? [];
+      morticeImages = prefs.getStringList('morticeImages') ?? [];
+      windowLockImages = prefs.getStringList('windowLockImages') ?? [];
+      gasMeterImages = prefs.getStringList('gasMeterImages') ?? [];
+      carPassImages = prefs.getStringList('carPassImages') ?? [];
+      remoteImages = prefs.getStringList('remoteImages') ?? [];
+      otherImages = prefs.getStringList('otherImages') ?? [];
     });
   }
 
@@ -69,6 +84,11 @@ class _KeysState extends State<Keys> {
   Future<void> _savePreference(String key, String? value) async {
     final prefs = await SharedPreferences.getInstance();
     prefs.setString(key, value ?? '');
+  }
+
+  Future<void> _savePreferenceList(String key, List<String> value) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setStringList(key, value);
   }
 
   @override
@@ -112,6 +132,7 @@ class _KeysState extends State<Keys> {
                 name: "Yale",
                 location: yaleLocation,
                 reading: yaleReading,
+                images: yaleImages,
                 onLocationSelected: (location) {
                   setState(() {
                     yaleLocation = location;
@@ -124,6 +145,13 @@ class _KeysState extends State<Keys> {
                   });
                   _savePreference('yaleReading', reading); // Save preference
                 },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    yaleImages.add(imagePath);
+                  });
+                  _savePreferenceList(
+                      'yaleImages', yaleImages); // Save preference
+                },
               ),
 
               // Mortice
@@ -131,6 +159,7 @@ class _KeysState extends State<Keys> {
                 name: "Mortice",
                 location: morticeLocation,
                 reading: morticeReading,
+                images: morticeImages,
                 onLocationSelected: (location) {
                   setState(() {
                     morticeLocation = location;
@@ -144,6 +173,13 @@ class _KeysState extends State<Keys> {
                   });
                   _savePreference('morticeReading', reading); // Save preference
                 },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    morticeImages.add(imagePath);
+                  });
+                  _savePreferenceList(
+                      'morticeImages', morticeImages); // Save preference
+                },
               ),
 
               // Window Lock
@@ -151,6 +187,7 @@ class _KeysState extends State<Keys> {
                 name: "Window Lock",
                 location: windowLockLocation,
                 reading: windowLockReading,
+                images: windowLockImages,
                 onLocationSelected: (location) {
                   setState(() {
                     windowLockLocation = location;
@@ -165,6 +202,13 @@ class _KeysState extends State<Keys> {
                   _savePreference(
                       'windowLockReading', reading); // Save preference
                 },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    windowLockImages.add(imagePath);
+                  });
+                  _savePreferenceList(
+                      'windowLockImages', windowLockImages); // Save preference
+                },
               ),
 
               // Gas Meter
@@ -172,6 +216,7 @@ class _KeysState extends State<Keys> {
                 name: "Gas Meter",
                 location: gasMeterLocation,
                 reading: gasMeterReading,
+                images: gasMeterImages,
                 onLocationSelected: (location) {
                   setState(() {
                     gasMeterLocation = location;
@@ -186,6 +231,13 @@ class _KeysState extends State<Keys> {
                   _savePreference(
                       'gasMeterReading', reading); // Save preference
                 },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    gasMeterImages.add(imagePath);
+                  });
+                  _savePreferenceList(
+                      'gasMeterImages', gasMeterImages); // Save preference
+                },
               ),
 
               // Car Pass
@@ -193,6 +245,7 @@ class _KeysState extends State<Keys> {
                 name: "Car Pass",
                 location: carPassLocation,
                 reading: carPassReading,
+                images: carPassImages,
                 onLocationSelected: (location) {
                   setState(() {
                     carPassLocation = location;
@@ -206,6 +259,13 @@ class _KeysState extends State<Keys> {
                   });
                   _savePreference('carPassReading', reading); // Save preference
                 },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    carPassImages.add(imagePath);
+                  });
+                  _savePreferenceList(
+                      'carPassImages', carPassImages); // Save preference
+                },
               ),
 
               // Remote
@@ -213,6 +273,7 @@ class _KeysState extends State<Keys> {
                 name: "Remote",
                 location: remoteLocation,
                 reading: remoteReading,
+                images: remoteImages,
                 onLocationSelected: (location) {
                   setState(() {
                     remoteLocation = location;
@@ -226,6 +287,13 @@ class _KeysState extends State<Keys> {
                   });
                   _savePreference('remoteReading', reading); // Save preference
                 },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    remoteImages.add(imagePath);
+                  });
+                  _savePreferenceList(
+                      'remoteImages', remoteImages); // Save preference
+                },
               ),
 
               // Other
@@ -233,6 +301,7 @@ class _KeysState extends State<Keys> {
                 name: "Other",
                 location: otherLocation,
                 reading: otherReading,
+                images: otherImages,
                 onLocationSelected: (location) {
                   setState(() {
                     otherLocation = location;
@@ -244,6 +313,13 @@ class _KeysState extends State<Keys> {
                     otherReading = reading;
                   });
                   _savePreference('otherReading', reading); // Save preference
+                },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    otherImages.add(imagePath);
+                  });
+                  _savePreferenceList(
+                      'otherImages', otherImages); // Save preference
                 },
               ),
 
@@ -260,16 +336,20 @@ class ConditionItem extends StatelessWidget {
   final String name;
   final String? location;
   final String? reading;
+  final List<String> images;
   final Function(String?) onLocationSelected;
   final Function(String?) onReadingSelected;
+  final Function(String) onImageAdded;
 
   const ConditionItem({
     Key? key,
     required this.name,
     this.location,
     this.reading,
+    required this.images,
     required this.onLocationSelected,
     required this.onReadingSelected,
+    required this.onImageAdded,
   }) : super(key: key);
 
   @override
@@ -329,19 +409,16 @@ class ConditionItem extends StatelessWidget {
                       color: kSecondaryTextColourTwo,
                     ),
                     onPressed: () async {
-                      // Initialize the camera when the button is pressed
                       final cameras = await availableCameras();
                       if (cameras.isNotEmpty) {
-                        final cameraController = CameraController(
-                          cameras.first,
-                          ResolutionPreset.high,
-                        );
-                        await cameraController.initialize();
                         Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) => CameraPreviewPage(
-                              cameraController: cameraController,
+                              camera: cameras.first,
+                              onPictureTaken: (imagePath) {
+                                onImageAdded(imagePath);
+                              },
                             ),
                           ),
                         );
@@ -410,6 +487,31 @@ class ConditionItem extends StatelessWidget {
               ),
             ),
           ),
+          SizedBox(
+            height: 12,
+          ),
+          images.isNotEmpty
+              ? Wrap(
+                  spacing: 8.0,
+                  runSpacing: 8.0,
+                  children: images.map((imagePath) {
+                    return Image.file(
+                      File(imagePath),
+                      width: 100,
+                      height: 100,
+                      fit: BoxFit.cover,
+                    );
+                  }).toList(),
+                )
+              : Text(
+                  "No images selected",
+                  style: TextStyle(
+                    fontSize: 12.0,
+                    fontWeight: FontWeight.w700,
+                    color: kPrimaryTextColourTwo,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
           Divider(thickness: 1, color: Color(0xFFC2C2C2)),
         ],
       ),

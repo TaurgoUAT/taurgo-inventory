@@ -6,10 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart'; // Import shared_preferences
 import 'package:taurgo_inventory/pages/conditions/condition_details.dart';
 import 'package:taurgo_inventory/pages/edit_report_page.dart';
+import 'package:taurgo_inventory/pages/reportPages/camera_preview_page.dart';
 
 import '../../constants/AppColors.dart';
 import '../../widgets/add_action.dart';
-import '../camera_preview_page.dart';
 
 class Toilet extends StatefulWidget {
   final List<File>? capturedImages;
@@ -61,6 +61,46 @@ class _ToiletState extends State<Toilet> {
   String? flooringDescription;
   String? additionalItemsCondition;
   String? additionalItemsDescription;
+  String? doorImagePath;
+  String? doorFrameImagePath;
+  String? ceilingImagePath;
+  String? extractorFanImagePath;
+  String? lightingImagePath;
+  String? wallsImagePath;
+  String? skirtingImagePath;
+  String? windowSillImagePath;
+  String? curtainsImagePath;
+  String? blindsImagePath;
+  String? toiletImagePath;
+  String? basinImagePath;
+  String? showerCubicleImagePath;
+  String? bathImagePath;
+  String? switchBoardImagePath;
+  String? socketImagePath;
+  String? heatingImagePath;
+  String? accessoriesImagePath;
+  String? flooringImagePath;
+  String? additionalItemsImagePath;
+  List<String> doorImages = [];
+  List<String> doorFrameImages = [];
+  List<String> ceilingImages = [];
+  List<String> extractorFanImages = [];
+  List<String> lightingImages = [];
+  List<String> wallsImages = [];
+  List<String> skirtingImages = [];
+  List<String> windowSillImages = [];
+  List<String> curtainsImages = [];
+  List<String> blindsImages = [];
+  List<String> toiletImages = [];
+  List<String> basinImages = [];
+  List<String> showerCubicleImages = [];
+  List<String> bathImages = [];
+  List<String> switchBoardImages = [];
+  List<String> socketImages = [];
+  List<String> heatingImages = [];
+  List<String> accessoriesImages = [];
+  List<String> flooringImages = [];
+  List<String> additionalItemsImages = [];
   late List<File> capturedImages;
 
   @override
@@ -115,13 +155,39 @@ class _ToiletState extends State<Toilet> {
       additionalItemsCondition = prefs.getString('additionalItemsCondition');
       additionalItemsDescription =
           prefs.getString('additionalItemsDescription');
+      doorImages = prefs.getStringList('doorImages') ?? [];
+      doorFrameImages = prefs.getStringList('doorFrameImages') ?? [];
+      ceilingImages = prefs.getStringList('ceilingImages') ?? [];
+      extractorFanImages = prefs.getStringList('extractorFanImages') ?? [];
+      lightingImages = prefs.getStringList('lightingImages') ?? [];
+      wallsImages = prefs.getStringList('wallsImages') ?? [];
+      skirtingImages = prefs.getStringList('skirtingImages') ?? [];
+      windowSillImages = prefs.getStringList('windowSillImages') ?? [];
+      curtainsImages = prefs.getStringList('curtainsImages') ?? [];
+      blindsImages = prefs.getStringList('blindsImages') ?? [];
+      toiletImages = prefs.getStringList('toiletImages') ?? [];
+      basinImages = prefs.getStringList('basinImages') ?? [];
+      showerCubicleImages = prefs.getStringList('showerCubicleImages') ?? [];
+      bathImages = prefs.getStringList('bathImages') ?? [];
+      switchBoardImages = prefs.getStringList('switchBoardImages') ?? [];
+      socketImages = prefs.getStringList('socketImages') ?? [];
+      heatingImages = prefs.getStringList('heatingImages') ?? [];
+      accessoriesImages = prefs.getStringList('accessoriesImages') ?? [];
+      flooringImages = prefs.getStringList('flooringImages') ?? [];
+      additionalItemsImages =
+          prefs.getStringList('additionalItemsImages') ?? [];
     });
   }
 
   // Function to save a preference
-  Future<void> _savePreference(String key, String? value) async {
+  Future<void> _savePreference(String key, String value) async {
     final prefs = await SharedPreferences.getInstance();
-    prefs.setString(key, value ?? '');
+    prefs.setString(key, value);
+  }
+
+  Future<void> _savePreferenceList(String key, List<String> value) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setStringList(key, value);
   }
 
   @override
@@ -165,19 +231,27 @@ class _ToiletState extends State<Toilet> {
                 name: "Door Frame",
                 condition: doorFrameCondition,
                 description: doorFrameDescription,
+                images: doorFrameImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     doorFrameCondition = condition;
                   });
                   _savePreference(
-                      'doorFrameCondition', condition); // Save preference
+                      'doorFrameCondition', condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     doorFrameDescription = description;
                   });
                   _savePreference(
-                      'doorFrameDescription', description); // Save preference
+                      'doorFrameDescription', description!); // Save preference
+                },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    doorFrameImages.add(imagePath);
+                  });
+                  _savePreferenceList(
+                      'doorFrameImages', doorFrameImages); // Save preference
                 },
               ),
 
@@ -186,19 +260,27 @@ class _ToiletState extends State<Toilet> {
                 name: "Ceiling",
                 condition: ceilingCondition,
                 description: ceilingDescription,
+                images: ceilingImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     ceilingCondition = condition;
                   });
                   _savePreference(
-                      'ceilingCondition', condition); // Save preference
+                      'ceilingCondition', condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     ceilingDescription = description;
                   });
                   _savePreference(
-                      'ceilingDescription', description); // Save preference
+                      'ceilingDescription', description!); // Save preference
+                },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    ceilingImages.add(imagePath);
+                  });
+                  _savePreferenceList(
+                      'ceilingImages', ceilingImages); // Save preference
                 },
               ),
 
@@ -207,19 +289,27 @@ class _ToiletState extends State<Toilet> {
                 name: "Extractor Fan",
                 condition: extractorFanCondition,
                 description: extractorFanDescription,
+                images: extractorFanImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     extractorFanCondition = condition;
                   });
                   _savePreference(
-                      'extractorFanCondition', condition); // Save preference
+                      'extractorFanCondition', condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     extractorFanDescription = description;
                   });
                   _savePreference('extractorFanDescription',
-                      description); // Save preference
+                      description!); // Save preference
+                },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    extractorFanImages.add(imagePath);
+                  });
+                  _savePreferenceList('extractorFanImages',
+                      extractorFanImages); // Save preference
                 },
               ),
 
@@ -228,19 +318,27 @@ class _ToiletState extends State<Toilet> {
                 name: "Lighting",
                 condition: lightingCondition,
                 description: lightingDescription,
+                images: lightingImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     lightingCondition = condition;
                   });
                   _savePreference(
-                      'lightingCondition', condition); // Save preference
+                      'lightingCondition', condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     lightingDescription = description;
                   });
                   _savePreference(
-                      'lightingDescription', description); // Save preference
+                      'lightingDescription', description!); // Save preference
+                },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    lightingImages.add(imagePath);
+                  });
+                  _savePreferenceList(
+                      'lightingImages', lightingImages); // Save preference
                 },
               ),
 
@@ -249,19 +347,27 @@ class _ToiletState extends State<Toilet> {
                 name: "Walls",
                 condition: wallsCondition,
                 description: wallsDescription,
+                images: wallsImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     wallsCondition = condition;
                   });
                   _savePreference(
-                      'wallsCondition', condition); // Save preference
+                      'wallsCondition', condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     wallsDescription = description;
                   });
                   _savePreference(
-                      'wallsDescription', description); // Save preference
+                      'wallsDescription', description!); // Save preference
+                },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    wallsImages.add(imagePath);
+                  });
+                  _savePreferenceList(
+                      'wallsImages', wallsImages); // Save preference
                 },
               ),
 
@@ -270,19 +376,27 @@ class _ToiletState extends State<Toilet> {
                 name: "Skirting",
                 condition: skirtingCondition,
                 description: skirtingDescription,
+                images: skirtingImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     skirtingCondition = condition;
                   });
                   _savePreference(
-                      'skirtingCondition', condition); // Save preference
+                      'skirtingCondition', condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     skirtingDescription = description;
                   });
                   _savePreference(
-                      'skirtingDescription', description); // Save preference
+                      'skirtingDescription', description!); // Save preference
+                },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    skirtingImages.add(imagePath);
+                  });
+                  _savePreferenceList(
+                      'skirtingImages', skirtingImages); // Save preference
                 },
               ),
 
@@ -291,19 +405,27 @@ class _ToiletState extends State<Toilet> {
                 name: "Window Sill",
                 condition: windowSillCondition,
                 description: windowSillDescription,
+                images: windowSillImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     windowSillCondition = condition;
                   });
                   _savePreference(
-                      'windowSillCondition', condition); // Save preference
+                      'windowSillCondition', condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     windowSillDescription = description;
                   });
                   _savePreference(
-                      'windowSillDescription', description); // Save preference
+                      'windowSillDescription', description!); // Save preference
+                },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    windowSillImages.add(imagePath);
+                  });
+                  _savePreferenceList(
+                      'windowSillImages', windowSillImages); // Save preference
                 },
               ),
 
@@ -312,19 +434,27 @@ class _ToiletState extends State<Toilet> {
                 name: "Curtains",
                 condition: curtainsCondition,
                 description: curtainsDescription,
+                images: curtainsImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     curtainsCondition = condition;
                   });
                   _savePreference(
-                      'curtainsCondition', condition); // Save preference
+                      'curtainsCondition', condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     curtainsDescription = description;
                   });
                   _savePreference(
-                      'curtainsDescription', description); // Save preference
+                      'curtainsDescription', description!); // Save preference
+                },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    curtainsImages.add(imagePath);
+                  });
+                  _savePreferenceList(
+                      'curtainsImages', curtainsImages); // Save preference
                 },
               ),
 
@@ -333,19 +463,27 @@ class _ToiletState extends State<Toilet> {
                 name: "Blinds",
                 condition: blindsCondition,
                 description: blindsDescription,
+                images: blindsImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     blindsCondition = condition;
                   });
                   _savePreference(
-                      'blindsCondition', condition); // Save preference
+                      'blindsCondition', condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     blindsDescription = description;
                   });
                   _savePreference(
-                      'blindsDescription', description); // Save preference
+                      'blindsDescription', description!); // Save preference
+                },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    blindsImages.add(imagePath);
+                  });
+                  _savePreferenceList(
+                      'blindsImages', blindsImages); // Save preference
                 },
               ),
 
@@ -354,19 +492,27 @@ class _ToiletState extends State<Toilet> {
                 name: "Toilet",
                 condition: toiletCondition,
                 description: toiletDescription,
+                images: toiletImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     toiletCondition = condition;
                   });
                   _savePreference(
-                      'toiletCondition', condition); // Save preference
+                      'toiletCondition', condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     toiletDescription = description;
                   });
                   _savePreference(
-                      'toiletDescription', description); // Save preference
+                      'toiletDescription', description!); // Save preference
+                },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    toiletImages.add(imagePath);
+                  });
+                  _savePreferenceList(
+                      'toiletImages', toiletImages); // Save preference
                 },
               ),
 
@@ -375,19 +521,27 @@ class _ToiletState extends State<Toilet> {
                 name: "Basin",
                 condition: basinCondition,
                 description: basinDescription,
+                images: basinImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     basinCondition = condition;
                   });
                   _savePreference(
-                      'basinCondition', condition); // Save preference
+                      'basinCondition', condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     basinDescription = description;
                   });
                   _savePreference(
-                      'basinDescription', description); // Save preference
+                      'basinDescription', description!); // Save preference
+                },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    basinImages.add(imagePath);
+                  });
+                  _savePreferenceList(
+                      'basinImages', basinImages); // Save preference
                 },
               ),
 
@@ -396,19 +550,27 @@ class _ToiletState extends State<Toilet> {
                 name: "Shower Cubicle",
                 condition: showerCubicleCondition,
                 description: showerCubicleDescription,
+                images: showerCubicleImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     showerCubicleCondition = condition;
                   });
                   _savePreference(
-                      'showerCubicleCondition', condition); // Save preference
+                      'showerCubicleCondition', condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     showerCubicleDescription = description;
                   });
                   _savePreference('showerCubicleDescription',
-                      description); // Save preference
+                      description!); // Save preference
+                },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    showerCubicleImages.add(imagePath);
+                  });
+                  _savePreferenceList('showerCubicleImages',
+                      showerCubicleImages); // Save preference
                 },
               ),
 
@@ -417,19 +579,27 @@ class _ToiletState extends State<Toilet> {
                 name: "Bath",
                 condition: bathCondition,
                 description: bathDescription,
+                images: bathImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     bathCondition = condition;
                   });
                   _savePreference(
-                      'bathCondition', condition); // Save preference
+                      'bathCondition', condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     bathDescription = description;
                   });
                   _savePreference(
-                      'bathDescription', description); // Save preference
+                      'bathDescription', description!); // Save preference
+                },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    bathImages.add(imagePath);
+                  });
+                  _savePreferenceList(
+                      'bathImages', bathImages); // Save preference
                 },
               ),
 
@@ -438,19 +608,26 @@ class _ToiletState extends State<Toilet> {
                 name: "Switch Board",
                 condition: switchBoardCondition,
                 description: switchBoardDescription,
+                images: switchBoardImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     switchBoardCondition = condition;
                   });
                   _savePreference(
-                      'switchBoardCondition', condition); // Save preference
+                      'switchBoardCondition', condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     switchBoardDescription = description;
                   });
-                  _savePreference(
-                      'switchBoardDescription', description); // Save preference
+                  _savePreference('switchBoardDescription',
+                      description!); // Save preference
+                },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    switchBoardImages.add(imagePath);
+                  });
+                  _savePreferenceList('switchBoardImages', switchBoardImages);
                 },
               ),
 
@@ -459,19 +636,27 @@ class _ToiletState extends State<Toilet> {
                 name: "Socket",
                 condition: socketCondition,
                 description: socketDescription,
+                images: socketImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     socketCondition = condition;
                   });
                   _savePreference(
-                      'socketCondition', condition); // Save preference
+                      'socketCondition', condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     socketDescription = description;
                   });
                   _savePreference(
-                      'socketDescription', description); // Save preference
+                      'socketDescription', description!); // Save preference
+                },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    socketImages.add(imagePath);
+                  });
+                  _savePreferenceList(
+                      'socketImages', socketImages); // Save preference
                 },
               ),
 
@@ -480,19 +665,27 @@ class _ToiletState extends State<Toilet> {
                 name: "Heating",
                 condition: heatingCondition,
                 description: heatingDescription,
+                images: heatingImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     heatingCondition = condition;
                   });
                   _savePreference(
-                      'heatingCondition', condition); // Save preference
+                      'heatingCondition', condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     heatingDescription = description;
                   });
                   _savePreference(
-                      'heatingDescription', description); // Save preference
+                      'heatingDescription', description!); // Save preference
+                },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    heatingImages.add(imagePath);
+                  });
+                  _savePreferenceList(
+                      'heatingImages', heatingImages); // Save preference
                 },
               ),
 
@@ -501,19 +694,27 @@ class _ToiletState extends State<Toilet> {
                 name: "Accessories",
                 condition: accessoriesCondition,
                 description: accessoriesDescription,
+                images: accessoriesImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     accessoriesCondition = condition;
                   });
                   _savePreference(
-                      'accessoriesCondition', condition); // Save preference
+                      'accessoriesCondition', condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     accessoriesDescription = description;
                   });
-                  _savePreference(
-                      'accessoriesDescription', description); // Save preference
+                  _savePreference('accessoriesDescription',
+                      description!); // Save preference
+                },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    accessoriesImages.add(imagePath);
+                  });
+                  _savePreferenceList('accessoriesImages',
+                      accessoriesImages); // Save preference
                 },
               ),
 
@@ -522,19 +723,27 @@ class _ToiletState extends State<Toilet> {
                 name: "Flooring",
                 condition: flooringCondition,
                 description: flooringDescription,
+                images: flooringImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     flooringCondition = condition;
                   });
                   _savePreference(
-                      'flooringCondition', condition); // Save preference
+                      'flooringCondition', condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     flooringDescription = description;
                   });
                   _savePreference(
-                      'flooringDescription', description); // Save preference
+                      'flooringDescription', description!); // Save preference
+                },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    flooringImages.add(imagePath);
+                  });
+                  _savePreferenceList(
+                      'flooringImages', flooringImages); // Save preference
                 },
               ),
 
@@ -543,19 +752,27 @@ class _ToiletState extends State<Toilet> {
                 name: "Additional Items",
                 condition: additionalItemsCondition,
                 description: additionalItemsDescription,
+                images: additionalItemsImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     additionalItemsCondition = condition;
                   });
-                  _savePreference(
-                      'additionalItemsCondition', condition); // Save preference
+                  _savePreference('additionalItemsCondition',
+                      condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     additionalItemsDescription = description;
                   });
                   _savePreference('additionalItemsDescription',
-                      description); // Save preference
+                      description!); // Save preference
+                },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    additionalItemsImages.add(imagePath);
+                  });
+                  _savePreferenceList('additionalItemsImages',
+                      additionalItemsImages); // Save preference
                 },
               ),
 
@@ -572,16 +789,20 @@ class ConditionItem extends StatelessWidget {
   final String name;
   final String? condition;
   final String? description;
+  final List<String> images;
   final Function(String?) onConditionSelected;
   final Function(String?) onDescriptionSelected;
+  final Function(String) onImageAdded;
 
   const ConditionItem({
     Key? key,
     required this.name,
     this.condition,
     this.description,
+    required this.images,
     required this.onConditionSelected,
     required this.onDescriptionSelected,
+    required this.onImageAdded,
   }) : super(key: key);
 
   @override
@@ -641,19 +862,16 @@ class ConditionItem extends StatelessWidget {
                       color: kSecondaryTextColourTwo,
                     ),
                     onPressed: () async {
-                      // Initialize the camera when the button is pressed
                       final cameras = await availableCameras();
                       if (cameras.isNotEmpty) {
-                        final cameraController = CameraController(
-                          cameras.first,
-                          ResolutionPreset.high,
-                        );
-                        await cameraController.initialize();
                         Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) => CameraPreviewPage(
-                              cameraController: cameraController,
+                              camera: cameras.first,
+                              onPictureTaken: (imagePath) {
+                                onImageAdded(imagePath);
+                              },
                             ),
                           ),
                         );
@@ -722,6 +940,31 @@ class ConditionItem extends StatelessWidget {
               ),
             ),
           ),
+          SizedBox(
+            height: 12,
+          ),
+          images.isNotEmpty
+              ? Wrap(
+                  spacing: 8.0,
+                  runSpacing: 8.0,
+                  children: images.map((imagePath) {
+                    return Image.file(
+                      File(imagePath),
+                      width: 100,
+                      height: 100,
+                      fit: BoxFit.cover,
+                    );
+                  }).toList(),
+                )
+              : Text(
+                  "No images selected",
+                  style: TextStyle(
+                    fontSize: 12.0,
+                    fontWeight: FontWeight.w700,
+                    color: kPrimaryTextColourTwo,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
           Divider(thickness: 1, color: Color(0xFFC2C2C2)),
         ],
       ),

@@ -6,10 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart'; // Import shared_preferences
 import 'package:taurgo_inventory/pages/conditions/condition_details.dart';
 import 'package:taurgo_inventory/pages/edit_report_page.dart';
+import 'package:taurgo_inventory/pages/reportPages/camera_preview_page.dart';
 
 import '../../constants/AppColors.dart';
 import '../../widgets/add_action.dart';
-import '../camera_preview_page.dart';
 
 class FrontGarden extends StatefulWidget {
   final List<File>? capturedImages;
@@ -27,6 +27,9 @@ class _FrontGardenState extends State<FrontGarden> {
   String? outsideLightingDescription;
   String? additionalItemsCondition;
   String? additionalItemsDescription;
+  List<String> driveWayImages = [];
+  List<String> outsideLightingImages = [];
+  List<String> additionalItemsImages = [];
   late List<File> capturedImages;
 
   @override
@@ -46,6 +49,10 @@ class _FrontGardenState extends State<FrontGarden> {
       outsideLightingDescription = prefs.getString('outsideLightingDescription');
       additionalItemsCondition = prefs.getString('additionalItemsCondition');
       additionalItemsDescription = prefs.getString('additionalItemsDescription');
+
+      driveWayImages = prefs.getStringList('driveWayImages') ?? [];
+      outsideLightingImages = prefs.getStringList('outsideLightingImages') ?? [];
+      additionalItemsImages = prefs.getStringList('additionalItemsImages') ?? [];
     });
   }
 
@@ -53,6 +60,11 @@ class _FrontGardenState extends State<FrontGarden> {
   Future<void> _savePreference(String key, String? value) async {
     final prefs = await SharedPreferences.getInstance();
     prefs.setString(key, value ?? '');
+  }
+
+  Future<void> _savePreferenceList(String key, List<String> value) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setStringList(key, value);
   }
 
   @override
@@ -96,6 +108,7 @@ class _FrontGardenState extends State<FrontGarden> {
                 name: "Drive Way",
                 condition: driveWayCondition,
                 description: driveWayDescription,
+                images: driveWayImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     driveWayCondition = condition;
@@ -108,6 +121,12 @@ class _FrontGardenState extends State<FrontGarden> {
                   });
                   _savePreference('driveWayDescription', description); // Save preference
                 },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    driveWayImages.add(imagePath);
+                  });
+                  _savePreferenceList('driveWayImages', driveWayImages);
+                },
               ),
 
               // Outside Lighting
@@ -115,6 +134,7 @@ class _FrontGardenState extends State<FrontGarden> {
                 name: "Outside Lighting",
                 condition: outsideLightingCondition,
                 description: outsideLightingDescription,
+                images: outsideLightingImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     outsideLightingCondition = condition;
@@ -127,6 +147,12 @@ class _FrontGardenState extends State<FrontGarden> {
                   });
                   _savePreference('outsideLightingDescription', description); // Save preference
                 },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    outsideLightingImages.add(imagePath);
+                  });
+                  _savePreferenceList('outsideLightingImages', outsideLightingImages);
+                },
               ),
 
               // Additional Items
@@ -134,6 +160,7 @@ class _FrontGardenState extends State<FrontGarden> {
                 name: "Additional Items",
                 condition: additionalItemsCondition,
                 description: additionalItemsDescription,
+                images: additionalItemsImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     additionalItemsCondition = condition;
@@ -145,6 +172,12 @@ class _FrontGardenState extends State<FrontGarden> {
                     additionalItemsDescription = description;
                   });
                   _savePreference('additionalItemsDescription', description); // Save preference
+                },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    additionalItemsImages.add(imagePath);
+                  });
+                  _savePreferenceList('additionalItemsImages', additionalItemsImages);
                 },
               ),
 
@@ -161,16 +194,20 @@ class ConditionItem extends StatelessWidget {
   final String name;
   final String? condition;
   final String? description;
+  final List<String> images;
   final Function(String?) onConditionSelected;
   final Function(String?) onDescriptionSelected;
+  final Function(String) onImageAdded;
 
   const ConditionItem({
     Key? key,
     required this.name,
     this.condition,
     this.description,
+    required this.images,
     required this.onConditionSelected,
     required this.onDescriptionSelected,
+    required this.onImageAdded,
   }) : super(key: key);
 
   @override
@@ -230,19 +267,16 @@ class ConditionItem extends StatelessWidget {
                       color: kSecondaryTextColourTwo,
                     ),
                     onPressed: () async {
-                      // Initialize the camera when the button is pressed
                       final cameras = await availableCameras();
                       if (cameras.isNotEmpty) {
-                        final cameraController = CameraController(
-                          cameras.first,
-                          ResolutionPreset.high,
-                        );
-                        await cameraController.initialize();
                         Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) => CameraPreviewPage(
-                              cameraController: cameraController,
+                              camera: cameras.first,
+                              onPictureTaken: (imagePath) {
+                                onImageAdded(imagePath);
+                              },
                             ),
                           ),
                         );
@@ -253,7 +287,9 @@ class ConditionItem extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: 12,),
+          SizedBox(
+            height: 12,
+          ),
           GestureDetector(
             onTap: () async {
               final result = await Navigator.push(
@@ -280,7 +316,9 @@ class ConditionItem extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(height: 12,),
+          SizedBox(
+            height: 12,
+          ),
           GestureDetector(
             onTap: () async {
               final result = await Navigator.push(
@@ -307,6 +345,31 @@ class ConditionItem extends StatelessWidget {
               ),
             ),
           ),
+          SizedBox(
+            height: 12,
+          ),
+          images.isNotEmpty
+              ? Wrap(
+                  spacing: 8.0,
+                  runSpacing: 8.0,
+                  children: images.map((imagePath) {
+                    return Image.file(
+                      File(imagePath),
+                      width: 100,
+                      height: 100,
+                      fit: BoxFit.cover,
+                    );
+                  }).toList(),
+                )
+              : Text(
+                  "No images selected",
+                  style: TextStyle(
+                    fontSize: 12.0,
+                    fontWeight: FontWeight.w700,
+                    color: kPrimaryTextColourTwo,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
           Divider(thickness: 1, color: Color(0xFFC2C2C2)),
         ],
       ),

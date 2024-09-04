@@ -6,10 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart'; // Import shared_preferences
 import 'package:taurgo_inventory/pages/conditions/condition_details.dart';
 import 'package:taurgo_inventory/pages/edit_report_page.dart';
+import 'package:taurgo_inventory/pages/reportPages/camera_preview_page.dart';
 
 import '../../constants/AppColors.dart';
 import '../../widgets/add_action.dart';
-import '../camera_preview_page.dart';
 
 class KeyHandedOver extends StatefulWidget {
   final List<File>? capturedImages;
@@ -24,6 +24,9 @@ class _KeyHandedOverState extends State<KeyHandedOver> {
   String? yale;
   String? mortice;
   String? other;
+  List<String> yaleImages = [];
+  List<String> morticeImages = [];
+  List<String> otherImages = [];
   late List<File> capturedImages;
 
   @override
@@ -40,6 +43,10 @@ class _KeyHandedOverState extends State<KeyHandedOver> {
       yale = prefs.getString('yale');
       mortice = prefs.getString('mortice');
       other = prefs.getString('other');
+
+      yaleImages = prefs.getStringList('yaleImages') ?? [];
+      morticeImages = prefs.getStringList('morticeImages') ?? [];
+      otherImages = prefs.getStringList('otherImages') ?? [];
     });
   }
 
@@ -49,12 +56,17 @@ class _KeyHandedOverState extends State<KeyHandedOver> {
     prefs.setString(key, value ?? '');
   }
 
+  Future<void> _savePreferenceList(String key, List<String> value) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setStringList(key, value);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Bed Room',
+          'Key Handed Over',
           style: TextStyle(
             color: kPrimaryColor,
             fontSize: 14,
@@ -85,42 +97,81 @@ class _KeyHandedOverState extends State<KeyHandedOver> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              //Gas Meter
+              // Yale
               ConditionItem(
                 name: "Yale",
-                location: yale,
+                condition: yale,
                 description: yale,
+                images: yaleImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     yale = condition;
                   });
-                  _savePreference('yale', condition); // Save preference
+                  _savePreference('yale', condition!);
+                },
+                onDescriptionSelected: (description) {
+                  setState(() {
+                    yale = description;
+                  });
+                  _savePreference('yale', description!);
+                },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    yaleImages.add(imagePath);
+                  });
+                  _savePreferenceList('yaleImages', yaleImages);
                 },
               ),
 
-              //Electric Meter
+              // Mortice
               ConditionItem(
                 name: "Mortice",
-                location: mortice,
+                condition: mortice,
                 description: mortice,
+                images: morticeImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     mortice = condition;
                   });
-                  _savePreference('mortice', condition); // Save preference
+                  _savePreference('mortice', condition!);
+                },
+                onDescriptionSelected: (description) {
+                  setState(() {
+                    mortice = description;
+                  });
+                  _savePreference('mortice', description!);
+                },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    morticeImages.add(imagePath);
+                  });
+                  _savePreferenceList('morticeImages', morticeImages);
                 },
               ),
 
-              //Additional Items
+              // Other
               ConditionItem(
                 name: "Other",
-                location: other,
+                condition: other,
                 description: other,
+                images: otherImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     other = condition;
                   });
-                  _savePreference('other', condition); // Save preference
+                  _savePreference('other', condition!);
+                },
+                onDescriptionSelected: (description) {
+                  setState(() {
+                    other = description;
+                  });
+                  _savePreference('other', description!);
+                },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    otherImages.add(imagePath);
+                  });
+                  _savePreferenceList('otherImages', otherImages);
                 },
               ),
 
@@ -135,16 +186,22 @@ class _KeyHandedOverState extends State<KeyHandedOver> {
 
 class ConditionItem extends StatelessWidget {
   final String name;
-  final String? location;
+  final String? condition;
   final String? description;
+  final List<String> images;
   final Function(String?) onConditionSelected;
+  final Function(String?) onDescriptionSelected;
+  final Function(String) onImageAdded;
 
   const ConditionItem({
     Key? key,
     required this.name,
-    this.location,
+    this.condition,
     this.description,
+    required this.images,
     required this.onConditionSelected,
+    required this.onDescriptionSelected,
+    required this.onImageAdded,
   }) : super(key: key);
 
   @override
@@ -204,19 +261,16 @@ class ConditionItem extends StatelessWidget {
                       color: kSecondaryTextColourTwo,
                     ),
                     onPressed: () async {
-                      // Initialize the camera when the button is pressed
                       final cameras = await availableCameras();
                       if (cameras.isNotEmpty) {
-                        final cameraController = CameraController(
-                          cameras.first,
-                          ResolutionPreset.high,
-                        );
-                        await cameraController.initialize();
                         Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) => CameraPreviewPage(
-                              cameraController: cameraController,
+                              camera: cameras.first,
+                              onPictureTaken: (imagePath) {
+                                onImageAdded(imagePath);
+                              },
                             ),
                           ),
                         );
@@ -236,7 +290,7 @@ class ConditionItem extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) => ConditionDetails(
-                    initialCondition: location,
+                    initialCondition: condition,
                     type: name,
                   ),
                 ),
@@ -247,7 +301,7 @@ class ConditionItem extends StatelessWidget {
               }
             },
             child: Text(
-              location?.isNotEmpty == true ? location! : "Location",
+              condition?.isNotEmpty == true ? condition! : "Condition",
               style: TextStyle(
                 fontSize: 12.0,
                 fontWeight: FontWeight.w700,
@@ -272,7 +326,7 @@ class ConditionItem extends StatelessWidget {
               );
 
               if (result != null) {
-                onConditionSelected(result);
+                onDescriptionSelected(result);
               }
             },
             child: Text(
@@ -285,6 +339,31 @@ class ConditionItem extends StatelessWidget {
               ),
             ),
           ),
+          SizedBox(
+            height: 12,
+          ),
+          images.isNotEmpty
+              ? Wrap(
+                  spacing: 8.0,
+                  runSpacing: 8.0,
+                  children: images.map((imagePath) {
+                    return Image.file(
+                      File(imagePath),
+                      width: 100,
+                      height: 100,
+                      fit: BoxFit.cover,
+                    );
+                  }).toList(),
+                )
+              : Text(
+                  "No images selected",
+                  style: TextStyle(
+                    fontSize: 12.0,
+                    fontWeight: FontWeight.w700,
+                    color: kPrimaryTextColourTwo,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
           Divider(thickness: 1, color: Color(0xFFC2C2C2)),
         ],
       ),

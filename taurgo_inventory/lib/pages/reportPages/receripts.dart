@@ -6,10 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart'; // Import shared_preferences
 import 'package:taurgo_inventory/pages/conditions/condition_details.dart';
 import 'package:taurgo_inventory/pages/edit_report_page.dart';
+import 'package:taurgo_inventory/pages/reportPages/camera_preview_page.dart';
 
 import '../../constants/AppColors.dart';
 import '../../widgets/add_action.dart';
-import '../camera_preview_page.dart';
 
 class Receripts extends StatefulWidget {
   final List<File>? capturedImages;
@@ -37,6 +37,14 @@ class _ReceriptsState extends State<Receripts> {
   String? energyPerformanceCertificateDescription;
   String? moveInChecklistCondition;
   String? moveInChecklistDescription;
+  List<String> houseApplinceManualImages = [];
+  List<String> kitchenApplinceManualImages = [];
+  List<String> heatingManualImages = [];
+  List<String> landlordGasSafetyCertificateImages = [];
+  List<String> legionellaRiskAssessmentImages = [];
+  List<String> electricalSafetyCertificateImages = [];
+  List<String> energyPerformanceCertificateImages = [];
+  List<String> moveInChecklistImages = [];
   late List<File> capturedImages;
 
   @override
@@ -66,13 +74,27 @@ class _ReceriptsState extends State<Receripts> {
       energyPerformanceCertificateDescription = prefs.getString('energyPerformanceCertificateDescription');
       moveInChecklistCondition = prefs.getString('moveInChecklistCondition');
       moveInChecklistDescription = prefs.getString('moveInChecklistDescription');
+
+      houseApplinceManualImages = prefs.getStringList('houseApplinceManualImages') ?? [];
+      kitchenApplinceManualImages = prefs.getStringList('kitchenApplinceManualImages') ?? [];
+      heatingManualImages = prefs.getStringList('heatingManualImages') ?? [];
+      landlordGasSafetyCertificateImages = prefs.getStringList('landlordGasSafetyCertificateImages') ?? [];
+      legionellaRiskAssessmentImages = prefs.getStringList('legionellaRiskAssessmentImages') ?? [];
+      electricalSafetyCertificateImages = prefs.getStringList('electricalSafetyCertificateImages') ?? [];
+      energyPerformanceCertificateImages = prefs.getStringList('energyPerformanceCertificateImages') ?? [];
+      moveInChecklistImages = prefs.getStringList('moveInChecklistImages') ?? [];
     });
   }
 
   // Function to save a preference
-  Future<void> _savePreference(String key, String? value) async {
+  Future<void> _savePreference(String key, String value) async {
     final prefs = await SharedPreferences.getInstance();
-    prefs.setString(key, value ?? '');
+    prefs.setString(key, value);
+  }
+
+  Future<void> _savePreferenceList(String key, List<String> value) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setStringList(key, value);
   }
 
   @override
@@ -116,17 +138,24 @@ class _ReceriptsState extends State<Receripts> {
                 name: "House Appliance Manual",
                 condition: houseApplinceManualCondition,
                 description: houseApplinceManualDescription,
+                images: houseApplinceManualImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     houseApplinceManualCondition = condition;
                   });
-                  _savePreference('houseApplinceManualCondition', condition); // Save preference
+                  _savePreference('houseApplinceManualCondition', condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     houseApplinceManualDescription = description;
                   });
-                  _savePreference('houseApplinceManualDescription', description); // Save preference
+                  _savePreference('houseApplinceManualDescription', description!); // Save preference
+                },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    houseApplinceManualImages.add(imagePath);
+                  });
+                  _savePreferenceList('houseApplinceManualImages', houseApplinceManualImages); // Save preference
                 },
               ),
 
@@ -135,17 +164,24 @@ class _ReceriptsState extends State<Receripts> {
                 name: "Kitchen Appliance Manual",
                 condition: kitchenApplinceManualCondition,
                 description: kitchenApplinceManualDescription,
+                images: kitchenApplinceManualImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     kitchenApplinceManualCondition = condition;
                   });
-                  _savePreference('kitchenApplinceManualCondition', condition); // Save preference
+                  _savePreference('kitchenApplinceManualCondition', condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     kitchenApplinceManualDescription = description;
                   });
-                  _savePreference('kitchenApplinceManualDescription', description); // Save preference
+                  _savePreference('kitchenApplinceManualDescription', description!); // Save preference
+                },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    kitchenApplinceManualImages.add(imagePath);
+                  });
+                  _savePreferenceList('kitchenApplinceManualImages', kitchenApplinceManualImages); // Save preference
                 },
               ),
 
@@ -154,17 +190,24 @@ class _ReceriptsState extends State<Receripts> {
                 name: "Heating Manual",
                 condition: heatingManualCondition,
                 description: heatingManualDescription,
+                images: heatingManualImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     heatingManualCondition = condition;
                   });
-                  _savePreference('heatingManualCondition', condition); // Save preference
+                  _savePreference('heatingManualCondition', condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     heatingManualDescription = description;
                   });
-                  _savePreference('heatingManualDescription', description); // Save preference
+                  _savePreference('heatingManualDescription', description!); // Save preference
+                },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    heatingManualImages.add(imagePath);
+                  });
+                  _savePreferenceList('heatingManualImages', heatingManualImages); // Save preference
                 },
               ),
 
@@ -173,17 +216,24 @@ class _ReceriptsState extends State<Receripts> {
                 name: "Landlord Gas Safety Certificate",
                 condition: landlordGasSafetyCertificateCondition,
                 description: landlordGasSafetyCertificateDescription,
+                images: landlordGasSafetyCertificateImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     landlordGasSafetyCertificateCondition = condition;
                   });
-                  _savePreference('landlordGasSafetyCertificateCondition', condition); // Save preference
+                  _savePreference('landlordGasSafetyCertificateCondition', condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     landlordGasSafetyCertificateDescription = description;
                   });
-                  _savePreference('landlordGasSafetyCertificateDescription', description); // Save preference
+                  _savePreference('landlordGasSafetyCertificateDescription', description!); // Save preference
+                },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    landlordGasSafetyCertificateImages.add(imagePath);
+                  });
+                  _savePreferenceList('landlordGasSafetyCertificateImages', landlordGasSafetyCertificateImages); // Save preference
                 },
               ),
 
@@ -192,17 +242,24 @@ class _ReceriptsState extends State<Receripts> {
                 name: "Legionella Risk Assessment",
                 condition: legionellaRiskAssessmentCondition,
                 description: legionellaRiskAssessmentDescription,
+                images: legionellaRiskAssessmentImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     legionellaRiskAssessmentCondition = condition;
                   });
-                  _savePreference('legionellaRiskAssessmentCondition', condition); // Save preference
+                  _savePreference('legionellaRiskAssessmentCondition', condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     legionellaRiskAssessmentDescription = description;
                   });
-                  _savePreference('legionellaRiskAssessmentDescription', description); // Save preference
+                  _savePreference('legionellaRiskAssessmentDescription', description!); // Save preference
+                },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    legionellaRiskAssessmentImages.add(imagePath);
+                  });
+                  _savePreferenceList('legionellaRiskAssessmentImages', legionellaRiskAssessmentImages); // Save preference
                 },
               ),
 
@@ -211,17 +268,24 @@ class _ReceriptsState extends State<Receripts> {
                 name: "Electrical Safety Certificate",
                 condition: electricalSafetyCertificateCondition,
                 description: electricalSafetyCertificateDescription,
+                images: electricalSafetyCertificateImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     electricalSafetyCertificateCondition = condition;
                   });
-                  _savePreference('electricalSafetyCertificateCondition', condition); // Save preference
+                  _savePreference('electricalSafetyCertificateCondition', condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     electricalSafetyCertificateDescription = description;
                   });
-                  _savePreference('electricalSafetyCertificateDescription', description); // Save preference
+                  _savePreference('electricalSafetyCertificateDescription', description!); // Save preference
+                },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    electricalSafetyCertificateImages.add(imagePath);
+                  });
+                  _savePreferenceList('electricalSafetyCertificateImages', electricalSafetyCertificateImages); // Save preference
                 },
               ),
 
@@ -230,17 +294,24 @@ class _ReceriptsState extends State<Receripts> {
                 name: "Energy Performance Certificate",
                 condition: energyPerformanceCertificateCondition,
                 description: energyPerformanceCertificateDescription,
+                images: energyPerformanceCertificateImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     energyPerformanceCertificateCondition = condition;
                   });
-                  _savePreference('energyPerformanceCertificateCondition', condition); // Save preference
+                  _savePreference('energyPerformanceCertificateCondition', condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     energyPerformanceCertificateDescription = description;
                   });
-                  _savePreference('energyPerformanceCertificateDescription', description); // Save preference
+                  _savePreference('energyPerformanceCertificateDescription', description!); // Save preference
+                },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    energyPerformanceCertificateImages.add(imagePath);
+                  });
+                  _savePreferenceList('energyPerformanceCertificateImages', energyPerformanceCertificateImages); // Save preference
                 },
               ),
 
@@ -249,17 +320,24 @@ class _ReceriptsState extends State<Receripts> {
                 name: "Move In Checklist",
                 condition: moveInChecklistCondition,
                 description: moveInChecklistDescription,
+                images: moveInChecklistImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     moveInChecklistCondition = condition;
                   });
-                  _savePreference('moveInChecklistCondition', condition); // Save preference
+                  _savePreference('moveInChecklistCondition', condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     moveInChecklistDescription = description;
                   });
-                  _savePreference('moveInChecklistDescription', description); // Save preference
+                  _savePreference('moveInChecklistDescription', description!); // Save preference
+                },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    moveInChecklistImages.add(imagePath);
+                  });
+                  _savePreferenceList('moveInChecklistImages', moveInChecklistImages); // Save preference
                 },
               ),
 
@@ -276,16 +354,20 @@ class ConditionItem extends StatelessWidget {
   final String name;
   final String? condition;
   final String? description;
+  final List<String> images;
   final Function(String?) onConditionSelected;
   final Function(String?) onDescriptionSelected;
+  final Function(String) onImageAdded;
 
   const ConditionItem({
     Key? key,
     required this.name,
     this.condition,
     this.description,
+    required this.images,
     required this.onConditionSelected,
     required this.onDescriptionSelected,
+    required this.onImageAdded,
   }) : super(key: key);
 
   @override
@@ -345,19 +427,16 @@ class ConditionItem extends StatelessWidget {
                       color: kSecondaryTextColourTwo,
                     ),
                     onPressed: () async {
-                      // Initialize the camera when the button is pressed
                       final cameras = await availableCameras();
                       if (cameras.isNotEmpty) {
-                        final cameraController = CameraController(
-                          cameras.first,
-                          ResolutionPreset.high,
-                        );
-                        await cameraController.initialize();
                         Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) => CameraPreviewPage(
-                              cameraController: cameraController,
+                              camera: cameras.first,
+                              onPictureTaken: (imagePath) {
+                                onImageAdded(imagePath);
+                              },
                             ),
                           ),
                         );
@@ -368,7 +447,9 @@ class ConditionItem extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: 12,),
+          SizedBox(
+            height: 12,
+          ),
           GestureDetector(
             onTap: () async {
               final result = await Navigator.push(
@@ -395,7 +476,9 @@ class ConditionItem extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(height: 12,),
+          SizedBox(
+            height: 12,
+          ),
           GestureDetector(
             onTap: () async {
               final result = await Navigator.push(
@@ -422,6 +505,31 @@ class ConditionItem extends StatelessWidget {
               ),
             ),
           ),
+          SizedBox(
+            height: 12,
+          ),
+          images.isNotEmpty
+              ? Wrap(
+                  spacing: 8.0,
+                  runSpacing: 8.0,
+                  children: images.map((imagePath) {
+                    return Image.file(
+                      File(imagePath),
+                      width: 100,
+                      height: 100,
+                      fit: BoxFit.cover,
+                    );
+                  }).toList(),
+                )
+              : Text(
+                  "No images selected",
+                  style: TextStyle(
+                    fontSize: 12.0,
+                    fontWeight: FontWeight.w700,
+                    color: kPrimaryTextColourTwo,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
           Divider(thickness: 1, color: Color(0xFFC2C2C2)),
         ],
       ),

@@ -6,10 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart'; // Import shared_preferences
 import 'package:taurgo_inventory/pages/conditions/condition_details.dart';
 import 'package:taurgo_inventory/pages/edit_report_page.dart';
+import 'package:taurgo_inventory/pages/reportPages/camera_preview_page.dart';
 
 import '../../constants/AppColors.dart';
 import '../../widgets/add_action.dart';
-import '../camera_preview_page.dart';
 
 class DiningRoom extends StatefulWidget {
   final List<File>? capturedImages;
@@ -29,6 +29,14 @@ class _DiningRoomState extends State<DiningRoom> {
   String? waterMeterLocation;
   String? oilMeterCondition;
   String? oilMeterLocation;
+  String? gasMeterImagePath;
+  String? electricMeterImagePath;
+  String? waterMeterImagePath;
+  String? oilMeterImagePath;
+  List<String> gasMeterImages = [];
+  List<String> electricMeterImages = [];
+  List<String> waterMeterImages = [];
+  List<String> oilMeterImages = [];
   late List<File> capturedImages;
 
   @override
@@ -50,13 +58,22 @@ class _DiningRoomState extends State<DiningRoom> {
       waterMeterLocation = prefs.getString('waterMeterLocation');
       oilMeterCondition = prefs.getString('oilMeterCondition');
       oilMeterLocation = prefs.getString('oilMeterLocation');
+      gasMeterImages = prefs.getStringList('gasMeterImages') ?? [];
+      electricMeterImages = prefs.getStringList('electricMeterImages') ?? [];
+      waterMeterImages = prefs.getStringList('waterMeterImages') ?? [];
+      oilMeterImages = prefs.getStringList('oilMeterImages') ?? [];
     });
   }
 
   // Function to save a preference
-  Future<void> _savePreference(String key, String? value) async {
+  Future<void> _savePreference(String key, String value) async {
     final prefs = await SharedPreferences.getInstance();
-    prefs.setString(key, value ?? '');
+    prefs.setString(key, value);
+  }
+
+  Future<void> _savePreferenceList(String key, List<String> value) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setStringList(key, value);
   }
 
   @override
@@ -100,17 +117,27 @@ class _DiningRoomState extends State<DiningRoom> {
                 name: "Gas Meter",
                 condition: gasMeterCondition,
                 location: gasMeterLocation,
+                images: gasMeterImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     gasMeterCondition = condition;
                   });
-                  _savePreference('gasMeterCondition', condition); // Save preference
+                  _savePreference(
+                      'gasMeterCondition', condition!); // Save preference
                 },
-                onLocationSelected: (location) {
+                onlocationSelected: (location) {
                   setState(() {
                     gasMeterLocation = location;
                   });
-                  _savePreference('gasMeterLocation', location); // Save preference
+                  _savePreference(
+                      'gasMeterLocation', location!); // Save preference
+                },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    gasMeterImages.add(imagePath);
+                  });
+                  _savePreferenceList(
+                      'gasMeterImages', gasMeterImages); // Save preference
                 },
               ),
               // Electric Meter
@@ -118,17 +145,27 @@ class _DiningRoomState extends State<DiningRoom> {
                 name: "Electric Meter",
                 condition: electricMeterCondition,
                 location: electricMeterLocation,
+                images: electricMeterImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     electricMeterCondition = condition;
                   });
-                  _savePreference('electricMeterCondition', condition); // Save preference
+                  _savePreference(
+                      'electricMeterCondition', condition!); // Save preference
                 },
-                onLocationSelected: (location) {
+                onlocationSelected: (location) {
                   setState(() {
                     electricMeterLocation = location;
                   });
-                  _savePreference('electricMeterLocation', location); // Save preference
+                  _savePreference(
+                      'electricMeterLocation', location!); // Save preference
+                },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    electricMeterImages.add(imagePath);
+                  });
+                  _savePreferenceList('electricMeterImages',
+                      electricMeterImages); // Save preference
                 },
               ),
               // Water Meter
@@ -136,17 +173,27 @@ class _DiningRoomState extends State<DiningRoom> {
                 name: "Water Meter",
                 condition: waterMeterCondition,
                 location: waterMeterLocation,
+                images: waterMeterImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     waterMeterCondition = condition;
                   });
-                  _savePreference('waterMeterCondition', condition); // Save preference
+                  _savePreference(
+                      'waterMeterCondition', condition!); // Save preference
                 },
-                onLocationSelected: (location) {
+                onlocationSelected: (location) {
                   setState(() {
                     waterMeterLocation = location;
                   });
-                  _savePreference('waterMeterLocation', location); // Save preference
+                  _savePreference(
+                      'waterMeterLocation', location!); // Save preference
+                },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    waterMeterImages.add(imagePath);
+                  });
+                  _savePreferenceList(
+                      'waterMeterImages', waterMeterImages); // Save preference
                 },
               ),
               // Oil Meter
@@ -154,17 +201,27 @@ class _DiningRoomState extends State<DiningRoom> {
                 name: "Oil Meter",
                 condition: oilMeterCondition,
                 location: oilMeterLocation,
+                images: oilMeterImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     oilMeterCondition = condition;
                   });
-                  _savePreference('oilMeterCondition', condition); // Save preference
+                  _savePreference(
+                      'oilMeterCondition', condition!); // Save preference
                 },
-                onLocationSelected: (location) {
+                onlocationSelected: (location) {
                   setState(() {
                     oilMeterLocation = location;
                   });
-                  _savePreference('oilMeterLocation', location); // Save preference
+                  _savePreference(
+                      'oilMeterLocation', location!); // Save preference
+                },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    oilMeterImages.add(imagePath);
+                  });
+                  _savePreferenceList(
+                      'oilMeterImages', oilMeterImages); // Save preference
                 },
               ),
               // Add more ConditionItem widgets as needed
@@ -180,16 +237,20 @@ class ConditionItem extends StatelessWidget {
   final String name;
   final String? condition;
   final String? location;
+  final List<String> images;
   final Function(String?) onConditionSelected;
-  final Function(String?) onLocationSelected;
+  final Function(String?) onlocationSelected;
+  final Function(String) onImageAdded;
 
   const ConditionItem({
     Key? key,
     required this.name,
     this.condition,
     this.location,
+    required this.images,
     required this.onConditionSelected,
-    required this.onLocationSelected,
+    required this.onlocationSelected,
+    required this.onImageAdded,
   }) : super(key: key);
 
   @override
@@ -249,19 +310,16 @@ class ConditionItem extends StatelessWidget {
                       color: kSecondaryTextColourTwo,
                     ),
                     onPressed: () async {
-                      // Initialize the camera when the button is pressed
                       final cameras = await availableCameras();
                       if (cameras.isNotEmpty) {
-                        final cameraController = CameraController(
-                          cameras.first,
-                          ResolutionPreset.high,
-                        );
-                        await cameraController.initialize();
                         Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) => CameraPreviewPage(
-                              cameraController: cameraController,
+                              camera: cameras.first,
+                              onPictureTaken: (imagePath) {
+                                onImageAdded(imagePath);
+                              },
                             ),
                           ),
                         );
@@ -272,7 +330,9 @@ class ConditionItem extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: 12,),
+          SizedBox(
+            height: 12,
+          ),
           GestureDetector(
             onTap: () async {
               final result = await Navigator.push(
@@ -284,6 +344,7 @@ class ConditionItem extends StatelessWidget {
                   ),
                 ),
               );
+
               if (result != null) {
                 onConditionSelected(result);
               }
@@ -298,7 +359,9 @@ class ConditionItem extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(height: 12,),
+          SizedBox(
+            height: 12,
+          ),
           GestureDetector(
             onTap: () async {
               final result = await Navigator.push(
@@ -310,12 +373,13 @@ class ConditionItem extends StatelessWidget {
                   ),
                 ),
               );
+
               if (result != null) {
-                onLocationSelected(result);
+                onlocationSelected(result);
               }
             },
             child: Text(
-              location?.isNotEmpty == true ? location! : "Description",
+              location?.isNotEmpty == true ? location! : "Location",
               style: TextStyle(
                 fontSize: 12.0,
                 fontWeight: FontWeight.w700,
@@ -324,6 +388,31 @@ class ConditionItem extends StatelessWidget {
               ),
             ),
           ),
+          SizedBox(
+            height: 12,
+          ),
+          images.isNotEmpty
+              ? Wrap(
+                  spacing: 8.0,
+                  runSpacing: 8.0,
+                  children: images.map((imagePath) {
+                    return Image.file(
+                      File(imagePath),
+                      width: 100,
+                      height: 100,
+                      fit: BoxFit.cover,
+                    );
+                  }).toList(),
+                )
+              : Text(
+                  "No images selected",
+                  style: TextStyle(
+                    fontSize: 12.0,
+                    fontWeight: FontWeight.w700,
+                    color: kPrimaryTextColourTwo,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
           Divider(thickness: 1, color: Color(0xFFC2C2C2)),
         ],
       ),

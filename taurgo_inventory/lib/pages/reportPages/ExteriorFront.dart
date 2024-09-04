@@ -6,10 +6,11 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart'; // Import shared_preferences
 import 'package:taurgo_inventory/pages/conditions/condition_details.dart';
 import 'package:taurgo_inventory/pages/edit_report_page.dart';
+import 'package:taurgo_inventory/pages/reportPages/camera_preview_page.dart';
 
 import '../../constants/AppColors.dart';
 import '../../widgets/add_action.dart';
-import '../camera_preview_page.dart';
+
 
 class Exteriorfront extends StatefulWidget {
   final List<File>? capturedImages;
@@ -30,6 +31,10 @@ class _ExteriorfrontState extends State<Exteriorfront> {
   String? porchDescription;
   String? additionalItemsCondition;
   String? additionalItemsDescription;
+  List<String> doorImages = [];
+  List<String> doorFrameImages = [];
+  List<String> porchImages = [];
+  List<String> additionalItemsImages = [];
   late List<File> capturedImages;
 
   @override
@@ -51,8 +56,12 @@ class _ExteriorfrontState extends State<Exteriorfront> {
       porchCondition = prefs.getString('porchCondition');
       porchDescription = prefs.getString('porchDescription');
       additionalItemsCondition = prefs.getString('additionalItemsCondition');
-      additionalItemsDescription =
-          prefs.getString('additionalItemsDescription');
+      additionalItemsDescription = prefs.getString('additionalItemsDescription');
+
+      doorImages = prefs.getStringList('doorImages') ?? [];
+      doorFrameImages = prefs.getStringList('doorFrameImages') ?? [];
+      porchImages = prefs.getStringList('porchImages') ?? [];
+      additionalItemsImages = prefs.getStringList('additionalItemsImages') ?? [];
     });
   }
 
@@ -60,6 +69,11 @@ class _ExteriorfrontState extends State<Exteriorfront> {
   Future<void> _savePreference(String key, String? value) async {
     final prefs = await SharedPreferences.getInstance();
     prefs.setString(key, value ?? '');
+  }
+
+  Future<void> _savePreferenceList(String key, List<String> value) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setStringList(key, value);
   }
 
   @override
@@ -103,6 +117,7 @@ class _ExteriorfrontState extends State<Exteriorfront> {
                 name: "Door",
                 condition: doorCondition,
                 description: newdoor,
+                images: doorImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     doorCondition = condition;
@@ -115,25 +130,36 @@ class _ExteriorfrontState extends State<Exteriorfront> {
                   });
                   _savePreference('newdoor', description);
                 },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    doorImages.add(imagePath);
+                  });
+                  _savePreferenceList('doorImages', doorImages);
+                },
               ),
               // Door Frame
               ConditionItem(
                 name: "Door Frame",
                 condition: doorFrameCondition,
                 description: doorFrameDescription,
+                images: doorFrameImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     doorFrameCondition = condition;
                   });
-                  _savePreference(
-                      'doorFrameCondition', condition); // Save preference
+                  _savePreference('doorFrameCondition', condition); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     doorFrameDescription = description;
                   });
-                  _savePreference(
-                      'doorFrameDescription', description); // Save preference
+                  _savePreference('doorFrameDescription', description); // Save preference
+                },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    doorFrameImages.add(imagePath);
+                  });
+                  _savePreferenceList('doorFrameImages', doorFrameImages); // Save preference
                 },
               ),
 
@@ -142,19 +168,24 @@ class _ExteriorfrontState extends State<Exteriorfront> {
                 name: "Porch",
                 condition: porchCondition,
                 description: porchDescription,
+                images: porchImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     porchCondition = condition;
                   });
-                  _savePreference(
-                      'porchCondition', condition); // Save preference
+                  _savePreference('porchCondition', condition); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     porchDescription = description;
                   });
-                  _savePreference(
-                      'porchDescription', description); // Save preference
+                  _savePreference('porchDescription', description); // Save preference
+                },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    porchImages.add(imagePath);
+                  });
+                  _savePreferenceList('porchImages', porchImages); // Save preference
                 },
               ),
 
@@ -163,21 +194,29 @@ class _ExteriorfrontState extends State<Exteriorfront> {
                 name: "Additional Items",
                 condition: additionalItemsCondition,
                 description: additionalItemsDescription,
+                images: additionalItemsImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     additionalItemsCondition = condition;
                   });
-                  _savePreference(
-                      'additionalItemsCondition', condition); // Save preference
+                  _savePreference('additionalItemsCondition', condition); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     additionalItemsDescription = description;
                   });
-                  _savePreference('additionalItemsDescription',
-                      description); // Save preference
+                  _savePreference('additionalItemsDescription', description); // Save preference
+                },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    additionalItemsImages.add(imagePath);
+                  });
+                  _savePreferenceList('additionalItemsImages', additionalItemsImages); // Save preference
                 },
               ),
+
+              // Display captured images
+              ...capturedImages.map((file) => Image.file(file)).toList(),
 
               // Add more ConditionItem widgets as needed
             ],
@@ -192,16 +231,20 @@ class ConditionItem extends StatelessWidget {
   final String name;
   final String? condition;
   final String? description;
+  final List<String> images;
   final Function(String?) onConditionSelected;
   final Function(String?) onDescriptionSelected;
+  final Function(String) onImageAdded;
 
   const ConditionItem({
     Key? key,
     required this.name,
     this.condition,
     this.description,
+    required this.images,
     required this.onConditionSelected,
     required this.onDescriptionSelected,
+    required this.onImageAdded,
   }) : super(key: key);
 
   @override
@@ -261,19 +304,16 @@ class ConditionItem extends StatelessWidget {
                       color: kSecondaryTextColourTwo,
                     ),
                     onPressed: () async {
-                      // Initialize the camera when the button is pressed
                       final cameras = await availableCameras();
                       if (cameras.isNotEmpty) {
-                        final cameraController = CameraController(
-                          cameras.first,
-                          ResolutionPreset.high,
-                        );
-                        await cameraController.initialize();
                         Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) => CameraPreviewPage(
-                              cameraController: cameraController,
+                              camera: cameras.first,
+                              onPictureTaken: (imagePath) {
+                                onImageAdded(imagePath);
+                              },
                             ),
                           ),
                         );
@@ -342,6 +382,31 @@ class ConditionItem extends StatelessWidget {
               ),
             ),
           ),
+          SizedBox(
+            height: 12,
+          ),
+          images.isNotEmpty
+              ? Wrap(
+                  spacing: 8.0,
+                  runSpacing: 8.0,
+                  children: images.map((imagePath) {
+                    return Image.file(
+                      File(imagePath),
+                      width: 100,
+                      height: 100,
+                      fit: BoxFit.cover,
+                    );
+                  }).toList(),
+                )
+              : Text(
+                  "No images selected",
+                  style: TextStyle(
+                    fontSize: 12.0,
+                    fontWeight: FontWeight.w700,
+                    color: kPrimaryTextColourTwo,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
           Divider(thickness: 1, color: Color(0xFFC2C2C2)),
         ],
       ),

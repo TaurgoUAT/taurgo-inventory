@@ -6,10 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart'; // Import shared_preferences
 import 'package:taurgo_inventory/pages/conditions/condition_details.dart';
 import 'package:taurgo_inventory/pages/edit_report_page.dart';
+import 'package:taurgo_inventory/pages/reportPages/camera_preview_page.dart';
 
 import '../../constants/AppColors.dart';
 import '../../widgets/add_action.dart';
-import '../camera_preview_page.dart';
 
 class RearGarden extends StatefulWidget {
   final List<File>? capturedImages;
@@ -26,6 +26,11 @@ class _RearGardenState extends State<RearGarden> {
   String? summerHouse;
   String? shed;
   String? additionalInformation;
+  List<String> gardenDescriptionImages = [];
+  List<String> outsideLightingImages = [];
+  List<String> summerHouseImages = [];
+  List<String> shedImages = [];
+  List<String> additionalInformationImages = [];
   late List<File> capturedImages;
 
   @override
@@ -44,13 +49,24 @@ class _RearGardenState extends State<RearGarden> {
       summerHouse = prefs.getString('summerHouse');
       shed = prefs.getString('shed');
       additionalInformation = prefs.getString('additionalInformation');
+
+      gardenDescriptionImages = prefs.getStringList('gardenDescriptionImages') ?? [];
+      outsideLightingImages = prefs.getStringList('outsideLightingImages') ?? [];
+      summerHouseImages = prefs.getStringList('summerHouseImages') ?? [];
+      shedImages = prefs.getStringList('shedImages') ?? [];
+      additionalInformationImages = prefs.getStringList('additionalInformationImages') ?? [];
     });
   }
 
   // Function to save a preference
-  Future<void> _savePreference(String key, String? value) async {
+  Future<void> _savePreference(String key, String value) async {
     final prefs = await SharedPreferences.getInstance();
-    prefs.setString(key, value ?? '');
+    prefs.setString(key, value);
+  }
+
+  Future<void> _savePreferenceList(String key, List<String> value) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setStringList(key, value);
   }
 
   @override
@@ -94,17 +110,24 @@ class _RearGardenState extends State<RearGarden> {
                 name: "Garden Description",
                 condition: gardenDescription,
                 description: gardenDescription,
+                images: gardenDescriptionImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     gardenDescription = condition;
                   });
-                  _savePreference('gardenDescription', condition); // Save preference
+                  _savePreference('gardenDescription', condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     gardenDescription = description;
                   });
-                  _savePreference('gardenDescription', description); // Save preference
+                  _savePreference('gardenDescription', description!); // Save preference
+                },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    gardenDescriptionImages.add(imagePath);
+                  });
+                  _savePreferenceList('gardenDescriptionImages', gardenDescriptionImages); // Save preference
                 },
               ),
 
@@ -113,17 +136,24 @@ class _RearGardenState extends State<RearGarden> {
                 name: "Outside Lighting",
                 condition: outsideLighting,
                 description: outsideLighting,
+                images: outsideLightingImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     outsideLighting = condition;
                   });
-                  _savePreference('outsideLighting', condition); // Save preference
+                  _savePreference('outsideLighting', condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     outsideLighting = description;
                   });
-                  _savePreference('outsideLighting', description); // Save preference
+                  _savePreference('outsideLighting', description!); // Save preference
+                },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    outsideLightingImages.add(imagePath);
+                  });
+                  _savePreferenceList('outsideLightingImages', outsideLightingImages); // Save preference
                 },
               ),
 
@@ -132,17 +162,24 @@ class _RearGardenState extends State<RearGarden> {
                 name: "Summer House",
                 condition: summerHouse,
                 description: summerHouse,
+                images: summerHouseImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     summerHouse = condition;
                   });
-                  _savePreference('summerHouse', condition); // Save preference
+                  _savePreference('summerHouse', condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     summerHouse = description;
                   });
-                  _savePreference('summerHouse', description); // Save preference
+                  _savePreference('summerHouse', description!); // Save preference
+                },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    summerHouseImages.add(imagePath);
+                  });
+                  _savePreferenceList('summerHouseImages', summerHouseImages); // Save preference
                 },
               ),
 
@@ -151,17 +188,24 @@ class _RearGardenState extends State<RearGarden> {
                 name: "Shed",
                 condition: shed,
                 description: shed,
+                images: shedImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     shed = condition;
                   });
-                  _savePreference('shed', condition); // Save preference
+                  _savePreference('shed', condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     shed = description;
                   });
-                  _savePreference('shed', description); // Save preference
+                  _savePreference('shed', description!); // Save preference
+                },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    shedImages.add(imagePath);
+                  });
+                  _savePreferenceList('shedImages', shedImages); // Save preference
                 },
               ),
 
@@ -170,17 +214,24 @@ class _RearGardenState extends State<RearGarden> {
                 name: "Additional Information",
                 condition: additionalInformation,
                 description: additionalInformation,
+                images: additionalInformationImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     additionalInformation = condition;
                   });
-                  _savePreference('additionalInformation', condition); // Save preference
+                  _savePreference('additionalInformation', condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     additionalInformation = description;
                   });
-                  _savePreference('additionalInformation', description); // Save preference
+                  _savePreference('additionalInformation', description!); // Save preference
+                },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    additionalInformationImages.add(imagePath);
+                  });
+                  _savePreferenceList('additionalInformationImages', additionalInformationImages); // Save preference
                 },
               ),
 
@@ -197,16 +248,20 @@ class ConditionItem extends StatelessWidget {
   final String name;
   final String? condition;
   final String? description;
+  final List<String> images;
   final Function(String?) onConditionSelected;
   final Function(String?) onDescriptionSelected;
+  final Function(String) onImageAdded;
 
   const ConditionItem({
     Key? key,
     required this.name,
     this.condition,
     this.description,
+    required this.images,
     required this.onConditionSelected,
     required this.onDescriptionSelected,
+    required this.onImageAdded,
   }) : super(key: key);
 
   @override
@@ -266,19 +321,16 @@ class ConditionItem extends StatelessWidget {
                       color: kSecondaryTextColourTwo,
                     ),
                     onPressed: () async {
-                      // Initialize the camera when the button is pressed
                       final cameras = await availableCameras();
                       if (cameras.isNotEmpty) {
-                        final cameraController = CameraController(
-                          cameras.first,
-                          ResolutionPreset.high,
-                        );
-                        await cameraController.initialize();
                         Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) => CameraPreviewPage(
-                              cameraController: cameraController,
+                              camera: cameras.first,
+                              onPictureTaken: (imagePath) {
+                                onImageAdded(imagePath);
+                              },
                             ),
                           ),
                         );
@@ -289,7 +341,9 @@ class ConditionItem extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: 12,),
+          SizedBox(
+            height: 12,
+          ),
           GestureDetector(
             onTap: () async {
               final result = await Navigator.push(
@@ -316,7 +370,9 @@ class ConditionItem extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(height: 12,),
+          SizedBox(
+            height: 12,
+          ),
           GestureDetector(
             onTap: () async {
               final result = await Navigator.push(
@@ -343,6 +399,31 @@ class ConditionItem extends StatelessWidget {
               ),
             ),
           ),
+          SizedBox(
+            height: 12,
+          ),
+          images.isNotEmpty
+              ? Wrap(
+                  spacing: 8.0,
+                  runSpacing: 8.0,
+                  children: images.map((imagePath) {
+                    return Image.file(
+                      File(imagePath),
+                      width: 100,
+                      height: 100,
+                      fit: BoxFit.cover,
+                    );
+                  }).toList(),
+                )
+              : Text(
+                  "No images selected",
+                  style: TextStyle(
+                    fontSize: 12.0,
+                    fontWeight: FontWeight.w700,
+                    color: kPrimaryTextColourTwo,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
           Divider(thickness: 1, color: Color(0xFFC2C2C2)),
         ],
       ),

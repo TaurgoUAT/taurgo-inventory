@@ -6,10 +6,12 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart'; // Add this import for SharedPreferences
 import 'package:taurgo_inventory/pages/conditions/condition_details.dart';
 import 'package:taurgo_inventory/pages/edit_report_page.dart';
+import 'package:taurgo_inventory/pages/reportPages/camera_preview_page.dart';
+
 
 import '../../constants/AppColors.dart';
 import '../../widgets/add_action.dart';
-import '../camera_preview_page.dart';
+
 
 class KitchenPage extends StatefulWidget {
   final List<File>? capturedImages;
@@ -62,6 +64,26 @@ class _KitchenPageState extends State<KitchenPage> {
   String? flooringDescription;
   String? additionItemsCondition;
   String? additionItemsDescription;
+  List<String> doorImages = [];
+  List<String> doorFrameImages = [];
+  List<String> ceilingImages = [];
+  List<String> extractorFanImages = [];
+  List<String> lightingImages = [];
+  List<String> wallsImages = [];
+  List<String> skirtingImages = [];
+  List<String> windowSillImages = [];
+  List<String> curtainsImages = [];
+  List<String> blindsImages = [];
+  List<String> toiletImages = [];
+  List<String> basinImages = [];
+  List<String> showerCubicleImages = [];
+  List<String> bathImages = [];
+  List<String> switchBoardImages = [];
+  List<String> socketImages = [];
+  List<String> heatingImages = [];
+  List<String> accessoriesImages = [];
+  List<String> flooringImages = [];
+  List<String> additionItemsImages = [];
   late List<File> capturedImages;
 
   @override
@@ -116,6 +138,27 @@ class _KitchenPageState extends State<KitchenPage> {
       flooringDescription = prefs.getString('flooringDescription');
       additionItemsCondition = prefs.getString('additionItemsCondition');
       additionItemsDescription = prefs.getString('additionItemsDescription');
+
+      doorImages = prefs.getStringList('doorImages') ?? [];
+      doorFrameImages = prefs.getStringList('doorFrameImages') ?? [];
+      ceilingImages = prefs.getStringList('ceilingImages') ?? [];
+      extractorFanImages = prefs.getStringList('extractorFanImages') ?? [];
+      lightingImages = prefs.getStringList('lightingImages') ?? [];
+      wallsImages = prefs.getStringList('wallsImages') ?? [];
+      skirtingImages = prefs.getStringList('skirtingImages') ?? [];
+      windowSillImages = prefs.getStringList('windowSillImages') ?? [];
+      curtainsImages = prefs.getStringList('curtainsImages') ?? [];
+      blindsImages = prefs.getStringList('blindsImages') ?? [];
+      toiletImages = prefs.getStringList('toiletImages') ?? [];
+      basinImages = prefs.getStringList('basinImages') ?? [];
+      showerCubicleImages = prefs.getStringList('showerCubicleImages') ?? [];
+      bathImages = prefs.getStringList('bathImages') ?? [];
+      switchBoardImages = prefs.getStringList('switchBoardImages') ?? [];
+      socketImages = prefs.getStringList('socketImages') ?? [];
+      heatingImages = prefs.getStringList('heatingImages') ?? [];
+      accessoriesImages = prefs.getStringList('accessoriesImages') ?? [];
+      flooringImages = prefs.getStringList('flooringImages') ?? [];
+      additionItemsImages = prefs.getStringList('additionItemsImages') ?? [];
     });
   }
 
@@ -123,6 +166,11 @@ class _KitchenPageState extends State<KitchenPage> {
   Future<void> _savePreference(String key, String? value) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString(key, value ?? '');
+  }
+
+  Future<void> _savePreferenceList(String key, List<String> value) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setStringList(key, value);
   }
 
   @override
@@ -166,6 +214,7 @@ class _KitchenPageState extends State<KitchenPage> {
                 name: "Door",
                 condition: doorCondition,
                 description: newdoor,
+                images: doorImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     doorCondition = condition;
@@ -178,6 +227,12 @@ class _KitchenPageState extends State<KitchenPage> {
                   });
                   _savePreference('newdoor', description);
                 },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    doorImages.add(imagePath);
+                  });
+                  _savePreferenceList('doorImages', doorImages);
+                },
               ),
 
               // Door Frame
@@ -185,6 +240,7 @@ class _KitchenPageState extends State<KitchenPage> {
                 name: "Door Frame",
                 condition: doorFrameCondition,
                 description: doorFrameDescription,
+                images: doorFrameImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     doorFrameCondition = condition;
@@ -197,6 +253,12 @@ class _KitchenPageState extends State<KitchenPage> {
                   });
                   _savePreference('doorFrameDescription', description);
                 },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    doorFrameImages.add(imagePath);
+                  });
+                  _savePreferenceList('doorFrameImages', doorFrameImages);
+                },
               ),
 
               // Ceiling
@@ -204,6 +266,7 @@ class _KitchenPageState extends State<KitchenPage> {
                 name: "Ceiling",
                 condition: ceilingCondition,
                 description: ceilingDescription,
+                images: ceilingImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     ceilingCondition = condition;
@@ -216,6 +279,12 @@ class _KitchenPageState extends State<KitchenPage> {
                   });
                   _savePreference('ceilingDescription', description);
                 },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    ceilingImages.add(imagePath);
+                  });
+                  _savePreferenceList('ceilingImages', ceilingImages);
+                },
               ),
 
               // Extractor Fan
@@ -223,6 +292,7 @@ class _KitchenPageState extends State<KitchenPage> {
                 name: "Extractor Fan",
                 condition: extractorFanCondition,
                 description: extractorFanDescription,
+                images: extractorFanImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     extractorFanCondition = condition;
@@ -235,6 +305,12 @@ class _KitchenPageState extends State<KitchenPage> {
                   });
                   _savePreference('extractorFanDescription', description);
                 },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    extractorFanImages.add(imagePath);
+                  });
+                  _savePreferenceList('extractorFanImages', extractorFanImages);
+                },
               ),
 
               // Lighting
@@ -242,6 +318,7 @@ class _KitchenPageState extends State<KitchenPage> {
                 name: "Lighting",
                 condition: lightingCondition,
                 description: lightingDescription,
+                images: lightingImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     lightingCondition = condition;
@@ -254,6 +331,12 @@ class _KitchenPageState extends State<KitchenPage> {
                   });
                   _savePreference('lightingDescription', description);
                 },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    lightingImages.add(imagePath);
+                  });
+                  _savePreferenceList('lightingImages', lightingImages);
+                },
               ),
 
               // Walls
@@ -261,6 +344,7 @@ class _KitchenPageState extends State<KitchenPage> {
                 name: "Walls",
                 condition: wallsCondition,
                 description: wallsDescription,
+                images: wallsImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     wallsCondition = condition;
@@ -273,6 +357,12 @@ class _KitchenPageState extends State<KitchenPage> {
                   });
                   _savePreference('wallsDescription', description);
                 },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    wallsImages.add(imagePath);
+                  });
+                  _savePreferenceList('wallsImages', wallsImages);
+                },
               ),
 
               // Skirting
@@ -280,6 +370,7 @@ class _KitchenPageState extends State<KitchenPage> {
                 name: "Skirting",
                 condition: skirtingCondition,
                 description: skirtingDescription,
+                images: skirtingImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     skirtingCondition = condition;
@@ -292,6 +383,12 @@ class _KitchenPageState extends State<KitchenPage> {
                   });
                   _savePreference('skirtingDescription', description);
                 },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    skirtingImages.add(imagePath);
+                  });
+                  _savePreferenceList('skirtingImages', skirtingImages);
+                },
               ),
 
               // Window Sill
@@ -299,6 +396,7 @@ class _KitchenPageState extends State<KitchenPage> {
                 name: "Window Sill",
                 condition: windowSillCondition,
                 description: windowSillDescription,
+                images: windowSillImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     windowSillCondition = condition;
@@ -311,6 +409,12 @@ class _KitchenPageState extends State<KitchenPage> {
                   });
                   _savePreference('windowSillDescription', description);
                 },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    windowSillImages.add(imagePath);
+                  });
+                  _savePreferenceList('windowSillImages', windowSillImages);
+                },
               ),
 
               // Curtains
@@ -318,6 +422,7 @@ class _KitchenPageState extends State<KitchenPage> {
                 name: "Curtains",
                 condition: curtainsCondition,
                 description: curtainsDescription,
+                images: curtainsImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     curtainsCondition = condition;
@@ -330,6 +435,12 @@ class _KitchenPageState extends State<KitchenPage> {
                   });
                   _savePreference('curtainsDescription', description);
                 },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    curtainsImages.add(imagePath);
+                  });
+                  _savePreferenceList('curtainsImages', curtainsImages);
+                },
               ),
 
               // Blinds
@@ -337,6 +448,7 @@ class _KitchenPageState extends State<KitchenPage> {
                 name: "Blinds",
                 condition: blindsCondition,
                 description: blindsDescription,
+                images: blindsImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     blindsCondition = condition;
@@ -349,6 +461,12 @@ class _KitchenPageState extends State<KitchenPage> {
                   });
                   _savePreference('blindsDescription', description);
                 },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    blindsImages.add(imagePath);
+                  });
+                  _savePreferenceList('blindsImages', blindsImages);
+                },
               ),
 
               // Toilet
@@ -356,6 +474,7 @@ class _KitchenPageState extends State<KitchenPage> {
                 name: "Toilet",
                 condition: toiletCondition,
                 description: toiletDescription,
+                images: toiletImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     toiletCondition = condition;
@@ -368,6 +487,12 @@ class _KitchenPageState extends State<KitchenPage> {
                   });
                   _savePreference('toiletDescription', description);
                 },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    toiletImages.add(imagePath);
+                  });
+                  _savePreferenceList('toiletImages', toiletImages);
+                },
               ),
 
               // Basin
@@ -375,6 +500,7 @@ class _KitchenPageState extends State<KitchenPage> {
                 name: "Basin",
                 condition: basinCondition,
                 description: basinDescription,
+                images: basinImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     basinCondition = condition;
@@ -387,6 +513,12 @@ class _KitchenPageState extends State<KitchenPage> {
                   });
                   _savePreference('basinDescription', description);
                 },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    basinImages.add(imagePath);
+                  });
+                  _savePreferenceList('basinImages', basinImages);
+                },
               ),
 
               // Shower Cubicle
@@ -394,6 +526,7 @@ class _KitchenPageState extends State<KitchenPage> {
                 name: "Shower Cubicle",
                 condition: showerCubicleCondition,
                 description: showerCubicleDescription,
+                images: showerCubicleImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     showerCubicleCondition = condition;
@@ -406,6 +539,12 @@ class _KitchenPageState extends State<KitchenPage> {
                   });
                   _savePreference('showerCubicleDescription', description);
                 },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    showerCubicleImages.add(imagePath);
+                  });
+                  _savePreferenceList('showerCubicleImages', showerCubicleImages);
+                },
               ),
 
               // Bath
@@ -413,6 +552,7 @@ class _KitchenPageState extends State<KitchenPage> {
                 name: "Bath",
                 condition: bathCondition,
                 description: bathDescription,
+                images: bathImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     bathCondition = condition;
@@ -425,6 +565,12 @@ class _KitchenPageState extends State<KitchenPage> {
                   });
                   _savePreference('bathDescription', description);
                 },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    bathImages.add(imagePath);
+                  });
+                  _savePreferenceList('bathImages', bathImages);
+                },
               ),
 
               // Switch Board
@@ -432,6 +578,7 @@ class _KitchenPageState extends State<KitchenPage> {
                 name: "Switch Board",
                 condition: switchBoardCondition,
                 description: switchBoardDescription,
+                images: switchBoardImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     switchBoardCondition = condition;
@@ -444,6 +591,12 @@ class _KitchenPageState extends State<KitchenPage> {
                   });
                   _savePreference('switchBoardDescription', description);
                 },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    switchBoardImages.add(imagePath);
+                  });
+                  _savePreferenceList('switchBoardImages', switchBoardImages);
+                },
               ),
 
               // Socket
@@ -451,6 +604,7 @@ class _KitchenPageState extends State<KitchenPage> {
                 name: "Socket",
                 condition: socketCondition,
                 description: socketDescription,
+                images: socketImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     socketCondition = condition;
@@ -463,6 +617,12 @@ class _KitchenPageState extends State<KitchenPage> {
                   });
                   _savePreference('socketDescription', description);
                 },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    socketImages.add(imagePath);
+                  });
+                  _savePreferenceList('socketImages', socketImages);
+                },
               ),
 
               // Heating
@@ -470,6 +630,7 @@ class _KitchenPageState extends State<KitchenPage> {
                 name: "Heating",
                 condition: heatingCondition,
                 description: heatingDescription,
+                images: heatingImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     heatingCondition = condition;
@@ -482,6 +643,12 @@ class _KitchenPageState extends State<KitchenPage> {
                   });
                   _savePreference('heatingDescription', description);
                 },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    heatingImages.add(imagePath);
+                  });
+                  _savePreferenceList('heatingImages', heatingImages);
+                },
               ),
 
               // Accessories
@@ -489,6 +656,7 @@ class _KitchenPageState extends State<KitchenPage> {
                 name: "Accessories",
                 condition: accessoriesCondition,
                 description: accessoriesDescription,
+                images: accessoriesImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     accessoriesCondition = condition;
@@ -501,6 +669,12 @@ class _KitchenPageState extends State<KitchenPage> {
                   });
                   _savePreference('accessoriesDescription', description);
                 },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    accessoriesImages.add(imagePath);
+                  });
+                  _savePreferenceList('accessoriesImages', accessoriesImages);
+                },
               ),
 
               // Flooring
@@ -508,6 +682,7 @@ class _KitchenPageState extends State<KitchenPage> {
                 name: "Flooring",
                 condition: flooringCondition,
                 description: flooringDescription,
+                images: flooringImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     flooringCondition = condition;
@@ -520,6 +695,12 @@ class _KitchenPageState extends State<KitchenPage> {
                   });
                   _savePreference('flooringDescription', description);
                 },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    flooringImages.add(imagePath);
+                  });
+                  _savePreferenceList('flooringImages', flooringImages);
+                },
               ),
 
               // Addition Items
@@ -527,6 +708,7 @@ class _KitchenPageState extends State<KitchenPage> {
                 name: "Addition Items",
                 condition: additionItemsCondition,
                 description: additionItemsDescription,
+                images: additionItemsImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     additionItemsCondition = condition;
@@ -538,6 +720,12 @@ class _KitchenPageState extends State<KitchenPage> {
                     additionItemsDescription = description;
                   });
                   _savePreference('additionItemsDescription', description);
+                },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    additionItemsImages.add(imagePath);
+                  });
+                  _savePreferenceList('additionItemsImages', additionItemsImages);
                 },
               ),
 
@@ -554,16 +742,20 @@ class ConditionItem extends StatelessWidget {
   final String name;
   final String? condition;
   final String? description;
+  final List<String> images;
   final Function(String?) onConditionSelected;
   final Function(String?) onDescriptionSelected;
+  final Function(String) onImageAdded;
 
   const ConditionItem({
     Key? key,
     required this.name,
     this.condition,
     this.description,
+    required this.images,
     required this.onConditionSelected,
     required this.onDescriptionSelected,
+    required this.onImageAdded,
   }) : super(key: key);
 
   @override
@@ -623,19 +815,16 @@ class ConditionItem extends StatelessWidget {
                       color: kSecondaryTextColourTwo,
                     ),
                     onPressed: () async {
-                      // Initialize the camera when the button is pressed
                       final cameras = await availableCameras();
                       if (cameras.isNotEmpty) {
-                        final cameraController = CameraController(
-                          cameras.first,
-                          ResolutionPreset.high,
-                        );
-                        await cameraController.initialize();
                         Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) => CameraPreviewPage(
-                              cameraController: cameraController,
+                              camera: cameras.first,
+                              onPictureTaken: (imagePath) {
+                                onImageAdded(imagePath);
+                              },
                             ),
                           ),
                         );
@@ -704,6 +893,31 @@ class ConditionItem extends StatelessWidget {
               ),
             ),
           ),
+          SizedBox(
+            height: 12,
+          ),
+          images.isNotEmpty
+              ? Wrap(
+                  spacing: 8.0,
+                  runSpacing: 8.0,
+                  children: images.map((imagePath) {
+                    return Image.file(
+                      File(imagePath),
+                      width: 100,
+                      height: 100,
+                      fit: BoxFit.cover,
+                    );
+                  }).toList(),
+                )
+              : Text(
+                  "No images selected",
+                  style: TextStyle(
+                    fontSize: 12.0,
+                    fontWeight: FontWeight.w700,
+                    color: kPrimaryTextColourTwo,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
           Divider(thickness: 1, color: Color(0xFFC2C2C2)),
         ],
       ),

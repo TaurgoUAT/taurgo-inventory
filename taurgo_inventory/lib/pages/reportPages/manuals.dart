@@ -6,10 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart'; // Import shared_preferences
 import 'package:taurgo_inventory/pages/conditions/condition_details.dart';
 import 'package:taurgo_inventory/pages/edit_report_page.dart';
+import 'package:taurgo_inventory/pages/reportPages/camera_preview_page.dart';
 
 import '../../constants/AppColors.dart';
 import '../../widgets/add_action.dart';
-import '../camera_preview_page.dart';
 
 class Manuals extends StatefulWidget {
   final List<File>? capturedImages;
@@ -37,6 +37,14 @@ class _ManualsState extends State<Manuals> {
   String? energyPerformanceCertificateDescription;
   String? moveInChecklist;
   String? moveInChecklistDescription;
+  List<String> houseApplinceManualImages = [];
+  List<String> kitchenApplinceManualImages = [];
+  List<String> heatingManualImages = [];
+  List<String> landlordGasSafetyCertificateImages = [];
+  List<String> legionellaRiskAssessmentImages = [];
+  List<String> electricalSafetyCertificateImages = [];
+  List<String> energyPerformanceCertificateImages = [];
+  List<String> moveInChecklistImages = [];
   late List<File> capturedImages;
 
   @override
@@ -66,6 +74,15 @@ class _ManualsState extends State<Manuals> {
       energyPerformanceCertificateDescription = prefs.getString('energyPerformanceCertificateDescription');
       moveInChecklist = prefs.getString('moveInChecklist');
       moveInChecklistDescription = prefs.getString('moveInChecklistDescription');
+
+      houseApplinceManualImages = prefs.getStringList('houseApplinceManualImages') ?? [];
+      kitchenApplinceManualImages = prefs.getStringList('kitchenApplinceManualImages') ?? [];
+      heatingManualImages = prefs.getStringList('heatingManualImages') ?? [];
+      landlordGasSafetyCertificateImages = prefs.getStringList('landlordGasSafetyCertificateImages') ?? [];
+      legionellaRiskAssessmentImages = prefs.getStringList('legionellaRiskAssessmentImages') ?? [];
+      electricalSafetyCertificateImages = prefs.getStringList('electricalSafetyCertificateImages') ?? [];
+      energyPerformanceCertificateImages = prefs.getStringList('energyPerformanceCertificateImages') ?? [];
+      moveInChecklistImages = prefs.getStringList('moveInChecklistImages') ?? [];
     });
   }
 
@@ -73,6 +90,11 @@ class _ManualsState extends State<Manuals> {
   Future<void> _savePreference(String key, String? value) async {
     final prefs = await SharedPreferences.getInstance();
     prefs.setString(key, value ?? '');
+  }
+
+  Future<void> _savePreferenceList(String key, List<String> value) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setStringList(key, value);
   }
 
   @override
@@ -116,6 +138,7 @@ class _ManualsState extends State<Manuals> {
                 name: "House Appliance Manual",
                 condition: houseApplinceManual,
                 description: houseApplinceManualDescription,
+                images: houseApplinceManualImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     houseApplinceManual = condition;
@@ -128,6 +151,12 @@ class _ManualsState extends State<Manuals> {
                   });
                   _savePreference('houseApplinceManualDescription', description); // Save preference
                 },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    houseApplinceManualImages.add(imagePath);
+                  });
+                  _savePreferenceList('houseApplinceManualImages', houseApplinceManualImages);
+                },
               ),
 
               // Kitchen Appliance Manual
@@ -135,6 +164,7 @@ class _ManualsState extends State<Manuals> {
                 name: "Kitchen Appliance Manual",
                 condition: kitchenApplinceManual,
                 description: kitchenApplinceManualDescription,
+                images: kitchenApplinceManualImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     kitchenApplinceManual = condition;
@@ -147,6 +177,12 @@ class _ManualsState extends State<Manuals> {
                   });
                   _savePreference('kitchenApplinceManualDescription', description); // Save preference
                 },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    kitchenApplinceManualImages.add(imagePath);
+                  });
+                  _savePreferenceList('kitchenApplinceManualImages', kitchenApplinceManualImages);
+                },
               ),
 
               // Heating Manual
@@ -154,6 +190,7 @@ class _ManualsState extends State<Manuals> {
                 name: "Heating Manual",
                 condition: heatingManual,
                 description: heatingManualDescription,
+                images: heatingManualImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     heatingManual = condition;
@@ -166,6 +203,12 @@ class _ManualsState extends State<Manuals> {
                   });
                   _savePreference('heatingManualDescription', description); // Save preference
                 },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    heatingManualImages.add(imagePath);
+                  });
+                  _savePreferenceList('heatingManualImages', heatingManualImages);
+                },
               ),
 
               // Landlord Gas Safety Certificate
@@ -173,6 +216,7 @@ class _ManualsState extends State<Manuals> {
                 name: "Landlord Gas Safety Certificate",
                 condition: landlordGasSafetyCertificate,
                 description: landlordGasSafetyCertificateDescription,
+                images: landlordGasSafetyCertificateImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     landlordGasSafetyCertificate = condition;
@@ -185,6 +229,12 @@ class _ManualsState extends State<Manuals> {
                   });
                   _savePreference('landlordGasSafetyCertificateDescription', description); // Save preference
                 },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    landlordGasSafetyCertificateImages.add(imagePath);
+                  });
+                  _savePreferenceList('landlordGasSafetyCertificateImages', landlordGasSafetyCertificateImages);
+                },
               ),
 
               // Legionella Risk Assessment
@@ -192,6 +242,7 @@ class _ManualsState extends State<Manuals> {
                 name: "Legionella Risk Assessment",
                 condition: legionellaRiskAssessment,
                 description: legionellaRiskAssessmentDescription,
+                images: legionellaRiskAssessmentImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     legionellaRiskAssessment = condition;
@@ -204,6 +255,12 @@ class _ManualsState extends State<Manuals> {
                   });
                   _savePreference('legionellaRiskAssessmentDescription', description); // Save preference
                 },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    legionellaRiskAssessmentImages.add(imagePath);
+                  });
+                  _savePreferenceList('legionellaRiskAssessmentImages', legionellaRiskAssessmentImages);
+                },
               ),
 
               // Electrical Safety Certificate
@@ -211,6 +268,7 @@ class _ManualsState extends State<Manuals> {
                 name: "Electrical Safety Certificate",
                 condition: electricalSafetyCertificate,
                 description: electricalSafetyCertificateDescription,
+                images: electricalSafetyCertificateImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     electricalSafetyCertificate = condition;
@@ -223,6 +281,12 @@ class _ManualsState extends State<Manuals> {
                   });
                   _savePreference('electricalSafetyCertificateDescription', description); // Save preference
                 },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    electricalSafetyCertificateImages.add(imagePath);
+                  });
+                  _savePreferenceList('electricalSafetyCertificateImages', electricalSafetyCertificateImages);
+                },
               ),
 
               // Energy Performance Certificate
@@ -230,6 +294,7 @@ class _ManualsState extends State<Manuals> {
                 name: "Energy Performance Certificate",
                 condition: energyPerformanceCertificate,
                 description: energyPerformanceCertificateDescription,
+                images: energyPerformanceCertificateImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     energyPerformanceCertificate = condition;
@@ -242,6 +307,12 @@ class _ManualsState extends State<Manuals> {
                   });
                   _savePreference('energyPerformanceCertificateDescription', description); // Save preference
                 },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    energyPerformanceCertificateImages.add(imagePath);
+                  });
+                  _savePreferenceList('energyPerformanceCertificateImages', energyPerformanceCertificateImages);
+                },
               ),
 
               // Move In Checklist
@@ -249,6 +320,7 @@ class _ManualsState extends State<Manuals> {
                 name: "Move In Checklist",
                 condition: moveInChecklist,
                 description: moveInChecklistDescription,
+                images: moveInChecklistImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     moveInChecklist = condition;
@@ -261,6 +333,12 @@ class _ManualsState extends State<Manuals> {
                   });
                   _savePreference('moveInChecklistDescription', description); // Save preference
                 },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    moveInChecklistImages.add(imagePath);
+                  });
+                  _savePreferenceList('moveInChecklistImages', moveInChecklistImages);
+                },
               ),
 
               // Add more ConditionItem widgets as needed
@@ -271,21 +349,24 @@ class _ManualsState extends State<Manuals> {
     );
   }
 }
-
 class ConditionItem extends StatelessWidget {
   final String name;
   final String? condition;
   final String? description;
+  final List<String> images;
   final Function(String?) onConditionSelected;
   final Function(String?) onDescriptionSelected;
+  final Function(String) onImageAdded;
 
   const ConditionItem({
     Key? key,
     required this.name,
     this.condition,
     this.description,
+    required this.images,
     required this.onConditionSelected,
     required this.onDescriptionSelected,
+    required this.onImageAdded,
   }) : super(key: key);
 
   @override
@@ -345,19 +426,16 @@ class ConditionItem extends StatelessWidget {
                       color: kSecondaryTextColourTwo,
                     ),
                     onPressed: () async {
-                      // Initialize the camera when the button is pressed
                       final cameras = await availableCameras();
                       if (cameras.isNotEmpty) {
-                        final cameraController = CameraController(
-                          cameras.first,
-                          ResolutionPreset.high,
-                        );
-                        await cameraController.initialize();
                         Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) => CameraPreviewPage(
-                              cameraController: cameraController,
+                              camera: cameras.first,
+                              onPictureTaken: (imagePath) {
+                                onImageAdded(imagePath);
+                              },
                             ),
                           ),
                         );
@@ -368,7 +446,9 @@ class ConditionItem extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: 12,),
+          SizedBox(
+            height: 12,
+          ),
           GestureDetector(
             onTap: () async {
               final result = await Navigator.push(
@@ -395,7 +475,9 @@ class ConditionItem extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(height: 12,),
+          SizedBox(
+            height: 12,
+          ),
           GestureDetector(
             onTap: () async {
               final result = await Navigator.push(
@@ -422,6 +504,31 @@ class ConditionItem extends StatelessWidget {
               ),
             ),
           ),
+          SizedBox(
+            height: 12,
+          ),
+          images.isNotEmpty
+              ? Wrap(
+                  spacing: 8.0,
+                  runSpacing: 8.0,
+                  children: images.map((imagePath) {
+                    return Image.file(
+                      File(imagePath),
+                      width: 100,
+                      height: 100,
+                      fit: BoxFit.cover,
+                    );
+                  }).toList(),
+                )
+              : Text(
+                  "No images selected",
+                  style: TextStyle(
+                    fontSize: 12.0,
+                    fontWeight: FontWeight.w700,
+                    color: kPrimaryTextColourTwo,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
           Divider(thickness: 1, color: Color(0xFFC2C2C2)),
         ],
       ),

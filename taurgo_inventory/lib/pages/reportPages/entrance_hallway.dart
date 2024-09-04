@@ -6,10 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart'; // Import shared_preferences
 import 'package:taurgo_inventory/pages/conditions/condition_details.dart';
 import 'package:taurgo_inventory/pages/edit_report_page.dart';
+import 'package:taurgo_inventory/pages/reportPages/camera_preview_page.dart';
 
 import '../../constants/AppColors.dart';
 import '../../widgets/add_action.dart';
-import '../camera_preview_page.dart';
 
 class EntranceHallway extends StatefulWidget {
   final List<File>? capturedImages;
@@ -17,10 +17,10 @@ class EntranceHallway extends StatefulWidget {
   const EntranceHallway({super.key, this.capturedImages});
 
   @override
-  State<EntranceHallway> createState() => _EnsuiteState();
+  State<EntranceHallway> createState() => _EntranceHallwayState();
 }
 
-class _EnsuiteState extends State<EntranceHallway> {
+class _EntranceHallwayState extends State<EntranceHallway> {
   String? doorCondition;
   String? doorLocation;
   String? doorFrameCondition;
@@ -47,6 +47,33 @@ class _EnsuiteState extends State<EntranceHallway> {
   String? flooringLocation;
   String? additionalItemsCondition;
   String? additionalItemsLocation;
+  String? doorImagePaths;
+  String? doorFrameImagePaths;
+  String? ceilingImagePaths;
+  String? lightingImagePaths;
+  String? wallsImagePaths;
+  String? skirtingImagePaths;
+  String? windowSillImagePaths;
+  String? curtainsImagePaths;
+  String? blindsImagePaths;
+  String? lightSwitchesImagePaths;
+  String? socketsImagePaths;
+  String? flooringImagePaths;
+  String? additionalItemsImagePaths;
+
+  List<String> doorImages = [];
+  List<String> doorFrameImages = [];
+  List<String> ceilingImages = [];
+  List<String> lightingImages = [];
+  List<String> wallsImages = [];
+  List<String> skirtingImages = [];
+  List<String> windowSillImages = [];
+  List<String> curtainsImages = [];
+  List<String> blindsImages = [];
+  List<String> lightSwitchesImages = [];
+  List<String> socketsImages = [];
+  List<String> flooringImages = [];
+  List<String> additionalItemsImages = [];
   late List<File> capturedImages;
 
   @override
@@ -86,6 +113,21 @@ class _EnsuiteState extends State<EntranceHallway> {
       flooringLocation = prefs.getString('flooringLocation');
       additionalItemsCondition = prefs.getString('additionalItemsCondition');
       additionalItemsLocation = prefs.getString('additionalItemsLocation');
+
+      doorImages = prefs.getStringList('doorImages') ?? [];
+      doorFrameImages = prefs.getStringList('doorFrameImages') ?? [];
+      ceilingImages = prefs.getStringList('ceilingImages') ?? [];
+      lightingImages = prefs.getStringList('lightingImages') ?? [];
+      wallsImages = prefs.getStringList('wallsImages') ?? [];
+      skirtingImages = prefs.getStringList('skirtingImages') ?? [];
+      windowSillImages = prefs.getStringList('windowSillImages') ?? [];
+      curtainsImages = prefs.getStringList('curtainsImages') ?? [];
+      blindsImages = prefs.getStringList('blindsImages') ?? [];
+      lightSwitchesImages = prefs.getStringList('lightSwitchesImages') ?? [];
+      socketsImages = prefs.getStringList('socketsImages') ?? [];
+      flooringImages = prefs.getStringList('flooringImages') ?? [];
+      additionalItemsImages =
+          prefs.getStringList('additionalItemsImages') ?? [];
     });
   }
 
@@ -93,6 +135,11 @@ class _EnsuiteState extends State<EntranceHallway> {
   Future<void> _savePreference(String key, String? value) async {
     final prefs = await SharedPreferences.getInstance();
     prefs.setString(key, value ?? '');
+  }
+
+  Future<void> _savePreferenceList(String key, List<String> value) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setStringList(key, value);
   }
 
   @override
@@ -136,17 +183,25 @@ class _EnsuiteState extends State<EntranceHallway> {
                 name: "Door",
                 condition: doorCondition,
                 location: doorLocation,
+                images: doorImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     doorCondition = condition;
                   });
-                  _savePreference('doorCondition', condition); // Save preference
+                  _savePreference(
+                      'doorCondition', condition); // Save preference
                 },
                 onLocationSelected: (location) {
                   setState(() {
                     doorLocation = location;
                   });
                   _savePreference('doorLocation', location); // Save preference
+                },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    doorImages.add(imagePath);
+                  });
+                  _savePreferenceList('doorImages', doorImages);
                 },
               ),
 
@@ -155,17 +210,26 @@ class _EnsuiteState extends State<EntranceHallway> {
                 name: "Door Frame",
                 condition: doorFrameCondition,
                 location: doorFrameLocation,
+                images: doorFrameImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     doorFrameCondition = condition;
                   });
-                  _savePreference('doorFrameCondition', condition); // Save preference
+                  _savePreference(
+                      'doorFrameCondition', condition); // Save preference
                 },
                 onLocationSelected: (location) {
                   setState(() {
                     doorFrameLocation = location;
                   });
-                  _savePreference('doorFrameLocation', location); // Save preference
+                  _savePreference(
+                      'doorFrameLocation', location); // Save preference
+                },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    doorFrameImages.add(imagePath);
+                  });
+                  _savePreferenceList('doorFrameImages', doorFrameImages);
                 },
               ),
 
@@ -174,17 +238,26 @@ class _EnsuiteState extends State<EntranceHallway> {
                 name: "Ceiling",
                 condition: ceilingCondition,
                 location: ceilingLocation,
+                images: ceilingImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     ceilingCondition = condition;
                   });
-                  _savePreference('ceilingCondition', condition); // Save preference
+                  _savePreference(
+                      'ceilingCondition', condition); // Save preference
                 },
                 onLocationSelected: (location) {
                   setState(() {
                     ceilingLocation = location;
                   });
-                  _savePreference('ceilingLocation', location); // Save preference
+                  _savePreference(
+                      'ceilingLocation', location); // Save preference
+                },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    ceilingImages.add(imagePath);
+                  });
+                  _savePreferenceList('ceilingImages', ceilingImages);
                 },
               ),
 
@@ -193,17 +266,26 @@ class _EnsuiteState extends State<EntranceHallway> {
                 name: "Lighting",
                 condition: lightingCondition,
                 location: lightingLocation,
+                images: lightingImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     lightingCondition = condition;
                   });
-                  _savePreference('lightingCondition', condition); // Save preference
+                  _savePreference(
+                      'lightingCondition', condition); // Save preference
                 },
                 onLocationSelected: (location) {
                   setState(() {
                     lightingLocation = location;
                   });
-                  _savePreference('lightingLocation', location); // Save preference
+                  _savePreference(
+                      'lightingLocation', location); // Save preference
+                },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    lightingImages.add(imagePath);
+                  });
+                  _savePreferenceList('lightingImages', lightingImages);
                 },
               ),
 
@@ -212,17 +294,25 @@ class _EnsuiteState extends State<EntranceHallway> {
                 name: "Walls",
                 condition: wallsCondition,
                 location: wallsLocation,
+                images: wallsImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     wallsCondition = condition;
                   });
-                  _savePreference('wallsCondition', condition); // Save preference
+                  _savePreference(
+                      'wallsCondition', condition); // Save preference
                 },
                 onLocationSelected: (location) {
                   setState(() {
                     wallsLocation = location;
                   });
                   _savePreference('wallsLocation', location); // Save preference
+                },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    wallsImages.add(imagePath);
+                  });
+                  _savePreferenceList('wallsImages', wallsImages);
                 },
               ),
 
@@ -231,17 +321,26 @@ class _EnsuiteState extends State<EntranceHallway> {
                 name: "Skirting",
                 condition: skirtingCondition,
                 location: skirtingLocation,
+                images: skirtingImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     skirtingCondition = condition;
                   });
-                  _savePreference('skirtingCondition', condition); // Save preference
+                  _savePreference(
+                      'skirtingCondition', condition); // Save preference
                 },
                 onLocationSelected: (location) {
                   setState(() {
                     skirtingLocation = location;
                   });
-                  _savePreference('skirtingLocation', location); // Save preference
+                  _savePreference(
+                      'skirtingLocation', location); // Save preference
+                },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    skirtingImages.add(imagePath);
+                  });
+                  _savePreferenceList('skirtingImages', skirtingImages);
                 },
               ),
 
@@ -250,17 +349,26 @@ class _EnsuiteState extends State<EntranceHallway> {
                 name: "Window Sill",
                 condition: windowSillCondition,
                 location: windowSillLocation,
+                images: windowSillImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     windowSillCondition = condition;
                   });
-                  _savePreference('windowSillCondition', condition); // Save preference
+                  _savePreference(
+                      'windowSillCondition', condition); // Save preference
                 },
                 onLocationSelected: (location) {
                   setState(() {
                     windowSillLocation = location;
                   });
-                  _savePreference('windowSillLocation', location); // Save preference
+                  _savePreference(
+                      'windowSillLocation', location); // Save preference
+                },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    windowSillImages.add(imagePath);
+                  });
+                  _savePreferenceList('windowSillImages', windowSillImages);
                 },
               ),
 
@@ -269,17 +377,26 @@ class _EnsuiteState extends State<EntranceHallway> {
                 name: "Curtains",
                 condition: curtainsCondition,
                 location: curtainsLocation,
+                images: curtainsImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     curtainsCondition = condition;
                   });
-                  _savePreference('curtainsCondition', condition); // Save preference
+                  _savePreference(
+                      'curtainsCondition', condition); // Save preference
                 },
                 onLocationSelected: (location) {
                   setState(() {
                     curtainsLocation = location;
                   });
-                  _savePreference('curtainsLocation', location); // Save preference
+                  _savePreference(
+                      'curtainsLocation', location); // Save preference
+                },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    curtainsImages.add(imagePath);
+                  });
+                  _savePreferenceList('curtainsImages', curtainsImages);
                 },
               ),
 
@@ -288,17 +405,26 @@ class _EnsuiteState extends State<EntranceHallway> {
                 name: "Blinds",
                 condition: blindsCondition,
                 location: blindsLocation,
+                images: blindsImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     blindsCondition = condition;
                   });
-                  _savePreference('blindsCondition', condition); // Save preference
+                  _savePreference(
+                      'blindsCondition', condition); // Save preference
                 },
                 onLocationSelected: (location) {
                   setState(() {
                     blindsLocation = location;
                   });
-                  _savePreference('blindsLocation', location); // Save preference
+                  _savePreference(
+                      'blindsLocation', location); // Save preference
+                },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    blindsImages.add(imagePath);
+                  });
+                  _savePreferenceList('blindsImages', blindsImages);
                 },
               ),
 
@@ -307,17 +433,27 @@ class _EnsuiteState extends State<EntranceHallway> {
                 name: "Light Switches",
                 condition: lightSwitchesCondition,
                 location: lightSwitchesLocation,
+                images: lightSwitchesImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     lightSwitchesCondition = condition;
                   });
-                  _savePreference('lightSwitchesCondition', condition); // Save preference
+                  _savePreference(
+                      'lightSwitchesCondition', condition); // Save preference
                 },
                 onLocationSelected: (location) {
                   setState(() {
                     lightSwitchesLocation = location;
                   });
-                  _savePreference('lightSwitchesLocation', location); // Save preference
+                  _savePreference(
+                      'lightSwitchesLocation', location); // Save preference
+                },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    lightSwitchesImages.add(imagePath);
+                  });
+                  _savePreferenceList(
+                      'lightSwitchesImages', lightSwitchesImages);
                 },
               ),
 
@@ -326,17 +462,26 @@ class _EnsuiteState extends State<EntranceHallway> {
                 name: "Sockets",
                 condition: socketsCondition,
                 location: socketsLocation,
+                images: socketsImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     socketsCondition = condition;
                   });
-                  _savePreference('socketsCondition', condition); // Save preference
+                  _savePreference(
+                      'socketsCondition', condition); // Save preference
                 },
                 onLocationSelected: (location) {
                   setState(() {
                     socketsLocation = location;
                   });
-                  _savePreference('socketsLocation', location); // Save preference
+                  _savePreference(
+                      'socketsLocation', location); // Save preference
+                },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    socketsImages.add(imagePath);
+                  });
+                  _savePreferenceList('socketsImages', socketsImages);
                 },
               ),
 
@@ -345,17 +490,26 @@ class _EnsuiteState extends State<EntranceHallway> {
                 name: "Flooring",
                 condition: flooringCondition,
                 location: flooringLocation,
+                images: flooringImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     flooringCondition = condition;
                   });
-                  _savePreference('flooringCondition', condition); // Save preference
+                  _savePreference(
+                      'flooringCondition', condition); // Save preference
                 },
                 onLocationSelected: (location) {
                   setState(() {
                     flooringLocation = location;
                   });
-                  _savePreference('flooringLocation', location); // Save preference
+                  _savePreference(
+                      'flooringLocation', location); // Save preference
+                },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    flooringImages.add(imagePath);
+                  });
+                  _savePreferenceList('flooringImages', flooringImages);
                 },
               ),
 
@@ -364,17 +518,27 @@ class _EnsuiteState extends State<EntranceHallway> {
                 name: "Additional Items",
                 condition: additionalItemsCondition,
                 location: additionalItemsLocation,
+                images: additionalItemsImages,
                 onConditionSelected: (condition) {
                   setState(() {
                     additionalItemsCondition = condition;
                   });
-                  _savePreference('additionalItemsCondition', condition); // Save preference
+                  _savePreference(
+                      'additionalItemsCondition', condition); // Save preference
                 },
                 onLocationSelected: (location) {
                   setState(() {
                     additionalItemsLocation = location;
                   });
-                  _savePreference('additionalItemsLocation', location); // Save preference
+                  _savePreference(
+                      'additionalItemsLocation', location); // Save preference
+                },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    additionalItemsImages.add(imagePath);
+                  });
+                  _savePreferenceList(
+                      'additionalItemsImages', additionalItemsImages);
                 },
               ),
             ],
@@ -389,16 +553,20 @@ class ConditionItem extends StatelessWidget {
   final String name;
   final String? condition;
   final String? location;
+  final List<String> images;
   final Function(String?) onConditionSelected;
   final Function(String?) onLocationSelected;
+  final Function(String) onImageAdded;
 
   const ConditionItem({
     Key? key,
     required this.name,
     this.condition,
     this.location,
+    required this.images,
     required this.onConditionSelected,
     required this.onLocationSelected,
+    required this.onImageAdded,
   }) : super(key: key);
 
   @override
@@ -458,19 +626,16 @@ class ConditionItem extends StatelessWidget {
                       color: kSecondaryTextColourTwo,
                     ),
                     onPressed: () async {
-                      // Initialize the camera when the button is pressed
                       final cameras = await availableCameras();
                       if (cameras.isNotEmpty) {
-                        final cameraController = CameraController(
-                          cameras.first,
-                          ResolutionPreset.high,
-                        );
-                        await cameraController.initialize();
                         Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) => CameraPreviewPage(
-                              cameraController: cameraController,
+                              camera: cameras.first,
+                              onPictureTaken: (imagePath) {
+                                onImageAdded(imagePath);
+                              },
                             ),
                           ),
                         );
@@ -481,7 +646,9 @@ class ConditionItem extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: 12,),
+          SizedBox(
+            height: 12,
+          ),
           GestureDetector(
             onTap: () async {
               final result = await Navigator.push(
@@ -493,6 +660,7 @@ class ConditionItem extends StatelessWidget {
                   ),
                 ),
               );
+
               if (result != null) {
                 onConditionSelected(result);
               }
@@ -527,7 +695,7 @@ class ConditionItem extends StatelessWidget {
               }
             },
             child: Text(
-              location?.isNotEmpty == true ? location! : "Description",
+              location?.isNotEmpty == true ? location! : "Location",
               style: TextStyle(
                 fontSize: 12.0,
                 fontWeight: FontWeight.w700,
@@ -536,6 +704,31 @@ class ConditionItem extends StatelessWidget {
               ),
             ),
           ),
+          SizedBox(
+            height: 12,
+          ),
+          images.isNotEmpty
+              ? Wrap(
+                  spacing: 8.0,
+                  runSpacing: 8.0,
+                  children: images.map((imagePath) {
+                    return Image.file(
+                      File(imagePath),
+                      width: 100,
+                      height: 100,
+                      fit: BoxFit.cover,
+                    );
+                  }).toList(),
+                )
+              : Text(
+                  "No images selected",
+                  style: TextStyle(
+                    fontSize: 12.0,
+                    fontWeight: FontWeight.w700,
+                    color: kPrimaryTextColourTwo,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
           Divider(thickness: 1, color: Color(0xFFC2C2C2)),
         ],
       ),
