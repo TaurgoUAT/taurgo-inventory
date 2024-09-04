@@ -1,16 +1,19 @@
 import 'dart:async';
-import 'dart:io';
-import 'package:camera/camera.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:taurgo_inventory/pages/conditions/condition_details.dart';
-import 'package:taurgo_inventory/pages/edit_report_page.dart';
 import 'package:taurgo_inventory/pages/landing_screen.dart';
 import '../../constants/AppColors.dart';
-import '../../widgets/add_action.dart';
 import 'package:digital_signature_flutter/digital_signature_flutter.dart';
 import 'package:flutter/services.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:taurgo_inventory/constants/UrlConstants.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
+import '../Dtos/AddressDto.dart';
+import '../Dtos/InspectionReportDto.dart';
+import '../Dtos/PropertyDto.dart';
+import '../Dtos/UserDto.dart';
 
 class InspectionConfimationPage extends StatefulWidget {
   const InspectionConfimationPage({super.key});
@@ -23,33 +26,272 @@ class InspectionConfimationPage extends StatefulWidget {
 class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
   SignatureController? controller;
   Uint8List? signature;
+  List<Map<String, dynamic>> completedProperties = [];
+  List<Map<String, dynamic>> pendingProperties = [];
+  bool isLoading = true;
+  String filterOption = 'All'; // Initial filter option
+  List<Map<String, dynamic>> filteredProperties = [];
+  List<Map<String, dynamic>> properties = [];
+  List<Map<String, dynamic>> userDetails= [];
+  User? user;
+  late PropertyDto property;
+  // @override
+  // void initState() {
+  //   getFirebaseUserId();
+  //   // fetchProperties();
+  //   controller = SignatureController(penStrokeWidth: 2, penColor: Colors.black);
+  //   super.initState();
+  //
+  // }
 
   @override
   void initState() {
+    getFirebaseUserId();
+    // fetchProperties();
     controller = SignatureController(penStrokeWidth: 2, penColor: Colors.black);
     super.initState();
+    super.initState();
+    // Initialize your property object with data
+    property = PropertyDto(
+      id: 'property123',
+      addressDto: AddressDto(
+        addressLineOne: '123 Main St',
+        addressLineTwo: 'Kurumankadu',
+        city: 'Vavuniya',
+        state: 'Western',
+        country: 'Sri Lanka',
+        postalCode: '12345',
+      ),
+      userDto: UserDto(
+        firebaseId: 'user001',
+        firstName: 'Abishan',
+        lastName: 'Ananthan',
+        userName: 'abishaan09',
+        email: 'abiabishan09@gmail.com',
+        location: '+Vavuniya',
+      ),
+      inspectionDto: InspectionDto(
+        inspectionId: 'insp001',
+        inspectorName: 'Jane Smith',
+        inspectionType: 'Check Out',
+        date: '2024-09-01',
+        time: '2024-09-01',
+        keyLocation: '2024-09-01',
+        keyReference: '2024-09-01',
+        internalNotes: '2024-09-01',
+        inspectionReports: [
+          InspectionReportDto(
+            reportId: 'report001',
+            name: 'Schedule of Condition',
+            subTypes: [
+              SubTypeDto(
+                subTypeId: 'subType001',
+                subTypeName: 'Overview - Odours',
+                images: ['https://www.loans.com.au/dA/9de8aa8d51/what-factors-affect-property-value.png'],
+                comments: 'Condition: Good, Additional Comments: Good',
+                feedback: '',
+              ),
+
+              SubTypeDto(
+                subTypeId: 'subType001',
+                subTypeName: 'Overview - Odours',
+                images: ['https://www.loans.com.au/dA/9de8aa8d51/what-factors-affect-property-value.png'],
+                comments: 'Condition: Good, Additional Comments: Good',
+                feedback: '',
+              ),
+
+              SubTypeDto(
+                subTypeId: 'subType001',
+                subTypeName: 'Overview - Odours',
+                images: ['https://www.loans.com.au/dA/9de8aa8d51/what-factors-affect-property-value.png'],
+                comments: 'Condition: Good, Additional Comments: Good',
+                feedback: '',
+              ),
+
+              SubTypeDto(
+                subTypeId: 'subType001',
+                subTypeName: 'Overview - Odours',
+                images: ['https://www.loans.com.au/dA/9de8aa8d51/what-factors-affect-property-value.png'],
+                comments: 'Condition: Good, Additional Comments: Good',
+                feedback: '',
+              ),
+
+              SubTypeDto(
+                subTypeId: 'subType001',
+                subTypeName: 'Overview - Odours',
+                images: ['https://www.loans.com.au/dA/9de8aa8d51/what-factors-affect-property-value.png'],
+                comments: 'Condition: Good, Additional Comments: Good',
+                feedback: '',
+              ),
+
+              SubTypeDto(
+                subTypeId: 'subType001',
+                subTypeName: 'Overview - Odours',
+                images: ['https://www.loans.com.au/dA/9de8aa8d51/what-factors-affect-property-value.png'],
+                comments: 'Condition: Good, Additional Comments: Good',
+                feedback: '',
+              ),
+
+              SubTypeDto(
+                subTypeId: 'subType001',
+                subTypeName: 'Overview - Odours',
+                images: ['https://www.loans.com.au/dA/9de8aa8d51/what-factors-affect-property-value.png'],
+                comments: 'Condition: Good, Additional Comments: Good',
+                feedback: '',
+              ),
+
+              SubTypeDto(
+                subTypeId: 'subType001',
+                subTypeName: 'Overview - Odours',
+                images: ['https://www.loans.com.au/dA/9de8aa8d51/what-factors-affect-property-value.png'],
+                comments: 'Condition: Good, Additional Comments: Good',
+                feedback: '',
+              ),
+              SubTypeDto(
+                subTypeId: 'subType001',
+                subTypeName: 'Overview - Odours',
+                images: ['https://www.loans.com.au/dA/9de8aa8d51/what-factors-affect-property-value.png'],
+                comments: 'Condition: Good, Additional Comments: Good',
+                feedback: '',
+              ),
+
+              // Add more SubTypeDto items as needed
+            ],
+            additionalComments: 'All areas in good condition.',
+          ),
+          // Add more InspectionReportDto items as needed
+        ],
+      ),
+    );
   }
+
+  Future<void> _saveData() async {
+    try {
+      await sendPropertyData(property);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Data saved successfully!'),
+      ));
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Failed to save data: $e'),
+      ));
+    }
+  }
+
+  Future<void> sendPropertyData(PropertyDto property) async {
+    final url = '$baseURL/summary/generateReport'; // Replace with your backend URL
+    final headers = {'Content-Type': 'application/json'};
+    final body = jsonEncode(property.toJson());
+
+    final response = await http.post(
+      Uri.parse(url),
+      headers: headers,
+      body: body,
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to save data: ${response.reasonPhrase}');
+    }
+  }
+
+  late String firebaseId;
+
+  Future<void> getFirebaseUserId() async {
+    try {
+      user = FirebaseAuth.instance.currentUser;
+
+      if (user != null) {
+        setState(() {
+          firebaseId = user!.uid;
+        });
+        fetchUserDetails();
+      } else {
+        print("No user is currently signed in.");
+      }
+    } catch (e) {
+      print("Error getting user UID: $e");
+    }
+  }
+
+  Future<void> fetchUserDetails() async {
+    try {
+      final response = await http.get(Uri.parse
+        ('$baseURL/user/firebaseId/$firebaseId'));
+
+      if (response.statusCode == 200) {
+        print(response.statusCode);
+        final List<dynamic>userData = json.decode(response.body);
+
+        if (mounted) {
+          setState(() {
+            // Assuming you have a userDetails map to store user information
+            userDetails =
+                userData.map((item) => item as Map<String, dynamic>).toList();
+            print(userDetails.length);
+            isLoading = false;
+          });
+        }
+      } else {
+        print("Failed to load user data: ${response.statusCode}");
+        if (mounted) {
+          setState(() {
+            isLoading = false;
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text("Failed to load user data. Please try again."),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      print("Error fetching user data: $e");
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    }
+  }
+
+  // Future<void> sendPropertyData(PropertyDto.dart property) async {
+  //   final url = 'http://your-backend-url/api/property';
+  //   final headers = {'Content-Type': 'application/json'};
+  //   final body = jsonEncode(property.toJson());
+  //
+  //   final response = await http.post(
+  //     Uri.parse(url),
+  //     headers: headers,
+  //     body: body,
+  //   );
+  //
+  //   if (response.statusCode == 200) {
+  //     print('Data sent successfully');
+  //   } else {
+  //     print('Failed to send data: ${response.reasonPhrase}');
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
     final List<Map<String, dynamic>> data = [
       //Schedule of Condition',
       {
-        'title': '1 Schedule of Condition',
+        'title': '1. Schedule of Condition',
         'icon': Icons.schedule,
         'subItems': [
-
           // Overview
           {
-            'title': '1.1 Name - Overview',
+            'title': '1.1 Overview - Odours',
             'details': [
               {'label': 'Condition', 'value': 'Good'},
+              {'label': 'Additional Comments', 'value': 'Good'},
             ],
             'images': ['path_to_image1', 'path_to_image2']
             // Use image paths or URLs
           },
           {
-            'title': '1.2 Name - Cleanliness',
+            'title': '1.2 Genral Cleanliness',
             'details': [
               {'label': 'Condition', 'value': 'Clean'},
             ],
@@ -57,7 +299,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
             // Use image paths or URLs
           },
           {
-            'title': '1.1 Name - Overview',
+            'title': '1.3 Bathroom/En Suite/ Toilet(s)',
             'details': [
               {'label': 'Condition', 'value': 'Good'},
             ],
@@ -65,7 +307,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
             // Use image paths or URLs
           },
           {
-            'title': '1.2 Name - Cleanliness',
+            'title': '1.4 Carpets',
             'details': [
               {'label': 'Condition', 'value': 'Clean'},
             ],
@@ -73,7 +315,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
             // Use image paths or URLs
           },
           {
-            'title': '1.1 Name - Overview',
+            'title': '1.5 Ceiling(s)',
             'details': [
               {'label': 'Condition', 'value': 'Good'},
             ],
@@ -81,7 +323,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
             // Use image paths or URLs
           },
           {
-            'title': '1.2 Name - Cleanliness',
+            'title': '1.6 Curtains/Blinds',
             'details': [
               {'label': 'Condition', 'value': 'Clean'},
             ],
@@ -89,7 +331,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
             // Use image paths or URLs
           },
           {
-            'title': '1.1 Name - Overview',
+            'title': '1.7 Hard Flooring',
             'details': [
               {'label': 'Condition', 'value': 'Good'},
             ],
@@ -97,7 +339,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
             // Use image paths or URLs
           },
           {
-            'title': '1.2 Name - Cleanliness',
+            'title': '1.8 Kitchen Area',
             'details': [
               {'label': 'Condition', 'value': 'Clean'},
             ],
@@ -105,7 +347,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
             // Use image paths or URLs
           },
           {
-            'title': '1.1 Name - Overview',
+            'title': '1.9 Kitchen - White Goods',
             'details': [
               {'label': 'Condition', 'value': 'Good'},
             ],
@@ -113,7 +355,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
             // Use image paths or URLs
           },
           {
-            'title': '1.2 Name - Cleanliness',
+            'title': '1.10 Oven/Hob/Extractor Hood/Cooker',
             'details': [
               {'label': 'Condition', 'value': 'Clean'},
             ],
@@ -121,7 +363,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
             // Use image paths or URLs
           },
           {
-            'title': '1.1 Name - Overview',
+            'title': '1.11 Mattress(s)',
             'details': [
               {'label': 'Condition', 'value': 'Good'},
             ],
@@ -129,7 +371,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
             // Use image paths or URLs
           },
           {
-            'title': '1.2 Name - Cleanliness',
+            'title': '1.12 Upholstery',
             'details': [
               {'label': 'Condition', 'value': 'Clean'},
             ],
@@ -137,7 +379,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
             // Use image paths or URLs
           },
           {
-            'title': '1.1 Name - Overview',
+            'title': '1.13 Wall(s)',
             'details': [
               {'label': 'Condition', 'value': 'Good'},
             ],
@@ -145,7 +387,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
             // Use image paths or URLs
           },
           {
-            'title': '1.2 Name - Cleanliness',
+            'title': '1.14 Window(s)',
             'details': [
               {'label': 'Condition', 'value': 'Clean'},
             ],
@@ -153,29 +395,44 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
             // Use image paths or URLs
           },
           {
-            'title': '1.1 Name - Overview',
+            'title': '1.15 Woodwork',
             'details': [
               {'label': 'Condition', 'value': 'Good'},
             ],
             'images': ['path_to_image1', 'path_to_image2']
             // Use image paths or URLs
           },
-          {
-            'title': '1.2 Name - Cleanliness',
-            'details': [
-              {'label': 'Condition', 'value': 'Clean'},
-            ],
-            'images': ['path_to_image3', 'path_to_image4']
-            // Use image paths or URLs
-          },
+          // {
+          //   'title': '1.2 Name - Cleanliness',
+          //   'details': [
+          //     {'label': 'Condition', 'value': 'Clean'},
+          //   ],
+          //   'images': ['path_to_image3', 'path_to_image4']
+          //   // Use image paths or URLs
+          // },
         ],
       },
       {
-        'title': '2 Staircase',
-        'icon': Icons.stairs,
+        'title': '2. EV Charger(s)',
+        'icon': Icons.charging_station,
         'subItems': [
           {
-            'title': '2.1 Name - Overview',
+            'title': '2.1 Overview',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+
+        ],
+      },
+      {
+        'title': '3. Meter Readings',
+        'icon': Icons.gas_meter,
+        'subItems': [
+          {
+            'title': '3.1 Gas Meter ',
             'details': [
               {'label': 'Condition', 'value': 'Good'},
             ],
@@ -183,7 +440,31 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
             // Use image paths or URLs
           },
           {
-            'title': '2.2 Name - Cleanliness',
+            'title': '3.2 Electric Meter ',
+            'details': [
+              {'label': 'Condition', 'value': 'Clean'},
+            ],
+            'images': ['path_to_image7', 'path_to_image8']
+            // Use image paths or URLs
+          },
+          {
+            'title': '3.3 Water Meter ',
+            'details': [
+              {'label': 'Condition', 'value': 'Clean'},
+            ],
+            'images': ['path_to_image7', 'path_to_image8']
+            // Use image paths or URLs
+          },
+          {
+            'title': '3.4 Oil Meter ',
+            'details': [
+              {'label': 'Condition', 'value': 'Clean'},
+            ],
+            'images': ['path_to_image7', 'path_to_image8']
+            // Use image paths or URLs
+          },
+          {
+            'title': '3.5 Other ',
             'details': [
               {'label': 'Condition', 'value': 'Clean'},
             ],
@@ -193,11 +474,11 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
         ],
       },
       {
-        'title': '2 Staircase',
-        'icon': Icons.stairs,
+        'title': '4. Keys',
+        'icon': Icons.key,
         'subItems': [
           {
-            'title': '2.1 Name - Overview',
+            'title': '4.1 Yale ',
             'details': [
               {'label': 'Condition', 'value': 'Good'},
             ],
@@ -205,7 +486,47 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
             // Use image paths or URLs
           },
           {
-            'title': '2.2 Name - Cleanliness',
+            'title': '4.2 Mortice',
+            'details': [
+              {'label': 'Condition', 'value': 'Clean'},
+            ],
+            'images': ['path_to_image7', 'path_to_image8']
+            // Use image paths or URLs
+          },
+          {
+            'title': '4.3 Window Lock',
+            'details': [
+              {'label': 'Condition', 'value': 'Clean'},
+            ],
+            'images': ['path_to_image7', 'path_to_image8']
+            // Use image paths or URLs
+          },
+          {
+            'title': '4.4 Gas/Electric Meter ',
+            'details': [
+              {'label': 'Condition', 'value': 'Clean'},
+            ],
+            'images': ['path_to_image7', 'path_to_image8']
+            // Use image paths or URLs
+          },
+          {
+            'title': '4.5 Car Pass/Permit ',
+            'details': [
+              {'label': 'Condition', 'value': 'Clean'},
+            ],
+            'images': ['path_to_image7', 'path_to_image8']
+            // Use image paths or URLs
+          },
+          {
+            'title': '4.6 Remote/Security Fob ',
+            'details': [
+              {'label': 'Condition', 'value': 'Clean'},
+            ],
+            'images': ['path_to_image7', 'path_to_image8']
+            // Use image paths or URLs
+          },
+          {
+            'title': '4.7 Other ',
             'details': [
               {'label': 'Condition', 'value': 'Clean'},
             ],
@@ -215,11 +536,11 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
         ],
       },
       {
-        'title': '2 Staircase',
-        'icon': Icons.stairs,
+        'title': '5. Keys Handed Over At Check In',
+        'icon': Icons.key,
         'subItems': [
           {
-            'title': '2.1 Name - Overview',
+            'title': '5.1 Yale',
             'details': [
               {'label': 'Condition', 'value': 'Good'},
             ],
@@ -227,7 +548,45 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
             // Use image paths or URLs
           },
           {
-            'title': '2.2 Name - Cleanliness',
+            'title': '5.2 Mortice',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '5.3 Other',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+        ],
+      },
+      {
+        'title': '6. Health & Safety | Smoke & Carbon Monoxide Alarms',
+        'icon': Icons.health_and_safety,
+        'subItems': [
+          {
+            'title': '6.1 Smoke Alarm(s)',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '6.2 Heat Sensor Alarm(s)',
+            'details': [
+              {'label': 'Condition', 'value': 'Clean'},
+            ],
+            'images': ['path_to_image7', 'path_to_image8']
+            // Use image paths or URLs
+          },
+          {
+            'title': '6.3 Carbon Monoxide Alarm(s)',
             'details': [
               {'label': 'Condition', 'value': 'Clean'},
             ],
@@ -237,11 +596,11 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
         ],
       },
       {
-        'title': '2 Staircase',
-        'icon': Icons.stairs,
+        'title': '7. Garage',
+        'icon': Icons.garage,
         'subItems': [
           {
-            'title': '2.1 Name - Overview',
+            'title': '7.1 Overview',
             'details': [
               {'label': 'Condition', 'value': 'Good'},
             ],
@@ -249,7 +608,79 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
             // Use image paths or URLs
           },
           {
-            'title': '2.2 Name - Cleanliness',
+            'title': '7.2 Door',
+            'details': [
+              {'label': 'Condition', 'value': 'Clean'},
+            ],
+            'images': ['path_to_image7', 'path_to_image8']
+            // Use image paths or URLs
+          },
+          {
+            'title': '7.3 Door Frame',
+            'details': [
+              {'label': 'Condition', 'value': 'Clean'},
+            ],
+            'images': ['path_to_image7', 'path_to_image8']
+            // Use image paths or URLs
+          },
+          {
+            'title': '7.4 Ceiling',
+            'details': [
+              {'label': 'Condition', 'value': 'Clean'},
+            ],
+            'images': ['path_to_image7', 'path_to_image8']
+            // Use image paths or URLs
+          },
+          {
+            'title': '7.5 Lighting',
+            'details': [
+              {'label': 'Condition', 'value': 'Clean'},
+            ],
+            'images': ['path_to_image7', 'path_to_image8']
+            // Use image paths or URLs
+          },
+          {
+            'title': '7.6 Walls',
+            'details': [
+              {'label': 'Condition', 'value': 'Clean'},
+            ],
+            'images': ['path_to_image7', 'path_to_image8']
+            // Use image paths or URLs
+          },
+          {
+            'title': '7.7 Window(s)/Sill',
+            'details': [
+              {'label': 'Condition', 'value': 'Clean'},
+            ],
+            'images': ['path_to_image7', 'path_to_image8']
+            // Use image paths or URLs
+          },
+          {
+            'title': '7.8 Switch',
+            'details': [
+              {'label': 'Condition', 'value': 'Clean'},
+            ],
+            'images': ['path_to_image7', 'path_to_image8']
+            // Use image paths or URLs
+          },
+          {
+            'title': '7.9 Sockets',
+            'details': [
+              {'label': 'Condition', 'value': 'Clean'},
+            ],
+            'images': ['path_to_image7', 'path_to_image8']
+            // Use image paths or URLs
+          },
+          {
+            'title': '7.10 Flooring',
+            'details': [
+              {'label': 'Condition', 'value': 'Clean'},
+            ],
+            'images': ['path_to_image7', 'path_to_image8']
+            // Use image paths or URLs
+          },
+          {
+            'title': '7.11 Additional Items/ Information',
             'details': [
               {'label': 'Condition', 'value': 'Clean'},
             ],
@@ -259,11 +690,11 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
         ],
       },
       {
-        'title': '2 Staircase',
-        'icon': Icons.stairs,
+        'title': '8. Front Garden',
+        'icon': Icons.lightbulb,
         'subItems': [
           {
-            'title': '2.1 Name - Overview',
+            'title': '8.1 Garden Discritpion',
             'details': [
               {'label': 'Condition', 'value': 'Good'},
             ],
@@ -271,21 +702,37 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
             // Use image paths or URLs
           },
           {
-            'title': '2.2 Name - Cleanliness',
+            'title': '8.2 DriveWay',
             'details': [
-              {'label': 'Condition', 'value': 'Clean'},
+              {'label': 'Condition', 'value': 'Good'},
             ],
-            'images': ['path_to_image7', 'path_to_image8']
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '8.3 Outside Lighting',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '8.4 Additional Items/ Information',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
           },
         ],
       },
       {
-        'title': '2 Staircase',
+        'title': '9. Exterior Front',
         'icon': Icons.stairs,
         'subItems': [
           {
-            'title': '2.1 Name - Overview',
+            'title': '9.1 Overview',
             'details': [
               {'label': 'Condition', 'value': 'Good'},
             ],
@@ -293,21 +740,45 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
             // Use image paths or URLs
           },
           {
-            'title': '2.2 Name - Cleanliness',
+            'title': '9.2 Door',
             'details': [
-              {'label': 'Condition', 'value': 'Clean'},
+              {'label': 'Condition', 'value': 'Good'},
             ],
-            'images': ['path_to_image7', 'path_to_image8']
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '9.3 Door Frame',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '9.4 Porch',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '9.5 Additional Items/ Information',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
           },
         ],
       },
       {
-        'title': '2 Staircase',
+        'title': '10. Entrance Hallway',
         'icon': Icons.stairs,
         'subItems': [
           {
-            'title': '2.1 Name - Overview',
+            'title': '10.1 Overview',
             'details': [
               {'label': 'Condition', 'value': 'Good'},
             ],
@@ -315,21 +786,133 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
             // Use image paths or URLs
           },
           {
-            'title': '2.2 Name - Cleanliness',
+            'title': '10.2 Door',
             'details': [
-              {'label': 'Condition', 'value': 'Clean'},
+              {'label': 'Condition', 'value': 'Good'},
             ],
-            'images': ['path_to_image7', 'path_to_image8']
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '10.3 Door Frame',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '10.4 Door Bell/Reciever',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '10.5 Ceiling',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '10.6 Lighting',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '10.7 Walls',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '10.8 Skirting',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '10.9 Window(s)/Sill',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '10.10 Curtain',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '10.11 Blinds',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '10.12 Switch',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '10.13 Sockets',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '10.14 Heating',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '10.15 Flooring',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '10.16 Additional Items/ Information',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
           },
         ],
       },
       {
-        'title': '2 Staircase',
-        'icon': Icons.stairs,
+        'title': '11. Toilet',
+        'icon': Icons.wash_rounded,
         'subItems': [
           {
-            'title': '2.1 Name - Overview',
+            'title': '11.1 Overview',
             'details': [
               {'label': 'Condition', 'value': 'Good'},
             ],
@@ -337,21 +920,149 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
             // Use image paths or URLs
           },
           {
-            'title': '2.2 Name - Cleanliness',
+            'title': '11.2 Door',
             'details': [
-              {'label': 'Condition', 'value': 'Clean'},
+              {'label': 'Condition', 'value': 'Good'},
             ],
-            'images': ['path_to_image7', 'path_to_image8']
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '11.3 Door Frame',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '11.4 Ceiling',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '11.5 Extractor Fan',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '11.6 Lighting',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '11.7 Walls',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '11.8 Skirting',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '11.9 Window(s)/Sill',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '11.10 Blinds',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '11.11 Toilet',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '11.12 Basin',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '11.13 Switch',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '11.14 Sockets',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '11.15 Heating',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '11.16 Accessories',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '11.17 Flooring',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '11.18 Additional Items/ Information',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
           },
         ],
       },
       {
-        'title': '2 Staircase',
+        'title': '12. Lounge',
         'icon': Icons.stairs,
         'subItems': [
           {
-            'title': '2.1 Name - Overview',
+            'title': '12.1 Overview',
             'details': [
               {'label': 'Condition', 'value': 'Good'},
             ],
@@ -359,21 +1070,133 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
             // Use image paths or URLs
           },
           {
-            'title': '2.2 Name - Cleanliness',
+            'title': '12.2 Door',
             'details': [
-              {'label': 'Condition', 'value': 'Clean'},
+              {'label': 'Condition', 'value': 'Good'},
             ],
-            'images': ['path_to_image7', 'path_to_image8']
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '12.3 Door Frame',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '12.4 Ceiling',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '12.5 Lighting',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '12.6 Walls',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '12.7 Skirting',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '12.8 Window(s)/Sill',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '12.9 Curtain',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '12.10 Blinds',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '12.11 Switch',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '12.12 Sockets',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '12.13 Heating',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '12.14 Fireplace',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '12.15 Flooring',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '12.16 Additional Items/ Information',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
           },
         ],
       },
       {
-        'title': '2 Staircase',
-        'icon': Icons.stairs,
+        'title': '13. Kitchen',
+        'icon': Icons.kitchen,
         'subItems': [
           {
-            'title': '2.1 Name - Overview',
+            'title': '13.1 Overview',
             'details': [
               {'label': 'Condition', 'value': 'Good'},
             ],
@@ -381,21 +1204,205 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
             // Use image paths or URLs
           },
           {
-            'title': '2.2 Name - Cleanliness',
+            'title': '13.2 Door',
             'details': [
-              {'label': 'Condition', 'value': 'Clean'},
+              {'label': 'Condition', 'value': 'Good'},
             ],
-            'images': ['path_to_image7', 'path_to_image8']
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '13.3 Door Frame',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '13.4 Ceiling',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '13.5 Extractor Fan',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '13.6 Lighting',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '13.7 Walls',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '13.8 Skirting',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '13.9 Window(s)/Sill',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '13.10 Curtain',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '13.11 Blinds',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '13.12 Switch',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '13.13 Sockets',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '13.14 Heating',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '13.15 Kitchen Units',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '13.16 Extractor Hood',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '13.17 Cooker',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '13.18 Hod',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '13.19 Oven',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '13.20 Worktop(s)',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '13.21 Sink',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '13.22 Fridge/Freezer',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '13.24 Dishwasher',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '13.25 Flooring',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '13.26 Additional Items/ Information',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
           },
         ],
       },
       {
-        'title': '2 Staircase',
-        'icon': Icons.stairs,
+        'title': '14. Utility Room/Area',
+        'icon': Icons.meeting_room,
         'subItems': [
           {
-            'title': '2.1 Name - Overview',
+            'title': '14.1 Overview',
             'details': [
               {'label': 'Condition', 'value': 'Good'},
             ],
@@ -403,21 +1410,181 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
             // Use image paths or URLs
           },
           {
-            'title': '2.2 Name - Cleanliness',
+            'title': '14.2 Door',
             'details': [
-              {'label': 'Condition', 'value': 'Clean'},
+              {'label': 'Condition', 'value': 'Good'},
             ],
-            'images': ['path_to_image7', 'path_to_image8']
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '14.3 Door Frame',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '14.4 Ceiling',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '14.5 Extractor Fan',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '14.6 Lighting',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '14.7 Walls',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '14.8 Skirting',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '14.9 Window(s)/Sill',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '14.10 Curtain',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '14.11 Blinds',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '14.12 Switch',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '14.13 Sockets',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '14.14 Heating',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '14.15 Kitchen Units',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '14.16 Worktop(s)',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '14.17 Sink',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '14.18 Fridge/Freezer',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '14.19 Washing Machine',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '14.20 Dishwasher',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '13.21 Flooring',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '13.22 Additional Items/ Information',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
           },
         ],
       },
       {
-        'title': '2 Staircase',
+        'title': '15. Stairs',
         'icon': Icons.stairs,
         'subItems': [
           {
-            'title': '2.1 Name - Overview',
+            'title': '15.1 Overview',
             'details': [
               {'label': 'Condition', 'value': 'Good'},
             ],
@@ -425,21 +1592,117 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
             // Use image paths or URLs
           },
           {
-            'title': '2.2 Name - Cleanliness',
+            'title': '15.2 Ceiling',
             'details': [
-              {'label': 'Condition', 'value': 'Clean'},
+              {'label': 'Condition', 'value': 'Good'},
             ],
-            'images': ['path_to_image7', 'path_to_image8']
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '15.3 Lighting',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '15.4 Walls',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '15.5 Skirting',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '15.6 Window(s)/Sill',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '15.7 Curtains',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '15.8 Blinds',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '15.9 Switch',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '15.10 Sockets',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '15.11 Heating',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '15.12 Staircase',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '15.13 Flooring',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '15.14 Additional Items/ Information',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
           },
         ],
       },
       {
-        'title': '2 Staircase',
+        'title': '16. Landing',
         'icon': Icons.stairs,
         'subItems': [
           {
-            'title': '2.1 Name - Overview',
+            'title': '16.1 Overview',
             'details': [
               {'label': 'Condition', 'value': 'Good'},
             ],
@@ -447,21 +1710,109 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
             // Use image paths or URLs
           },
           {
-            'title': '2.2 Name - Cleanliness',
+            'title': '16.2 Ceiling',
             'details': [
-              {'label': 'Condition', 'value': 'Clean'},
+              {'label': 'Condition', 'value': 'Good'},
             ],
-            'images': ['path_to_image7', 'path_to_image8']
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '16.3 Lighting',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '16.4 Walls',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '16.5 Skirting',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '16.6 Window(s)/Sill',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '16.7 Curtains',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '16.8 Blinds',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '16.9 Switch',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '16.10 Sockets',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '16.11 Heating',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '16.12 Flooring',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '16.13 Additional Items/ Information',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
           },
         ],
       },
       {
-        'title': '2 Staircase',
-        'icon': Icons.stairs,
+        'title': '17. Bedroom 1',
+        'icon': Icons.meeting_room,
         'subItems': [
           {
-            'title': '2.1 Name - Overview',
+            'title': '17.1 Overview',
             'details': [
               {'label': 'Condition', 'value': 'Good'},
             ],
@@ -469,21 +1820,125 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
             // Use image paths or URLs
           },
           {
-            'title': '2.2 Name - Cleanliness',
+            'title': '17.2 Door',
             'details': [
-              {'label': 'Condition', 'value': 'Clean'},
+              {'label': 'Condition', 'value': 'Good'},
             ],
-            'images': ['path_to_image7', 'path_to_image8']
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '17.3 Door Frame',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '17.4 Ceiling',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '17.5 Lighting',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '17.6 Walls',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '17.7 Skirting',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '17.8 Window(s)/Sill',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '17.9 Curtain',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '17.10 Blinds',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '17.11 Switch',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '17.12 Sockets',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '17.13 Heating',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '17.14 Flooring',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '17.15 Additional Items/ Information',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
           },
         ],
       },
       {
-        'title': '2 Staircase',
-        'icon': Icons.stairs,
+        'title': '18. En-Suite',
+        'icon': Icons.meeting_room,
         'subItems': [
           {
-            'title': '2.1 Name - Overview',
+            'title': '18.1 Overview',
             'details': [
               {'label': 'Condition', 'value': 'Good'},
             ],
@@ -491,21 +1946,165 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
             // Use image paths or URLs
           },
           {
-            'title': '2.2 Name - Cleanliness',
+            'title': '18.2 Door',
             'details': [
-              {'label': 'Condition', 'value': 'Clean'},
+              {'label': 'Condition', 'value': 'Good'},
             ],
-            'images': ['path_to_image7', 'path_to_image8']
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '18.3 Door Frame',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '18.4 Ceiling',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '18.5 Extractor Fan',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '18.6 Lighting',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '18.7 Walls',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '18.8 Skirting',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '18.9 Window(s)/Sill',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '18.10 Curtain',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '18.11 Blinds',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '18.12 Toilet',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '18.13 Basin',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '18.14 Shower Unit/Cubicle',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '18.15 Switch',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '18.16 Sockets',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '18.17 Heating',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '18.18 Accessories',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '18.19 Flooring',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '18.20 Additional Items/ Information',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
           },
         ],
       },
       {
-        'title': '2 Staircase',
-        'icon': Icons.stairs,
+        'title': '19. Bedroom ',
+        'icon': Icons.meeting_room,
         'subItems': [
           {
-            'title': '2.1 Name - Overview',
+            'title': '19.1 Overview',
             'details': [
               {'label': 'Condition', 'value': 'Good'},
             ],
@@ -513,21 +2112,173 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
             // Use image paths or URLs
           },
           {
-            'title': '2.2 Name - Cleanliness',
+            'title': '19.2 Door',
             'details': [
-              {'label': 'Condition', 'value': 'Clean'},
+              {'label': 'Condition', 'value': 'Good'},
             ],
-            'images': ['path_to_image7', 'path_to_image8']
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '19.3 Door Frame',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '19.4 Ceiling',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '19.5 Extractor Fan',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '19.6 Lighting',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '19.7 Walls',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '19.8 Skirting',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '19.9 Window(s)/Sill',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '19.10 Curtain',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '19.11 Blinds',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '19.12 Toilet',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '19.13 Basin',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '19.14 Shower Unit/Cubicle',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '19.15 Bath/ Bath Panels',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '19.16 Switch',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '19.17 Sockets',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '19.18 Heating',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '19.19 Accessories',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '19.20 Flooring',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '19.21 Additional Items/ Information',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
           },
         ],
       },
       {
-        'title': '2 Staircase',
-        'icon': Icons.stairs,
+        'title': '20. Rear Garden',
+        'icon': Icons.landscape,
         'subItems': [
           {
-            'title': '2.1 Name - Overview',
+            'title': '20.1 Garden Description',
             'details': [
               {'label': 'Condition', 'value': 'Good'},
             ],
@@ -535,11 +2286,119 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
             // Use image paths or URLs
           },
           {
-            'title': '2.2 Name - Cleanliness',
+            'title': '20.2 Outside Lighting',
             'details': [
-              {'label': 'Condition', 'value': 'Clean'},
+              {'label': 'Condition', 'value': 'Good'},
             ],
-            'images': ['path_to_image7', 'path_to_image8']
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '20.3 Summer House',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '20.4 Shed(s)',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '20.5 Additional Items/ Information',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+        ],
+      },
+      {
+        'title': '21. Manuals & Certificates',
+        'icon': Icons.receipt_long,
+        'subItems': [
+          {
+            'title': '21.1 House Application Manual',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '21.2 Kitchen Appliances Manuals',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '21.3 Heating System Manual',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '21.4 Landlord Gas Safety Certificate',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '21.5 Legionella Risk Assessment',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '21.6 Electrical Safety Certificate',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '21.7 Energy Performance Certificate',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+          {
+            'title': '21.8 Move In Checklist',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
+            // Use image paths or URLs
+          },
+        ],
+      },
+      {
+        'title': '22. Property Receipts',
+        'icon': Icons.receipt_long,
+        'subItems': [
+          {
+            'title': '22.1 Receipts',
+            'details': [
+              {'label': 'Condition', 'value': 'Good'},
+            ],
+            'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
           },
         ],
@@ -652,6 +2511,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           actions: [
             GestureDetector(
               onTap: () {
+                _saveData();// Link the save button to the function
                 // showDialog(
                 //   context: context,
                 //   builder: (BuildContext context) {
@@ -760,91 +2620,119 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
             )
           ],
         ),
-        // body: SingleChildScrollView(
-        //  child: Padding(
-        //    padding: EdgeInsets.all(16),
-        //    child: Column(
-        //      crossAxisAlignment: CrossAxisAlignment.start,
-        //      children: [
-        //
-        //
-        //        const SizedBox(height: 15),
-        //        const Text('Please put the signature here',
-        //            style: TextStyle(fontSize: 12, color: Colors.black)),
-        //        const SizedBox(height: 15),
-        //        Card(
-        //          child: Center(
-        //            child: Signature(
-        //              height: 200,
-        //              width: double.maxFinite,
-        //              controller: controller!,
-        //              backgroundColor: bWhite,
-        //            ),
-        //            // ),
-        //          ),
-        //        ),
-        //        buttonWidgets(context)!,
-        //        const SizedBox(height: 30),
-        //        // const Text(viewSignature),
-        //        signature != null
-        //            ? Column(
-        //          children: [
-        //            Center(child: Image.memory(signature!)),
-        //            const SizedBox(height: 10),
-        //            MaterialButton(
-        //              color: Colors.green,
-        //              onPressed: (){},
-        //              child: const Text("Submit", style: TextStyle(fontSize: 12, ),),
-        //            )
-        //          ],
-        //        ) : Container(),
-        //        const SizedBox(height: 30),
-        //      ],
-        //    ),
-        //  ),
-        // ),
-        body: ListView.builder(
-          padding: EdgeInsets.all(16),
-          itemCount: data.length,
-          itemBuilder: (context, index) {
-            final item = data[index];
-            return ExpansionTile(
-              title: Text(item['title']),
-              leading: Icon(item['icon']),
-              children: item['subItems'].map<Widget>((subItem) {
-                return ExpansionTile(
-                  title: Text(subItem['title']),
-                  children: [
-                    Column(
-                      children: subItem['details'].map<Widget>((detail) {
-                        return ListTile(
-                          title: Text(detail['label']),
-                          subtitle: Text(detail['value']),
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ListView.builder(
+                  padding: EdgeInsets.all(0),
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(), // Prevents ListView from scrolling independently
+                  itemCount: data.length,
+                  itemBuilder: (context, index) {
+                    final item = data[index];
+                    return ExpansionTile(
+                      title: Text(item['title']),
+                      leading: Icon(item['icon'],color: kPrimaryColor,),
+                      children: item['subItems'].map<Widget>((subItem) {
+                        return ExpansionTile(
+                          title: Text(subItem['title']),
+                          children: [
+                            Column(
+                              children: subItem['details'].map<Widget>((detail) {
+                                return ListTile(
+                                  title: Text(detail['label']),
+                                  subtitle: Text(detail['value']),
+                                );
+                              }).toList(),
+                            ),
+                            Container(
+                              height: 100,
+                              color: Colors.grey[200],
+                              child: ListView.builder(
+                                scrollDirection: Axis.horizontal,
+                                itemCount: subItem['images'].length,
+                                itemBuilder: (context, imgIndex) {
+                                  return Container(
+                                    margin: EdgeInsets.symmetric(horizontal: 8),
+                                    width: 100,
+                                    child: Image.asset(
+                                        subItem['images'][imgIndex]), // Use Image.network() for URLs
+                                  );
+                                },
+                              ),
+                            ),
+                          ],
                         );
                       }).toList(),
+                    );
+                  },
+                ),
+                const SizedBox(height: 15),
+                const Text('Declaration',
+                    style: TextStyle(
+                      color: kPrimaryColor,
+                      fontSize: 14, // Adjust the font size
+                      fontFamily: "Inter",
+                    )),
+                const SizedBox(height: 15),
+                const Text('I/We the undersigned, affirm  that if I/we do not'
+                    ' comment on the inventory in writing within seven days '
+                    'of receipt of this inventory I/We accept the inventory '
+                    'as being an accurate record of the contents and '
+                    'conditions of the property',
+                    textAlign: TextAlign.justify,
+                    style: TextStyle(
+                      color: kPrimaryTextColourTwo,
+                      fontSize: 12, // Adjust the font size
+                      fontFamily: "Inter",
+                    )),
+                const SizedBox(height: 15),
+                const Text('Please put the signature here',
+                    style: TextStyle(
+                      color: kPrimaryColor,
+                      fontSize: 14, // Adjust the font size
+                      fontFamily: "Inter",
+                    )),
+                const SizedBox(height: 15),
+                Card(
+                  child: Center(
+                    child: Signature(
+                      height: 200,
+                      width: double.maxFinite,
+                      controller: controller!,
+                      backgroundColor: bWhite,
                     ),
-                    Container(
-                      height: 100,
-                      color: Colors.grey[200],
-                      child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: subItem['images'].length,
-                        itemBuilder: (context, imgIndex) {
-                          return Container(
-                            margin: EdgeInsets.symmetric(horizontal: 8),
-                            width: 100,
-                            child: Image.asset(subItem['images']
-                                [imgIndex]), // Use Image.network() for URLs
-                          );
-                        },
+                  ),
+                ),
+                buttonWidgets(context)!,
+                const SizedBox(height: 30),
+                signature != null
+                    ? Column(
+                  children: [
+                    Center(child: Image.memory(signature!)),
+                    const SizedBox(height: 10),
+                    MaterialButton(
+                      color: Colors.green,
+                      onPressed: () {},
+                      child: const Text(
+                        "Submit",
+                        style: TextStyle(
+                          fontSize: 12,
+                        ),
                       ),
                     ),
                   ],
-                );
-              }).toList(),
-            );
-          },
+                )
+                    : Container(),
+                const SizedBox(height: 30),
+              ],
+            ),
+          ),
         ),
+
       ),
     );
   }
@@ -853,21 +2741,21 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        TextButton(
-          onPressed: () async {
-            if (controller!.isNotEmpty) {
-              final sign = await exportSignature();
-              setState(() {
-                signature = sign;
-              });
-            } else {
-              //showMessage
-              // Please put your signature;
-            }
-          },
-          child: const Text("Preview",
-              style: TextStyle(fontSize: 20, color: kPrimaryColor)),
-        ),
+        // TextButton(
+        //   onPressed: () async {
+        //     if (controller!.isNotEmpty) {
+        //       final sign = await exportSignature();
+        //       setState(() {
+        //         signature = sign;
+        //       });
+        //     } else {
+        //       //showMessage
+        //       // Please put your signature;
+        //     }
+        //   },
+        //   child: const Text("Preview",
+        //       style: TextStyle(fontSize: 20, color: kPrimaryColor)),
+        // ),
         TextButton(
           onPressed: () {
             controller?.clear();
@@ -875,7 +2763,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               signature = null;
             });
           },
-          child: const Text("Re SIgn",
+          child: const Text("Re-Sign",
               style: TextStyle(fontSize: 20, color: Colors.redAccent)),
         ),
       ],

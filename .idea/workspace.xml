@@ -10,16 +10,21 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9cfeb956-5354-4366-ab84-34804ef25cb7" name="Changes" comment="Summary Screen Added">
-      <change afterPath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/Assets.xcassets/AppIcon.appiconset/100 1.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/Assets.xcassets/AppIcon.appiconset/120 1.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/Assets.xcassets/AppIcon.appiconset/40 1.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/Assets.xcassets/AppIcon.appiconset/58 1.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/Assets.xcassets/AppIcon.appiconset/58 2.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/Assets.xcassets/AppIcon.appiconset/80 1.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/Assets.xcassets/AppIcon.appiconset/80 2.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/Assets.xcassets/AppIcon.appiconset/87 1.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/taurgo_inventory/lib/Dtos/AddressDto.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/taurgo_inventory/lib/Dtos/InspectionReportDto.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/taurgo_inventory/lib/Dtos/PropertyDto.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/taurgo_inventory/lib/Dtos/UserDto.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/CameraPreviewPage.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/taurgo_inventory/lib/temp/temp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/taurgo_inventory/lib/widgets/CaptureImagePage.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/taurgo_inventory/lib/widgets/ConditionItem.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/Assets.xcassets/AppIcon.appiconset/Contents.json" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/Assets.xcassets/AppIcon.appiconset/Contents.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/constants/UrlConstants.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/constants/UrlConstants.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/camera_preview_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/camera_preview_page.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/inspection_confimation_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/inspection_confimation_page.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/bathroom.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/bathroom.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/meter_reading.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/meter_reading.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/schedule_of_condition.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/schedule_of_condition.dart" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -246,7 +251,14 @@
       <option name="project" value="LOCAL" />
       <updated>1725362616781</updated>
     </task>
-    <option name="localTasksCounter" value="24" />
+    <task id="LOCAL-00024" summary="Summary Screen Added">
+      <created>1725373582587</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1725373582587</updated>
+    </task>
+    <option name="localTasksCounter" value="25" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">

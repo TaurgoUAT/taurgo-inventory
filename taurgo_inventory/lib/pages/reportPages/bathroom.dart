@@ -1,11 +1,14 @@
 import 'dart:async';
 import 'dart:io';
+
 import 'package:camera/camera.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart'; // Add this import for SharedPreferences
 import 'package:taurgo_inventory/pages/conditions/condition_details.dart';
 import 'package:taurgo_inventory/pages/edit_report_page.dart';
+import 'package:taurgo_inventory/pages/reportPages/camera_preview_page.dart'
+    as reportPages;
+
 import '../../constants/AppColors.dart';
 import '../../widgets/add_action.dart';
 import '../camera_preview_page.dart';
@@ -20,18 +23,176 @@ class Bathroom extends StatefulWidget {
 }
 
 class _BathroomState extends State<Bathroom> {
-  String? gasMeter;
-  String? electricMeter;
-  String? waterMeter;
-  String? oilMeter;
-  String? other;
+  String? doorCondition;
+  String? doorDescription;
+  String? doorFrameCondition;
+  String? doorFrameDescription;
+  String? ceilingCondition;
+  String? ceilingDescription;
+  String? extractorFanCondition;
+  String? extractorFanDescription;
+  String? lightingCondition;
+  String? lightingDescription;
+  String? wallsCondition;
+  String? wallsDescription;
+  String? skirtingCondition;
+  String? skirtingDescription;
+  String? windowSillCondition;
+  String? windowSillDescription;
+  String? curtainsCondition;
+  String? curtainsDescription;
+  String? blindsCondition;
+  String? blindsDescription;
+  String? toiletCondition;
+  String? toiletDescription;
+  String? basinCondition;
+  String? basinDescription;
+  String? showerCubicleCondition;
+  String? showerCubicleDescription;
+  String? bathCondition;
+  String? bathDescription;
+  String? switchBoardCondition;
+  String? switchBoardDescription;
+  String? socketCondition;
+  String? socketDescription;
+  String? heatingCondition;
+  String? heatingDescription;
+  String? accessoriesCondition;
+  String? accessoriesDescription;
+  String? flooringCondition;
+  String? flooringDescription;
+  String? additionItemsCondition;
+  String? additionItemsDescription;
+  String? doorImagePath;
+  String? doorFrameImagePath;
+  String? ceilingImagePath;
+  String? extractorFanImagePath;
+  String? lightingImagePath;
+  String? wallsImagePath;
+  String? skirtingImagePath;
+  String? windowSillImagePath;
+  String? curtainsImagePath;
+  String? blindsImagePath;
+  String? toiletImagePath;
+  String? basinImagePath;
+  String? showerCubicleImagePath;
+  String? bathImagePath;
+  String? switchBoardImagePath;
+  String? socketImagePath;
+  String? heatingImagePath;
+  String? accessoriesImagePath;
+  String? flooringImagePath;
+  String? additionItemsImagePath;
+  List<String> doorImages = [];
+  List<String> doorFrameImages = [];
+  List<String> ceilingImages = [];
+  List<String> extractorFanImages = [];
+  List<String> lightingImages = [];
+  List<String> wallsImages = [];
+  List<String> skirtingImages = [];
+  List<String> windowSillImages = [];
+  List<String> curtainsImages = [];
+  List<String> blindsImages = [];
+  List<String> toiletImages = [];
+  List<String> basinImages = [];
+  List<String> showerCubicleImages = [];
+  List<String> bathImages = [];
+  List<String> switchBoardImages = [];
+  List<String> socketImages = [];
+  List<String> heatingImages = [];
+  List<String> accessoriesImages = [];
+  List<String> flooringImages = [];
+  List<String> additionItemsImages = [];
   late List<File> capturedImages;
 
   @override
   void initState() {
     super.initState();
     capturedImages = widget.capturedImages ?? [];
+    _loadPreferences(); // Load preferences on init
   }
+
+  // Load saved preferences
+  Future<void> _loadPreferences() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      doorCondition = prefs.getString('doorCondition');
+      doorDescription = prefs.getString('doorDescription');
+      doorFrameCondition = prefs.getString('doorFrameCondition');
+      doorFrameDescription = prefs.getString('doorFrameDescription');
+      ceilingCondition = prefs.getString('ceilingCondition');
+      ceilingDescription = prefs.getString('ceilingDescription');
+      extractorFanCondition = prefs.getString('extractorFanCondition');
+      extractorFanDescription = prefs.getString('extractorFanDescription');
+      lightingCondition = prefs.getString('lightingCondition');
+      lightingDescription = prefs.getString('lightingDescription');
+      wallsCondition = prefs.getString('wallsCondition');
+      wallsDescription = prefs.getString('wallsDescription');
+      skirtingCondition = prefs.getString('skirtingCondition');
+      skirtingDescription = prefs.getString('skirtingDescription');
+      windowSillCondition = prefs.getString('windowSillCondition');
+      windowSillDescription = prefs.getString('windowSillDescription');
+      curtainsCondition = prefs.getString('curtainsCondition');
+      curtainsDescription = prefs.getString('curtainsDescription');
+      blindsCondition = prefs.getString('blindsCondition');
+      blindsDescription = prefs.getString('blindsDescription');
+      toiletCondition = prefs.getString('toiletCondition');
+      toiletDescription = prefs.getString('toiletDescription');
+      basinCondition = prefs.getString('basinCondition');
+      basinDescription = prefs.getString('basinDescription');
+      showerCubicleCondition = prefs.getString('showerCubicleCondition');
+      showerCubicleDescription = prefs.getString('showerCubicleDescription');
+      bathCondition = prefs.getString('bathCondition');
+      bathDescription = prefs.getString('bathDescription');
+      switchBoardCondition = prefs.getString('switchBoardCondition');
+      switchBoardDescription = prefs.getString('switchBoardDescription');
+      socketCondition = prefs.getString('socketCondition');
+      socketDescription = prefs.getString('socketDescription');
+      heatingCondition = prefs.getString('heatingCondition');
+      heatingDescription = prefs.getString('heatingDescription');
+      accessoriesCondition = prefs.getString('accessoriesCondition');
+      accessoriesDescription = prefs.getString('accessoriesDescription');
+      flooringCondition = prefs.getString('flooringCondition');
+      flooringDescription = prefs.getString('flooringDescription');
+      additionItemsCondition = prefs.getString('additionItemsCondition');
+      additionItemsDescription = prefs.getString('additionItemsDescription');
+      capturedImages = (prefs.getStringList('capturedImages') ?? [])
+          .map((path) => File(path))
+          .toList();
+      doorImages = prefs.getStringList('doorImages') ?? [];
+      doorFrameImages = prefs.getStringList('doorFrameImages') ?? [];
+      ceilingImages = prefs.getStringList('ceilingImages') ?? [];
+      extractorFanImages = prefs.getStringList('extractorFanImages') ?? [];
+      lightingImages = prefs.getStringList('lightingImages') ?? [];
+      wallsImages = prefs.getStringList('wallsImages') ?? [];
+      skirtingImages = prefs.getStringList('skirtingImages') ?? [];
+      windowSillImages = prefs.getStringList('windowSillImages') ?? [];
+      curtainsImages = prefs.getStringList('curtainsImages') ?? [];
+      blindsImages = prefs.getStringList('blindsImages') ?? [];
+      toiletImages = prefs.getStringList('toiletImages') ?? [];
+      basinImages = prefs.getStringList('basinImages') ?? [];
+      showerCubicleImages = prefs.getStringList('showerCubicleImages') ?? [];
+      bathImages = prefs.getStringList('bathImages') ?? [];
+      switchBoardImages = prefs.getStringList('switchBoardImages') ?? [];
+      socketImages = prefs.getStringList('socketImages') ?? [];
+      heatingImages = prefs.getStringList('heatingImages') ?? [];
+      accessoriesImages = prefs.getStringList('accessoriesImages') ?? [];
+      flooringImages = prefs.getStringList('flooringImages') ?? [];
+      additionItemsImages = prefs.getStringList('additionItemsImages') ?? [];
+    });
+  }
+
+  // Save preferences when a condition or description is selected
+  Future<void> _savePreference(String key, String value) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setString(key, value);
+  }
+
+  Future<void> _savePreferenceList(String key, List<String> value) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setStringList(key, value);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -68,51 +229,527 @@ class _BathroomState extends State<Bathroom> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-
-              //Gas Meter
+              // Door
               ConditionItem(
-                name: "Gas Meter",
-                selectedCondition: gasMeter,
+                name: "Door",
+                condition: doorCondition,
+                description: doorDescription,
+                images: doorImages,
                 onConditionSelected: (condition) {
                   setState(() {
-                    gasMeter = condition;
+                    doorCondition = condition;
                   });
+                  _savePreference('doorCondition', condition!);
+                },
+                onDescriptionSelected: (description) {
+                  setState(() {
+                    doorDescription = description;
+                  });
+                  _savePreference('doorDescription', description!);
+                },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    doorImages.add(imagePath);
+                  });
+                  _savePreferenceList('doorImages', doorImages);
                 },
               ),
 
-              //Electric Meter
+              // Door Frame
               ConditionItem(
-                name: "Electric Meter",
-                selectedCondition: electricMeter,
+                name: "Door Frame",
+                condition: doorFrameCondition,
+                description: doorFrameDescription,
+                images: doorFrameImages,
                 onConditionSelected: (condition) {
                   setState(() {
-                    electricMeter = condition;
+                    doorFrameCondition = condition;
                   });
+                  _savePreference('doorFrameCondition', condition!);
+                },
+                onDescriptionSelected: (description) {
+                  setState(() {
+                    doorFrameDescription = description;
+                  });
+                  _savePreference('doorFrameDescription', description!);
+                },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    doorFrameImages.add(imagePath);
+                  });
+                  _savePreferenceList('doorFrameImages', doorFrameImages);
                 },
               ),
 
-              //Water Meter
+              // Ceiling
               ConditionItem(
-                name: "Water Meter",
-                selectedCondition: waterMeter,
+                name: "Ceiling",
+                condition: ceilingCondition,
+                description: ceilingDescription,
+                images: ceilingImages,
                 onConditionSelected: (condition) {
                   setState(() {
-                    waterMeter = condition;
+                    ceilingCondition = condition;
                   });
+                  _savePreference('ceilingCondition', condition!);
+                },
+                onDescriptionSelected: (description) {
+                  setState(() {
+                    ceilingDescription = description;
+                  });
+                  _savePreference('ceilingDescription', description!);
+                },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    ceilingImages.add(imagePath);
+                  });
+                  _savePreferenceList('ceilingImages', ceilingImages);
                 },
               ),
 
-              //Oil Meter
+              // Extractor Fan
               ConditionItem(
-                name: "Oil Meter",
-                selectedCondition: oilMeter,
+                name: "Extractor Fan",
+                condition: extractorFanCondition,
+                description: extractorFanDescription,
+                images: extractorFanImages,
                 onConditionSelected: (condition) {
                   setState(() {
-                    oilMeter = condition;
+                    extractorFanCondition = condition;
                   });
+                  _savePreference('extractorFanCondition', condition!);
+                },
+                onDescriptionSelected: (description) {
+                  setState(() {
+                    extractorFanDescription = description;
+                  });
+                  _savePreference('extractorFanDescription', description!);
+                },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    extractorFanImages.add(imagePath);
+                  });
+                  _savePreferenceList('extractorFanImages', extractorFanImages);
                 },
               ),
 
+              // Lighting
+              ConditionItem(
+                name: "Lighting",
+                condition: lightingCondition,
+                description: lightingDescription,
+                images: lightingImages,
+                onConditionSelected: (condition) {
+                  setState(() {
+                    lightingCondition = condition;
+                  });
+                  _savePreference('lightingCondition', condition!);
+                },
+                onDescriptionSelected: (description) {
+                  setState(() {
+                    lightingDescription = description;
+                  });
+                  _savePreference('lightingDescription', description!);
+                },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    lightingImages.add(imagePath);
+                  });
+                  _savePreferenceList('lightingImages', lightingImages);
+                },
+              ),
+
+              // Walls
+              ConditionItem(
+                name: "Walls",
+                condition: wallsCondition,
+                description: wallsDescription,
+                images: wallsImages,
+                onConditionSelected: (condition) {
+                  setState(() {
+                    wallsCondition = condition;
+                  });
+                  _savePreference('wallsCondition', condition!);
+                },
+                onDescriptionSelected: (description) {
+                  setState(() {
+                    wallsDescription = description;
+                  });
+                  _savePreference('wallsDescription', description!);
+                },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    wallsImages.add(imagePath);
+                  });
+                  _savePreferenceList('wallsImages', wallsImages);
+                },
+              ),
+
+              // Skirting
+              ConditionItem(
+                name: "Skirting",
+                condition: skirtingCondition,
+                description: skirtingDescription,
+                images: skirtingImages,
+                onConditionSelected: (condition) {
+                  setState(() {
+                    skirtingCondition = condition;
+                  });
+                  _savePreference('skirtingCondition', condition!);
+                },
+                onDescriptionSelected: (description) {
+                  setState(() {
+                    skirtingDescription = description;
+                  });
+                  _savePreference('skirtingDescription', description!);
+                },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    skirtingImages.add(imagePath);
+                  });
+                  _savePreferenceList('skirtingImages', skirtingImages);
+                },
+              ),
+
+              // Window Sill
+              ConditionItem(
+                name: "Window Sill",
+                condition: windowSillCondition,
+                description: windowSillDescription,
+                images: windowSillImages,
+                onConditionSelected: (condition) {
+                  setState(() {
+                    windowSillCondition = condition;
+                  });
+                  _savePreference('windowSillCondition', condition!);
+                },
+                onDescriptionSelected: (description) {
+                  setState(() {
+                    windowSillDescription = description;
+                  });
+                  _savePreference('windowSillDescription', description!);
+                },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    windowSillImages.add(imagePath);
+                  });
+                  _savePreferenceList('windowSillImages', windowSillImages);
+                },
+              ),
+
+              // Curtains
+              ConditionItem(
+                name: "Curtains",
+                condition: curtainsCondition,
+                description: curtainsDescription,
+                images: curtainsImages,
+                onConditionSelected: (condition) {
+                  setState(() {
+                    curtainsCondition = condition;
+                  });
+                  _savePreference('curtainsCondition', condition!);
+                },
+                onDescriptionSelected: (description) {
+                  setState(() {
+                    curtainsDescription = description;
+                  });
+                  _savePreference('curtainsDescription', description!);
+                },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    curtainsImages.add(imagePath);
+                  });
+                  _savePreferenceList('curtainsImages', curtainsImages);
+                },
+              ),
+
+              // Blinds
+              ConditionItem(
+                name: "Blinds",
+                condition: blindsCondition,
+                description: blindsDescription,
+                images: blindsImages,
+                onConditionSelected: (condition) {
+                  setState(() {
+                    blindsCondition = condition;
+                  });
+                  _savePreference('blindsCondition', condition!);
+                },
+                onDescriptionSelected: (description) {
+                  setState(() {
+                    blindsDescription = description;
+                  });
+                  _savePreference('blindsDescription', description!);
+                },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    blindsImages.add(imagePath);
+                  });
+                  _savePreferenceList('blindsImages', blindsImages);
+                },
+              ),
+
+              // Toilet
+              ConditionItem(
+                name: "Toilet",
+                condition: toiletCondition,
+                description: toiletDescription,
+                images: toiletImages,
+                onConditionSelected: (condition) {
+                  setState(() {
+                    toiletCondition = condition;
+                  });
+                  _savePreference('toiletCondition', condition!);
+                },
+                onDescriptionSelected: (description) {
+                  setState(() {
+                    toiletDescription = description;
+                  });
+                  _savePreference('toiletDescription', description!);
+                },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    toiletImages.add(imagePath);
+                  });
+                  _savePreferenceList('toiletImages', toiletImages);
+                },
+              ),
+
+              // Basin
+              ConditionItem(
+                name: "Basin",
+                condition: basinCondition,
+                description: basinDescription,
+                images: basinImages,
+                onConditionSelected: (condition) {
+                  setState(() {
+                    basinCondition = condition;
+                  });
+                  _savePreference('basinCondition', condition!);
+                },
+                onDescriptionSelected: (description) {
+                  setState(() {
+                    basinDescription = description;
+                  });
+                  _savePreference('basinDescription', description!);
+                },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    basinImages.add(imagePath);
+                  });
+                  _savePreferenceList('basinImages', basinImages);
+                },
+              ),
+
+              // Shower Cubicle
+              ConditionItem(
+                name: "Shower Cubicle",
+                condition: showerCubicleCondition,
+                description: showerCubicleDescription,
+                images: showerCubicleImages,
+                onConditionSelected: (condition) {
+                  setState(() {
+                    showerCubicleCondition = condition;
+                  });
+                  _savePreference('showerCubicleCondition', condition!);
+                },
+                onDescriptionSelected: (description) {
+                  setState(() {
+                    showerCubicleDescription = description;
+                  });
+                  _savePreference('showerCubicleDescription', description!);
+                },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    showerCubicleImages.add(imagePath);
+                  });
+                  _savePreferenceList(
+                      'showerCubicleImages', showerCubicleImages);
+                },
+              ),
+
+              // Bath
+              ConditionItem(
+                name: "Bath",
+                condition: bathCondition,
+                description: bathDescription,
+                images: bathImages,
+                onConditionSelected: (condition) {
+                  setState(() {
+                    bathCondition = condition;
+                  });
+                  _savePreference('bathCondition', condition!);
+                },
+                onDescriptionSelected: (description) {
+                  setState(() {
+                    bathDescription = description;
+                  });
+                  _savePreference('bathDescription', description!);
+                },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    bathImages.add(imagePath);
+                  });
+                  _savePreferenceList('bathImages', bathImages);
+                },
+              ),
+
+              // Switch Board
+              ConditionItem(
+                name: "Switch Board",
+                condition: switchBoardCondition,
+                description: switchBoardDescription,
+                images: switchBoardImages,
+                onConditionSelected: (condition) {
+                  setState(() {
+                    switchBoardCondition = condition;
+                  });
+                  _savePreference('switchBoardCondition', condition!);
+                },
+                onDescriptionSelected: (description) {
+                  setState(() {
+                    switchBoardDescription = description;
+                  });
+                  _savePreference('switchBoardDescription', description!);
+                },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    switchBoardImages.add(imagePath);
+                  });
+                  _savePreferenceList('switchBoardImages', switchBoardImages);
+                },
+              ),
+
+              // Socket
+              ConditionItem(
+                name: "Socket",
+                condition: socketCondition,
+                description: socketDescription,
+                images: socketImages,
+                onConditionSelected: (condition) {
+                  setState(() {
+                    socketCondition = condition;
+                  });
+                  _savePreference('socketCondition', condition!);
+                },
+                onDescriptionSelected: (description) {
+                  setState(() {
+                    socketDescription = description;
+                  });
+                  _savePreference('socketDescription', description!);
+                },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    socketImages.add(imagePath);
+                  });
+                  _savePreferenceList('socketImages', socketImages);
+                },
+              ),
+
+              // Heating
+              ConditionItem(
+                name: "Heating",
+                condition: heatingCondition,
+                description: heatingDescription,
+                images: heatingImages,
+                onConditionSelected: (condition) {
+                  setState(() {
+                    heatingCondition = condition;
+                  });
+                  _savePreference('heatingCondition', condition!);
+                },
+                onDescriptionSelected: (description) {
+                  setState(() {
+                    heatingDescription = description;
+                  });
+                  _savePreference('heatingDescription', description!);
+                },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    heatingImages.add(imagePath);
+                  });
+                  _savePreferenceList('heatingImages', heatingImages);
+                },
+              ),
+
+              // Accessories
+              ConditionItem(
+                name: "Accessories",
+                condition: accessoriesCondition,
+                description: accessoriesDescription,
+                images: accessoriesImages,
+                onConditionSelected: (condition) {
+                  setState(() {
+                    accessoriesCondition = condition;
+                  });
+                  _savePreference('accessoriesCondition', condition!);
+                },
+                onDescriptionSelected: (description) {
+                  setState(() {
+                    accessoriesDescription = description;
+                  });
+                  _savePreference('accessoriesDescription', description!);
+                },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    accessoriesImages.add(imagePath);
+                  });
+                  _savePreferenceList('accessoriesImages', accessoriesImages);
+                },
+              ),
+
+              // Flooring
+              ConditionItem(
+                name: "Flooring",
+                condition: flooringCondition,
+                description: flooringDescription,
+                images: flooringImages,
+                onConditionSelected: (condition) {
+                  setState(() {
+                    flooringCondition = condition;
+                  });
+                  _savePreference('flooringCondition', condition!);
+                },
+                onDescriptionSelected: (description) {
+                  setState(() {
+                    flooringDescription = description;
+                  });
+                  _savePreference('flooringDescription', description!);
+                },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    flooringImages.add(imagePath);
+                  });
+                  _savePreferenceList('flooringImages', flooringImages);
+                },
+              ),
+
+              // Addition Items
+              ConditionItem(
+                name: "Addition Items",
+                condition: additionItemsCondition,
+                description: additionItemsDescription,
+                images: additionItemsImages,
+                onConditionSelected: (condition) {
+                  setState(() {
+                    additionItemsCondition = condition;
+                  });
+                  _savePreference('additionItemsCondition', condition!);
+                },
+                onDescriptionSelected: (description) {
+                  setState(() {
+                    additionItemsDescription = description;
+                  });
+                  _savePreference('additionItemsDescription', description!);
+                },
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    additionItemsImages.add(imagePath);
+                  });
+                  _savePreferenceList(
+                      'additionItemsImages', additionItemsImages);
+                },
+              ),
 
               // Add more ConditionItem widgets as needed
             ],
@@ -125,14 +762,22 @@ class _BathroomState extends State<Bathroom> {
 
 class ConditionItem extends StatelessWidget {
   final String name;
-  final String? selectedCondition;
+  final String? condition;
+  final String? description;
+  final List<String> images;
   final Function(String?) onConditionSelected;
+  final Function(String?) onDescriptionSelected;
+  final Function(String) onImageAdded;
 
   const ConditionItem({
     Key? key,
     required this.name,
-    this.selectedCondition,
+    this.condition,
+    this.description,
+    required this.images,
     required this.onConditionSelected,
+    required this.onDescriptionSelected,
+    required this.onImageAdded,
   }) : super(key: key);
 
   @override
@@ -191,21 +836,17 @@ class ConditionItem extends StatelessWidget {
                       size: 24,
                       color: kSecondaryTextColourTwo,
                     ),
-                    onPressed: ()  async{
-                      // Initialize the camera when the button is pressed
+                    onPressed: () async {
                       final cameras = await availableCameras();
                       if (cameras.isNotEmpty) {
-                        print("${cameras.toString()}");
-                        final cameraController = CameraController(
-                          cameras.first,
-                          ResolutionPreset.high,
-                        );
-                        await cameraController.initialize();
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => CameraPreviewPage(
-                              cameraController: cameraController,
+                            builder: (context) => reportPages.CameraPreviewPage(
+                              camera: cameras.first,
+                              onPictureTaken: (imagePath) {
+                                onImageAdded(imagePath);
+                              },
                             ),
                           ),
                         );
@@ -216,15 +857,16 @@ class ConditionItem extends StatelessWidget {
               ),
             ],
           ),
-
-          SizedBox(height: 12,),
+          SizedBox(
+            height: 12,
+          ),
           GestureDetector(
             onTap: () async {
               final result = await Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => ConditionDetails(
-                    initialCondition: selectedCondition,
+                    initialCondition: condition,
                     type: name,
                   ),
                 ),
@@ -235,7 +877,7 @@ class ConditionItem extends StatelessWidget {
               }
             },
             child: Text(
-              selectedCondition ?? "Location",
+              condition?.isNotEmpty == true ? condition! : "Condition",
               style: TextStyle(
                 fontSize: 12.0,
                 fontWeight: FontWeight.w700,
@@ -244,25 +886,27 @@ class ConditionItem extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(height: 12,),
+          SizedBox(
+            height: 12,
+          ),
           GestureDetector(
             onTap: () async {
               final result = await Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => ConditionDetails(
-                    initialCondition: selectedCondition,
+                    initialCondition: description,
                     type: name,
                   ),
                 ),
               );
 
               if (result != null) {
-                onConditionSelected(result);
+                onDescriptionSelected(result);
               }
             },
             child: Text(
-              selectedCondition ?? "Serial Number",
+              description?.isNotEmpty == true ? description! : "Description",
               style: TextStyle(
                 fontSize: 12.0,
                 fontWeight: FontWeight.w700,
@@ -271,37 +915,34 @@ class ConditionItem extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(height: 12,),
-          GestureDetector(
-            onTap: () async {
-              final result = await Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ConditionDetails(
-                    initialCondition: selectedCondition,
-                    type: name,
+          SizedBox(
+            height: 12,
+          ),
+          images.isNotEmpty
+              ? Wrap(
+                  spacing: 8.0,
+                  runSpacing: 8.0,
+                  children: images.map((imagePath) {
+                    return Image.file(
+                      File(imagePath),
+                      width: 100,
+                      height: 100,
+                      fit: BoxFit.cover,
+                    );
+                  }).toList(),
+                )
+              : Text(
+                  "No images selected",
+                  style: TextStyle(
+                    fontSize: 12.0,
+                    fontWeight: FontWeight.w700,
+                    color: kPrimaryTextColourTwo,
+                    fontStyle: FontStyle.italic,
                   ),
                 ),
-              );
-
-              if (result != null) {
-                onConditionSelected(result);
-              }
-            },
-            child: Text(
-              selectedCondition ?? "Reading",
-              style: TextStyle(
-                fontSize: 12.0,
-                fontWeight: FontWeight.w700,
-                color: kPrimaryTextColourTwo,
-                fontStyle: FontStyle.italic,
-              ),
-            ),
-          ),
           Divider(thickness: 1, color: Color(0xFFC2C2C2)),
         ],
       ),
     );
   }
 }
-

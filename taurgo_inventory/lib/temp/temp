@@ -1,0 +1,139 @@
+ // ConditionItem(
+                //   name: "Accessory - Cleanliness",
+                //   selectedCondition: accessoryCleanliness,
+                //   onConditionSelected: (condition) {
+                //     setState(() {
+                //       accessoryCleanliness = condition;
+                //     });
+                //   },
+                // ),
+                // ConditionItem(
+                //   name: "Window Sill",
+                //   selectedCondition: windowSill,
+                //   onConditionSelected: (condition) {
+                //     setState(() {
+                //       windowSill = condition;
+                //     });
+                //   },
+                // ),
+                // ConditionItem(
+                //   name: "Carpets",
+                //   selectedCondition: carpets,
+                //   onConditionSelected: (condition) {
+                //     setState(() {
+                //       carpets = condition;
+                //     });
+                //   },
+                // ),
+                // ConditionItem(
+                //   name: "Ceilings",
+                //   selectedCondition: ceilings,
+                //   onConditionSelected: (condition) {
+                //     setState(() {
+                //       ceilings = condition;
+                //     });
+                //   },
+                // ),
+                // ConditionItem(
+                //   name: "Curtains",
+                //   selectedCondition: curtains,
+                //   onConditionSelected: (condition) {
+                //     setState(() {
+                //       curtains = condition;
+                //     });
+                //   },
+                // ),
+                // ConditionItem(
+                //   name: "Hard Flooring",
+                //   selectedCondition: hardFlooring,
+                //   onConditionSelected: (condition) {
+                //     setState(() {
+                //       hardFlooring = condition;
+                //     });
+                //   },
+                // ),
+                // ConditionItem(
+                //   name: "Kitchen Area",
+                //   selectedCondition: kitchenArea,
+                //   onConditionSelected: (condition) {
+                //     setState(() {
+                //       kitchenArea = condition;
+                //     });
+                //   },
+                // ),
+                // ConditionItem(
+                //   name: "Oven",
+                //   selectedCondition: oven,
+                //   onConditionSelected: (condition) {
+                //     setState(() {
+                //       oven = condition;
+                //     });
+                //   },
+                // ),
+                // ConditionItem(
+                //   name: "Mattress",
+                //   selectedCondition: mattress,
+                //   onConditionSelected: (condition) {
+                //     setState(() {
+                //       mattress = condition;
+                //     });
+                //   },
+                // ),
+                // ConditionItem(
+                //   name: "Upholstrey",
+                //   selectedCondition: upholstrey,
+                //   onConditionSelected: (condition) {
+                //     setState(() {
+                //       upholstrey = condition;
+                //     });
+                //   },
+                // ),
+                // ConditionItem(
+                //   name: "Wall",
+                //   selectedCondition: wall,
+                //   onConditionSelected: (condition) {
+                //     setState(() {
+                //       wall = condition;
+                //     });
+                //   },
+                // ),
+                // ConditionItem(
+                //   name: "Window",
+                //   selectedCondition: window,
+                //   onConditionSelected: (condition) {
+                //     setState(() {
+                //       window = condition;
+                //     });
+                //   },
+                // ),
+                // ConditionItem(
+                //   name: "Woodwork",
+                //   selectedCondition: woodwork,
+                //   onConditionSelected: (condition) {
+                //     setState(() {
+                //       woodwork = condition;
+                //     });
+                //   },
+                // ),
+
+
+
+
+                //FAC
+                // floatingActionButton: FloatingActionButton.extended(
+                        //   onPressed: _showCapturedImages, // Show captured images when clicked
+                        //   label: Icon(
+                        //     Icons.image_outlined,
+                        //     color: bWhite,
+                        //     size: 24,
+                        //   ),
+                        //   backgroundColor: kPrimaryColor,
+                        //   hoverColor: kPrimaryColor.withOpacity(0.4),
+                        //   shape: CircleBorder(
+                        //     side: BorderSide(
+                        //       color: Colors.white,
+                        //       width: 2.0,
+                        //     ),
+                        //   ),
+                        //   elevation: 3.0,
+                        // ),

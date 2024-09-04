@@ -134,11 +134,12 @@ class _CameraPreviewPageState extends State<CameraPreviewPage> {
         ),
         actions: [
           GestureDetector(
-            onTap: (){
+            onTap: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => ScheduleOfCondition(capturedImages: capturedImages),
+                  builder: (context) =>
+                      ScheduleOfCondition(capturedImages: capturedImages),
                 ),
               );
             },
