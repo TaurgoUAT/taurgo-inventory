@@ -88,7 +88,8 @@ class _KeyHandedOverState extends State<KeyHandedOver> {
               //Gas Meter
               ConditionItem(
                 name: "Yale",
-                selectedCondition: yale,
+                location: yale,
+                description: yale,
                 onConditionSelected: (condition) {
                   setState(() {
                     yale = condition;
@@ -100,7 +101,8 @@ class _KeyHandedOverState extends State<KeyHandedOver> {
               //Electric Meter
               ConditionItem(
                 name: "Mortice",
-                selectedCondition: mortice,
+                location: mortice,
+                description: mortice,
                 onConditionSelected: (condition) {
                   setState(() {
                     mortice = condition;
@@ -112,7 +114,8 @@ class _KeyHandedOverState extends State<KeyHandedOver> {
               //Additional Items
               ConditionItem(
                 name: "Other",
-                selectedCondition: other,
+                location: other,
+                description: other,
                 onConditionSelected: (condition) {
                   setState(() {
                     other = condition;
@@ -132,13 +135,15 @@ class _KeyHandedOverState extends State<KeyHandedOver> {
 
 class ConditionItem extends StatelessWidget {
   final String name;
-  final String? selectedCondition;
+  final String? location;
+  final String? description;
   final Function(String?) onConditionSelected;
 
   const ConditionItem({
     Key? key,
     required this.name,
-    this.selectedCondition,
+    this.location,
+    this.description,
     required this.onConditionSelected,
   }) : super(key: key);
 
@@ -231,7 +236,7 @@ class ConditionItem extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) => ConditionDetails(
-                    initialCondition: selectedCondition,
+                    initialCondition: location,
                     type: name,
                   ),
                 ),
@@ -242,7 +247,7 @@ class ConditionItem extends StatelessWidget {
               }
             },
             child: Text(
-              selectedCondition ?? "Location",
+              location?.isNotEmpty == true ? location! : "Location",
               style: TextStyle(
                 fontSize: 12.0,
                 fontWeight: FontWeight.w700,
@@ -260,7 +265,7 @@ class ConditionItem extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) => ConditionDetails(
-                    initialCondition: selectedCondition,
+                    initialCondition: description,
                     type: name,
                   ),
                 ),
@@ -271,7 +276,7 @@ class ConditionItem extends StatelessWidget {
               }
             },
             child: Text(
-              selectedCondition ?? "Description",
+              description?.isNotEmpty == true ? description! : "Description",
               style: TextStyle(
                 fontSize: 12.0,
                 fontWeight: FontWeight.w700,

@@ -21,6 +21,7 @@ class KitchenPage extends StatefulWidget {
 }
 
 class _KitchenPageState extends State<KitchenPage> {
+  String? newdoor;
   String? doorCondition;
   String? doorDescription;
   String? doorFrameCondition;
@@ -74,6 +75,7 @@ class _KitchenPageState extends State<KitchenPage> {
   Future<void> _loadPreferences() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
+      newdoor = prefs.getString('newdoor');
       doorCondition = prefs.getString('doorCondition');
       doorDescription = prefs.getString('doorDescription');
       doorFrameCondition = prefs.getString('doorFrameCondition');
@@ -163,7 +165,7 @@ class _KitchenPageState extends State<KitchenPage> {
               ConditionItem(
                 name: "Door",
                 condition: doorCondition,
-                description: doorDescription,
+                description: newdoor,
                 onConditionSelected: (condition) {
                   setState(() {
                     doorCondition = condition;
@@ -172,9 +174,9 @@ class _KitchenPageState extends State<KitchenPage> {
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
-                    doorDescription = description;
+                    newdoor = description;
                   });
-                  _savePreference('doorDescription', description);
+                  _savePreference('newdoor', description);
                 },
               ),
 
@@ -644,7 +646,9 @@ class ConditionItem extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: 12,),
+          SizedBox(
+            height: 12,
+          ),
           GestureDetector(
             onTap: () async {
               final result = await Navigator.push(
@@ -671,7 +675,9 @@ class ConditionItem extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(height: 12,),
+          SizedBox(
+            height: 12,
+          ),
           GestureDetector(
             onTap: () async {
               final result = await Navigator.push(

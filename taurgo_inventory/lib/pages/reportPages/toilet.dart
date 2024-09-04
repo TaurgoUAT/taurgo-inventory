@@ -160,27 +160,6 @@ class _ToiletState extends State<Toilet> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Door
-              ConditionItem(
-                name: "Door",
-                condition: doorCondition,
-                description: doorDescription,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    doorCondition = condition;
-                  });
-                  _savePreference(
-                      'doorCondition', condition); // Save preference
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    doorDescription = description;
-                  });
-                  _savePreference(
-                      'doorDescription', description); // Save preference
-                },
-              ),
-
               // Door Frame
               ConditionItem(
                 name: "Door Frame",

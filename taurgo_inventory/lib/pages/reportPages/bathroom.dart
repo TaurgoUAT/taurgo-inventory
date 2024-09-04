@@ -547,6 +547,7 @@ class _BathroomState extends State<Bathroom> {
     );
   }
 }
+
 class ConditionItem extends StatelessWidget {
   final String name;
   final String? condition;
@@ -664,7 +665,7 @@ class ConditionItem extends StatelessWidget {
               }
             },
             child: Text(
-              condition ?? "Condition",
+              condition?.isNotEmpty == true ? condition! : "Condition",
               style: TextStyle(
                 fontSize: 12.0,
                 fontWeight: FontWeight.w700,
@@ -693,7 +694,7 @@ class ConditionItem extends StatelessWidget {
               }
             },
             child: Text(
-              description ?? "Description",
+              description?.isNotEmpty == true ? description! : "Description",
               style: TextStyle(
                 fontSize: 12.0,
                 fontWeight: FontWeight.w700,

@@ -135,7 +135,8 @@ class _KeysState extends State<Keys> {
                   setState(() {
                     morticeLocation = location;
                   });
-                  _savePreference('morticeLocation', location); // Save preference
+                  _savePreference(
+                      'morticeLocation', location); // Save preference
                 },
                 onReadingSelected: (reading) {
                   setState(() {
@@ -154,13 +155,15 @@ class _KeysState extends State<Keys> {
                   setState(() {
                     windowLockLocation = location;
                   });
-                  _savePreference('windowLockLocation', location); // Save preference
+                  _savePreference(
+                      'windowLockLocation', location); // Save preference
                 },
                 onReadingSelected: (reading) {
                   setState(() {
                     windowLockReading = reading;
                   });
-                  _savePreference('windowLockReading', reading); // Save preference
+                  _savePreference(
+                      'windowLockReading', reading); // Save preference
                 },
               ),
 
@@ -173,13 +176,15 @@ class _KeysState extends State<Keys> {
                   setState(() {
                     gasMeterLocation = location;
                   });
-                  _savePreference('gasMeterLocation', location); // Save preference
+                  _savePreference(
+                      'gasMeterLocation', location); // Save preference
                 },
                 onReadingSelected: (reading) {
                   setState(() {
                     gasMeterReading = reading;
                   });
-                  _savePreference('gasMeterReading', reading); // Save preference
+                  _savePreference(
+                      'gasMeterReading', reading); // Save preference
                 },
               ),
 
@@ -192,7 +197,8 @@ class _KeysState extends State<Keys> {
                   setState(() {
                     carPassLocation = location;
                   });
-                  _savePreference('carPassLocation', location); // Save preference
+                  _savePreference(
+                      'carPassLocation', location); // Save preference
                 },
                 onReadingSelected: (reading) {
                   setState(() {
@@ -211,7 +217,8 @@ class _KeysState extends State<Keys> {
                   setState(() {
                     remoteLocation = location;
                   });
-                  _savePreference('remoteLocation', location); // Save preference
+                  _savePreference(
+                      'remoteLocation', location); // Save preference
                 },
                 onReadingSelected: (reading) {
                   setState(() {
@@ -365,7 +372,7 @@ class ConditionItem extends StatelessWidget {
               }
             },
             child: Text(
-              location ?? "Location",
+              location?.isNotEmpty == true ? location! : "Location",
               style: TextStyle(
                 fontSize: 12.0,
                 fontWeight: FontWeight.w700,
@@ -394,7 +401,7 @@ class ConditionItem extends StatelessWidget {
               }
             },
             child: Text(
-              reading ?? "Comments",
+              reading?.isNotEmpty == true ? reading! : "Reading",
               style: TextStyle(
                 fontSize: 12.0,
                 fontWeight: FontWeight.w700,

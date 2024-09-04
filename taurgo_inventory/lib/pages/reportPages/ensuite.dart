@@ -140,7 +140,8 @@ class _EnsuiteState extends State<Ensuite> {
                   setState(() {
                     doorCondition = condition;
                   });
-                  _savePreference('doorCondition', condition); // Save preference
+                  _savePreference(
+                      'doorCondition', condition); // Save preference
                 },
                 onLocationSelected: (location) {
                   setState(() {
@@ -159,13 +160,15 @@ class _EnsuiteState extends State<Ensuite> {
                   setState(() {
                     doorFrameCondition = condition;
                   });
-                  _savePreference('doorFrameCondition', condition); // Save preference
+                  _savePreference(
+                      'doorFrameCondition', condition); // Save preference
                 },
                 onLocationSelected: (location) {
                   setState(() {
                     doorFrameLocation = location;
                   });
-                  _savePreference('doorFrameLocation', location); // Save preference
+                  _savePreference(
+                      'doorFrameLocation', location); // Save preference
                 },
               ),
 
@@ -178,13 +181,15 @@ class _EnsuiteState extends State<Ensuite> {
                   setState(() {
                     ceilingCondition = condition;
                   });
-                  _savePreference('ceilingCondition', condition); // Save preference
+                  _savePreference(
+                      'ceilingCondition', condition); // Save preference
                 },
                 onLocationSelected: (location) {
                   setState(() {
                     ceilingLocation = location;
                   });
-                  _savePreference('ceilingLocation', location); // Save preference
+                  _savePreference(
+                      'ceilingLocation', location); // Save preference
                 },
               ),
 
@@ -197,13 +202,15 @@ class _EnsuiteState extends State<Ensuite> {
                   setState(() {
                     lightingCondition = condition;
                   });
-                  _savePreference('lightingCondition', condition); // Save preference
+                  _savePreference(
+                      'lightingCondition', condition); // Save preference
                 },
                 onLocationSelected: (location) {
                   setState(() {
                     lightingLocation = location;
                   });
-                  _savePreference('lightingLocation', location); // Save preference
+                  _savePreference(
+                      'lightingLocation', location); // Save preference
                 },
               ),
 
@@ -216,7 +223,8 @@ class _EnsuiteState extends State<Ensuite> {
                   setState(() {
                     wallsCondition = condition;
                   });
-                  _savePreference('wallsCondition', condition); // Save preference
+                  _savePreference(
+                      'wallsCondition', condition); // Save preference
                 },
                 onLocationSelected: (location) {
                   setState(() {
@@ -235,13 +243,15 @@ class _EnsuiteState extends State<Ensuite> {
                   setState(() {
                     skirtingCondition = condition;
                   });
-                  _savePreference('skirtingCondition', condition); // Save preference
+                  _savePreference(
+                      'skirtingCondition', condition); // Save preference
                 },
                 onLocationSelected: (location) {
                   setState(() {
                     skirtingLocation = location;
                   });
-                  _savePreference('skirtingLocation', location); // Save preference
+                  _savePreference(
+                      'skirtingLocation', location); // Save preference
                 },
               ),
 
@@ -254,13 +264,15 @@ class _EnsuiteState extends State<Ensuite> {
                   setState(() {
                     windowSillCondition = condition;
                   });
-                  _savePreference('windowSillCondition', condition); // Save preference
+                  _savePreference(
+                      'windowSillCondition', condition); // Save preference
                 },
                 onLocationSelected: (location) {
                   setState(() {
                     windowSillLocation = location;
                   });
-                  _savePreference('windowSillLocation', location); // Save preference
+                  _savePreference(
+                      'windowSillLocation', location); // Save preference
                 },
               ),
 
@@ -273,13 +285,15 @@ class _EnsuiteState extends State<Ensuite> {
                   setState(() {
                     curtainsCondition = condition;
                   });
-                  _savePreference('curtainsCondition', condition); // Save preference
+                  _savePreference(
+                      'curtainsCondition', condition); // Save preference
                 },
                 onLocationSelected: (location) {
                   setState(() {
                     curtainsLocation = location;
                   });
-                  _savePreference('curtainsLocation', location); // Save preference
+                  _savePreference(
+                      'curtainsLocation', location); // Save preference
                 },
               ),
 
@@ -292,13 +306,15 @@ class _EnsuiteState extends State<Ensuite> {
                   setState(() {
                     blindsCondition = condition;
                   });
-                  _savePreference('blindsCondition', condition); // Save preference
+                  _savePreference(
+                      'blindsCondition', condition); // Save preference
                 },
                 onLocationSelected: (location) {
                   setState(() {
                     blindsLocation = location;
                   });
-                  _savePreference('blindsLocation', location); // Save preference
+                  _savePreference(
+                      'blindsLocation', location); // Save preference
                 },
               ),
 
@@ -311,13 +327,15 @@ class _EnsuiteState extends State<Ensuite> {
                   setState(() {
                     lightSwitchesCondition = condition;
                   });
-                  _savePreference('lightSwitchesCondition', condition); // Save preference
+                  _savePreference(
+                      'lightSwitchesCondition', condition); // Save preference
                 },
                 onLocationSelected: (location) {
                   setState(() {
                     lightSwitchesLocation = location;
                   });
-                  _savePreference('lightSwitchesLocation', location); // Save preference
+                  _savePreference(
+                      'lightSwitchesLocation', location); // Save preference
                 },
               ),
 
@@ -330,13 +348,15 @@ class _EnsuiteState extends State<Ensuite> {
                   setState(() {
                     socketsCondition = condition;
                   });
-                  _savePreference('socketsCondition', condition); // Save preference
+                  _savePreference(
+                      'socketsCondition', condition); // Save preference
                 },
                 onLocationSelected: (location) {
                   setState(() {
                     socketsLocation = location;
                   });
-                  _savePreference('socketsLocation', location); // Save preference
+                  _savePreference(
+                      'socketsLocation', location); // Save preference
                 },
               ),
 
@@ -349,13 +369,15 @@ class _EnsuiteState extends State<Ensuite> {
                   setState(() {
                     flooringCondition = condition;
                   });
-                  _savePreference('flooringCondition', condition); // Save preference
+                  _savePreference(
+                      'flooringCondition', condition); // Save preference
                 },
                 onLocationSelected: (location) {
                   setState(() {
                     flooringLocation = location;
                   });
-                  _savePreference('flooringLocation', location); // Save preference
+                  _savePreference(
+                      'flooringLocation', location); // Save preference
                 },
               ),
 
@@ -368,13 +390,15 @@ class _EnsuiteState extends State<Ensuite> {
                   setState(() {
                     additionalItemsCondition = condition;
                   });
-                  _savePreference('additionalItemsCondition', condition); // Save preference
+                  _savePreference(
+                      'additionalItemsCondition', condition); // Save preference
                 },
                 onLocationSelected: (location) {
                   setState(() {
                     additionalItemsLocation = location;
                   });
-                  _savePreference('additionalItemsLocation', location); // Save preference
+                  _savePreference(
+                      'additionalItemsLocation', location); // Save preference
                 },
               ),
             ],
@@ -481,7 +505,9 @@ class ConditionItem extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: 12,),
+          SizedBox(
+            height: 12,
+          ),
           GestureDetector(
             onTap: () async {
               final result = await Navigator.push(
@@ -498,7 +524,7 @@ class ConditionItem extends StatelessWidget {
               }
             },
             child: Text(
-              location ?? "Location",
+              location?.isNotEmpty == true ? location! : "Location",
               style: TextStyle(
                 fontSize: 12.0,
                 fontWeight: FontWeight.w700,
@@ -507,7 +533,9 @@ class ConditionItem extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(height: 12,),
+          SizedBox(
+            height: 12,
+          ),
           GestureDetector(
             onTap: () async {
               final result = await Navigator.push(
@@ -524,7 +552,7 @@ class ConditionItem extends StatelessWidget {
               }
             },
             child: Text(
-              condition ?? "Condition",
+              condition?.isNotEmpty == true ? condition! : "Condition",
               style: TextStyle(
                 fontSize: 12.0,
                 fontWeight: FontWeight.w700,

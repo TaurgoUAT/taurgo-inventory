@@ -21,6 +21,7 @@ class UtilityRoom extends StatefulWidget {
 }
 
 class _UtilityRoomState extends State<UtilityRoom> {
+  String? newdoor;
   String? doorCondition;
   String? doorDescription;
   String? doorFrameCondition;
@@ -60,6 +61,7 @@ class _UtilityRoomState extends State<UtilityRoom> {
   Future<void> _loadPreferences() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
+      newdoor = prefs.getString('newdoor');
       doorCondition = prefs.getString('doorCondition');
       doorDescription = prefs.getString('doorDescription');
       doorFrameCondition = prefs.getString('doorFrameCondition');
@@ -136,20 +138,18 @@ class _UtilityRoomState extends State<UtilityRoom> {
               ConditionItem(
                 name: "Door",
                 condition: doorCondition,
-                description: doorDescription,
+                description: newdoor,
                 onConditionSelected: (condition) {
                   setState(() {
                     doorCondition = condition;
                   });
-                  _savePreference(
-                      'doorCondition', condition); // Save preference
+                  _savePreference('doorCondition', condition);
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
-                    doorDescription = description;
+                    newdoor = description;
                   });
-                  _savePreference(
-                      'doorDescription', description); // Save preference
+                  _savePreference('newdoor', description);
                 },
               ),
 

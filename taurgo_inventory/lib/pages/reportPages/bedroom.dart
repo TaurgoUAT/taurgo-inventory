@@ -146,7 +146,8 @@ class _BedroomState extends State<Bedroom> {
                   setState(() {
                     doorCondition = condition;
                   });
-                  _savePreference('doorCondition', condition); // Save preference
+                  _savePreference(
+                      'doorCondition', condition); // Save preference
                 },
               ),
 
@@ -159,13 +160,15 @@ class _BedroomState extends State<Bedroom> {
                   setState(() {
                     doorFrameLocation = location;
                   });
-                  _savePreference('doorFrameLocation', location); // Save preference
+                  _savePreference(
+                      'doorFrameLocation', location); // Save preference
                 },
                 onConditionSelected: (condition) {
                   setState(() {
                     doorFrameCondition = condition;
                   });
-                  _savePreference('doorFrameCondition', condition); // Save preference
+                  _savePreference(
+                      'doorFrameCondition', condition); // Save preference
                 },
               ),
 
@@ -178,13 +181,15 @@ class _BedroomState extends State<Bedroom> {
                   setState(() {
                     ceilingLocation = location;
                   });
-                  _savePreference('ceilingLocation', location); // Save preference
+                  _savePreference(
+                      'ceilingLocation', location); // Save preference
                 },
                 onConditionSelected: (condition) {
                   setState(() {
                     ceilingCondition = condition;
                   });
-                  _savePreference('ceilingCondition', condition); // Save preference
+                  _savePreference(
+                      'ceilingCondition', condition); // Save preference
                 },
               ),
 
@@ -197,13 +202,15 @@ class _BedroomState extends State<Bedroom> {
                   setState(() {
                     lightingLocation = location;
                   });
-                  _savePreference('lightingLocation', location); // Save preference
+                  _savePreference(
+                      'lightingLocation', location); // Save preference
                 },
                 onConditionSelected: (condition) {
                   setState(() {
                     lightingCondition = condition;
                   });
-                  _savePreference('lightingCondition', condition); // Save preference
+                  _savePreference(
+                      'lightingCondition', condition); // Save preference
                 },
               ),
 
@@ -222,7 +229,8 @@ class _BedroomState extends State<Bedroom> {
                   setState(() {
                     wallsCondition = condition;
                   });
-                  _savePreference('wallsCondition', condition); // Save preference
+                  _savePreference(
+                      'wallsCondition', condition); // Save preference
                 },
               ),
 
@@ -235,13 +243,15 @@ class _BedroomState extends State<Bedroom> {
                   setState(() {
                     skirtingLocation = location;
                   });
-                  _savePreference('skirtingLocation', location); // Save preference
+                  _savePreference(
+                      'skirtingLocation', location); // Save preference
                 },
                 onConditionSelected: (condition) {
                   setState(() {
                     skirtingCondition = condition;
                   });
-                  _savePreference('skirtingCondition', condition); // Save preference
+                  _savePreference(
+                      'skirtingCondition', condition); // Save preference
                 },
               ),
 
@@ -254,13 +264,15 @@ class _BedroomState extends State<Bedroom> {
                   setState(() {
                     windowSillLocation = location;
                   });
-                  _savePreference('windowSillLocation', location); // Save preference
+                  _savePreference(
+                      'windowSillLocation', location); // Save preference
                 },
                 onConditionSelected: (condition) {
                   setState(() {
                     windowSillCondition = condition;
                   });
-                  _savePreference('windowSillCondition', condition); // Save preference
+                  _savePreference(
+                      'windowSillCondition', condition); // Save preference
                 },
               ),
 
@@ -273,13 +285,15 @@ class _BedroomState extends State<Bedroom> {
                   setState(() {
                     curtainsLocation = location;
                   });
-                  _savePreference('curtainsLocation', location); // Save preference
+                  _savePreference(
+                      'curtainsLocation', location); // Save preference
                 },
                 onConditionSelected: (condition) {
                   setState(() {
                     curtainsCondition = condition;
                   });
-                  _savePreference('curtainsCondition', condition); // Save preference
+                  _savePreference(
+                      'curtainsCondition', condition); // Save preference
                 },
               ),
 
@@ -292,13 +306,15 @@ class _BedroomState extends State<Bedroom> {
                   setState(() {
                     blindsLocation = location;
                   });
-                  _savePreference('blindsLocation', location); // Save preference
+                  _savePreference(
+                      'blindsLocation', location); // Save preference
                 },
                 onConditionSelected: (condition) {
                   setState(() {
                     blindsCondition = condition;
                   });
-                  _savePreference('blindsCondition', condition); // Save preference
+                  _savePreference(
+                      'blindsCondition', condition); // Save preference
                 },
               ),
 
@@ -311,13 +327,15 @@ class _BedroomState extends State<Bedroom> {
                   setState(() {
                     lightSwitchesLocation = location;
                   });
-                  _savePreference('lightSwitchesLocation', location); // Save preference
+                  _savePreference(
+                      'lightSwitchesLocation', location); // Save preference
                 },
                 onConditionSelected: (condition) {
                   setState(() {
                     lightSwitchesCondition = condition;
                   });
-                  _savePreference('lightSwitchesCondition', condition); // Save preference
+                  _savePreference(
+                      'lightSwitchesCondition', condition); // Save preference
                 },
               ),
 
@@ -330,13 +348,15 @@ class _BedroomState extends State<Bedroom> {
                   setState(() {
                     socketsLocation = location;
                   });
-                  _savePreference('socketsLocation', location); // Save preference
+                  _savePreference(
+                      'socketsLocation', location); // Save preference
                 },
                 onConditionSelected: (condition) {
                   setState(() {
                     socketsCondition = condition;
                   });
-                  _savePreference('socketsCondition', condition); // Save preference
+                  _savePreference(
+                      'socketsCondition', condition); // Save preference
                 },
               ),
 
@@ -349,13 +369,15 @@ class _BedroomState extends State<Bedroom> {
                   setState(() {
                     flooringLocation = location;
                   });
-                  _savePreference('flooringLocation', location); // Save preference
+                  _savePreference(
+                      'flooringLocation', location); // Save preference
                 },
                 onConditionSelected: (condition) {
                   setState(() {
                     flooringCondition = condition;
                   });
-                  _savePreference('flooringCondition', condition); // Save preference
+                  _savePreference(
+                      'flooringCondition', condition); // Save preference
                 },
               ),
 
@@ -368,13 +390,15 @@ class _BedroomState extends State<Bedroom> {
                   setState(() {
                     additionalItemsLocation = location;
                   });
-                  _savePreference('additionalItemsLocation', location); // Save preference
+                  _savePreference(
+                      'additionalItemsLocation', location); // Save preference
                 },
                 onConditionSelected: (condition) {
                   setState(() {
                     additionalItemsCondition = condition;
                   });
-                  _savePreference('additionalItemsCondition', condition); // Save preference
+                  _savePreference(
+                      'additionalItemsCondition', condition); // Save preference
                 },
               ),
 
@@ -503,7 +527,7 @@ class ConditionItem extends StatelessWidget {
               }
             },
             child: Text(
-              location ?? "Location",
+              location?.isNotEmpty == true ? location! : "Location",
               style: TextStyle(
                 fontSize: 12.0,
                 fontWeight: FontWeight.w700,
@@ -532,7 +556,7 @@ class ConditionItem extends StatelessWidget {
               }
             },
             child: Text(
-              condition ?? "Condition",
+              condition?.isNotEmpty == true ? condition! : "Condition",
               style: TextStyle(
                 fontSize: 12.0,
                 fontWeight: FontWeight.w700,

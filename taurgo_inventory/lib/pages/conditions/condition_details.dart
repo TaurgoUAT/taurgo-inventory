@@ -7,7 +7,8 @@ import '../../constants/AppColors.dart';
 class ConditionDetails extends StatefulWidget {
   final String? initialCondition;
   final String type;
-  const ConditionDetails({super.key, required this.initialCondition, required this.type});
+  const ConditionDetails(
+      {super.key, required this.initialCondition, required this.type});
 
   @override
   State<ConditionDetails> createState() => _ConditionDetailsState();
@@ -82,7 +83,7 @@ class _ConditionDetailsState extends State<ConditionDetails> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Schedule of Condition',
+          'Details',
           style: TextStyle(
             color: kPrimaryColor,
             fontSize: 14,
@@ -172,15 +173,18 @@ class _ConditionDetailsState extends State<ConditionDetails> {
                 hintText: 'Enter any additional details here...',
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide(color: kPrimaryColor), // Default border color
+                  borderSide:
+                      BorderSide(color: kPrimaryColor), // Default border color
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide(color: kPrimaryColor), // Border color when focused
+                  borderSide: BorderSide(
+                      color: kPrimaryColor), // Border color when focused
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide(color: kPrimaryColor), // Border color when enabled
+                  borderSide: BorderSide(
+                      color: kPrimaryColor), // Border color when enabled
                 ),
               ),
             ),

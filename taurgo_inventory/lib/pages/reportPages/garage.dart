@@ -21,6 +21,7 @@ class Garage extends StatefulWidget {
 }
 
 class _GarageState extends State<Garage> {
+  String? newdoor;
   String? doorCondition;
   String? doorDescription;
   String? doorFrameCondition;
@@ -60,6 +61,7 @@ class _GarageState extends State<Garage> {
   Future<void> _loadPreferences() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
+      newdoor = prefs.getString('newdoor');
       doorCondition = prefs.getString('doorCondition');
       doorDescription = prefs.getString('doorDescription');
       doorFrameCondition = prefs.getString('doorFrameCondition');
@@ -85,7 +87,8 @@ class _GarageState extends State<Garage> {
       flooringCondition = prefs.getString('flooringCondition');
       flooringDescription = prefs.getString('flooringDescription');
       additionalItemsCondition = prefs.getString('additionalItemsCondition');
-      additionalItemsDescription = prefs.getString('additionalItemsDescription');
+      additionalItemsDescription =
+          prefs.getString('additionalItemsDescription');
     });
   }
 
@@ -132,21 +135,21 @@ class _GarageState extends State<Garage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Door
-              ConditionItem(
+                 ConditionItem(
                 name: "Door",
                 condition: doorCondition,
-                description: doorDescription,
+                description: newdoor,
                 onConditionSelected: (condition) {
                   setState(() {
                     doorCondition = condition;
                   });
-                  _savePreference('doorCondition', condition); // Save preference
+                  _savePreference('doorCondition', condition);
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
-                    doorDescription = description;
+                    newdoor = description;
                   });
-                  _savePreference('doorDescription', description); // Save preference
+                  _savePreference('newdoor', description);
                 },
               ),
 
@@ -159,13 +162,15 @@ class _GarageState extends State<Garage> {
                   setState(() {
                     doorFrameCondition = condition;
                   });
-                  _savePreference('doorFrameCondition', condition); // Save preference
+                  _savePreference(
+                      'doorFrameCondition', condition); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     doorFrameDescription = description;
                   });
-                  _savePreference('doorFrameDescription', description); // Save preference
+                  _savePreference(
+                      'doorFrameDescription', description); // Save preference
                 },
               ),
 
@@ -178,13 +183,15 @@ class _GarageState extends State<Garage> {
                   setState(() {
                     ceilingCondition = condition;
                   });
-                  _savePreference('ceilingCondition', condition); // Save preference
+                  _savePreference(
+                      'ceilingCondition', condition); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     ceilingDescription = description;
                   });
-                  _savePreference('ceilingDescription', description); // Save preference
+                  _savePreference(
+                      'ceilingDescription', description); // Save preference
                 },
               ),
 
@@ -197,13 +204,15 @@ class _GarageState extends State<Garage> {
                   setState(() {
                     lightingCondition = condition;
                   });
-                  _savePreference('lightingCondition', condition); // Save preference
+                  _savePreference(
+                      'lightingCondition', condition); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     lightingDescription = description;
                   });
-                  _savePreference('lightingDescription', description); // Save preference
+                  _savePreference(
+                      'lightingDescription', description); // Save preference
                 },
               ),
 
@@ -216,13 +225,15 @@ class _GarageState extends State<Garage> {
                   setState(() {
                     wallsCondition = condition;
                   });
-                  _savePreference('wallsCondition', condition); // Save preference
+                  _savePreference(
+                      'wallsCondition', condition); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     wallsDescription = description;
                   });
-                  _savePreference('wallsDescription', description); // Save preference
+                  _savePreference(
+                      'wallsDescription', description); // Save preference
                 },
               ),
 
@@ -235,13 +246,15 @@ class _GarageState extends State<Garage> {
                   setState(() {
                     skirtingCondition = condition;
                   });
-                  _savePreference('skirtingCondition', condition); // Save preference
+                  _savePreference(
+                      'skirtingCondition', condition); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     skirtingDescription = description;
                   });
-                  _savePreference('skirtingDescription', description); // Save preference
+                  _savePreference(
+                      'skirtingDescription', description); // Save preference
                 },
               ),
 
@@ -254,13 +267,15 @@ class _GarageState extends State<Garage> {
                   setState(() {
                     windowSillCondition = condition;
                   });
-                  _savePreference('windowSillCondition', condition); // Save preference
+                  _savePreference(
+                      'windowSillCondition', condition); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     windowSillDescription = description;
                   });
-                  _savePreference('windowSillDescription', description); // Save preference
+                  _savePreference(
+                      'windowSillDescription', description); // Save preference
                 },
               ),
 
@@ -273,13 +288,15 @@ class _GarageState extends State<Garage> {
                   setState(() {
                     curtainsCondition = condition;
                   });
-                  _savePreference('curtainsCondition', condition); // Save preference
+                  _savePreference(
+                      'curtainsCondition', condition); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     curtainsDescription = description;
                   });
-                  _savePreference('curtainsDescription', description); // Save preference
+                  _savePreference(
+                      'curtainsDescription', description); // Save preference
                 },
               ),
 
@@ -292,13 +309,15 @@ class _GarageState extends State<Garage> {
                   setState(() {
                     blindsCondition = condition;
                   });
-                  _savePreference('blindsCondition', condition); // Save preference
+                  _savePreference(
+                      'blindsCondition', condition); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     blindsDescription = description;
                   });
-                  _savePreference('blindsDescription', description); // Save preference
+                  _savePreference(
+                      'blindsDescription', description); // Save preference
                 },
               ),
 
@@ -311,13 +330,15 @@ class _GarageState extends State<Garage> {
                   setState(() {
                     lightSwitchesCondition = condition;
                   });
-                  _savePreference('lightSwitchesCondition', condition); // Save preference
+                  _savePreference(
+                      'lightSwitchesCondition', condition); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     lightSwitchesDescription = description;
                   });
-                  _savePreference('lightSwitchesDescription', description); // Save preference
+                  _savePreference('lightSwitchesDescription',
+                      description); // Save preference
                 },
               ),
 
@@ -330,13 +351,15 @@ class _GarageState extends State<Garage> {
                   setState(() {
                     socketsCondition = condition;
                   });
-                  _savePreference('socketsCondition', condition); // Save preference
+                  _savePreference(
+                      'socketsCondition', condition); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     socketsDescription = description;
                   });
-                  _savePreference('socketsDescription', description); // Save preference
+                  _savePreference(
+                      'socketsDescription', description); // Save preference
                 },
               ),
 
@@ -349,13 +372,15 @@ class _GarageState extends State<Garage> {
                   setState(() {
                     flooringCondition = condition;
                   });
-                  _savePreference('flooringCondition', condition); // Save preference
+                  _savePreference(
+                      'flooringCondition', condition); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     flooringDescription = description;
                   });
-                  _savePreference('flooringDescription', description); // Save preference
+                  _savePreference(
+                      'flooringDescription', description); // Save preference
                 },
               ),
 
@@ -368,13 +393,15 @@ class _GarageState extends State<Garage> {
                   setState(() {
                     additionalItemsCondition = condition;
                   });
-                  _savePreference('additionalItemsCondition', condition); // Save preference
+                  _savePreference(
+                      'additionalItemsCondition', condition); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     additionalItemsDescription = description;
                   });
-                  _savePreference('additionalItemsDescription', description); // Save preference
+                  _savePreference('additionalItemsDescription',
+                      description); // Save preference
                 },
               ),
 
@@ -483,7 +510,9 @@ class ConditionItem extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: 12,),
+          SizedBox(
+            height: 12,
+          ),
           GestureDetector(
             onTap: () async {
               final result = await Navigator.push(
@@ -510,7 +539,9 @@ class ConditionItem extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(height: 12,),
+          SizedBox(
+            height: 12,
+          ),
           GestureDetector(
             onTap: () async {
               final result = await Navigator.push(
