@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:taurgo_inventory/pages/add_property_details_page_second.dart';
+import 'package:taurgo_inventory/pages/home_page.dart';
 import 'package:taurgo_inventory/pages/landing_screen.dart';
 import '../constants/AppColors.dart';
 
@@ -154,7 +155,8 @@ class _AddPropertyDetailsPageState extends State<AddPropertyDetailsPage> {
                               context,
                               MaterialPageRoute(
                                   builder: (context) =>
-                                      LandingScreen()), // Replace HomePage with your home page
+                                      HomePage()), // Replace HomePage with your
+                              // home page
                               // widget
                             ); // Close the dialog
                           },

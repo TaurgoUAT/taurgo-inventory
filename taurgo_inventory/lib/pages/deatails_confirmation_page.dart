@@ -10,6 +10,16 @@ import 'package:taurgo_inventory/pages/landing_screen.dart';
 import '../../constants/AppColors.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'dart:async';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:taurgo_inventory/constants/UrlConstants.dart';
+import 'package:taurgo_inventory/pages/add_property_details_page.dart';
+import 'package:taurgo_inventory/pages/property_details_view_page.dart';
+import '../constants/AppColors.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'authentication/controller/authController.dart';
 
 class DetailsConfirmationPage extends StatefulWidget {
 
@@ -43,6 +53,30 @@ class DetailsConfirmationPage extends StatefulWidget {
 }
 
 class _DetailsConfirmationPageState extends State<DetailsConfirmationPage> {
+  User? user;
+  late String firebaseId;
+
+  @override
+  void initState() {
+    super.initState();
+    getFirebaseUserId();
+  }
+  Future<void> getFirebaseUserId() async {
+    try {
+      user = FirebaseAuth.instance.currentUser;
+
+      if (user != null) {
+        setState(() {
+          firebaseId = user!.uid;
+        });
+      } else {
+        print("No user is currently signed in.");
+      }
+    } catch (e) {
+      print("Error getting user UID: $e");
+    }
+  }
+
   Future<void> _saveDetails() async {
 
     // Show loading indicator
@@ -68,6 +102,9 @@ class _DetailsConfirmationPageState extends State<DetailsConfirmationPage> {
       // var uri = Uri.parse('http://192.168.1.18:9090/partner/add-partner');
 
       final request = http.MultipartRequest('POST', uri)
+
+        ..fields['firebaseId'] = firebaseId
+
 
       //Address
         ..fields['addressLineOne'] = widget.lineOneAddress ?? 'N/A'
@@ -177,7 +214,9 @@ class _DetailsConfirmationPageState extends State<DetailsConfirmationPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return PopScope(
+      canPop: false,
+        child: Scaffold(
       appBar: AppBar(
         title: Text(
           'Confirmation',
@@ -541,7 +580,7 @@ class _DetailsConfirmationPageState extends State<DetailsConfirmationPage> {
                         color: Color(0xFFC2C2C2), // Divider color
                       ),
                     ),
-                    
+
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -662,7 +701,7 @@ class _DetailsConfirmationPageState extends State<DetailsConfirmationPage> {
           ],
         ),
       ),
-    );
+    ));
   }
 }
 

@@ -1,5 +1,6 @@
+import 'dart:io';
+
 import 'AddressDto.dart';
-import 'InspectionReportDto.dart';
 import 'UserDto.dart';
 
 class PropertyDto {
@@ -67,7 +68,9 @@ class InspectionDto {
       keyLocation: json['keyLocation'],
       keyReference: json['keyReference'],
       internalNotes: json['internalNotes'],
-      inspectionReports: (json['inspectionReports'] as List).map((i) => InspectionReportDto.fromJson(i)).toList(),
+      inspectionReports: (json['inspectionReports'] as List)
+          .map((i) => InspectionReportDto.fromJson(i))
+          .toList(),
     );
   }
 
@@ -82,6 +85,80 @@ class InspectionDto {
       'keyReference': keyReference,
       'internalNotes': internalNotes,
       'inspectionReports': inspectionReports.map((report) => report.toJson()).toList(),
+    };
+  }
+}
+
+class InspectionReportDto {
+  final String reportId;
+  final String name;
+  final List<SubTypeDto> subTypes;
+  final String additionalComments;
+
+  InspectionReportDto({
+    required this.reportId,
+    required this.name,
+    required this.subTypes,
+    required this.additionalComments,
+  });
+
+  factory InspectionReportDto.fromJson(Map<String, dynamic> json) {
+    return InspectionReportDto(
+      reportId: json['reportId'],
+      name: json['name'],
+      subTypes: (json['subTypes'] as List)
+          .map((i) => SubTypeDto.fromJson(i))
+          .toList(),
+      additionalComments: json['additionalComments'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'reportId': reportId,
+      'name': name,
+      'subTypes': subTypes.map((subType) => subType.toJson()).toList(),
+      'additionalComments': additionalComments,
+    };
+  }
+}
+
+class SubTypeDto {
+  final String subTypeId;
+  final String subTypeName;
+  final List<String> images; // URLs or file paths
+  List<File> conditionImages; // This holds the image files for upload
+  final String comments;
+  final String feedback;
+
+  SubTypeDto({
+    required this.subTypeId,
+    required this.subTypeName,
+    required this.images,
+    required this.conditionImages,
+    required this.comments,
+    required this.feedback,
+  });
+
+  factory SubTypeDto.fromJson(Map<String, dynamic> json) {
+    return SubTypeDto(
+      subTypeId: json['subTypeId'],
+      subTypeName: json['subTypeName'],
+      images: List<String>.from(json['images']),
+      comments: json['comments'],
+      feedback: json['feedback'],
+      conditionImages: [], // Initialize as an empty list; file objects are managed separately
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'subTypeId': subTypeId,
+      'subTypeName': subTypeName,
+      'images': images,
+      'comments': comments,
+      'feedback': feedback,
+      // Exclude conditionImages from JSON serialization
     };
   }
 }

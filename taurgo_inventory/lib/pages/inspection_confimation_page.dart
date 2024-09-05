@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:taurgo_inventory/pages/landing_screen.dart';
 import '../../constants/AppColors.dart';
 import 'package:digital_signature_flutter/digital_signature_flutter.dart';
@@ -11,12 +13,13 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 import '../Dtos/AddressDto.dart';
-import '../Dtos/InspectionReportDto.dart';
 import '../Dtos/PropertyDto.dart';
 import '../Dtos/UserDto.dart';
 
 class InspectionConfimationPage extends StatefulWidget {
-  const InspectionConfimationPage({super.key});
+  final String propertyId;
+
+  const InspectionConfimationPage({super.key, required this.propertyId});
 
   @override
   State<InspectionConfimationPage> createState() =>
@@ -32,138 +35,213 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
   String filterOption = 'All'; // Initial filter option
   List<Map<String, dynamic>> filteredProperties = [];
   List<Map<String, dynamic>> properties = [];
-  List<Map<String, dynamic>> userDetails= [];
+  List<Map<String, dynamic>> userDetails = [];
   User? user;
-  late PropertyDto property;
-  // @override
-  // void initState() {
-  //   getFirebaseUserId();
-  //   // fetchProperties();
-  //   controller = SignatureController(penStrokeWidth: 2, penColor: Colors.black);
-  //   super.initState();
-  //
-  // }
+  String? selectedType;
+  final Set<String> visitedPages = {}; // Track visited pages
+
+  //SOC
+  String? overview;
+  String? accessoryCleanliness;
+  String? windowSill;
+  String? carpets;
+  String? ceilings;
+  String? curtains;
+  String? hardFlooring;
+  String? kitchenArea;
+  String? oven;
+  String? mattress;
+  String? upholstrey;
+  String? wall;
+  String? window;
+  String? woodwork;
+  List<String> overviewImages = [];
+  List<String> accessoryCleanlinessImages = [];
+  List<String> windowSillImages = [];
+  List<String> carpetsImages = [];
+  List<String> ceilingsImages = [];
+  List<String> curtainsImages = [];
+  List<String> hardFlooringImages = [];
+  List<String> kitchenAreaImages = [];
+  List<String> ovenImages = [];
+  List<String> mattressImages = [];
+  List<String> upholstreyImages = [];
+  List<String> wallImages = [];
+  List<String> windowImages = [];
+  List<String> woodworkImages = [];
 
   @override
   void initState() {
+    super.initState();
+    fetchProperties();
     getFirebaseUserId();
     // fetchProperties();
     controller = SignatureController(penStrokeWidth: 2, penColor: Colors.black);
-    super.initState();
-    super.initState();
-    // Initialize your property object with data
-    property = PropertyDto(
-      id: 'property123',
-      addressDto: AddressDto(
-        addressLineOne: '123 Main St',
-        addressLineTwo: 'Kurumankadu',
-        city: 'Vavuniya',
-        state: 'Western',
-        country: 'Sri Lanka',
-        postalCode: '12345',
-      ),
-      userDto: UserDto(
-        firebaseId: 'user001',
-        firstName: 'Abishan',
-        lastName: 'Ananthan',
-        userName: 'abishaan09',
-        email: 'abiabishan09@gmail.com',
-        location: '+Vavuniya',
-      ),
-      inspectionDto: InspectionDto(
-        inspectionId: 'insp001',
-        inspectorName: 'Jane Smith',
-        inspectionType: 'Check Out',
-        date: '2024-09-01',
-        time: '2024-09-01',
-        keyLocation: '2024-09-01',
-        keyReference: '2024-09-01',
-        internalNotes: '2024-09-01',
-        inspectionReports: [
-          InspectionReportDto(
-            reportId: 'report001',
-            name: 'Schedule of Condition',
-            subTypes: [
-              SubTypeDto(
-                subTypeId: 'subType001',
-                subTypeName: 'Overview - Odours',
-                images: ['https://www.loans.com.au/dA/9de8aa8d51/what-factors-affect-property-value.png'],
-                comments: 'Condition: Good, Additional Comments: Good',
-                feedback: '',
-              ),
+    getSharedPreferencesData();
+    print(overview);
+    _loadPreferences(widget.propertyId);
 
-              SubTypeDto(
-                subTypeId: 'subType001',
-                subTypeName: 'Overview - Odours',
-                images: ['https://www.loans.com.au/dA/9de8aa8d51/what-factors-affect-property-value.png'],
-                comments: 'Condition: Good, Additional Comments: Good',
-                feedback: '',
-              ),
-
-              SubTypeDto(
-                subTypeId: 'subType001',
-                subTypeName: 'Overview - Odours',
-                images: ['https://www.loans.com.au/dA/9de8aa8d51/what-factors-affect-property-value.png'],
-                comments: 'Condition: Good, Additional Comments: Good',
-                feedback: '',
-              ),
-
-              SubTypeDto(
-                subTypeId: 'subType001',
-                subTypeName: 'Overview - Odours',
-                images: ['https://www.loans.com.au/dA/9de8aa8d51/what-factors-affect-property-value.png'],
-                comments: 'Condition: Good, Additional Comments: Good',
-                feedback: '',
-              ),
-
-              SubTypeDto(
-                subTypeId: 'subType001',
-                subTypeName: 'Overview - Odours',
-                images: ['https://www.loans.com.au/dA/9de8aa8d51/what-factors-affect-property-value.png'],
-                comments: 'Condition: Good, Additional Comments: Good',
-                feedback: '',
-              ),
-
-              SubTypeDto(
-                subTypeId: 'subType001',
-                subTypeName: 'Overview - Odours',
-                images: ['https://www.loans.com.au/dA/9de8aa8d51/what-factors-affect-property-value.png'],
-                comments: 'Condition: Good, Additional Comments: Good',
-                feedback: '',
-              ),
-
-              SubTypeDto(
-                subTypeId: 'subType001',
-                subTypeName: 'Overview - Odours',
-                images: ['https://www.loans.com.au/dA/9de8aa8d51/what-factors-affect-property-value.png'],
-                comments: 'Condition: Good, Additional Comments: Good',
-                feedback: '',
-              ),
-
-              SubTypeDto(
-                subTypeId: 'subType001',
-                subTypeName: 'Overview - Odours',
-                images: ['https://www.loans.com.au/dA/9de8aa8d51/what-factors-affect-property-value.png'],
-                comments: 'Condition: Good, Additional Comments: Good',
-                feedback: '',
-              ),
-              SubTypeDto(
-                subTypeId: 'subType001',
-                subTypeName: 'Overview - Odours',
-                images: ['https://www.loans.com.au/dA/9de8aa8d51/what-factors-affect-property-value.png'],
-                comments: 'Condition: Good, Additional Comments: Good',
-                feedback: '',
-              ),
-
-              // Add more SubTypeDto items as needed
-            ],
-            additionalComments: 'All areas in good condition.',
-          ),
-          // Add more InspectionReportDto items as needed
-        ],
-      ),
-    );
   }
+
+  Future<void> _loadPreferences(String propertyId) async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      overview = prefs.getString('overview_${propertyId}' ?? "N/A") ;
+
+      accessoryCleanliness =
+          prefs.getString('accessoryCleanliness_${propertyId}' ?? "N/A");
+      windowSill = prefs.getString('windowSill_${propertyId}' ?? "N/A");
+      carpets = prefs.getString('carpets_${propertyId}');
+      ceilings = prefs.getString('ceilings_${propertyId}');
+      curtains = prefs.getString('curtains_${propertyId}');
+      hardFlooring = prefs.getString('hardFlooring_${propertyId}');
+      kitchenArea = prefs.getString('kitchenArea_${propertyId}');
+      oven = prefs.getString('oven_${propertyId}');
+      mattress = prefs.getString('mattress_${propertyId}');
+      upholstrey = prefs.getString('upholstrey_${propertyId}');
+      wall = prefs.getString('wall_${propertyId}');
+      window = prefs.getString('window_${propertyId}');
+      woodwork = prefs.getString('woodwork_${propertyId}');
+
+      overviewImages =
+          prefs.getStringList('overviewImages_${propertyId}') ?? [];
+      accessoryCleanlinessImages =
+          prefs.getStringList('accessoryCleanlinessImages_${propertyId}') ?? [];
+      windowSillImages =
+          prefs.getStringList('windowSillImages_${propertyId}') ?? [];
+      carpetsImages = prefs.getStringList('carpetsImages_${propertyId}') ?? [];
+      ceilingsImages =
+          prefs.getStringList('ceilingsImages_${propertyId}') ?? [];
+      curtainsImages =
+          prefs.getStringList('curtainsImages_${propertyId}') ?? [];
+      hardFlooringImages =
+          prefs.getStringList('hardFlooringImages_${propertyId}') ?? [];
+      kitchenAreaImages =
+          prefs.getStringList('kitchenAreaImages_${propertyId}') ?? [];
+      ovenImages = prefs.getStringList('ovenImages_${propertyId}') ?? [];
+      mattressImages =
+          prefs.getStringList('mattressImages_${propertyId}') ?? [];
+      upholstreyImages =
+          prefs.getStringList('upholstreyImages_${propertyId}') ?? [];
+      wallImages = prefs.getStringList('wallImages_${propertyId}') ?? [];
+      windowImages = prefs.getStringList('windowImages_${propertyId}') ?? [];
+      woodworkImages =
+          prefs.getStringList('woodworkImages_${propertyId}') ?? [];
+      print(overview);
+    });
+  }
+
+  late PropertyDto property = PropertyDto(
+    id: 'property123',
+    addressDto: AddressDto(
+      addressLineOne: overview ?? 'N/A',
+      addressLineTwo: accessoryCleanliness ?? 'N/A',
+      city: 'Vavuniya',
+      state: 'Western',
+      country: 'Sri Lanka',
+      postalCode: '12345',
+    ),
+    userDto: UserDto(
+      firebaseId: 'user001',
+      firstName: 'Abishan',
+      lastName: 'Ananthan',
+      userName: 'abishaan09',
+      email: 'abiabishan09@gmail.com',
+      location: '+Vavuniya',
+    ),
+    inspectionDto: InspectionDto(
+      inspectionId: 'insp001',
+      inspectorName: 'Jane Smith',
+      inspectionType: 'Check Out',
+      date: '2024-09-01',
+      time: '2024-09-01',
+      keyLocation: '2024-09-01',
+      keyReference: '2024-09-01',
+      internalNotes: '2024-09-01',
+      inspectionReports: [
+        InspectionReportDto(
+          reportId: 'report001',
+          name: 'Schedule of Condition',
+          subTypes: [
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Overview - Odours',
+              images: ['https://www.loans.com.au/dA/9de8aa8d51/what-factors-affect-property-value.png'],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '', conditionImages: [],
+            ),
+
+            // SubTypeDto(
+            //   subTypeId: 'subType001',
+            //   subTypeName: 'Overview - Odours',
+            //   images: ['https://www.loans.com.au/dA/9de8aa8d51/what-factors-affect-property-value.png'],
+            //   comments: 'Condition: Good, Additional Comments: Good',
+            //   feedback: '',
+            // ),
+            //
+            // SubTypeDto(
+            //   subTypeId: 'subType001',
+            //   subTypeName: 'Overview - Odours',
+            //   images: ['https://www.loans.com.au/dA/9de8aa8d51/what-factors-affect-property-value.png'],
+            //   comments: 'Condition: Good, Additional Comments: Good',
+            //   feedback: '',
+            // ),
+            //
+            // SubTypeDto(
+            //   subTypeId: 'subType001',
+            //   subTypeName: 'Overview - Odours',
+            //   images: ['https://www.loans.com.au/dA/9de8aa8d51/what-factors-affect-property-value.png'],
+            //   comments: 'Condition: Good, Additional Comments: Good',
+            //   feedback: '',
+            // ),
+            //
+            // SubTypeDto(
+            //   subTypeId: 'subType001',
+            //   subTypeName: 'Overview - Odours',
+            //   images: ['https://www.loans.com.au/dA/9de8aa8d51/what-factors-affect-property-value.png'],
+            //   comments: 'Condition: Good, Additional Comments: Good',
+            //   feedback: '',
+            // ),
+            //
+            // SubTypeDto(
+            //   subTypeId: 'subType001',
+            //   subTypeName: 'Overview - Odours',
+            //   images: ['https://www.loans.com.au/dA/9de8aa8d51/what-factors-affect-property-value.png'],
+            //   comments: 'Condition: Good, Additional Comments: Good',
+            //   feedback: '',
+            // ),
+            //
+            // SubTypeDto(
+            //   subTypeId: 'subType001',
+            //   subTypeName: 'Overview - Odours',
+            //   images: ['https://www.loans.com.au/dA/9de8aa8d51/what-factors-affect-property-value.png'],
+            //   comments: 'Condition: Good, Additional Comments: Good',
+            //   feedback: '',
+            // ),
+            //
+            // SubTypeDto(
+            //   subTypeId: 'subType001',
+            //   subTypeName: 'Overview - Odours',
+            //   images: ['https://www.loans.com.au/dA/9de8aa8d51/what-factors-affect-property-value.png'],
+            //   comments: 'Condition: Good, Additional Comments: Good',
+            //   feedback: '',
+            // ),
+            // SubTypeDto(
+            //   subTypeId: 'subType001',
+            //   subTypeName: 'Overview - Odours',
+            //   images: ['https://www.loans.com.au/dA/9de8aa8d51/what-factors-affect-property-value.png'],
+            //   comments: 'Condition: Good, Additional Comments: Good',
+            //   feedback: '',
+            // ),
+
+            // Add more SubTypeDto items as needed
+          ],
+          additionalComments: 'All areas in good condition.',
+        ),
+        // Add more InspectionReportDto items as needed
+      ],
+    ),
+  );
 
   Future<void> _saveData() async {
     try {
@@ -194,6 +272,212 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
     }
   }
 
+  Future<void> fetchProperties() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    String propertyId = widget.propertyId;
+
+    try {
+      final response = await http
+          .get(Uri.parse('$baseURL/property/$propertyId'))
+          .timeout(Duration(seconds: 60)); // Set the timeout duration
+
+      if (response.statusCode == 200) {
+        print("Edit Page - $propertyId");
+        final List<dynamic> data = json.decode(response.body);
+        setState(() {
+          properties =
+              data.map((item) => item as Map<String, dynamic>).toList();
+          isLoading = false;
+        });
+      } else {
+        // Handle server errors
+        setState(() {
+          properties = []; // Ensure properties is set to an empty list
+          isLoading = false;
+        });
+        // Display error message
+      }
+    } catch (e) {
+      // Handle network errors
+      setState(() {
+        properties = []; // Ensure properties is set to an empty list
+        isLoading = false;
+      });
+      // Display error message
+    }
+  }
+
+
+  Future<Map<String, dynamic>> getSharedPreferencesData() async {
+    String propertyId = widget.propertyId;
+    final prefs = await SharedPreferences.getInstance();
+
+    // Retrieve address data
+    final addressLineOne =
+        prefs.getString('overview_${propertyId}') ?? 'Default Address Line One';
+    final addressLineTwo =
+        prefs.getString('addressLineTwo') ?? 'Default Address Line Two';
+    final city = prefs.getString('city') ?? 'Default City';
+    final state = prefs.getString('state') ?? 'Default State';
+    final country = prefs.getString('country') ?? 'Default Country';
+    final postalCode = prefs.getString('postalCode') ?? 'Default Postal Code';
+
+    // Retrieve user data
+    final userFirebaseId =
+        prefs.getString('userFirebaseId') ?? 'Default Firebase ID';
+    final userFirstName =
+        prefs.getString('userFirstName') ?? 'Default First Name';
+    final userLastName = prefs.getString('userLastName') ?? 'Default Last Name';
+    final userUserName = prefs.getString('userUserName') ?? 'Default Username';
+    final userEmail = prefs.getString('userEmail') ?? 'Default Email';
+    final userLocation = prefs.getString('userLocation') ?? 'Default Location';
+
+    // Retrieve inspection data
+    final inspectionId =
+        prefs.getString('inspectionId') ?? 'Default Inspection ID';
+    final inspectorName =
+        prefs.getString('inspectorName') ?? 'Default Inspector Name';
+    final inspectionType =
+        prefs.getString('inspectionType') ?? 'Default Inspection Type';
+    final date = prefs.getString('date') ?? 'Default Date';
+    final time = prefs.getString('time') ?? 'Default Time';
+    final keyLocation =
+        prefs.getString('keyLocation') ?? 'Default Key Location';
+    final keyReference =
+        prefs.getString('keyReference') ?? 'Default Key Reference';
+    final internalNotes =
+        prefs.getString('internalNotes') ?? 'Default Internal Notes';
+
+    // Retrieve image paths or URLs from SharedPreferences
+    final subTypeImagePaths = prefs.getString('overview_${propertyId}') ?? [];
+    final subTypeComments =
+        prefs.getString('subTypeComments') ?? 'Default Comments';
+    final subTypeFeedback =
+        prefs.getString('subTypeFeedback') ?? 'Default Feedback';
+    final additionalComments =
+        prefs.getString('additionalComments') ?? 'Default Additional Comments';
+
+    return {
+      'addressDto': {
+        'addressLineOne': addressLineOne,
+        'addressLineTwo': addressLineTwo,
+        'city': city,
+        'state': state,
+        'country': country,
+        'postalCode': postalCode,
+      },
+      'userDto': {
+        'firebaseId': userFirebaseId,
+        'firstName': userFirstName,
+        'lastName': userLastName,
+        'userName': userUserName,
+        'email': userEmail,
+        'location': userLocation,
+      },
+      'inspectionDto': {
+        'inspectionId': inspectionId,
+        'inspectorName': inspectorName,
+        'inspectionType': inspectionType,
+        'date': date,
+        'time': time,
+        'keyLocation': keyLocation,
+        'keyReference': keyReference,
+        'internalNotes': internalNotes,
+        'inspectionReports': [
+          {
+            'reportId': 'report001',
+            'name': 'Schedule of Condition',
+            'subTypes': [
+              {
+                'subTypeId': 'subType001',
+                'subTypeName': 'Odours',
+                'images': subTypeImagePaths, // Use image paths or URLs
+                'comments': subTypeComments,
+                'feedback': subTypeFeedback,
+              },
+            ],
+            'additionalComments': additionalComments,
+          },
+        ],
+      },
+    };
+  }
+
+// Function to load images based on their paths
+  Future<List<File>> loadImages(List<String> imagePaths) async {
+    final imageFiles = <File>[];
+    for (String path in imagePaths) {
+      final file = File(path);
+      if (await file.exists()) {
+        imageFiles.add(file);
+      }
+    }
+    return imageFiles;
+  }
+
+  // Example usage
+  void exampleUsage() async {
+    final data = await getSharedPreferencesData();
+    final imagePaths = List<String>.from(
+        data['inspectionDto']['inspectionReports'][0]['subTypes'][0]['images']);
+    final imageFiles = await loadImages(imagePaths);
+
+    // Now you have the list of image files and can use them as needed
+  }
+
+  // void onPreviewPressed() async {
+  //   final data = await getSharedPreferencesData();
+  //
+  //   Navigator.push(
+  //     context,
+  //     MaterialPageRoute(
+  //       builder: (context) => InspectionConfimationPage(
+  //         finalDate: data,),
+  //     ),
+  //   );
+  // }
+
+  // @override
+  // void initState() {
+  //   getFirebaseUserId();
+  //   // fetchProperties();
+  //   controller = SignatureController(penStrokeWidth: 2, penColor: Colors.black);
+  //   super.initState();
+  //
+  // }
+
+  // Future<void> _saveData() async {
+  //   try {
+  //     await sendPropertyData(property);
+  //     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+  //       content: Text('Data saved successfully!'),
+  //     ));
+  //   } catch (e) {
+  //     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+  //       content: Text('Failed to save data: $e'),
+  //     ));
+  //   }
+  // }
+
+  // Future<void> sendPropertyData(PropertyDto property) async {
+  //   final url = '$baseURL/summary/generateReport'; // Replace with your backend URL
+  //   final headers = {'Content-Type': 'application/json'};
+  //   final body = jsonEncode(property.toJson());
+  //
+  //   final response = await http.post(
+  //     Uri.parse(url),
+  //     headers: headers,
+  //     body: body,
+  //   );
+  //
+  //   if (response.statusCode != 200) {
+  //     throw Exception('Failed to save data: ${response.reasonPhrase}');
+  //   }
+  // }
+
   late String firebaseId;
 
   Future<void> getFirebaseUserId() async {
@@ -215,12 +499,12 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
 
   Future<void> fetchUserDetails() async {
     try {
-      final response = await http.get(Uri.parse
-        ('$baseURL/user/firebaseId/$firebaseId'));
+      final response =
+          await http.get(Uri.parse('$baseURL/user/firebaseId/$firebaseId'));
 
       if (response.statusCode == 200) {
         print(response.statusCode);
-        final List<dynamic>userData = json.decode(response.body);
+        final List<dynamic> userData = json.decode(response.body);
 
         if (mounted) {
           setState(() {
@@ -254,6 +538,84 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
     }
   }
 
+  // void _previewReport() async {
+  //   try {
+  //     // Pass all types, subtypes, and images from the form into the DTO
+  //     property.inspectionDto!.inspectionReports[0].subTypes = [
+  //       SubTypeDto(
+  //         subTypeId: 'subType001',
+  //         subTypeName: 'Overview - Odours',
+  //         imageUrls: [], // Initially empty, will be populated after upload
+  //         images: selectedImages, // List of image files selected by user
+  //         comments: 'Condition: Good, Additional Comments: Good',
+  //         feedback: '',
+  //       ),
+  //       // Add more subtypes as necessary
+  //     ];
+  //
+  //     // Navigate to preview or call _saveData if needed
+  //     Navigator.push(
+  //       context,
+  //       MaterialPageRoute(
+  //         builder: (context) => PreviewPage(property: property),
+  //       ),
+  //     );
+  //   } catch (e) {
+  //     print("Error in previewing report: $e");
+  //   }
+  // }
+  //
+  // Future<void> sendPropertyData(PropertyDto property) async {
+  //   final url = '$baseURL/summary/generateReport';
+  //   final headers = {'Content-Type': 'application/json'};
+  //
+  //   // Upload images first, then update imageUrls in DTO
+  //   for (var report in property.inspectionDto.inspectionReports) {
+  //     for (var subType in report.subTypes) {
+  //       await uploadImages(subType);
+  //     }
+  //   }
+  //
+  //   final body = jsonEncode(property.toJson());
+  //
+  //   final response = await http.post(
+  //     Uri.parse(url),
+  //     headers: headers,
+  //     body: body,
+  //   );
+  //
+  //   if (response.statusCode != 200) {
+  //     throw Exception('Failed to save data: ${response.reasonPhrase}');
+  //   }
+  // }
+  //
+  // Future<void> uploadImages(SubTypeDto subType) async {
+  //   final url = '$baseURL/uploadImages';
+  //   var request = http.MultipartRequest('POST', Uri.parse(url));
+  //
+  //   // Attach the images to the request
+  //   for (File image in subType.images) {
+  //     request.files.add(
+  //       await http.MultipartFile.fromPath(
+  //         'images',
+  //         image.path,
+  //       ),
+  //     );
+  //   }
+  //
+  //   final response = await request.send();
+  //
+  //   if (response.statusCode == 200) {
+  //     final responseBody = await response.stream.bytesToString();
+  //     List<String> uploadedImageUrls = jsonDecode(responseBody);
+  //
+  //     // Update imageUrls with uploaded URLs
+  //     subType.imageUrls.addAll(uploadedImageUrls);
+  //   } else {
+  //     throw Exception('Failed to upload images');
+  //   }
+  // }
+
   // Future<void> sendPropertyData(PropertyDto.dart property) async {
   //   final url = 'http://your-backend-url/api/property';
   //   final headers = {'Content-Type': 'application/json'};
@@ -284,7 +646,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '1.1 Overview - Odours',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {'label': 'Condition', 'value': "overview"},
               {'label': 'Additional Comments', 'value': 'Good'},
             ],
             'images': ['path_to_image1', 'path_to_image2']
@@ -424,7 +786,6 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
           },
-
         ],
       },
       {
@@ -2629,19 +2990,24 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
                 ListView.builder(
                   padding: EdgeInsets.all(0),
                   shrinkWrap: true,
-                  physics: NeverScrollableScrollPhysics(), // Prevents ListView from scrolling independently
+                  physics: NeverScrollableScrollPhysics(),
+                  // Prevents ListView from scrolling independently
                   itemCount: data.length,
                   itemBuilder: (context, index) {
                     final item = data[index];
                     return ExpansionTile(
                       title: Text(item['title']),
-                      leading: Icon(item['icon'],color: kPrimaryColor,),
+                      leading: Icon(
+                        item['icon'],
+                        color: kPrimaryColor,
+                      ),
                       children: item['subItems'].map<Widget>((subItem) {
                         return ExpansionTile(
                           title: Text(subItem['title']),
                           children: [
                             Column(
-                              children: subItem['details'].map<Widget>((detail) {
+                              children:
+                                  subItem['details'].map<Widget>((detail) {
                                 return ListTile(
                                   title: Text(detail['label']),
                                   subtitle: Text(detail['value']),
@@ -2658,8 +3024,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
                                   return Container(
                                     margin: EdgeInsets.symmetric(horizontal: 8),
                                     width: 100,
-                                    child: Image.asset(
-                                        subItem['images'][imgIndex]), // Use Image.network() for URLs
+                                    child: Image.asset(subItem['images'][
+                                        imgIndex]), // Use Image.network() for URLs
                                   );
                                 },
                               ),
@@ -2678,7 +3044,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
                       fontFamily: "Inter",
                     )),
                 const SizedBox(height: 15),
-                const Text('I/We the undersigned, affirm  that if I/we do not'
+                const Text(
+                    'I/We the undersigned, affirm  that if I/we do not'
                     ' comment on the inventory in writing within seven days '
                     'of receipt of this inventory I/We accept the inventory '
                     'as being an accurate record of the contents and '
@@ -2711,28 +3078,27 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
                 const SizedBox(height: 30),
                 signature != null
                     ? Column(
-                  children: [
-                    Center(child: Image.memory(signature!)),
-                    const SizedBox(height: 10),
-                    MaterialButton(
-                      color: Colors.green,
-                      onPressed: () {},
-                      child: const Text(
-                        "Submit",
-                        style: TextStyle(
-                          fontSize: 12,
-                        ),
-                      ),
-                    ),
-                  ],
-                )
+                        children: [
+                          Center(child: Image.memory(signature!)),
+                          const SizedBox(height: 10),
+                          MaterialButton(
+                            color: Colors.green,
+                            onPressed: () {},
+                            child: const Text(
+                              "Submit",
+                              style: TextStyle(
+                                fontSize: 12,
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
                     : Container(),
                 const SizedBox(height: 30),
               ],
             ),
           ),
         ),
-
       ),
     );
   }
