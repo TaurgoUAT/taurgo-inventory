@@ -78,7 +78,7 @@ class _EditReportPageState extends State<EditReportPage> {
       'Schedule of Condition': ScheduleOfCondition(propertyId: widget.propertyId),
       'EV Charger': EvCharger(),
       'Meter Reading': MeterReading(propertyId: widget.propertyId,),
-      'Keys': Keys(),
+      'Keys': Keys(propertyId: widget.propertyId,),
       "Keys Handed Over At Check In": KeyHandedOver(),
       'Health & Safety | Smoke & Carbon Monoxide': HealthAndSafety(),
       'Front Garden': FrontGarden(),
