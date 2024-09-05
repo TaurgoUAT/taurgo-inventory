@@ -9,38 +9,7 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9cfeb956-5354-4366-ab84-34804ef25cb7" name="Changes" comment="Project updated">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/constants/UrlConstants.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/constants/UrlConstants.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/camera_preview_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/camera_preview_page.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/deatails_confirmation_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/deatails_confirmation_page.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/edit_report_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/edit_report_page.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/landing_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/landing_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/property_details_view_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/property_details_view_page.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/ExteriorFront.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/ExteriorFront.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/bathroom.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/bathroom.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/bedroom.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/bedroom.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/dining_room.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/dining_room.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/ensuite.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/ensuite.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/entrance_hallway.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/entrance_hallway.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/front_garden.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/front_garden.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/garage.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/garage.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/health_and_safety.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/health_and_safety.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/key_handed_over.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/key_handed_over.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/keys.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/keys.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/kitchen_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/kitchen_page.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/landing.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/landing.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/lounge.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/lounge.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/manuals.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/manuals.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/meter_reading.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/meter_reading.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/rear_garden.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/rear_garden.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/receripts.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/receripts.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/schedule_of_condition.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/schedule_of_condition.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/stairs.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/stairs.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/toilet.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/toilet.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/utility_room.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/utility_room.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/widgets/add_action.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/widgets/add_action.dart" afterDir="false" />
-    </list>
+    <list default="true" id="9cfeb956-5354-4366-ab84-34804ef25cb7" name="Changes" comment="Share References for Mete&#10;r Reading is Done" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -284,7 +253,21 @@
       <option name="project" value="LOCAL" />
       <updated>1725445649755</updated>
     </task>
-    <option name="localTasksCounter" value="26" />
+    <task id="LOCAL-00026" summary="Share References added by Property Id">
+      <created>1725524205542</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1725524205542</updated>
+    </task>
+    <task id="LOCAL-00027" summary="Share References for Mete&#10;r Reading is Done">
+      <created>1725524979922</created>
+      <option name="number" value="00027" />
+      <option name="presentableId" value="LOCAL-00027" />
+      <option name="project" value="LOCAL" />
+      <updated>1725524979922</updated>
+    </task>
+    <option name="localTasksCounter" value="28" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -316,7 +299,9 @@
     <MESSAGE value="Shared Prefernces Added" />
     <MESSAGE value="Summary Screen Added" />
     <MESSAGE value="Project updated" />
-    <option name="LAST_COMMIT_MESSAGE" value="Project updated" />
+    <MESSAGE value="Share References added by Property Id" />
+    <MESSAGE value="Share References for Mete&#10;r Reading is Done" />
+    <option name="LAST_COMMIT_MESSAGE" value="Share References for Mete&#10;r Reading is Done" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

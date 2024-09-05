@@ -543,21 +543,21 @@ class ConditionItem extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  IconButton(
-                    icon: Icon(
-                      Icons.warning_amber,
-                      size: 24,
-                      color: kAccentColor,
-                    ),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => AddAction(),
-                        ),
-                      );
-                    },
-                  ),
+                  // IconButton(
+                  //   icon: Icon(
+                  //     Icons.warning_amber,
+                  //     size: 24,
+                  //     color: kAccentColor,
+                  //   ),
+                  //   onPressed: () {
+                  //     Navigator.push(
+                  //       context,
+                  //       MaterialPageRoute(
+                  //         builder: (context) => AddAction(),
+                  //       ),
+                  //     );
+                  //   },
+                  // ),
                   IconButton(
                     icon: Icon(
                       Icons.camera_alt_outlined,
