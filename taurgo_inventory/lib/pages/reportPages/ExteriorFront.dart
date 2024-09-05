@@ -14,8 +14,8 @@ import '../../widgets/add_action.dart';
 
 class Exteriorfront extends StatefulWidget {
   final List<File>? capturedImages;
-
-  const Exteriorfront({super.key, this.capturedImages});
+  final String propertyId;
+  const Exteriorfront({super.key, this.capturedImages, required this.propertyId});
 
   @override
   State<Exteriorfront> createState() => _ExteriorfrontState();
@@ -37,15 +37,17 @@ class _ExteriorfrontState extends State<Exteriorfront> {
   List<String> additionalItemsImages = [];
   late List<File> capturedImages;
 
-  @override
+ @override
   void initState() {
     super.initState();
     capturedImages = widget.capturedImages ?? [];
-    _loadPreferences(); // Load the saved preferences when the state is initialized
+    print("Property Id - SOC${widget.propertyId}");
+    _loadPreferences(widget.propertyId);
+    // Load the saved preferences when the state is initialized
   }
 
   // Function to load preferences
-  Future<void> _loadPreferences() async {
+  Future<void> _loadPreferences(String propertyId) async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       newdoor = prefs.getString('newdoor');
@@ -66,18 +68,20 @@ class _ExteriorfrontState extends State<Exteriorfront> {
   }
 
   // Function to save a preference
-  Future<void> _savePreference(String key, String? value) async {
+  Future<void> _savePreference(String propertyId, String key, String value)
+  async {
     final prefs = await SharedPreferences.getInstance();
-    prefs.setString(key, value ?? '');
+    prefs.setString('${key}_$propertyId', value);
   }
 
-  Future<void> _savePreferenceList(String key, List<String> value) async {
+  Future<void> _savePreferenceList(String propertyId, String key, List<String> value) async {
     final prefs = await SharedPreferences.getInstance();
-    prefs.setStringList(key, value);
+    prefs.setStringList('${key}_$propertyId', value);
   }
 
   @override
   Widget build(BuildContext context) {
+     String propertyId = widget.propertyId;
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -122,19 +126,19 @@ class _ExteriorfrontState extends State<Exteriorfront> {
                   setState(() {
                     doorCondition = condition;
                   });
-                  _savePreference('doorCondition', condition);
+                  _savePreference(propertyId,'doorCondition', condition!);
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     newdoor = description;
                   });
-                  _savePreference('newdoor', description);
+                  _savePreference(propertyId,'newdoor', description!);
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     doorImages.add(imagePath);
                   });
-                  _savePreferenceList('doorImages', doorImages);
+                  _savePreferenceList(propertyId,'doorImages', doorImages);
                 },
               ),
               // Door Frame
@@ -147,19 +151,19 @@ class _ExteriorfrontState extends State<Exteriorfront> {
                   setState(() {
                     doorFrameCondition = condition;
                   });
-                  _savePreference('doorFrameCondition', condition); // Save preference
+                  _savePreference(propertyId,'doorFrameCondition', condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     doorFrameDescription = description;
                   });
-                  _savePreference('doorFrameDescription', description); // Save preference
+                  _savePreference(propertyId,'doorFrameDescription', description!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     doorFrameImages.add(imagePath);
                   });
-                  _savePreferenceList('doorFrameImages', doorFrameImages); // Save preference
+                  _savePreferenceList(propertyId,'doorFrameImages', doorFrameImages); // Save preference
                 },
               ),
 
@@ -173,19 +177,19 @@ class _ExteriorfrontState extends State<Exteriorfront> {
                   setState(() {
                     porchCondition = condition;
                   });
-                  _savePreference('porchCondition', condition); // Save preference
+                  _savePreference(propertyId,'porchCondition', condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     porchDescription = description;
                   });
-                  _savePreference('porchDescription', description); // Save preference
+                  _savePreference(propertyId,'porchDescription', description!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     porchImages.add(imagePath);
                   });
-                  _savePreferenceList('porchImages', porchImages); // Save preference
+                  _savePreferenceList(propertyId,'porchImages', porchImages); // Save preference
                 },
               ),
 
@@ -199,19 +203,19 @@ class _ExteriorfrontState extends State<Exteriorfront> {
                   setState(() {
                     additionalItemsCondition = condition;
                   });
-                  _savePreference('additionalItemsCondition', condition); // Save preference
+                  _savePreference(propertyId,'additionalItemsCondition', condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     additionalItemsDescription = description;
                   });
-                  _savePreference('additionalItemsDescription', description); // Save preference
+                  _savePreference(propertyId,'additionalItemsDescription', description!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     additionalItemsImages.add(imagePath);
                   });
-                  _savePreferenceList('additionalItemsImages', additionalItemsImages); // Save preference
+                  _savePreferenceList(propertyId,'additionalItemsImages', additionalItemsImages); // Save preference
                 },
               ),
 

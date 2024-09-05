@@ -13,8 +13,8 @@ import '../../widgets/add_action.dart';
 
 class RearGarden extends StatefulWidget {
   final List<File>? capturedImages;
-
-  const RearGarden({super.key, this.capturedImages});
+  final String propertyId;
+  const RearGarden({super.key, this.capturedImages, required this.propertyId});
 
   @override
   State<RearGarden> createState() => _RearGardenState();
@@ -33,44 +33,46 @@ class _RearGardenState extends State<RearGarden> {
   List<String> additionalInformationImages = [];
   late List<File> capturedImages;
 
-  @override
+   @override
   void initState() {
     super.initState();
     capturedImages = widget.capturedImages ?? [];
-    _loadPreferences(); // Load the saved preferences when the state is initialized
+    print("Property Id - SOC${widget.propertyId}");
+    _loadPreferences(widget.propertyId);
+    // Load the saved preferences when the state is initialized
   }
-
   // Function to load preferences
-  Future<void> _loadPreferences() async {
+  Future<void> _loadPreferences(String propertyId) async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      gardenDescription = prefs.getString('gardenDescription');
-      outsideLighting = prefs.getString('outsideLighting');
-      summerHouse = prefs.getString('summerHouse');
-      shed = prefs.getString('shed');
-      additionalInformation = prefs.getString('additionalInformation');
+      gardenDescription = prefs.getString('gardenDescription_${propertyId}');
+      outsideLighting = prefs.getString('outsideLighting_${propertyId}');
+      summerHouse = prefs.getString('summerHouse_${propertyId}');
+      shed = prefs.getString('shed_${propertyId}');
+      additionalInformation = prefs.getString('additionalInformation_${propertyId}');
 
-      gardenDescriptionImages = prefs.getStringList('gardenDescriptionImages') ?? [];
-      outsideLightingImages = prefs.getStringList('outsideLightingImages') ?? [];
-      summerHouseImages = prefs.getStringList('summerHouseImages') ?? [];
-      shedImages = prefs.getStringList('shedImages') ?? [];
-      additionalInformationImages = prefs.getStringList('additionalInformationImages') ?? [];
+      gardenDescriptionImages = prefs.getStringList('gardenDescriptionImages_${propertyId}') ?? [];
+      outsideLightingImages = prefs.getStringList('outsideLightingImages_${propertyId}') ?? [];
+      summerHouseImages = prefs.getStringList('summerHouseImages_${propertyId}') ?? [];
+      shedImages = prefs.getStringList('shedImages_${propertyId}') ?? [];
+      additionalInformationImages = prefs.getStringList('additionalInformationImages_${propertyId}') ?? [];
     });
   }
 
   // Function to save a preference
-  Future<void> _savePreference(String key, String value) async {
+  Future<void> _savePreference(String propertyId, String key, String value)
+  async {
     final prefs = await SharedPreferences.getInstance();
-    prefs.setString(key, value);
+    prefs.setString('${key}_$propertyId', value);
   }
 
-  Future<void> _savePreferenceList(String key, List<String> value) async {
+  Future<void> _savePreferenceList(String propertyId, String key, List<String> value) async {
     final prefs = await SharedPreferences.getInstance();
-    prefs.setStringList(key, value);
+    prefs.setStringList('${key}_$propertyId', value);
   }
-
   @override
   Widget build(BuildContext context) {
+     String propertyId = widget.propertyId;
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -115,19 +117,19 @@ class _RearGardenState extends State<RearGarden> {
                   setState(() {
                     gardenDescription = condition;
                   });
-                  _savePreference('gardenDescription', condition!); // Save preference
+                  _savePreference(propertyId,'gardenDescription', condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     gardenDescription = description;
                   });
-                  _savePreference('gardenDescription', description!); // Save preference
+                  _savePreference(propertyId,'gardenDescription', description!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     gardenDescriptionImages.add(imagePath);
                   });
-                  _savePreferenceList('gardenDescriptionImages', gardenDescriptionImages); // Save preference
+                  _savePreferenceList(propertyId,'gardenDescriptionImages', gardenDescriptionImages); // Save preference
                 },
               ),
 
@@ -141,19 +143,19 @@ class _RearGardenState extends State<RearGarden> {
                   setState(() {
                     outsideLighting = condition;
                   });
-                  _savePreference('outsideLighting', condition!); // Save preference
+                  _savePreference(propertyId,'outsideLighting', condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     outsideLighting = description;
                   });
-                  _savePreference('outsideLighting', description!); // Save preference
+                  _savePreference(propertyId,'outsideLighting', description!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     outsideLightingImages.add(imagePath);
                   });
-                  _savePreferenceList('outsideLightingImages', outsideLightingImages); // Save preference
+                  _savePreferenceList(propertyId,'outsideLightingImages', outsideLightingImages); // Save preference
                 },
               ),
 
@@ -167,19 +169,19 @@ class _RearGardenState extends State<RearGarden> {
                   setState(() {
                     summerHouse = condition;
                   });
-                  _savePreference('summerHouse', condition!); // Save preference
+                  _savePreference(propertyId,'summerHouse', condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     summerHouse = description;
                   });
-                  _savePreference('summerHouse', description!); // Save preference
+                  _savePreference(propertyId,'summerHouse', description!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     summerHouseImages.add(imagePath);
                   });
-                  _savePreferenceList('summerHouseImages', summerHouseImages); // Save preference
+                  _savePreferenceList(propertyId,'summerHouseImages', summerHouseImages); // Save preference
                 },
               ),
 
@@ -193,19 +195,19 @@ class _RearGardenState extends State<RearGarden> {
                   setState(() {
                     shed = condition;
                   });
-                  _savePreference('shed', condition!); // Save preference
+                  _savePreference(propertyId,'shed', condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     shed = description;
                   });
-                  _savePreference('shed', description!); // Save preference
+                  _savePreference(propertyId,'shed', description!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     shedImages.add(imagePath);
                   });
-                  _savePreferenceList('shedImages', shedImages); // Save preference
+                  _savePreferenceList(propertyId,'shedImages', shedImages); // Save preference
                 },
               ),
 
@@ -219,19 +221,19 @@ class _RearGardenState extends State<RearGarden> {
                   setState(() {
                     additionalInformation = condition;
                   });
-                  _savePreference('additionalInformation', condition!); // Save preference
+                  _savePreference(propertyId,'additionalInformation', condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     additionalInformation = description;
                   });
-                  _savePreference('additionalInformation', description!); // Save preference
+                  _savePreference(propertyId,'additionalInformation', description!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     additionalInformationImages.add(imagePath);
                   });
-                  _savePreferenceList('additionalInformationImages', additionalInformationImages); // Save preference
+                  _savePreferenceList(propertyId,'additionalInformationImages', additionalInformationImages); // Save preference
                 },
               ),
 

@@ -13,8 +13,8 @@ import '../../widgets/add_action.dart';
 
 class FrontGarden extends StatefulWidget {
   final List<File>? capturedImages;
-
-  const FrontGarden({super.key, this.capturedImages});
+  final String propertyId;
+  const FrontGarden({super.key, this.capturedImages, required this.propertyId});
 
   @override
   State<FrontGarden> createState() => _FrontGardenState();
@@ -32,43 +32,47 @@ class _FrontGardenState extends State<FrontGarden> {
   List<String> additionalItemsImages = [];
   late List<File> capturedImages;
 
-  @override
+   @override
   void initState() {
     super.initState();
     capturedImages = widget.capturedImages ?? [];
-    _loadPreferences(); // Load the saved preferences when the state is initialized
+    print("Property Id - SOC${widget.propertyId}");
+    _loadPreferences(widget.propertyId);
+    // Load the saved preferences when the state is initialized
   }
 
   // Function to load preferences
-  Future<void> _loadPreferences() async {
+  Future<void> _loadPreferences(String propertyId) async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      driveWayCondition = prefs.getString('driveWayCondition');
-      driveWayDescription = prefs.getString('driveWayDescription');
-      outsideLightingCondition = prefs.getString('outsideLightingCondition');
-      outsideLightingDescription = prefs.getString('outsideLightingDescription');
-      additionalItemsCondition = prefs.getString('additionalItemsCondition');
-      additionalItemsDescription = prefs.getString('additionalItemsDescription');
+      driveWayCondition = prefs.getString('driveWayCondition_${propertyId}');
+      driveWayDescription = prefs.getString('driveWayDescription_${propertyId}');
+      outsideLightingCondition = prefs.getString('outsideLightingCondition_${propertyId}');
+      outsideLightingDescription = prefs.getString('outsideLightingDescription_${propertyId}');
+      additionalItemsCondition = prefs.getString('additionalItemsCondition_${propertyId}');
+      additionalItemsDescription = prefs.getString('additionalItemsDescription_${propertyId}');
 
-      driveWayImages = prefs.getStringList('driveWayImages') ?? [];
-      outsideLightingImages = prefs.getStringList('outsideLightingImages') ?? [];
-      additionalItemsImages = prefs.getStringList('additionalItemsImages') ?? [];
+      driveWayImages = prefs.getStringList('driveWayImages_${propertyId}') ?? [];
+      outsideLightingImages = prefs.getStringList('outsideLightingImages_${propertyId}') ?? [];
+      additionalItemsImages = prefs.getStringList('additionalItemsImages_${propertyId}') ?? [];
     });
   }
 
   // Function to save a preference
-  Future<void> _savePreference(String key, String? value) async {
+  Future<void> _savePreference(String propertyId, String key, String value)
+  async {
     final prefs = await SharedPreferences.getInstance();
-    prefs.setString(key, value ?? '');
+    prefs.setString('${key}_$propertyId', value);
   }
 
-  Future<void> _savePreferenceList(String key, List<String> value) async {
+  Future<void> _savePreferenceList(String propertyId, String key, List<String> value) async {
     final prefs = await SharedPreferences.getInstance();
-    prefs.setStringList(key, value);
+    prefs.setStringList('${key}_$propertyId', value);
   }
 
   @override
   Widget build(BuildContext context) {
+     String propertyId = widget.propertyId;
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -113,19 +117,19 @@ class _FrontGardenState extends State<FrontGarden> {
                   setState(() {
                     driveWayCondition = condition;
                   });
-                  _savePreference('driveWayCondition', condition); // Save preference
+                  _savePreference(propertyId,'driveWayCondition', condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     driveWayDescription = description;
                   });
-                  _savePreference('driveWayDescription', description); // Save preference
+                  _savePreference(propertyId,'driveWayDescription', description!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     driveWayImages.add(imagePath);
                   });
-                  _savePreferenceList('driveWayImages', driveWayImages);
+                  _savePreferenceList(propertyId,'driveWayImages', driveWayImages);
                 },
               ),
 
@@ -139,19 +143,19 @@ class _FrontGardenState extends State<FrontGarden> {
                   setState(() {
                     outsideLightingCondition = condition;
                   });
-                  _savePreference('outsideLightingCondition', condition); // Save preference
+                  _savePreference(propertyId,'outsideLightingCondition', condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     outsideLightingDescription = description;
                   });
-                  _savePreference('outsideLightingDescription', description); // Save preference
+                  _savePreference(propertyId,'outsideLightingDescription', description!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     outsideLightingImages.add(imagePath);
                   });
-                  _savePreferenceList('outsideLightingImages', outsideLightingImages);
+                  _savePreferenceList(propertyId,'outsideLightingImages', outsideLightingImages);
                 },
               ),
 
@@ -165,19 +169,19 @@ class _FrontGardenState extends State<FrontGarden> {
                   setState(() {
                     additionalItemsCondition = condition;
                   });
-                  _savePreference('additionalItemsCondition', condition); // Save preference
+                  _savePreference(propertyId,'additionalItemsCondition', condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     additionalItemsDescription = description;
                   });
-                  _savePreference('additionalItemsDescription', description); // Save preference
+                  _savePreference(propertyId,'additionalItemsDescription', description!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     additionalItemsImages.add(imagePath);
                   });
-                  _savePreferenceList('additionalItemsImages', additionalItemsImages);
+                  _savePreferenceList(propertyId,'additionalItemsImages', additionalItemsImages);
                 },
               ),
 

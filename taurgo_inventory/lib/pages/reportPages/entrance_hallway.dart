@@ -13,8 +13,8 @@ import '../../widgets/add_action.dart';
 
 class EntranceHallway extends StatefulWidget {
   final List<File>? capturedImages;
-
-  const EntranceHallway({super.key, this.capturedImages});
+  final String propertyId;
+  const EntranceHallway({super.key, this.capturedImages, required this.propertyId});
 
   @override
   State<EntranceHallway> createState() => _EntranceHallwayState();
@@ -76,74 +76,78 @@ class _EntranceHallwayState extends State<EntranceHallway> {
   List<String> additionalItemsImages = [];
   late List<File> capturedImages;
 
-  @override
+   @override
   void initState() {
     super.initState();
     capturedImages = widget.capturedImages ?? [];
-    _loadPreferences(); // Load the saved preferences when the state is initialized
+    print("Property Id - SOC${widget.propertyId}");
+    _loadPreferences(widget.propertyId);
+    // Load the saved preferences when the state is initialized
   }
 
   // Function to load preferences
-  Future<void> _loadPreferences() async {
+  Future<void> _loadPreferences(String propertyId) async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      doorCondition = prefs.getString('doorCondition');
-      doorLocation = prefs.getString('doorLocation');
-      doorFrameCondition = prefs.getString('doorFrameCondition');
-      doorFrameLocation = prefs.getString('doorFrameLocation');
-      ceilingCondition = prefs.getString('ceilingCondition');
-      ceilingLocation = prefs.getString('ceilingLocation');
-      lightingCondition = prefs.getString('lightingCondition');
-      lightingLocation = prefs.getString('lightingLocation');
-      wallsCondition = prefs.getString('wallsCondition');
-      wallsLocation = prefs.getString('wallsLocation');
-      skirtingCondition = prefs.getString('skirtingCondition');
-      skirtingLocation = prefs.getString('skirtingLocation');
-      windowSillCondition = prefs.getString('windowSillCondition');
-      windowSillLocation = prefs.getString('windowSillLocation');
-      curtainsCondition = prefs.getString('curtainsCondition');
-      curtainsLocation = prefs.getString('curtainsLocation');
-      blindsCondition = prefs.getString('blindsCondition');
-      blindsLocation = prefs.getString('blindsLocation');
-      lightSwitchesCondition = prefs.getString('lightSwitchesCondition');
-      lightSwitchesLocation = prefs.getString('lightSwitchesLocation');
-      socketsCondition = prefs.getString('socketsCondition');
-      socketsLocation = prefs.getString('socketsLocation');
-      flooringCondition = prefs.getString('flooringCondition');
-      flooringLocation = prefs.getString('flooringLocation');
-      additionalItemsCondition = prefs.getString('additionalItemsCondition');
-      additionalItemsLocation = prefs.getString('additionalItemsLocation');
+      doorCondition = prefs.getString('doorCondition_${propertyId}');
+      doorLocation = prefs.getString('doorLocation_${propertyId}');
+      doorFrameCondition = prefs.getString('doorFrameCondition_${propertyId}');
+      doorFrameLocation = prefs.getString('doorFrameLocation_${propertyId}');
+      ceilingCondition = prefs.getString('ceilingCondition_${propertyId}');
+      ceilingLocation = prefs.getString('ceilingLocation_${propertyId}');
+      lightingCondition = prefs.getString('lightingCondition_${propertyId}');
+      lightingLocation = prefs.getString('lightingLocation_${propertyId}');
+      wallsCondition = prefs.getString('wallsCondition_${propertyId}');
+      wallsLocation = prefs.getString('wallsLocation_${propertyId}');
+      skirtingCondition = prefs.getString('skirtingCondition_${propertyId}');
+      skirtingLocation = prefs.getString('skirtingLocation_${propertyId}');
+      windowSillCondition = prefs.getString('windowSillCondition_${propertyId}');
+      windowSillLocation = prefs.getString('windowSillLocation_${propertyId}');
+      curtainsCondition = prefs.getString('curtainsCondition_${propertyId}');
+      curtainsLocation = prefs.getString('curtainsLocation_${propertyId}');
+      blindsCondition = prefs.getString('blindsCondition_${propertyId}');
+      blindsLocation = prefs.getString('blindsLocation_${propertyId}');
+      lightSwitchesCondition = prefs.getString('lightSwitchesCondition_${propertyId}');
+      lightSwitchesLocation = prefs.getString('lightSwitchesLocation_${propertyId}');
+      socketsCondition = prefs.getString('socketsCondition_${propertyId}');
+      socketsLocation = prefs.getString('socketsLocation_${propertyId}');
+      flooringCondition = prefs.getString('flooringCondition_${propertyId}');
+      flooringLocation = prefs.getString('flooringLocation_${propertyId}');
+      additionalItemsCondition = prefs.getString('additionalItemsCondition_${propertyId}');
+      additionalItemsLocation = prefs.getString('additionalItemsLocation_${propertyId}');
 
-      doorImages = prefs.getStringList('doorImages') ?? [];
-      doorFrameImages = prefs.getStringList('doorFrameImages') ?? [];
-      ceilingImages = prefs.getStringList('ceilingImages') ?? [];
-      lightingImages = prefs.getStringList('lightingImages') ?? [];
-      wallsImages = prefs.getStringList('wallsImages') ?? [];
-      skirtingImages = prefs.getStringList('skirtingImages') ?? [];
-      windowSillImages = prefs.getStringList('windowSillImages') ?? [];
-      curtainsImages = prefs.getStringList('curtainsImages') ?? [];
-      blindsImages = prefs.getStringList('blindsImages') ?? [];
-      lightSwitchesImages = prefs.getStringList('lightSwitchesImages') ?? [];
-      socketsImages = prefs.getStringList('socketsImages') ?? [];
-      flooringImages = prefs.getStringList('flooringImages') ?? [];
+      doorImages = prefs.getStringList('doorImages_${propertyId}') ?? [];
+      doorFrameImages = prefs.getStringList('doorFrameImages_${propertyId}') ?? [];
+      ceilingImages = prefs.getStringList('ceilingImages_${propertyId}') ?? [];
+      lightingImages = prefs.getStringList('lightingImages_${propertyId}') ?? [];
+      wallsImages = prefs.getStringList('wallsImages_${propertyId}') ?? [];
+      skirtingImages = prefs.getStringList('skirtingImages_${propertyId}') ?? [];
+      windowSillImages = prefs.getStringList('windowSillImages_${propertyId}') ?? [];
+      curtainsImages = prefs.getStringList('curtainsImages_${propertyId}') ?? [];
+      blindsImages = prefs.getStringList('blindsImages_${propertyId}') ?? [];
+      lightSwitchesImages = prefs.getStringList('lightSwitchesImages_${propertyId}') ?? [];
+      socketsImages = prefs.getStringList('socketsImages_${propertyId}') ?? [];
+      flooringImages = prefs.getStringList('flooringImages_${propertyId}') ?? [];
       additionalItemsImages =
-          prefs.getStringList('additionalItemsImages') ?? [];
+          prefs.getStringList('additionalItemsImages_${propertyId}') ?? [];
     });
   }
 
   // Function to save a preference
-  Future<void> _savePreference(String key, String? value) async {
+ Future<void> _savePreference(String propertyId, String key, String value)
+  async {
     final prefs = await SharedPreferences.getInstance();
-    prefs.setString(key, value ?? '');
+    prefs.setString('${key}_$propertyId', value);
   }
 
-  Future<void> _savePreferenceList(String key, List<String> value) async {
+  Future<void> _savePreferenceList(String propertyId, String key, List<String> value) async {
     final prefs = await SharedPreferences.getInstance();
-    prefs.setStringList(key, value);
+    prefs.setStringList('${key}_$propertyId', value);
   }
 
   @override
   Widget build(BuildContext context) {
+     String propertyId = widget.propertyId;
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -189,19 +193,19 @@ class _EntranceHallwayState extends State<EntranceHallway> {
                     doorCondition = condition;
                   });
                   _savePreference(
-                      'doorCondition', condition); // Save preference
+                      propertyId,'doorCondition', condition!); // Save preference
                 },
                 onLocationSelected: (location) {
                   setState(() {
                     doorLocation = location;
                   });
-                  _savePreference('doorLocation', location); // Save preference
+                  _savePreference(propertyId,'doorLocation', location!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     doorImages.add(imagePath);
                   });
-                  _savePreferenceList('doorImages', doorImages);
+                  _savePreferenceList(propertyId,'doorImages', doorImages);
                 },
               ),
 
@@ -216,20 +220,20 @@ class _EntranceHallwayState extends State<EntranceHallway> {
                     doorFrameCondition = condition;
                   });
                   _savePreference(
-                      'doorFrameCondition', condition); // Save preference
+                      propertyId,'doorFrameCondition', condition!); // Save preference
                 },
                 onLocationSelected: (location) {
                   setState(() {
                     doorFrameLocation = location;
                   });
                   _savePreference(
-                      'doorFrameLocation', location); // Save preference
+                      propertyId,'doorFrameLocation', location!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     doorFrameImages.add(imagePath);
                   });
-                  _savePreferenceList('doorFrameImages', doorFrameImages);
+                  _savePreferenceList(propertyId,'doorFrameImages', doorFrameImages);
                 },
               ),
 
@@ -244,20 +248,20 @@ class _EntranceHallwayState extends State<EntranceHallway> {
                     ceilingCondition = condition;
                   });
                   _savePreference(
-                      'ceilingCondition', condition); // Save preference
+                     propertyId, 'ceilingCondition', condition!); // Save preference
                 },
                 onLocationSelected: (location) {
                   setState(() {
                     ceilingLocation = location;
                   });
                   _savePreference(
-                      'ceilingLocation', location); // Save preference
+                      propertyId,'ceilingLocation', location!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     ceilingImages.add(imagePath);
                   });
-                  _savePreferenceList('ceilingImages', ceilingImages);
+                  _savePreferenceList(propertyId,'ceilingImages', ceilingImages);
                 },
               ),
 
@@ -272,20 +276,20 @@ class _EntranceHallwayState extends State<EntranceHallway> {
                     lightingCondition = condition;
                   });
                   _savePreference(
-                      'lightingCondition', condition); // Save preference
+                      propertyId,'lightingCondition', condition!); // Save preference
                 },
                 onLocationSelected: (location) {
                   setState(() {
                     lightingLocation = location;
                   });
                   _savePreference(
-                      'lightingLocation', location); // Save preference
+                      propertyId,'lightingLocation', location!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     lightingImages.add(imagePath);
                   });
-                  _savePreferenceList('lightingImages', lightingImages);
+                  _savePreferenceList(propertyId,'lightingImages', lightingImages);
                 },
               ),
 
@@ -300,19 +304,19 @@ class _EntranceHallwayState extends State<EntranceHallway> {
                     wallsCondition = condition;
                   });
                   _savePreference(
-                      'wallsCondition', condition); // Save preference
+                     propertyId, 'wallsCondition', condition!); // Save preference
                 },
                 onLocationSelected: (location) {
                   setState(() {
                     wallsLocation = location;
                   });
-                  _savePreference('wallsLocation', location); // Save preference
+                  _savePreference(propertyId,'wallsLocation', location!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     wallsImages.add(imagePath);
                   });
-                  _savePreferenceList('wallsImages', wallsImages);
+                  _savePreferenceList(propertyId,'wallsImages', wallsImages);
                 },
               ),
 
@@ -327,20 +331,20 @@ class _EntranceHallwayState extends State<EntranceHallway> {
                     skirtingCondition = condition;
                   });
                   _savePreference(
-                      'skirtingCondition', condition); // Save preference
+                     propertyId, 'skirtingCondition', condition!); // Save preference
                 },
                 onLocationSelected: (location) {
                   setState(() {
                     skirtingLocation = location;
                   });
                   _savePreference(
-                      'skirtingLocation', location); // Save preference
+                     propertyId, 'skirtingLocation', location!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     skirtingImages.add(imagePath);
                   });
-                  _savePreferenceList('skirtingImages', skirtingImages);
+                  _savePreferenceList(propertyId,'skirtingImages', skirtingImages);
                 },
               ),
 
@@ -355,20 +359,20 @@ class _EntranceHallwayState extends State<EntranceHallway> {
                     windowSillCondition = condition;
                   });
                   _savePreference(
-                      'windowSillCondition', condition); // Save preference
+                     propertyId, 'windowSillCondition', condition!); // Save preference
                 },
                 onLocationSelected: (location) {
                   setState(() {
                     windowSillLocation = location;
                   });
                   _savePreference(
-                      'windowSillLocation', location); // Save preference
+                     propertyId, 'windowSillLocation', location!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     windowSillImages.add(imagePath);
                   });
-                  _savePreferenceList('windowSillImages', windowSillImages);
+                  _savePreferenceList(propertyId,'windowSillImages', windowSillImages);
                 },
               ),
 
@@ -383,20 +387,20 @@ class _EntranceHallwayState extends State<EntranceHallway> {
                     curtainsCondition = condition;
                   });
                   _savePreference(
-                      'curtainsCondition', condition); // Save preference
+                     propertyId, 'curtainsCondition', condition!); // Save preference
                 },
                 onLocationSelected: (location) {
                   setState(() {
                     curtainsLocation = location;
                   });
                   _savePreference(
-                      'curtainsLocation', location); // Save preference
+                      propertyId,'curtainsLocation', location!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     curtainsImages.add(imagePath);
                   });
-                  _savePreferenceList('curtainsImages', curtainsImages);
+                  _savePreferenceList(propertyId,'curtainsImages', curtainsImages);
                 },
               ),
 
@@ -411,20 +415,20 @@ class _EntranceHallwayState extends State<EntranceHallway> {
                     blindsCondition = condition;
                   });
                   _savePreference(
-                      'blindsCondition', condition); // Save preference
+                      propertyId,'blindsCondition', condition!); // Save preference
                 },
                 onLocationSelected: (location) {
                   setState(() {
                     blindsLocation = location;
                   });
                   _savePreference(
-                      'blindsLocation', location); // Save preference
+                      propertyId,'blindsLocation', location!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     blindsImages.add(imagePath);
                   });
-                  _savePreferenceList('blindsImages', blindsImages);
+                  _savePreferenceList(propertyId,'blindsImages', blindsImages);
                 },
               ),
 
@@ -439,21 +443,21 @@ class _EntranceHallwayState extends State<EntranceHallway> {
                     lightSwitchesCondition = condition;
                   });
                   _savePreference(
-                      'lightSwitchesCondition', condition); // Save preference
+                     propertyId, 'lightSwitchesCondition', condition!); // Save preference
                 },
                 onLocationSelected: (location) {
                   setState(() {
                     lightSwitchesLocation = location;
                   });
                   _savePreference(
-                      'lightSwitchesLocation', location); // Save preference
+                      propertyId,'lightSwitchesLocation', location!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     lightSwitchesImages.add(imagePath);
                   });
                   _savePreferenceList(
-                      'lightSwitchesImages', lightSwitchesImages);
+                     propertyId, 'lightSwitchesImages', lightSwitchesImages);
                 },
               ),
 
@@ -468,20 +472,20 @@ class _EntranceHallwayState extends State<EntranceHallway> {
                     socketsCondition = condition;
                   });
                   _savePreference(
-                      'socketsCondition', condition); // Save preference
+                      propertyId,'socketsCondition', condition!); // Save preference
                 },
                 onLocationSelected: (location) {
                   setState(() {
                     socketsLocation = location;
                   });
                   _savePreference(
-                      'socketsLocation', location); // Save preference
+                     propertyId, 'socketsLocation', location!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     socketsImages.add(imagePath);
                   });
-                  _savePreferenceList('socketsImages', socketsImages);
+                  _savePreferenceList(propertyId,'socketsImages', socketsImages);
                 },
               ),
 
@@ -496,20 +500,20 @@ class _EntranceHallwayState extends State<EntranceHallway> {
                     flooringCondition = condition;
                   });
                   _savePreference(
-                      'flooringCondition', condition); // Save preference
+                    propertyId,  'flooringCondition', condition!); // Save preference
                 },
                 onLocationSelected: (location) {
                   setState(() {
                     flooringLocation = location;
                   });
                   _savePreference(
-                      'flooringLocation', location); // Save preference
+                     propertyId, 'flooringLocation', location!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     flooringImages.add(imagePath);
                   });
-                  _savePreferenceList('flooringImages', flooringImages);
+                  _savePreferenceList(propertyId,'flooringImages', flooringImages);
                 },
               ),
 
@@ -524,21 +528,21 @@ class _EntranceHallwayState extends State<EntranceHallway> {
                     additionalItemsCondition = condition;
                   });
                   _savePreference(
-                      'additionalItemsCondition', condition); // Save preference
+                      propertyId,'additionalItemsCondition', condition!); // Save preference
                 },
                 onLocationSelected: (location) {
                   setState(() {
                     additionalItemsLocation = location;
                   });
                   _savePreference(
-                      'additionalItemsLocation', location); // Save preference
+                     propertyId, 'additionalItemsLocation', location!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     additionalItemsImages.add(imagePath);
                   });
                   _savePreferenceList(
-                      'additionalItemsImages', additionalItemsImages);
+                      propertyId,'additionalItemsImages', additionalItemsImages);
                 },
               ),
             ],

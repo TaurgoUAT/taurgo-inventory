@@ -13,8 +13,8 @@ import '../../widgets/add_action.dart';
 
 class KeyHandedOver extends StatefulWidget {
   final List<File>? capturedImages;
-
-  const KeyHandedOver({super.key, this.capturedImages});
+  final String propertyId;
+  const KeyHandedOver({super.key, this.capturedImages, required this.propertyId});
 
   @override
   State<KeyHandedOver> createState() => _KeyHandedOverState();
@@ -29,40 +29,44 @@ class _KeyHandedOverState extends State<KeyHandedOver> {
   List<String> otherImages = [];
   late List<File> capturedImages;
 
-  @override
+   @override
   void initState() {
     super.initState();
     capturedImages = widget.capturedImages ?? [];
-    _loadPreferences(); // Load the saved preferences when the state is initialized
+    print("Property Id - SOC${widget.propertyId}");
+    _loadPreferences(widget.propertyId);
+    // Load the saved preferences when the state is initialized
   }
 
   // Function to load preferences
-  Future<void> _loadPreferences() async {
+  Future<void> _loadPreferences(String propertyId) async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      yale = prefs.getString('yale');
-      mortice = prefs.getString('mortice');
-      other = prefs.getString('other');
+      yale = prefs.getString('yale_${propertyId}');
+      mortice = prefs.getString('mortice_${propertyId}');
+      other = prefs.getString('other_${propertyId}');
 
-      yaleImages = prefs.getStringList('yaleImages') ?? [];
-      morticeImages = prefs.getStringList('morticeImages') ?? [];
-      otherImages = prefs.getStringList('otherImages') ?? [];
+      yaleImages = prefs.getStringList('yaleImages_${propertyId}') ?? [];
+      morticeImages = prefs.getStringList('morticeImages_${propertyId}') ?? [];
+      otherImages = prefs.getStringList('otherImages_${propertyId}') ?? [];
     });
   }
 
   // Function to save a preference
-  Future<void> _savePreference(String key, String? value) async {
+  Future<void> _savePreference(String propertyId, String key, String value)
+  async {
     final prefs = await SharedPreferences.getInstance();
-    prefs.setString(key, value ?? '');
+    prefs.setString('${key}_$propertyId', value);
   }
 
-  Future<void> _savePreferenceList(String key, List<String> value) async {
+  Future<void> _savePreferenceList(String propertyId, String key, List<String> value) async {
     final prefs = await SharedPreferences.getInstance();
-    prefs.setStringList(key, value);
+    prefs.setStringList('${key}_$propertyId', value);
   }
 
   @override
   Widget build(BuildContext context) {
+     String propertyId = widget.propertyId;
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -107,19 +111,19 @@ class _KeyHandedOverState extends State<KeyHandedOver> {
                   setState(() {
                     yale = condition;
                   });
-                  _savePreference('yale', condition!);
+                  _savePreference(propertyId,'yale', condition!);
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     yale = description;
                   });
-                  _savePreference('yale', description!);
+                  _savePreference(propertyId,'yale', description!);
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     yaleImages.add(imagePath);
                   });
-                  _savePreferenceList('yaleImages', yaleImages);
+                  _savePreferenceList(propertyId,'yaleImages', yaleImages);
                 },
               ),
 
@@ -133,19 +137,19 @@ class _KeyHandedOverState extends State<KeyHandedOver> {
                   setState(() {
                     mortice = condition;
                   });
-                  _savePreference('mortice', condition!);
+                  _savePreference(propertyId,'mortice', condition!);
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     mortice = description;
                   });
-                  _savePreference('mortice', description!);
+                  _savePreference(propertyId,'mortice', description!);
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     morticeImages.add(imagePath);
                   });
-                  _savePreferenceList('morticeImages', morticeImages);
+                  _savePreferenceList(propertyId,'morticeImages', morticeImages);
                 },
               ),
 
@@ -159,19 +163,19 @@ class _KeyHandedOverState extends State<KeyHandedOver> {
                   setState(() {
                     other = condition;
                   });
-                  _savePreference('other', condition!);
+                  _savePreference(propertyId,'other', condition!);
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     other = description;
                   });
-                  _savePreference('other', description!);
+                  _savePreference(propertyId,'other', description!);
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     otherImages.add(imagePath);
                   });
-                  _savePreferenceList('otherImages', otherImages);
+                  _savePreferenceList(propertyId,'otherImages', otherImages);
                 },
               ),
 
