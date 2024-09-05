@@ -9,18 +9,7 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9cfeb956-5354-4366-ab84-34804ef25cb7" name="Changes" comment="Summary Screen Added">
-      <change afterPath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/Assets.xcassets/AppIcon.appiconset/100 1.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/Assets.xcassets/AppIcon.appiconset/120 1.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/Assets.xcassets/AppIcon.appiconset/40 1.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/Assets.xcassets/AppIcon.appiconset/58 1.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/Assets.xcassets/AppIcon.appiconset/58 2.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/Assets.xcassets/AppIcon.appiconset/80 1.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/Assets.xcassets/AppIcon.appiconset/80 2.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/Assets.xcassets/AppIcon.appiconset/87 1.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/Assets.xcassets/AppIcon.appiconset/Contents.json" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/Assets.xcassets/AppIcon.appiconset/Contents.json" afterDir="false" />
-    </list>
+    <list default="true" id="9cfeb956-5354-4366-ab84-34804ef25cb7" name="Changes" comment="Share References for Mete&#10;r Reading is Done" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -47,27 +36,31 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
-    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
-    &quot;com.google.services.firebase.aqiPopupShown&quot;: &quot;true&quot;,
-    &quot;dart.analysis.tool.window.visible&quot;: &quot;false&quot;,
-    &quot;io.flutter.reload.alreadyRun&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/Users/abishan/Desktop/Taurgo/Taurgo Inventory/taurgo-inventory/taurgo_inventory/lib/pages/authentication&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.lookFeel&quot;,
-    &quot;show.migrate.to.gradle.popup&quot;: &quot;false&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_ADD_EXTERNAL_FILES": "true",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.cidr.known.project.marker": "true",
+    "cidr.known.project.marker": "true",
+    "com.google.services.firebase.aqiPopupShown": "true",
+    "dart.analysis.tool.window.visible": "false",
+    "io.flutter.reload.alreadyRun": "true",
+    "last_opened_file_path": "/Users/abishan/Desktop/Taurgo/Taurgo Inventory/taurgo-inventory/taurgo_inventory/lib/pages/reportPages",
+    "settings.editor.selected.configurable": "preferences.lookFeel",
+    "show.migrate.to.gradle.popup": "false"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages" />
       <recent name="$PROJECT_DIR$/taurgo_inventory/lib/pages/authentication" />
       <recent name="$PROJECT_DIR$/taurgo_inventory/lib/pages/authentication/controller" />
       <recent name="$PROJECT_DIR$/taurgo_inventory/android/app" />
       <recent name="$PROJECT_DIR$/taurgo_inventory/ios/Runner" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages" />
     </key>
   </component>
   <component name="RunManager">
@@ -246,7 +239,35 @@
       <option name="project" value="LOCAL" />
       <updated>1725362616781</updated>
     </task>
-    <option name="localTasksCounter" value="24" />
+    <task id="LOCAL-00024" summary="Summary Screen Added">
+      <created>1725373582587</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1725373582587</updated>
+    </task>
+    <task id="LOCAL-00025" summary="Project updated">
+      <created>1725445649755</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1725445649755</updated>
+    </task>
+    <task id="LOCAL-00026" summary="Share References added by Property Id">
+      <created>1725524205542</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1725524205542</updated>
+    </task>
+    <task id="LOCAL-00027" summary="Share References for Mete&#10;r Reading is Done">
+      <created>1725524979922</created>
+      <option name="number" value="00027" />
+      <option name="presentableId" value="LOCAL-00027" />
+      <option name="project" value="LOCAL" />
+      <updated>1725524979922</updated>
+    </task>
+    <option name="localTasksCounter" value="28" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -277,16 +298,14 @@
     <MESSAGE value="Version One Completed" />
     <MESSAGE value="Shared Prefernces Added" />
     <MESSAGE value="Summary Screen Added" />
-    <option name="LAST_COMMIT_MESSAGE" value="Summary Screen Added" />
+    <MESSAGE value="Project updated" />
+    <MESSAGE value="Share References added by Property Id" />
+    <MESSAGE value="Share References for Mete&#10;r Reading is Done" />
+    <option name="LAST_COMMIT_MESSAGE" value="Share References for Mete&#10;r Reading is Done" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
-        <line-breakpoint enabled="true" type="Dart">
-          <url>file://$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/keys.dart</url>
-          <line>73</line>
-          <option name="timeStamp" value="7" />
-        </line-breakpoint>
         <line-breakpoint enabled="true" type="Dart">
           <url>file://$PROJECT_DIR$/taurgo_inventory/lib/pages/deatails_confirmation_page.dart</url>
           <line>668</line>
@@ -319,8 +338,28 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="Dart">
           <url>file://$PROJECT_DIR$/taurgo_inventory/lib/pages/landing_screen.dart</url>
-          <line>151</line>
+          <line>152</line>
           <option name="timeStamp" value="15" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="Dart">
+          <url>file://$PROJECT_DIR$/taurgo_inventory/lib/pages/landing_screen.dart</url>
+          <line>565</line>
+          <option name="timeStamp" value="17" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="Dart">
+          <url>file://$PROJECT_DIR$/taurgo_inventory/lib/pages/property_details_view_page.dart</url>
+          <line>13</line>
+          <option name="timeStamp" value="18" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="Dart">
+          <url>file://$PROJECT_DIR$/taurgo_inventory/lib/pages/property_details_view_page.dart</url>
+          <line>23</line>
+          <option name="timeStamp" value="19" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="Dart">
+          <url>file://$PROJECT_DIR$/taurgo_inventory/lib/pages/property_details_view_page.dart</url>
+          <line>28</line>
+          <option name="timeStamp" value="20" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

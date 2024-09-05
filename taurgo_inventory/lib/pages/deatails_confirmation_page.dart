@@ -194,7 +194,7 @@ class _DetailsConfirmationPageState extends State<DetailsConfirmationPage> {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                builder: (context) => EditReportPage(),
+                builder: (context) => EditReportPage(propertyId: '',),
               ),
             );
           },
