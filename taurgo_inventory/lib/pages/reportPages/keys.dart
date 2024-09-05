@@ -13,8 +13,10 @@ import '../../widgets/add_action.dart';
 
 class Keys extends StatefulWidget {
   final List<File>? capturedImages;
+  final String propertyId;
 
-  const Keys({super.key, this.capturedImages});
+
+  const Keys({super.key, this.capturedImages, required this.propertyId});
 
   @override
   State<Keys> createState() => _KeysState();
@@ -48,51 +50,54 @@ class _KeysState extends State<Keys> {
   void initState() {
     super.initState();
     capturedImages = widget.capturedImages ?? [];
-    _loadPreferences(); // Load the saved preferences when the state is initialized
+    print("Property Id - SOC${widget.propertyId}");
+    _loadPreferences(widget.propertyId);
   }
 
   // Function to load preferences
-  Future<void> _loadPreferences() async {
+  Future<void> _loadPreferences(String propertyId) async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      yaleLocation = prefs.getString('yaleLocation');
-      yaleReading = prefs.getString('yaleReading');
-      morticeLocation = prefs.getString('morticeLocation');
-      morticeReading = prefs.getString('morticeReading');
-      windowLockLocation = prefs.getString('windowLockLocation');
-      windowLockReading = prefs.getString('windowLockReading');
-      gasMeterLocation = prefs.getString('gasMeterLocation');
-      gasMeterReading = prefs.getString('gasMeterReading');
-      carPassLocation = prefs.getString('carPassLocation');
-      carPassReading = prefs.getString('carPassReading');
-      remoteLocation = prefs.getString('remoteLocation');
-      remoteReading = prefs.getString('remoteReading');
-      otherLocation = prefs.getString('otherLocation');
-      otherReading = prefs.getString('otherReading');
+      yaleLocation = prefs.getString('yaleLocation_${propertyId}');
+      yaleReading = prefs.getString('yaleReading_${propertyId}');
+      morticeLocation = prefs.getString('morticeLocation_${propertyId}');
+      morticeReading = prefs.getString('morticeReading_${propertyId}');
+      windowLockLocation = prefs.getString('windowLockLocation_${propertyId}');
+      windowLockReading = prefs.getString('windowLockReading_${propertyId}');
+      gasMeterLocation = prefs.getString('gasMeterLocation_${propertyId}');
+      gasMeterReading = prefs.getString('gasMeterReading_${propertyId}');
+      carPassLocation = prefs.getString('carPassLocation_${propertyId}');
+      carPassReading = prefs.getString('carPassReading_${propertyId}');
+      remoteLocation = prefs.getString('remoteLocation_${propertyId}');
+      remoteReading = prefs.getString('remoteReading_${propertyId}');
+      otherLocation = prefs.getString('otherLocation_${propertyId}');
+      otherReading = prefs.getString('otherReading_${propertyId}');
 
-      yaleImages = prefs.getStringList('yaleImages') ?? [];
-      morticeImages = prefs.getStringList('morticeImages') ?? [];
-      windowLockImages = prefs.getStringList('windowLockImages') ?? [];
-      gasMeterImages = prefs.getStringList('gasMeterImages') ?? [];
-      carPassImages = prefs.getStringList('carPassImages') ?? [];
-      remoteImages = prefs.getStringList('remoteImages') ?? [];
-      otherImages = prefs.getStringList('otherImages') ?? [];
+      yaleImages = prefs.getStringList('yaleImages_${propertyId}') ?? [];
+      morticeImages = prefs.getStringList('morticeImages_${propertyId}') ?? [];
+      windowLockImages = prefs.getStringList('windowLockImages_${propertyId}') ?? [];
+      gasMeterImages = prefs.getStringList('gasMeterImages_${propertyId}') ?? [];
+      carPassImages = prefs.getStringList('carPassImages_${propertyId}') ?? [];
+      remoteImages = prefs.getStringList('remoteImages_${propertyId}') ?? [];
+      otherImages = prefs.getStringList('otherImages_${propertyId}') ?? [];
     });
   }
 
   // Function to save a preference
-  Future<void> _savePreference(String key, String? value) async {
+  Future<void> _savePreference(String propertyId, String key, String value)
+  async {
     final prefs = await SharedPreferences.getInstance();
-    prefs.setString(key, value ?? '');
+    prefs.setString('${key}_$propertyId', value);
   }
 
-  Future<void> _savePreferenceList(String key, List<String> value) async {
+  Future<void> _savePreferenceList(String propertyId, String key, List<String> value) async {
     final prefs = await SharedPreferences.getInstance();
-    prefs.setStringList(key, value);
+    prefs.setStringList('${key}_$propertyId', value);
   }
 
   @override
   Widget build(BuildContext context) {
+    String propertyId = widget.propertyId;
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -137,19 +142,20 @@ class _KeysState extends State<Keys> {
                   setState(() {
                     yaleLocation = location;
                   });
-                  _savePreference('yaleLocation', location); // Save preference
+                  _savePreference(propertyId,'yaleLocation', location!); //
+                  // Save preference
                 },
                 onReadingSelected: (reading) {
                   setState(() {
                     yaleReading = reading;
                   });
-                  _savePreference('yaleReading', reading); // Save preference
+                  _savePreference(propertyId,'yaleReading', reading!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     yaleImages.add(imagePath);
                   });
-                  _savePreferenceList(
+                  _savePreferenceList(propertyId,
                       'yaleImages', yaleImages); // Save preference
                 },
               ),
@@ -164,20 +170,20 @@ class _KeysState extends State<Keys> {
                   setState(() {
                     morticeLocation = location;
                   });
-                  _savePreference(
-                      'morticeLocation', location); // Save preference
+                  _savePreference(propertyId,
+                      'morticeLocation', location!); // Save preference
                 },
                 onReadingSelected: (reading) {
                   setState(() {
                     morticeReading = reading;
                   });
-                  _savePreference('morticeReading', reading); // Save preference
+                  _savePreference(propertyId, 'morticeReading', reading!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     morticeImages.add(imagePath);
                   });
-                  _savePreferenceList(
+                  _savePreferenceList(propertyId,
                       'morticeImages', morticeImages); // Save preference
                 },
               ),
@@ -192,21 +198,21 @@ class _KeysState extends State<Keys> {
                   setState(() {
                     windowLockLocation = location;
                   });
-                  _savePreference(
-                      'windowLockLocation', location); // Save preference
+                  _savePreference(propertyId,
+                      'windowLockLocation', location!); // Save preference
                 },
                 onReadingSelected: (reading) {
                   setState(() {
                     windowLockReading = reading;
                   });
-                  _savePreference(
-                      'windowLockReading', reading); // Save preference
+                  _savePreference(propertyId,
+                      'windowLockReading', reading!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     windowLockImages.add(imagePath);
                   });
-                  _savePreferenceList(
+                  _savePreferenceList(propertyId,
                       'windowLockImages', windowLockImages); // Save preference
                 },
               ),
@@ -221,21 +227,21 @@ class _KeysState extends State<Keys> {
                   setState(() {
                     gasMeterLocation = location;
                   });
-                  _savePreference(
-                      'gasMeterLocation', location); // Save preference
+                  _savePreference(propertyId,
+                      'gasMeterLocation', location!); // Save preference
                 },
                 onReadingSelected: (reading) {
                   setState(() {
                     gasMeterReading = reading;
                   });
-                  _savePreference(
-                      'gasMeterReading', reading); // Save preference
+                  _savePreference(propertyId,
+                      'gasMeterReading', reading!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     gasMeterImages.add(imagePath);
                   });
-                  _savePreferenceList(
+                  _savePreferenceList(propertyId,
                       'gasMeterImages', gasMeterImages); // Save preference
                 },
               ),
@@ -250,20 +256,20 @@ class _KeysState extends State<Keys> {
                   setState(() {
                     carPassLocation = location;
                   });
-                  _savePreference(
-                      'carPassLocation', location); // Save preference
+                  _savePreference(propertyId,
+                      'carPassLocation', location!); // Save preference
                 },
                 onReadingSelected: (reading) {
                   setState(() {
                     carPassReading = reading;
                   });
-                  _savePreference('carPassReading', reading); // Save preference
+                  _savePreference(propertyId, 'carPassReading', reading!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     carPassImages.add(imagePath);
                   });
-                  _savePreferenceList(
+                  _savePreferenceList(propertyId,
                       'carPassImages', carPassImages); // Save preference
                 },
               ),
@@ -278,20 +284,20 @@ class _KeysState extends State<Keys> {
                   setState(() {
                     remoteLocation = location;
                   });
-                  _savePreference(
-                      'remoteLocation', location); // Save preference
+                  _savePreference(propertyId,
+                      'remoteLocation', location!); // Save preference
                 },
                 onReadingSelected: (reading) {
                   setState(() {
                     remoteReading = reading;
                   });
-                  _savePreference('remoteReading', reading); // Save preference
+                  _savePreference(propertyId, 'remoteReading', reading!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     remoteImages.add(imagePath);
                   });
-                  _savePreferenceList(
+                  _savePreferenceList(propertyId,
                       'remoteImages', remoteImages); // Save preference
                 },
               ),
@@ -306,19 +312,19 @@ class _KeysState extends State<Keys> {
                   setState(() {
                     otherLocation = location;
                   });
-                  _savePreference('otherLocation', location); // Save preference
+                  _savePreference(propertyId, 'otherLocation', location!); // Save preference
                 },
                 onReadingSelected: (reading) {
                   setState(() {
                     otherReading = reading;
                   });
-                  _savePreference('otherReading', reading); // Save preference
+                  _savePreference(propertyId, 'otherReading', reading!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     otherImages.add(imagePath);
                   });
-                  _savePreferenceList(
+                  _savePreferenceList(propertyId,
                       'otherImages', otherImages); // Save preference
                 },
               ),
