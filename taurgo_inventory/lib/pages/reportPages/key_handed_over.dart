@@ -80,7 +80,7 @@ class _KeyHandedOverState extends State<KeyHandedOver> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => EditReportPage(),
+                builder: (context) => EditReportPage(propertyId: '',),
               ),
             );
           },

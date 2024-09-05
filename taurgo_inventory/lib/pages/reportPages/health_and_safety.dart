@@ -91,7 +91,7 @@ class _HealthAndSafetyState extends State<HealthAndSafety> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => EditReportPage(),
+                builder: (context) => EditReportPage(propertyId: '',),
               ),
             );
           },

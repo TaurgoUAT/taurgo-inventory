@@ -192,7 +192,7 @@ class _KitchenPageState extends State<KitchenPage> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => EditReportPage(),
+                builder: (context) => EditReportPage(propertyId: '',),
               ),
             );
           },

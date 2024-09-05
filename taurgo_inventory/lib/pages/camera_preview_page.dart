@@ -122,7 +122,7 @@ class _CameraPreviewPageState extends State<CameraPreviewPage> {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                builder: (context) => EditReportPage(),
+                builder: (context) => EditReportPage(propertyId: '',),
               ),
             );
           },
@@ -139,7 +139,7 @@ class _CameraPreviewPageState extends State<CameraPreviewPage> {
                 context,
                 MaterialPageRoute(
                   builder: (context) =>
-                      ScheduleOfCondition(capturedImages: capturedImages),
+                      ScheduleOfCondition(capturedImages: capturedImages, propertyId: '',),
                 ),
               );
             },

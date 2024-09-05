@@ -33,7 +33,7 @@ class _AddActionState extends State<AddAction> {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                builder: (context) => EditReportPage(),
+                builder: (context) => EditReportPage(propertyId: '',),
               ),
             );
           },

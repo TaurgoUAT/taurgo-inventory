@@ -92,6 +92,7 @@ class _LandingScreenState extends State<LandingScreen> {
       final response = await http.get(Uri.parse
         ('$baseURL/user/firebaseId/$firebaseId'));
 
+
       if (response.statusCode == 200) {
         print(response.statusCode);
         final List<dynamic>userData = json.decode(response.body);
@@ -558,28 +559,12 @@ class _LandingScreenState extends State<LandingScreen> {
   ) {
     return GestureDetector(
       onTap: () {
+        print(propertyId);
         Navigator.pushReplacement(
             context,
             MaterialPageRoute(
               builder: (context) => PropertyDetailsViewPage(
-                status: status,
-                propertyId:propertyId,
-                lineOneAddress: addressLineOne,
-                lineTwoAddress: addressLineTwo,
-                city: city,
-                state: state,
-                country: country,
-                postalCode: postalCode,
-                reference: ref,
-                client: client,
-                type: type,
-                noOfBeds: noOfBeds,
-                noOfBaths: noOfBaths,
-                selectedType: inspectionType,
-                date: date,
-                time: time,
-                keyLocation: keyLocation,
-                internalNotes: internalNotes,
+                propertyId: propertyId,
               ),
             ));
       },

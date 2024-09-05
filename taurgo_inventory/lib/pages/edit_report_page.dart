@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:taurgo_inventory/pages/home_page.dart';
 import 'package:taurgo_inventory/pages/inspection_confimation_page.dart';
 import 'package:taurgo_inventory/pages/property_details_view_page.dart';
 import 'package:taurgo_inventory/pages/reportPages/ExteriorFront.dart';
@@ -30,7 +31,8 @@ import '../constants/AppColors.dart';
 import 'landing_screen.dart';
 
 class EditReportPage extends StatefulWidget {
-  const EditReportPage({super.key});
+  final String propertyId;
+  const EditReportPage({super.key,  required this.propertyId});
 
   @override
   State<EditReportPage> createState() => _EditReportPageState();
@@ -40,85 +42,88 @@ class _EditReportPageState extends State<EditReportPage> {
   String? selectedType;
   final Set<String> visitedPages = {}; // Track visited pages
 
-  final List<String> types = [
-    'Schedule of Condition',
-    'EV Charger',
-    'Meter Reading',
-    'Keys',
-    "Keys Handed Over At Check In",
-    'Health & Safety | Smoke & Carbon Monoxide',
-    'Front Garden',
-    'Garage',
-    'Exterior Front',
-    'Entrance / Hallway',
-    'Toilet',
-    'Lounge',
-    'Dining Room',
-    'Kitchen',
-    'Utility Room / Area',
-    'Stairs',
-    'Landing',
-    'Bedroom 1',
-    'En Suite',
-    'Bathroom',
-    'Rear Garden',
-    'Manuals/ Certificates',
-    'Property Receipts'
-  ];
 
-  final Map<String, Widget> typeToPageMap = {
-    'Schedule of Condition': ScheduleOfCondition(),
-    'EV Charger': EvCharger(),
-    'Meter Reading': MeterReading(),
-    'Keys': Keys(),
-    "Keys Handed Over At Check In": KeyHandedOver(),
-    'Health & Safety | Smoke & Carbon Monoxide': HealthAndSafety(),
-    'Front Garden': FrontGarden(),
-    'Garage': Garage(),
-    'Exterior Front': Exteriorfront(),
-    'Entrance / Hallway': EntranceHallway(),
-    'Toilet': Toilet(),
-    'Lounge': Lounge(),
-    'Dining Room': DiningRoom(),
-    'Kitchen': KitchenPage(),
-    'Utility Room / Area': UtilityRoom(),
-    'Stairs': Stairs(),
-    'Landing': Landing(),
-    'Bedroom 1': Bedroom(),
-    'En Suite': Ensuite(),
-    'Bathroom': Bathroom(),
-    'Rear Garden': RearGarden(),
-    'Manuals/ Certificates': Manuals(),
-  };
 
-  final Map<String, IconData> typeToIconMap = {
-    'Schedule of Condition': Icons.schedule,
-    'EV Charger': Icons.ev_station,
-    'Meter Reading': Icons.electric_meter,
-    'Keys': Icons.vpn_key,
-    "Keys Handed Over At Check In": Icons.assignment_turned_in,
-    'Health & Safety | Smoke & Carbon Monoxide': Icons.health_and_safety,
-    'Front Garden': Icons.park,
-    'Garage': Icons.garage,
-    'Exterior Front': Icons.home,
-    'Entrance / Hallway': Icons.door_front_door,
-    'Toilet': Icons.wc,
-    'Lounge': Icons.living,
-    'Dining Room': Icons.dining,
-    'Kitchen': Icons.kitchen,
-    'Utility Room / Area': Icons.local_laundry_service,
-    'Stairs': Icons.stairs,
-    'Landing': Icons.flight_land,
-    'Bedroom 1': Icons.bed,
-    'En Suite': Icons.bathroom,
-    'Bathroom': Icons.bathtub,
-    'Rear Garden': Icons.garage_outlined,
-    'Manuals/ Certificates': Icons.book,
-    'Property Receipts': Icons.receipt,
-  };
 
   @override
   Widget build(BuildContext context) {
+    final List<String> types = [
+      'Schedule of Condition',
+      'EV Charger',
+      'Meter Reading',
+      'Keys',
+      "Keys Handed Over At Check In",
+      'Health & Safety | Smoke & Carbon Monoxide',
+      'Front Garden',
+      'Garage',
+      'Exterior Front',
+      'Entrance / Hallway',
+      'Toilet',
+      'Lounge',
+      'Dining Room',
+      'Kitchen',
+      'Utility Room / Area',
+      'Stairs',
+      'Landing',
+      'Bedroom 1',
+      'En Suite',
+      'Bathroom',
+      'Rear Garden',
+      'Manuals/ Certificates',
+      'Property Receipts'
+    ];
+
+
+    final Map<String, Widget> typeToPageMap = {
+      'Schedule of Condition': ScheduleOfCondition(propertyId: widget.propertyId),
+      'EV Charger': EvCharger(),
+      'Meter Reading': MeterReading(),
+      'Keys': Keys(),
+      "Keys Handed Over At Check In": KeyHandedOver(),
+      'Health & Safety | Smoke & Carbon Monoxide': HealthAndSafety(),
+      'Front Garden': FrontGarden(),
+      'Garage': Garage(),
+      'Exterior Front': Exteriorfront(),
+      'Entrance / Hallway': EntranceHallway(),
+      'Toilet': Toilet(),
+      'Lounge': Lounge(),
+      'Dining Room': DiningRoom(),
+      'Kitchen': KitchenPage(),
+      'Utility Room / Area': UtilityRoom(),
+      'Stairs': Stairs(),
+      'Landing': Landing(),
+      'Bedroom 1': Bedroom(),
+      'En Suite': Ensuite(),
+      'Bathroom': Bathroom(),
+      'Rear Garden': RearGarden(),
+      'Manuals/ Certificates': Manuals(),
+    };
+
+    final Map<String, IconData> typeToIconMap = {
+      'Schedule of Condition': Icons.schedule,
+      'EV Charger': Icons.ev_station,
+      'Meter Reading': Icons.electric_meter,
+      'Keys': Icons.vpn_key,
+      "Keys Handed Over At Check In": Icons.assignment_turned_in,
+      'Health & Safety | Smoke & Carbon Monoxide': Icons.health_and_safety,
+      'Front Garden': Icons.park,
+      'Garage': Icons.garage,
+      'Exterior Front': Icons.home,
+      'Entrance / Hallway': Icons.door_front_door,
+      'Toilet': Icons.wc,
+      'Lounge': Icons.living,
+      'Dining Room': Icons.dining,
+      'Kitchen': Icons.kitchen,
+      'Utility Room / Area': Icons.local_laundry_service,
+      'Stairs': Icons.stairs,
+      'Landing': Icons.flight_land,
+      'Bedroom 1': Icons.bed,
+      'En Suite': Icons.bathroom,
+      'Bathroom': Icons.bathtub,
+      'Rear Garden': Icons.garage_outlined,
+      'Manuals/ Certificates': Icons.book,
+      'Property Receipts': Icons.receipt,
+    };
     return PopScope(
       canPop: false,
       child: Scaffold(
@@ -182,10 +187,11 @@ class _EditReportPageState extends State<EditReportPage> {
                       ),
                       TextButton(
                         onPressed: () {
+                          print(widget.propertyId);
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => LandingScreen()),
+                                builder: (context) => HomePage()),
                           ); // Close the dialog
                         },
                         style: TextButton.styleFrom(

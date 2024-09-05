@@ -95,7 +95,7 @@ class _DiningRoomState extends State<DiningRoom> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => EditReportPage(),
+                builder: (context) => EditReportPage(propertyId: '',),
               ),
             );
           },

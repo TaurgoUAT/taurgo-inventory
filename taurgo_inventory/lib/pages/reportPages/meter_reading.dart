@@ -158,7 +158,7 @@ class _MeterReadingState extends State<MeterReading> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => EditReportPage(),
+                builder: (context) => EditReportPage(propertyId: '',),
               ),
             );
           },

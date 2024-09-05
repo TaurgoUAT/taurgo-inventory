@@ -86,7 +86,7 @@ class _FrontGardenState extends State<FrontGarden> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => EditReportPage(),
+                builder: (context) => EditReportPage(propertyId: '',),
               ),
             );
           },

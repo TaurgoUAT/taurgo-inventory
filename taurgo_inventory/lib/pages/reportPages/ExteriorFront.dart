@@ -95,7 +95,7 @@ class _ExteriorfrontState extends State<Exteriorfront> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => EditReportPage(),
+                builder: (context) => EditReportPage(propertyId: '',),
               ),
             );
           },

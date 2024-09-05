@@ -12,8 +12,10 @@ import 'package:taurgo_inventory/pages/reportPages/camera_preview_page.dart'; //
 
 class ScheduleOfCondition extends StatefulWidget {
   final List<File>? capturedImages;
+  final String propertyId;
 
-  const ScheduleOfCondition({super.key, this.capturedImages});
+  const ScheduleOfCondition({super.key, this.capturedImages, required this
+      .propertyId});
 
   @override
   State<ScheduleOfCondition> createState() => _ScheduleOfConditionState();
@@ -55,60 +57,102 @@ class _ScheduleOfConditionState extends State<ScheduleOfCondition> {
   void initState() {
     super.initState();
     capturedImages = widget.capturedImages ?? [];
-    _loadPreferences(); // Load the saved preferences when the state is initialized
+    print("Property Id - SOC${widget.propertyId}");
+    _loadPreferences(widget.propertyId);
   }
 
-  // Function to load preferences
-  Future<void> _loadPreferences() async {
+  Future<void> _loadPreferences(String propertyId) async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      overview = prefs.getString('overview');
-      accessoryCleanliness = prefs.getString('accessoryCleanliness');
-      windowSill = prefs.getString('windowSill');
-      carpets = prefs.getString('carpets');
-      ceilings = prefs.getString('ceilings');
-      curtains = prefs.getString('curtains');
-      hardFlooring = prefs.getString('hardFlooring');
-      kitchenArea = prefs.getString('kitchenArea');
-      oven = prefs.getString('oven');
-      mattress = prefs.getString('mattress');
-      upholstrey = prefs.getString('upholstrey');
-      wall = prefs.getString('wall');
-      window = prefs.getString('window');
-      woodwork = prefs.getString('woodwork');
+      overview = prefs.getString('overview_${propertyId}');
 
-      overviewImages = prefs.getStringList('overviewImages') ?? [];
-      accessoryCleanlinessImages =
-          prefs.getStringList('accessoryCleanlinessImages') ?? [];
-      windowSillImages = prefs.getStringList('windowSillImages') ?? [];
-      carpetsImages = prefs.getStringList('carpetsImages') ?? [];
-      ceilingsImages = prefs.getStringList('ceilingsImages') ?? [];
-      curtainsImages = prefs.getStringList('curtainsImages') ?? [];
-      hardFlooringImages = prefs.getStringList('hardFlooringImages') ?? [];
-      kitchenAreaImages = prefs.getStringList('kitchenAreaImages') ?? [];
-      ovenImages = prefs.getStringList('ovenImages') ?? [];
-      mattressImages = prefs.getStringList('mattressImages') ?? [];
-      upholstreyImages = prefs.getStringList('upholstreyImages') ?? [];
-      wallImages = prefs.getStringList('wallImages') ?? [];
-      windowImages = prefs.getStringList('windowImages') ?? [];
-      woodworkImages = prefs.getStringList('woodworkImages') ?? [];
+          accessoryCleanliness = prefs.getString('accessoryCleanliness_${propertyId}');
+          windowSill = prefs.getString('windowSill_${propertyId}');
+          carpets = prefs.getString('carpets_${propertyId}');
+          ceilings = prefs.getString('ceilings_${propertyId}');
+          curtains = prefs.getString('curtains_${propertyId}');
+          hardFlooring = prefs.getString('hardFlooring_${propertyId}');
+          kitchenArea = prefs.getString('kitchenArea_${propertyId}');
+          oven = prefs.getString('oven_${propertyId}');
+          mattress = prefs.getString('mattress_${propertyId}');
+          upholstrey = prefs.getString('upholstrey_${propertyId}');
+          wall = prefs.getString('wall_${propertyId}');
+          window = prefs.getString('window_${propertyId}');
+          woodwork = prefs.getString('woodwork_${propertyId}');
+
+
+      overviewImages = prefs.getStringList('overviewImages_${propertyId}') ?? [];
+          accessoryCleanlinessImages =
+              prefs.getStringList('accessoryCleanlinessImages_${propertyId}') ?? [];
+          windowSillImages = prefs.getStringList('windowSillImages_${propertyId}') ?? [];
+          carpetsImages = prefs.getStringList('carpetsImages_${propertyId}') ?? [];
+          ceilingsImages = prefs.getStringList('ceilingsImages_${propertyId}') ?? [];
+          curtainsImages = prefs.getStringList('curtainsImages_${propertyId}') ?? [];
+          hardFlooringImages = prefs.getStringList('hardFlooringImages_${propertyId}') ?? [];
+          kitchenAreaImages = prefs.getStringList('kitchenAreaImages_${propertyId}') ?? [];
+          ovenImages = prefs.getStringList('ovenImages_${propertyId}') ?? [];
+          mattressImages = prefs.getStringList('mattressImages_${propertyId}') ?? [];
+          upholstreyImages = prefs.getStringList('upholstreyImages_${propertyId}') ?? [];
+          wallImages = prefs.getStringList('wallImages_${propertyId}') ?? [];
+          windowImages = prefs.getStringList('windowImages_${propertyId}') ?? [];
+          woodworkImages = prefs.getStringList('woodworkImages_${propertyId}') ?? [];
     });
   }
+  // Function to load preferences
+  // Future<void> _loadPreferences() async {
+  //   final prefs = await SharedPreferences.getInstance();
+  //   setState(() {
+  //     overview = prefs.getString('overview');
+  //     accessoryCleanliness = prefs.getString('accessoryCleanliness');
+  //     windowSill = prefs.getString('windowSill');
+  //     carpets = prefs.getString('carpets');
+  //     ceilings = prefs.getString('ceilings');
+  //     curtains = prefs.getString('curtains');
+  //     hardFlooring = prefs.getString('hardFlooring');
+  //     kitchenArea = prefs.getString('kitchenArea');
+  //     oven = prefs.getString('oven');
+  //     mattress = prefs.getString('mattress');
+  //     upholstrey = prefs.getString('upholstrey');
+  //     wall = prefs.getString('wall');
+  //     window = prefs.getString('window');
+  //     woodwork = prefs.getString('woodwork');
+  //
+  //     overviewImages = prefs.getStringList('overviewImages') ?? [];
+  //     accessoryCleanlinessImages =
+  //         prefs.getStringList('accessoryCleanlinessImages') ?? [];
+  //     windowSillImages = prefs.getStringList('windowSillImages') ?? [];
+  //     carpetsImages = prefs.getStringList('carpetsImages') ?? [];
+  //     ceilingsImages = prefs.getStringList('ceilingsImages') ?? [];
+  //     curtainsImages = prefs.getStringList('curtainsImages') ?? [];
+  //     hardFlooringImages = prefs.getStringList('hardFlooringImages') ?? [];
+  //     kitchenAreaImages = prefs.getStringList('kitchenAreaImages') ?? [];
+  //     ovenImages = prefs.getStringList('ovenImages') ?? [];
+  //     mattressImages = prefs.getStringList('mattressImages') ?? [];
+  //     upholstreyImages = prefs.getStringList('upholstreyImages') ?? [];
+  //     wallImages = prefs.getStringList('wallImages') ?? [];
+  //     windowImages = prefs.getStringList('windowImages') ?? [];
+  //     woodworkImages = prefs.getStringList('woodworkImages') ?? [];
+  //   });
+  // }
 
   // Function to save a preference
-  Future<void> _savePreference(String key, String value) async {
+  Future<void> _savePreference(String propertyId, String key, String value)
+  async {
     final prefs = await SharedPreferences.getInstance();
-    prefs.setString(key, value);
+    prefs.setString('${key}_$propertyId', value);
   }
 
-  Future<void> _savePreferenceList(String key, List<String> value) async {
+  Future<void> _savePreferenceList(String propertyId, String key, List<String> value) async {
     final prefs = await SharedPreferences.getInstance();
-    prefs.setStringList(key, value);
+    prefs.setStringList('${key}_$propertyId', value);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    String propertyId = widget.propertyId;
+
+    return PopScope(canPop: false,
+        child: Scaffold(
       appBar: AppBar(
         title: Text(
           'Schedule of Condition',
@@ -125,7 +169,7 @@ class _ScheduleOfConditionState extends State<ScheduleOfCondition> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => EditReportPage(),
+                builder: (context) => EditReportPage(propertyId: '',),
               ),
             );
           },
@@ -152,22 +196,23 @@ class _ScheduleOfConditionState extends State<ScheduleOfCondition> {
                   setState(() {
                     overview = condition;
                   });
-                  _savePreference('overview', condition!); // Save preference
+                  _savePreference(propertyId, 'overview', condition!);
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     overview = description;
                   });
-                  _savePreference('overview', description!); // Save preference
+                  _savePreference(propertyId, 'overview', description!);
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     overviewImages.add(imagePath);
                   });
-                  _savePreferenceList(
-                      'overviewImages', overviewImages); // Save preference
+                  _savePreferenceList(propertyId, 'overviewImages', overviewImages);
                 },
               ),
+
+
 
               // Accessory Cleanliness
               ConditionItem(
@@ -179,21 +224,21 @@ class _ScheduleOfConditionState extends State<ScheduleOfCondition> {
                   setState(() {
                     accessoryCleanliness = condition;
                   });
-                  _savePreference(
+                  _savePreference(propertyId,
                       'accessoryCleanliness', condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     accessoryCleanliness = description;
                   });
-                  _savePreference(
+                  _savePreference(propertyId,
                       'accessoryCleanliness', description!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     accessoryCleanlinessImages.add(imagePath);
                   });
-                  _savePreferenceList('accessoryCleanlinessImages',
+                  _savePreferenceList(propertyId,'accessoryCleanlinessImages',
                       accessoryCleanlinessImages); // Save preference
                 },
               ),
@@ -208,20 +253,20 @@ class _ScheduleOfConditionState extends State<ScheduleOfCondition> {
                   setState(() {
                     windowSill = condition;
                   });
-                  _savePreference('windowSill', condition!); // Save preference
+                  _savePreference(propertyId,'windowSill', condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     windowSill = description;
                   });
-                  _savePreference(
+                  _savePreference(propertyId,
                       'windowSill', description!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     windowSillImages.add(imagePath);
                   });
-                  _savePreferenceList(
+                  _savePreferenceList(propertyId,
                       'windowSillImages', windowSillImages); // Save preference
                 },
               ),
@@ -236,19 +281,19 @@ class _ScheduleOfConditionState extends State<ScheduleOfCondition> {
                   setState(() {
                     carpets = condition;
                   });
-                  _savePreference('carpets', condition!); // Save preference
+                  _savePreference(propertyId,'carpets', condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     carpets = description;
                   });
-                  _savePreference('carpets', description!); // Save preference
+                  _savePreference(propertyId,'carpets', description!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     carpetsImages.add(imagePath);
                   });
-                  _savePreferenceList(
+                  _savePreferenceList(propertyId,
                       'carpetsImages', carpetsImages); // Save preference
                 },
               ),
@@ -263,19 +308,19 @@ class _ScheduleOfConditionState extends State<ScheduleOfCondition> {
                   setState(() {
                     ceilings = condition;
                   });
-                  _savePreference('ceilings', condition!); // Save preference
+                  _savePreference(propertyId,'ceilings', condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     ceilings = description;
                   });
-                  _savePreference('ceilings', description!); // Save preference
+                  _savePreference(propertyId,'ceilings', description!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     ceilingsImages.add(imagePath);
                   });
-                  _savePreferenceList(
+                  _savePreferenceList(propertyId,
                       'ceilingsImages', ceilingsImages); // Save preference
                 },
               ),
@@ -290,19 +335,19 @@ class _ScheduleOfConditionState extends State<ScheduleOfCondition> {
                   setState(() {
                     curtains = condition;
                   });
-                  _savePreference('curtains', condition!); // Save preference
+                  _savePreference(propertyId,'curtains', condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     curtains = description;
                   });
-                  _savePreference('curtains', description!); // Save preference
+                  _savePreference(propertyId,'curtains', description!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     curtainsImages.add(imagePath);
                   });
-                  _savePreferenceList(
+                  _savePreferenceList(propertyId,
                       'curtainsImages', curtainsImages); // Save preference
                 },
               ),
@@ -317,21 +362,21 @@ class _ScheduleOfConditionState extends State<ScheduleOfCondition> {
                   setState(() {
                     hardFlooring = condition;
                   });
-                  _savePreference(
+                  _savePreference(propertyId,
                       'hardFlooring', condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     hardFlooring = description;
                   });
-                  _savePreference(
+                  _savePreference(propertyId,
                       'hardFlooring', description!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     hardFlooringImages.add(imagePath);
                   });
-                  _savePreferenceList('hardFlooringImages',
+                  _savePreferenceList(propertyId,'hardFlooringImages',
                       hardFlooringImages); // Save preference
                 },
               ),
@@ -346,20 +391,20 @@ class _ScheduleOfConditionState extends State<ScheduleOfCondition> {
                   setState(() {
                     kitchenArea = condition;
                   });
-                  _savePreference('kitchenArea', condition!); // Save preference
+                  _savePreference(propertyId,'kitchenArea', condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     kitchenArea = description;
                   });
-                  _savePreference(
+                  _savePreference(propertyId,
                       'kitchenArea', description!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     kitchenAreaImages.add(imagePath);
                   });
-                  _savePreferenceList('kitchenAreaImages',
+                  _savePreferenceList(propertyId,'kitchenAreaImages',
                       kitchenAreaImages); // Save preference
                 },
               ),
@@ -374,19 +419,19 @@ class _ScheduleOfConditionState extends State<ScheduleOfCondition> {
                   setState(() {
                     oven = condition;
                   });
-                  _savePreference('oven', condition!); // Save preference
+                  _savePreference(propertyId,'oven', condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     oven = description;
                   });
-                  _savePreference('oven', description!); // Save preference
+                  _savePreference(propertyId,'oven', description!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     ovenImages.add(imagePath);
                   });
-                  _savePreferenceList(
+                  _savePreferenceList(propertyId,
                       'ovenImages', ovenImages); // Save preference
                 },
               ),
@@ -401,19 +446,19 @@ class _ScheduleOfConditionState extends State<ScheduleOfCondition> {
                   setState(() {
                     mattress = condition;
                   });
-                  _savePreference('mattress', condition!); // Save preference
+                  _savePreference(propertyId,'mattress', condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     mattress = description;
                   });
-                  _savePreference('mattress', description!); // Save preference
+                  _savePreference(propertyId,'mattress', description!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     mattressImages.add(imagePath);
                   });
-                  _savePreferenceList(
+                  _savePreferenceList(propertyId,
                       'mattressImages', mattressImages); // Save preference
                 },
               ),
@@ -428,20 +473,20 @@ class _ScheduleOfConditionState extends State<ScheduleOfCondition> {
                   setState(() {
                     upholstrey = condition;
                   });
-                  _savePreference('upholstrey', condition!); // Save preference
+                  _savePreference(propertyId,'upholstrey', condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     upholstrey = description;
                   });
-                  _savePreference(
+                  _savePreference(propertyId,
                       'upholstrey', description!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     upholstreyImages.add(imagePath);
                   });
-                  _savePreferenceList(
+                  _savePreferenceList(propertyId,
                       'upholstreyImages', upholstreyImages); // Save preference
                 },
               ),
@@ -456,19 +501,19 @@ class _ScheduleOfConditionState extends State<ScheduleOfCondition> {
                   setState(() {
                     wall = condition;
                   });
-                  _savePreference('wall', condition!); // Save preference
+                  _savePreference(propertyId,'wall', condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     wall = description;
                   });
-                  _savePreference('wall', description!); // Save preference
+                  _savePreference(propertyId,'wall', description!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     wallImages.add(imagePath);
                   });
-                  _savePreferenceList(
+                  _savePreferenceList(propertyId,
                       'wallImages', wallImages); // Save preference
                 },
               ),
@@ -482,19 +527,19 @@ class _ScheduleOfConditionState extends State<ScheduleOfCondition> {
                   setState(() {
                     window = condition;
                   });
-                  _savePreference('window', condition!); // Save preference
+                  _savePreference(propertyId,'window', condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     window = description;
                   });
-                  _savePreference('window', description!); // Save preference
+                  _savePreference(propertyId,'window', description!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     windowImages.add(imagePath);
                   });
-                  _savePreferenceList(
+                  _savePreferenceList(propertyId,
                       'windowImages', windowImages); // Save preference
                 },
               ),
@@ -509,19 +554,19 @@ class _ScheduleOfConditionState extends State<ScheduleOfCondition> {
                   setState(() {
                     woodwork = condition;
                   });
-                  _savePreference('woodwork', condition!); // Save preference
+                  _savePreference(propertyId,'woodwork', condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     woodwork = description;
                   });
-                  _savePreference('woodwork', description!); // Save preference
+                  _savePreference(propertyId,'woodwork', description!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     woodworkImages.add(imagePath);
                   });
-                  _savePreferenceList(
+                  _savePreferenceList(propertyId,
                       'woodworkImages', woodworkImages); // Save preference
                 },
               ),
@@ -531,7 +576,7 @@ class _ScheduleOfConditionState extends State<ScheduleOfCondition> {
           ),
         ),
       ),
-    );
+    ));
   }
 }
 // Import shared_preferences
@@ -591,21 +636,21 @@ class ConditionItem extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  IconButton(
-                    icon: Icon(
-                      Icons.warning_amber,
-                      size: 24,
-                      color: kAccentColor,
-                    ),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => AddAction(),
-                        ),
-                      );
-                    },
-                  ),
+                  // IconButton(
+                  //   icon: Icon(
+                  //     Icons.warning_amber,
+                  //     size: 24,
+                  //     color: kAccentColor,
+                  //   ),
+                  //   onPressed: () {
+                  //     Navigator.push(
+                  //       context,
+                  //       MaterialPageRoute(
+                  //         builder: (context) => AddAction(),
+                  //       ),
+                  //     );
+                  //   },
+                  // ),
                   IconButton(
                     icon: Icon(
                       Icons.camera_alt_outlined,

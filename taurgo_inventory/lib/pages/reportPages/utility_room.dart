@@ -161,7 +161,7 @@ class _UtilityRoomState extends State<UtilityRoom> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => EditReportPage(),
+                builder: (context) => EditReportPage(propertyId: '',),
               ),
             );
           },
