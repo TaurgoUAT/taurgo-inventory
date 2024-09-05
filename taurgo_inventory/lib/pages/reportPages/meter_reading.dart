@@ -13,8 +13,9 @@ import '../../widgets/add_action.dart';
 
 class MeterReading extends StatefulWidget {
   final List<File>? capturedImages;
+  final String propertyId;
 
-  const MeterReading({super.key, this.capturedImages});
+  const MeterReading({super.key, this.capturedImages, required this.propertyId});
 
   @override
   State<MeterReading> createState() => _MeterReadingState();
@@ -59,88 +60,92 @@ class _MeterReadingState extends State<MeterReading> {
   void initState() {
     super.initState();
     capturedImages = widget.capturedImages ?? [];
-    _loadPreferences(); // Load the saved preferences when the state is initialized
+    print("Property Id - SOC${widget.propertyId}");
+    _loadPreferences(widget.propertyId);
+    // Load the saved preferences when the state is initialized
   }
 
   // Function to load preferences
-  Future<void> _loadPreferences() async {
+  Future<void> _loadPreferences(String propertyId) async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       houseApplinceManualLocation =
-          prefs.getString('houseApplinceManualLocation');
+          prefs.getString('houseApplinceManualLocation_${propertyId}');
       houseApplinceManualReading =
-          prefs.getString('houseApplinceManualReading');
+          prefs.getString('houseApplinceManualReading_${propertyId}');
       houseApplinceManualSerialNumber =
-          prefs.getString('houseApplinceManualSerialNumber');
+          prefs.getString('houseApplinceManualSerialNumber_${propertyId}');
       kitchenApplinceManualLocation =
-          prefs.getString('kitchenApplinceManualLocation');
+          prefs.getString('kitchenApplinceManualLocation_${propertyId}');
       kitchenApplinceManualReading =
-          prefs.getString('kitchenApplinceManualReading');
+          prefs.getString('kitchenApplinceManualReading_${propertyId}');
       kitchenApplinceManualSerialNumber =
-          prefs.getString('kitchenApplinceManualSerialNumber');
-      heatingManualLocation = prefs.getString('heatingManualLocation');
-      heatingManualReading = prefs.getString('heatingManualReading');
-      heatingManualSerialNumber = prefs.getString('heatingManualSerialNumber');
+          prefs.getString('kitchenApplinceManualSerialNumber_${propertyId}');
+      heatingManualLocation = prefs.getString('heatingManualLocation_${propertyId}');
+      heatingManualReading = prefs.getString('heatingManualReading_${propertyId}');
+      heatingManualSerialNumber = prefs.getString('heatingManualSerialNumber_${propertyId}');
       landlordGasSafetyCertificateLocation =
-          prefs.getString('landlordGasSafetyCertificateLocation');
+          prefs.getString('landlordGasSafetyCertificateLocation_${propertyId}');
       landlordGasSafetyCertificateReading =
-          prefs.getString('landlordGasSafetyCertificateReading');
+          prefs.getString('landlordGasSafetyCertificateReading_${propertyId}');
       landlordGasSafetyCertificateSerialNumber =
-          prefs.getString('landlordGasSafetyCertificateSerialNumber');
+          prefs.getString('landlordGasSafetyCertificateSerialNumber_${propertyId}');
       legionellaRiskAssessmentLocation =
-          prefs.getString('legionellaRiskAssessmentLocation');
+          prefs.getString('legionellaRiskAssessmentLocation_${propertyId}');
       legionellaRiskAssessmentReading =
-          prefs.getString('legionellaRiskAssessmentReading');
+          prefs.getString('legionellaRiskAssessmentReading_${propertyId}');
       legionellaRiskAssessmentSerialNumber =
-          prefs.getString('legionellaRiskAssessmentSerialNumber');
+          prefs.getString('legionellaRiskAssessmentSerialNumber_${propertyId}');
       electricalSafetyCertificateLocation =
-          prefs.getString('electricalSafetyCertificateLocation');
+          prefs.getString('electricalSafetyCertificateLocation_${propertyId}');
       electricalSafetyCertificateReading =
-          prefs.getString('electricalSafetyCertificateReading');
+          prefs.getString('electricalSafetyCertificateReading_${propertyId}');
       electricalSafetyCertificateSerialNumber =
-          prefs.getString('electricalSafetyCertificateSerialNumber');
+          prefs.getString('electricalSafetyCertificateSerialNumber_${propertyId}');
       energyPerformanceCertificateLocation =
-          prefs.getString('energyPerformanceCertificateLocation');
+          prefs.getString('energyPerformanceCertificateLocation_${propertyId}');
       energyPerformanceCertificateReading =
-          prefs.getString('energyPerformanceCertificateReading');
+          prefs.getString('energyPerformanceCertificateReading_${propertyId}');
       energyPerformanceCertificateSerialNumber =
-          prefs.getString('energyPerformanceCertificateSerialNumber');
-      moveInChecklistLocation = prefs.getString('moveInChecklistLocation');
-      moveInChecklistReading = prefs.getString('moveInChecklistReading');
+          prefs.getString('energyPerformanceCertificateSerialNumber_${propertyId}');
+      moveInChecklistLocation = prefs.getString('moveInChecklistLocation_${propertyId}');
+      moveInChecklistReading = prefs.getString('moveInChecklistReading_${propertyId}');
       moveInChecklistSerialNumber =
-          prefs.getString('moveInChecklistSerialNumber');
+          prefs.getString('moveInChecklistSerialNumber_${propertyId}');
 
       houseApplinceManualImages =
-          prefs.getStringList('houseApplinceManualImages') ?? [];
+          prefs.getStringList('houseApplinceManualImages_${propertyId}') ?? [];
       kitchenApplinceManualImages =
-          prefs.getStringList('kitchenApplinceManualImages') ?? [];
-      heatingManualImages = prefs.getStringList('heatingManualImages') ?? [];
+          prefs.getStringList('kitchenApplinceManualImages_${propertyId}') ?? [];
+      heatingManualImages = prefs.getStringList('heatingManualImages_${propertyId}') ?? [];
       landlordGasSafetyCertificateImages =
-          prefs.getStringList('landlordGasSafetyCertificateImages') ?? [];
+          prefs.getStringList('landlordGasSafetyCertificateImages_${propertyId}') ?? [];
       legionellaRiskAssessmentImages =
-          prefs.getStringList('legionellaRiskAssessmentImages') ?? [];
+          prefs.getStringList('legionellaRiskAssessmentImages_${propertyId}') ?? [];
       electricalSafetyCertificateImages =
-          prefs.getStringList('electricalSafetyCertificateImages') ?? [];
+          prefs.getStringList('electricalSafetyCertificateImages_${propertyId}') ?? [];
       energyPerformanceCertificateImages =
-          prefs.getStringList('energyPerformanceCertificateImages') ?? [];
+          prefs.getStringList('energyPerformanceCertificateImages_${propertyId}') ?? [];
       moveInChecklistImages =
-          prefs.getStringList('moveInChecklistImages') ?? [];
+          prefs.getStringList('moveInChecklistImages_${propertyId}') ?? [];
     });
   }
 
   // Function to save a preference
-  Future<void> _savePreference(String key, String? value) async {
+  Future<void> _savePreference(String propertyId, String key, String value)
+  async {
     final prefs = await SharedPreferences.getInstance();
-    prefs.setString(key, value ?? '');
+    prefs.setString('${key}_$propertyId', value);
   }
 
-  Future<void> _savePreferenceList(String key, List<String> value) async {
+  Future<void> _savePreferenceList(String propertyId, String key, List<String> value) async {
     final prefs = await SharedPreferences.getInstance();
-    prefs.setStringList(key, value);
+    prefs.setStringList('${key}_$propertyId', value);
   }
 
   @override
   Widget build(BuildContext context) {
+    String propertyId = widget.propertyId;
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -186,28 +191,28 @@ class _MeterReadingState extends State<MeterReading> {
                   setState(() {
                     houseApplinceManualLocation = location;
                   });
-                  _savePreference('houseApplinceManualLocation',
-                      location); // Save preference
+                  _savePreference(propertyId,'houseApplinceManualLocation',
+                      location!); // Save preference
                 },
                 onReadingSelected: (reading) {
                   setState(() {
                     houseApplinceManualReading = reading;
                   });
-                  _savePreference(
-                      'houseApplinceManualReading', reading); // Save preference
+                  _savePreference(propertyId,
+                      'houseApplinceManualReading', reading!); // Save preference
                 },
                 onSerialNumberSelected: (serialNumber) {
                   setState(() {
                     houseApplinceManualSerialNumber = serialNumber;
                   });
-                  _savePreference('houseApplinceManualSerialNumber',
-                      serialNumber); // Save preference
+                  _savePreference(propertyId,'houseApplinceManualSerialNumber',
+                      serialNumber!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     houseApplinceManualImages.add(imagePath);
                   });
-                  _savePreferenceList(
+                  _savePreferenceList(propertyId,
                       'houseApplinceManualImages', houseApplinceManualImages);
                 },
               ),
@@ -223,28 +228,28 @@ class _MeterReadingState extends State<MeterReading> {
                   setState(() {
                     kitchenApplinceManualLocation = location;
                   });
-                  _savePreference('kitchenApplinceManualLocation',
-                      location); // Save preference
+                  _savePreference(propertyId,'kitchenApplinceManualLocation',
+                      location!); // Save preference
                 },
                 onReadingSelected: (reading) {
                   setState(() {
                     kitchenApplinceManualReading = reading;
                   });
-                  _savePreference('kitchenApplinceManualReading',
-                      reading); // Save preference
+                  _savePreference(propertyId,'kitchenApplinceManualReading',
+                      reading!); // Save preference
                 },
                 onSerialNumberSelected: (serialNumber) {
                   setState(() {
                     kitchenApplinceManualSerialNumber = serialNumber;
                   });
-                  _savePreference('kitchenApplinceManualSerialNumber',
-                      serialNumber); // Save preference
+                  _savePreference(propertyId,'kitchenApplinceManualSerialNumber',
+                      serialNumber!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     kitchenApplinceManualImages.add(imagePath);
                   });
-                  _savePreferenceList('kitchenApplinceManualImages',
+                  _savePreferenceList(propertyId,'kitchenApplinceManualImages',
                       kitchenApplinceManualImages);
                 },
               ),
@@ -260,28 +265,28 @@ class _MeterReadingState extends State<MeterReading> {
                   setState(() {
                     heatingManualLocation = location;
                   });
-                  _savePreference(
-                      'heatingManualLocation', location); // Save preference
+                  _savePreference(propertyId,
+                      'heatingManualLocation', location!); // Save preference
                 },
                 onReadingSelected: (reading) {
                   setState(() {
                     heatingManualReading = reading;
                   });
-                  _savePreference(
-                      'heatingManualReading', reading); // Save preference
+                  _savePreference(propertyId,
+                      'heatingManualReading', reading!); // Save preference
                 },
                 onSerialNumberSelected: (serialNumber) {
                   setState(() {
                     heatingManualSerialNumber = serialNumber;
                   });
-                  _savePreference('heatingManualSerialNumber',
-                      serialNumber); // Save preference
+                  _savePreference(propertyId,'heatingManualSerialNumber',
+                      serialNumber!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     heatingManualImages.add(imagePath);
                   });
-                  _savePreferenceList(
+                  _savePreferenceList(propertyId,
                       'heatingManualImages', heatingManualImages);
                 },
               ),
@@ -297,28 +302,28 @@ class _MeterReadingState extends State<MeterReading> {
                   setState(() {
                     landlordGasSafetyCertificateLocation = location;
                   });
-                  _savePreference('landlordGasSafetyCertificateLocation',
-                      location); // Save preference
+                  _savePreference(propertyId,'landlordGasSafetyCertificateLocation',
+                      location!); // Save preference
                 },
                 onReadingSelected: (reading) {
                   setState(() {
                     landlordGasSafetyCertificateReading = reading;
                   });
-                  _savePreference('landlordGasSafetyCertificateReading',
-                      reading); // Save preference
+                  _savePreference(propertyId,'landlordGasSafetyCertificateReading',
+                      reading!); // Save preference
                 },
                 onSerialNumberSelected: (serialNumber) {
                   setState(() {
                     landlordGasSafetyCertificateSerialNumber = serialNumber;
                   });
-                  _savePreference('landlordGasSafetyCertificateSerialNumber',
-                      serialNumber); // Save preference
+                  _savePreference(propertyId,'landlordGasSafetyCertificateSerialNumber',
+                      serialNumber!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     landlordGasSafetyCertificateImages.add(imagePath);
                   });
-                  _savePreferenceList('landlordGasSafetyCertificateImages',
+                  _savePreferenceList(propertyId,'landlordGasSafetyCertificateImages',
                       landlordGasSafetyCertificateImages);
                 },
               ),
@@ -334,28 +339,28 @@ class _MeterReadingState extends State<MeterReading> {
                   setState(() {
                     legionellaRiskAssessmentLocation = location;
                   });
-                  _savePreference('legionellaRiskAssessmentLocation',
-                      location); // Save preference
+                  _savePreference(propertyId,'legionellaRiskAssessmentLocation',
+                      location!); // Save preference
                 },
                 onReadingSelected: (reading) {
                   setState(() {
                     legionellaRiskAssessmentReading = reading;
                   });
-                  _savePreference('legionellaRiskAssessmentReading',
-                      reading); // Save preference
+                  _savePreference(propertyId,'legionellaRiskAssessmentReading',
+                      reading!); // Save preference
                 },
                 onSerialNumberSelected: (serialNumber) {
                   setState(() {
                     legionellaRiskAssessmentSerialNumber = serialNumber;
                   });
-                  _savePreference('legionellaRiskAssessmentSerialNumber',
-                      serialNumber); // Save preference
+                  _savePreference(propertyId,'legionellaRiskAssessmentSerialNumber',
+                      serialNumber!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     legionellaRiskAssessmentImages.add(imagePath);
                   });
-                  _savePreferenceList('legionellaRiskAssessmentImages',
+                  _savePreferenceList(propertyId,'legionellaRiskAssessmentImages',
                       legionellaRiskAssessmentImages);
                 },
               ),
@@ -371,28 +376,28 @@ class _MeterReadingState extends State<MeterReading> {
                   setState(() {
                     electricalSafetyCertificateLocation = location;
                   });
-                  _savePreference('electricalSafetyCertificateLocation',
-                      location); // Save preference
+                  _savePreference(propertyId,'electricalSafetyCertificateLocation',
+                      location!); // Save preference
                 },
                 onReadingSelected: (reading) {
                   setState(() {
                     electricalSafetyCertificateReading = reading;
                   });
-                  _savePreference('electricalSafetyCertificateReading',
-                      reading); // Save preference
+                  _savePreference(propertyId,'electricalSafetyCertificateReading',
+                      reading!); // Save preference
                 },
                 onSerialNumberSelected: (serialNumber) {
                   setState(() {
                     electricalSafetyCertificateSerialNumber = serialNumber;
                   });
-                  _savePreference('electricalSafetyCertificateSerialNumber',
-                      serialNumber); // Save preference
+                  _savePreference(propertyId,'electricalSafetyCertificateSerialNumber',
+                      serialNumber!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     electricalSafetyCertificateImages.add(imagePath);
                   });
-                  _savePreferenceList('electricalSafetyCertificateImages',
+                  _savePreferenceList(propertyId,'electricalSafetyCertificateImages',
                       electricalSafetyCertificateImages);
                 },
               ),
@@ -407,28 +412,28 @@ class _MeterReadingState extends State<MeterReading> {
                   setState(() {
                     energyPerformanceCertificateLocation = location;
                   });
-                  _savePreference('energyPerformanceCertificateLocation',
-                      location); // Save preference
+                  _savePreference(propertyId,'energyPerformanceCertificateLocation',
+                      location!); // Save preference
                 },
                 onReadingSelected: (reading) {
                   setState(() {
                     energyPerformanceCertificateReading = reading;
                   });
-                  _savePreference('energyPerformanceCertificateReading',
-                      reading); // Save preference
+                  _savePreference(propertyId,'energyPerformanceCertificateReading',
+                      reading!); // Save preference
                 },
                 onSerialNumberSelected: (serialNumber) {
                   setState(() {
                     energyPerformanceCertificateSerialNumber = serialNumber;
                   });
-                  _savePreference('energyPerformanceCertificateSerialNumber',
-                      serialNumber); // Save preference
+                  _savePreference(propertyId,'energyPerformanceCertificateSerialNumber',
+                      serialNumber!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     energyPerformanceCertificateImages.add(imagePath);
                   });
-                  _savePreferenceList('energyPerformanceCertificateImages',
+                  _savePreferenceList(propertyId,'energyPerformanceCertificateImages',
                       energyPerformanceCertificateImages);
                 },
               ),
@@ -444,28 +449,28 @@ class _MeterReadingState extends State<MeterReading> {
                   setState(() {
                     moveInChecklistLocation = location;
                   });
-                  _savePreference(
-                      'moveInChecklistLocation', location); // Save preference
+                  _savePreference(propertyId,
+                      'moveInChecklistLocation', location!); // Save preference
                 },
                 onReadingSelected: (reading) {
                   setState(() {
                     moveInChecklistReading = reading;
                   });
-                  _savePreference(
-                      'moveInChecklistReading', reading); // Save preference
+                  _savePreference(propertyId,
+                      'moveInChecklistReading', reading!); // Save preference
                 },
                 onSerialNumberSelected: (serialNumber) {
                   setState(() {
                     moveInChecklistSerialNumber = serialNumber;
                   });
-                  _savePreference('moveInChecklistSerialNumber',
-                      serialNumber); // Save preference
+                  _savePreference(propertyId,'moveInChecklistSerialNumber',
+                      serialNumber!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     moveInChecklistImages.add(imagePath);
                   });
-                  _savePreferenceList(
+                  _savePreferenceList(propertyId,
                       'moveInChecklistImages', moveInChecklistImages);
                 },
               ),
