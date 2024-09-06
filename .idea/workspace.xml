@@ -9,63 +9,8 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9cfeb956-5354-4366-ab84-34804ef25cb7" name="Changes" comment="Actions Added">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/Assets.xcassets/AppIcon.appiconset/100 1.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/Assets.xcassets/AppIcon.appiconset/100.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/Assets.xcassets/AppIcon.appiconset/1024.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/Assets.xcassets/AppIcon.appiconset/114.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/Assets.xcassets/AppIcon.appiconset/120 1.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/Assets.xcassets/AppIcon.appiconset/120.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/Assets.xcassets/AppIcon.appiconset/128.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/Assets.xcassets/AppIcon.appiconset/144.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/Assets.xcassets/AppIcon.appiconset/152.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/Assets.xcassets/AppIcon.appiconset/16.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/Assets.xcassets/AppIcon.appiconset/167.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/Assets.xcassets/AppIcon.appiconset/172.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/Assets.xcassets/AppIcon.appiconset/180.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/Assets.xcassets/AppIcon.appiconset/196.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/Assets.xcassets/AppIcon.appiconset/20.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/Assets.xcassets/AppIcon.appiconset/216.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/Assets.xcassets/AppIcon.appiconset/256.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/Assets.xcassets/AppIcon.appiconset/29.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/Assets.xcassets/AppIcon.appiconset/32.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/Assets.xcassets/AppIcon.appiconset/40 1.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/Assets.xcassets/AppIcon.appiconset/40.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/Assets.xcassets/AppIcon.appiconset/48.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/Assets.xcassets/AppIcon.appiconset/50.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/Assets.xcassets/AppIcon.appiconset/512.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/Assets.xcassets/AppIcon.appiconset/55.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/Assets.xcassets/AppIcon.appiconset/57.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/Assets.xcassets/AppIcon.appiconset/58 1.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/Assets.xcassets/AppIcon.appiconset/58 2.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/Assets.xcassets/AppIcon.appiconset/58.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/Assets.xcassets/AppIcon.appiconset/60.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/Assets.xcassets/AppIcon.appiconset/64.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/Assets.xcassets/AppIcon.appiconset/66.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/Assets.xcassets/AppIcon.appiconset/72.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/Assets.xcassets/AppIcon.appiconset/76.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/Assets.xcassets/AppIcon.appiconset/80 1.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/Assets.xcassets/AppIcon.appiconset/80 2.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/Assets.xcassets/AppIcon.appiconset/80.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/Assets.xcassets/AppIcon.appiconset/87 1.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/Assets.xcassets/AppIcon.appiconset/87.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/Assets.xcassets/AppIcon.appiconset/88.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/Assets.xcassets/AppIcon.appiconset/92.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/Assets.xcassets/AppIcon.appiconset/Contents.json" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/Assets.xcassets/AppIcon.appiconset/Contents.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/Assets.xcassets/New Folder/Contents.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/Info.plist" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/Info.plist" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/edit_report_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/edit_report_page.dart" afterDir="false" />
+    <list default="true" id="9cfeb956-5354-4366-ab84-34804ef25cb7" name="Changes" comment="App Icons Changed Along with Report Page Modifications">
       <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/inspection_confimation_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/inspection_confimation_page.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/bathroom.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/bathroom.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/dining_room.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/dining_room.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/ensuite.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/ensuite.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/kitchen_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/kitchen_page.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/landing.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/landing.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/lounge.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/lounge.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/rear_garden.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/rear_garden.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/stairs.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/stairs.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/utility_room.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/utility_room.dart" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -380,7 +325,14 @@
       <option name="project" value="LOCAL" />
       <updated>1725607575819</updated>
     </task>
-    <option name="localTasksCounter" value="36" />
+    <task id="LOCAL-00036" summary="App Icons Changed Along with Report Page Modifications">
+      <created>1725609954392</created>
+      <option name="number" value="00036" />
+      <option name="presentableId" value="LOCAL-00036" />
+      <option name="project" value="LOCAL" />
+      <updated>1725609954392</updated>
+    </task>
+    <option name="localTasksCounter" value="37" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -418,7 +370,8 @@
     <MESSAGE value="Sample DTO-SP Method Completed" />
     <MESSAGE value="DTO Upgrade" />
     <MESSAGE value="Actions Added" />
-    <option name="LAST_COMMIT_MESSAGE" value="Actions Added" />
+    <MESSAGE value="App Icons Changed Along with Report Page Modifications" />
+    <option name="LAST_COMMIT_MESSAGE" value="App Icons Changed Along with Report Page Modifications" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

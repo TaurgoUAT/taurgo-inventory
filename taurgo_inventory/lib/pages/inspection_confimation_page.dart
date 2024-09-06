@@ -95,6 +95,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
   String? windowLockLocation;
   String? windowLockReading;
   String? gasMeterLocation;
+
   // String? gasMeterReading;
   String? carPassLocation;
   String? carPassReading;
@@ -2078,142 +2079,53 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
             //1.1 Overview - Odours
             SubTypeDto(
               subTypeId: 'subType001',
-              subTypeName: 'Overview - Odours',
+              subTypeName: 'Gas Meter',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: gasMeterReading ?? 'N/A',
+              feedback: gasMeterReading ?? 'N/A',
               conditionImages: [],
             ),
 
             //1.2 Accessory Cleanliness
             SubTypeDto(
               subTypeId: 'subType001',
-              subTypeName: 'Accessory Cleanliness',
+              subTypeName: 'Electric Meter',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: electricMeterReading ?? 'N/A',
+              feedback: electricMeterReading ?? 'N/A',
               conditionImages: [],
             ),
 
             //1.3 Window Sill
             SubTypeDto(
               subTypeId: 'subType001',
-              subTypeName: 'Window Sill',
+              subTypeName: 'Water Meter',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: waterMeterReading ?? 'N/A',
+              feedback: waterMeterReading ?? 'N/A',
               conditionImages: [],
             ),
 
             //1.4 Carpets
             SubTypeDto(
               subTypeId: 'subType001',
-              subTypeName: 'Carpets',
+              subTypeName: 'Oil Meter',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: oilMeterReading ?? 'N/A',
+              feedback: oilMeterReading ?? 'N/A',
               conditionImages: [],
             ),
 
             //1.5 Ceilings
             SubTypeDto(
               subTypeId: 'subType001',
-              subTypeName: 'Ceilings',
+              subTypeName: 'Other Meter',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: otherMeterReading ?? 'N/A',
+              feedback: otherMeterReading ?? 'N/A',
               conditionImages: [],
             ),
 
-            //1.6 Curtains
-            SubTypeDto(
-              subTypeId: 'subType001',
-              subTypeName: 'Curtains',
-              images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
-              conditionImages: [],
-            ),
-
-            //1.7 Hard Flooring
-            SubTypeDto(
-              subTypeId: 'subType001',
-              subTypeName: 'Hard Flooring',
-              images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
-              conditionImages: [],
-            ),
-
-            //1.8 Kitchen Area
-            SubTypeDto(
-              subTypeId: 'subType001',
-              subTypeName: 'Kitchen Area',
-              images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
-              conditionImages: [],
-            ),
-
-            //1.9 Oven
-            SubTypeDto(
-              subTypeId: 'subType001',
-              subTypeName: 'Oven',
-              images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
-              conditionImages: [],
-            ),
-
-            //1.10 Mattress
-            SubTypeDto(
-              subTypeId: 'subType001',
-              subTypeName: 'Mattress',
-              images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
-              conditionImages: [],
-            ),
-
-            //1.11 Uholstrey
-            SubTypeDto(
-              subTypeId: 'subType001',
-              subTypeName: 'Uholstrey',
-              images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
-              conditionImages: [],
-            ),
-
-            //1.12 Wall
-            SubTypeDto(
-              subTypeId: 'subType001',
-              subTypeName: 'Wall',
-              images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
-              conditionImages: [],
-            ),
-
-            //1.13 Window
-            SubTypeDto(
-              subTypeId: 'subType001',
-              subTypeName: 'Window',
-              images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
-              conditionImages: [],
-            ),
-
-            //1.14 Woodwork
-            SubTypeDto(
-              subTypeId: 'subType001',
-              subTypeName: 'Woodwork',
-              images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
-              conditionImages: [],
-            ),
           ],
           additionalComments: 'All areas in good condition.',
         ),
@@ -4594,8 +4506,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '1.1 Overview - Odours',
             'details': [
-              {'label': 'Condition', 'value': "overview"},
-              {'label': 'Additional Comments', 'value': 'Good'},
+              {'label': 'Condition', 'value': overview ?? 'N/A',},
+              {'label': 'Additional Comments', 'value': overview ?? 'N/A',},
             ],
             'images': ['path_to_image1', 'path_to_image2']
             // Use image paths or URLs
@@ -4603,7 +4515,9 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '1.2 Genral Cleanliness',
             'details': [
-              {'label': 'Condition', 'value': 'Clean'},
+              {'label': 'Condition', 'value': accessoryCleanliness ?? 'N/A',},
+              {'label': 'Additional Comments', 'value': accessoryCleanliness ?? 'N/A',},
+
             ],
             'images': ['path_to_image3', 'path_to_image4']
             // Use image paths or URLs
