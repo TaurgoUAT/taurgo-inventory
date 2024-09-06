@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:taurgo_inventory/pages/edit_report_page.dart';
 import 'package:taurgo_inventory/pages/home_page.dart';
 import '../constants/AppColors.dart';
@@ -22,7 +25,19 @@ class PropertyDetailsViewPage extends StatefulWidget {
 class _PropertyDetailsViewPageState extends State<PropertyDetailsViewPage> {
   bool isLoading = true;
   List<Map<String, dynamic>> properties = [];
+  File? _imageFile; // File to store the selected image
 
+  // Method to pick an image from the camera
+  Future<void> _pickImage() async {
+    final ImagePicker _picker = ImagePicker();
+    final XFile? image = await _picker.pickImage(source: ImageSource.camera);
+
+    if (image != null) {
+      setState(() {
+        _imageFile = File(image.path); // Save the captured image
+      });
+    }
+  }
   @override
   void initState() {
     super.initState();
@@ -172,14 +187,47 @@ class _PropertyDetailsViewPageState extends State<PropertyDetailsViewPage> {
                     //Image
                     Padding(
                       padding: const EdgeInsets.all(0.0),
-                      child: Image.asset(
-                        'assets/images/prop-img.png',
-                        // Replace with your image path
-                        width: double
-                            .maxFinite, // Adjust the width as needed
-                        height: 220, // Adjust the height as needed
-                        fit: BoxFit
-                            .cover, // Adjust the fit as needed (e.g., BoxFit.contain, BoxFit.fill)
+                      child: Stack(
+                        children: [
+                          // Image or placeholder text
+                          Container(
+                            width: double.maxFinite,
+                            height: 220,
+                            color: Colors.grey[300], // Optional background color when no image
+                            child: _imageFile != null
+                                ? Image.file(
+                              _imageFile!,
+                              width: double.maxFinite,
+                              height: 220,
+                              fit: BoxFit.cover,
+                            )
+                                : Center(
+                              child: Text(
+                                'Pick a Cover Image',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: kPrimaryColor,
+                                ),
+                              ),
+                            ),
+                          ),
+                          // Camera icon button in the left bottom corner
+                          Positioned(
+                            bottom: 10,
+                            left: 10,
+                            child: IconButton(
+                              icon: Icon(
+                                Icons.camera_alt,
+                                color: Colors.white,
+                                size: 30,
+                              ),
+                              onPressed: () {
+                                // _pickImage(); // Open the camera and capture image
+                              },
+                              color: Colors.black54, // Optional background color for the icon
+                            ),
+                          ),
+                        ],
                       ),
                     ),
 
@@ -709,7 +757,7 @@ class _PropertyDetailsViewPageState extends State<PropertyDetailsViewPage> {
                           ),
                           child: Center(
                             child: Text(
-                              "Sync",
+                              "Update",
                               // The text you want to display
                               style: TextStyle(
                                 color: Colors.white, // Text color
