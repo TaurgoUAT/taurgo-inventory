@@ -12,37 +12,34 @@ import '../../constants/AppColors.dart';
 import '../../widgets/add_action.dart';
 
 class DiningRoom extends StatefulWidget {
-  final List<File>? capturedImages;
+  final List<File>? diningCapturedImages;
   final String propertyId;
-  const DiningRoom({super.key, this.capturedImages, required this.propertyId});
+  const DiningRoom(
+      {super.key, this.diningCapturedImages, required this.propertyId});
 
   @override
   State<DiningRoom> createState() => _DiningRoomState();
 }
 
 class _DiningRoomState extends State<DiningRoom> {
-  String? gasMeterCondition;
-  String? gasMeterLocation;
-  String? electricMeterCondition;
-  String? electricMeterLocation;
-  String? waterMeterCondition;
-  String? waterMeterLocation;
-  String? oilMeterCondition;
-  String? oilMeterLocation;
-  String? gasMeterImagePath;
-  String? electricMeterImagePath;
-  String? waterMeterImagePath;
-  String? oilMeterImagePath;
-  List<String> gasMeterImages = [];
-  List<String> electricMeterImages = [];
-  List<String> waterMeterImages = [];
-  List<String> oilMeterImages = [];
-  late List<File> capturedImages;
+  String? diningGasMeterCondition;
+  String? diningGasMeterLocation;
+  String? diningElectricMeterCondition;
+  String? diningElectricMeterLocation;
+  String? diningWaterMeterCondition;
+  String? diningWaterMeterLocation;
+  String? diningOilMeterCondition;
+  String? diningOilMeterLocation;
+  List<String> diningGasMeterImages = [];
+  List<String> diningElectricMeterImages = [];
+  List<String> diningWaterMeterImages = [];
+  List<String> diningOilMeterImages = [];
+  late List<File> diningCapturedImages;
 
   @override
   void initState() {
     super.initState();
-    capturedImages = widget.capturedImages ?? [];
+    diningCapturedImages = widget.diningCapturedImages ?? [];
     print("Property Id - SOC${widget.propertyId}");
     _loadPreferences(widget.propertyId);
     // Load the saved preferences when the state is initialized
@@ -52,36 +49,49 @@ class _DiningRoomState extends State<DiningRoom> {
   Future<void> _loadPreferences(String propertyId) async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      gasMeterCondition = prefs.getString('gasMeterCondition_${propertyId}');
-      gasMeterLocation = prefs.getString('gasMeterLocation_${propertyId}');
-      electricMeterCondition = prefs.getString('electricMeterCondition_${propertyId}');
-      electricMeterLocation = prefs.getString('electricMeterLocation_${propertyId}');
-      waterMeterCondition = prefs.getString('waterMeterCondition_${propertyId}');
-      waterMeterLocation = prefs.getString('waterMeterLocation_${propertyId}');
-      oilMeterCondition = prefs.getString('oilMeterCondition_${propertyId}');
-      oilMeterLocation = prefs.getString('oilMeterLocation_${propertyId}');
-      gasMeterImages = prefs.getStringList('gasMeterImages_${propertyId}') ?? [];
-      electricMeterImages = prefs.getStringList('electricMeterImages_${propertyId}') ?? [];
-      waterMeterImages = prefs.getStringList('waterMeterImages_${propertyId}') ?? [];
-      oilMeterImages = prefs.getStringList('oilMeterImages_${propertyId}') ?? [];
+      diningGasMeterCondition =
+          prefs.getString('diningGasMeterCondition_${propertyId}');
+      diningGasMeterLocation =
+          prefs.getString('diningGasMeterLocation_${propertyId}');
+      diningElectricMeterCondition =
+          prefs.getString('diningElectricMeterCondition_${propertyId}');
+      diningElectricMeterLocation =
+          prefs.getString('diningElectricMeterLocation_${propertyId}');
+      diningWaterMeterCondition =
+          prefs.getString('diningWaterMeterCondition_${propertyId}');
+      diningWaterMeterLocation =
+          prefs.getString('diningWaterMeterLocation_${propertyId}');
+      diningOilMeterCondition =
+          prefs.getString('diningOilMeterCondition_${propertyId}');
+      diningOilMeterLocation =
+          prefs.getString('diningOilMeterLocation_${propertyId}');
+      diningGasMeterImages =
+          prefs.getStringList('diningGasMeterImages_${propertyId}') ?? [];
+      diningElectricMeterImages =
+          prefs.getStringList('diningElectricMeterImages_${propertyId}') ?? [];
+      diningWaterMeterImages =
+          prefs.getStringList('diningWaterMeterImages_${propertyId}') ?? [];
+      diningOilMeterImages =
+          prefs.getStringList('diningOilMeterImages_${propertyId}') ?? [];
     });
   }
 
   // Function to save a preference
-  Future<void> _savePreference(String propertyId, String key, String value)
-  async {
+  Future<void> _savePreference(
+      String propertyId, String key, String value) async {
     final prefs = await SharedPreferences.getInstance();
     prefs.setString('${key}_$propertyId', value);
   }
 
-  Future<void> _savePreferenceList(String propertyId, String key, List<String> value) async {
+  Future<void> _savePreferenceList(
+      String propertyId, String key, List<String> value) async {
     final prefs = await SharedPreferences.getInstance();
     prefs.setStringList('${key}_$propertyId', value);
   }
 
   @override
   Widget build(BuildContext context) {
-     String propertyId = widget.propertyId;
+    String propertyId = widget.propertyId;
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -95,12 +105,83 @@ class _DiningRoomState extends State<DiningRoom> {
         centerTitle: true,
         backgroundColor: bWhite,
         leading: GestureDetector(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => EditReportPage(propertyId: '',),
-              ),
+          onTap: (){
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  elevation: 10,
+                  backgroundColor: Colors.white,
+                  title: Row(
+                    children: [
+                      Icon(Icons.info_outline, color: kPrimaryColor),
+                      SizedBox(width: 10),
+                      Text(
+                        'Exit',
+                        style: TextStyle(
+                          color: kPrimaryColor,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                  content: Text(
+                    'You may lost your data if you exit the process '
+                        'without saving',
+                    style: TextStyle(
+                      color: Colors.grey[800],
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                      height: 1.5,
+                    ),
+                  ),
+                  actions: <Widget>[
+                    TextButton(
+                      child: Text('Cancel',
+                        style: TextStyle(
+                          color: kPrimaryColor,
+                          fontSize: 16,
+                        ),
+                      ),
+                      onPressed: () {
+                        Navigator.of(context).pop(); // Close the dialog
+                      },
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        print("SOC -> EP ${widget.propertyId}");
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  EditReportPage(propertyId: widget.propertyId)), // Replace HomePage with your
+                          // home page
+                          // widget
+                        );
+                      },
+                      style: TextButton.styleFrom(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 8),
+                        backgroundColor: kPrimaryColor,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      child: Text(
+                        'Exit',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              },
             );
           },
           child: Icon(
@@ -109,6 +190,100 @@ class _DiningRoomState extends State<DiningRoom> {
             size: 24,
           ),
         ),
+        actions: [
+          GestureDetector(
+            onTap: (){
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    elevation: 10,
+                    backgroundColor: Colors.white,
+                    title: Row(
+                      children: [
+                        Icon(Icons.info_outline, color: kPrimaryColor),
+                        SizedBox(width: 10),
+                        Text(
+                          'Continue Saving',
+                          style: TextStyle(
+                            color: kPrimaryColor,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                    content: Text(
+                      'Please Make Sure You Have Added All the Necessary '
+                          'Information',
+                      style: TextStyle(
+                        color: Colors.grey[800],
+                        fontSize: 14,
+                        fontWeight: FontWeight.w400,
+                        height: 1.5,
+                      ),
+                    ),
+                    actions: <Widget>[
+                      TextButton(
+                        child: Text('Cancel',
+                          style: TextStyle(
+                            color: kPrimaryColor,
+                            fontSize: 16,
+                          ),
+                        ),
+                        onPressed: () {
+                          Navigator.of(context).pop(); // Close the dialog
+                        },
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          print("SOC -> EP ${widget.propertyId}");
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    EditReportPage(propertyId: widget.propertyId)), // Replace HomePage with your
+                            // home page
+                            // widget
+                          );
+                        },
+                        style: TextButton.styleFrom(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 8),
+                          backgroundColor: kPrimaryColor,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        child: Text(
+                          'Save',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              );
+            },
+            child: Container(
+              margin: EdgeInsets.all(16),
+              child: Text(
+                'Save', // Replace with the actual location
+                style: TextStyle(
+                  color: kPrimaryColor,
+                  fontSize: 14, // Adjust the font size
+                  fontFamily: "Inter",
+                ),
+              ),
+            ),
+          )
+        ],
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -119,113 +294,113 @@ class _DiningRoomState extends State<DiningRoom> {
               // Gas Meter
               ConditionItem(
                 name: "Gas Meter",
-                condition: gasMeterCondition,
-                location: gasMeterLocation,
-                images: gasMeterImages,
+                condition: diningGasMeterCondition,
+                location: diningGasMeterLocation,
+                images: diningGasMeterImages,
                 onConditionSelected: (condition) {
                   setState(() {
-                    gasMeterCondition = condition;
+                    diningGasMeterCondition = condition;
                   });
-                  _savePreference(
-                     propertyId, 'gasMeterCondition', condition!); // Save preference
+                  _savePreference(propertyId, 'diningGasMeterCondition',
+                      condition!); // Save preference
                 },
                 onlocationSelected: (location) {
                   setState(() {
-                    gasMeterLocation = location;
+                    diningGasMeterLocation = location;
                   });
-                  _savePreference(
-                      propertyId,'gasMeterLocation', location!); // Save preference
+                  _savePreference(propertyId, 'diningGasMeterLocation',
+                      location!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
-                    gasMeterImages.add(imagePath);
+                    diningGasMeterImages.add(imagePath);
                   });
-                  _savePreferenceList(
-                     propertyId, 'gasMeterImages', gasMeterImages); // Save preference
+                  _savePreferenceList(propertyId, 'diningGasMeterImages',
+                      diningGasMeterImages); // Save preference
                 },
               ),
               // Electric Meter
               ConditionItem(
                 name: "Electric Meter",
-                condition: electricMeterCondition,
-                location: electricMeterLocation,
-                images: electricMeterImages,
+                condition: diningElectricMeterCondition,
+                location: diningElectricMeterLocation,
+                images: diningElectricMeterImages,
                 onConditionSelected: (condition) {
                   setState(() {
-                    electricMeterCondition = condition;
+                    diningElectricMeterCondition = condition;
                   });
-                  _savePreference(
-                     propertyId, 'electricMeterCondition', condition!); // Save preference
+                  _savePreference(propertyId, 'diningElectricMeterCondition',
+                      condition!); // Save preference
                 },
                 onlocationSelected: (location) {
                   setState(() {
-                    electricMeterLocation = location;
+                    diningElectricMeterLocation = location;
                   });
-                  _savePreference(
-                     propertyId, 'electricMeterLocation', location!); // Save preference
+                  _savePreference(propertyId, 'diningElectricMeterLocation',
+                      location!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
-                    electricMeterImages.add(imagePath);
+                    diningElectricMeterImages.add(imagePath);
                   });
-                  _savePreferenceList(propertyId,'electricMeterImages',
-                      electricMeterImages); // Save preference
+                  _savePreferenceList(propertyId, 'diningElectricMeterImages',
+                      diningElectricMeterImages); // Save preference
                 },
               ),
               // Water Meter
               ConditionItem(
                 name: "Water Meter",
-                condition: waterMeterCondition,
-                location: waterMeterLocation,
-                images: waterMeterImages,
+                condition: diningWaterMeterCondition,
+                location: diningWaterMeterLocation,
+                images: diningWaterMeterImages,
                 onConditionSelected: (condition) {
                   setState(() {
-                    waterMeterCondition = condition;
+                    diningWaterMeterCondition = condition;
                   });
-                  _savePreference(
-                     propertyId, 'waterMeterCondition', condition!); // Save preference
+                  _savePreference(propertyId, 'diningWaterMeterCondition',
+                      condition!); // Save preference
                 },
                 onlocationSelected: (location) {
                   setState(() {
-                    waterMeterLocation = location;
+                    diningWaterMeterLocation = location;
                   });
-                  _savePreference(
-                     propertyId, 'waterMeterLocation', location!); // Save preference
+                  _savePreference(propertyId, 'diningWaterMeterLocation',
+                      location!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
-                    waterMeterImages.add(imagePath);
+                    diningWaterMeterImages.add(imagePath);
                   });
-                  _savePreferenceList(
-                     propertyId, 'waterMeterImages', waterMeterImages); // Save preference
+                  _savePreferenceList(propertyId, 'diningWaterMeterImages',
+                      diningWaterMeterImages); // Save preference
                 },
               ),
               // Oil Meter
               ConditionItem(
                 name: "Oil Meter",
-                condition: oilMeterCondition,
-                location: oilMeterLocation,
-                images: oilMeterImages,
+                condition: diningOilMeterCondition,
+                location: diningOilMeterLocation,
+                images: diningOilMeterImages,
                 onConditionSelected: (condition) {
                   setState(() {
-                    oilMeterCondition = condition;
+                    diningOilMeterCondition = condition;
                   });
-                  _savePreference(
-                     propertyId, 'oilMeterCondition', condition!); // Save preference
+                  _savePreference(propertyId, 'diningOilMeterCondition',
+                      condition!); // Save preference
                 },
                 onlocationSelected: (location) {
                   setState(() {
-                    oilMeterLocation = location;
+                    diningOilMeterLocation = location;
                   });
-                  _savePreference(
-                     propertyId, 'oilMeterLocation', location!); // Save preference
+                  _savePreference(propertyId, 'diningOilMeterLocation',
+                      location!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
-                    oilMeterImages.add(imagePath);
+                    diningOilMeterImages.add(imagePath);
                   });
-                  _savePreferenceList(
-                      propertyId,'oilMeterImages', oilMeterImages); // Save preference
+                  _savePreferenceList(propertyId, 'diningOilMeterImages',
+                      diningOilMeterImages); // Save preference
                 },
               ),
               // Add more ConditionItem widgets as needed
@@ -292,21 +467,21 @@ class ConditionItem extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  IconButton(
-                    icon: Icon(
-                      Icons.warning_amber,
-                      size: 24,
-                      color: kAccentColor,
-                    ),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => AddAction(),
-                        ),
-                      );
-                    },
-                  ),
+                  // IconButton(
+                  //   icon: Icon(
+                  //     Icons.warning_amber,
+                  //     size: 24,
+                  //     color: kAccentColor,
+                  //   ),
+                  //   onPressed: () {
+                  //     Navigator.push(
+                  //       context,
+                  //       MaterialPageRoute(
+                  //         builder: (context) => AddAction(),
+                  //       ),
+                  //     );
+                  //   },
+                  // ),
                   IconButton(
                     icon: Icon(
                       Icons.camera_alt_outlined,
@@ -397,26 +572,26 @@ class ConditionItem extends StatelessWidget {
           ),
           images.isNotEmpty
               ? Wrap(
-                  spacing: 8.0,
-                  runSpacing: 8.0,
-                  children: images.map((imagePath) {
-                    return Image.file(
-                      File(imagePath),
-                      width: 100,
-                      height: 100,
-                      fit: BoxFit.cover,
-                    );
-                  }).toList(),
-                )
+            spacing: 8.0,
+            runSpacing: 8.0,
+            children: images.map((imagePath) {
+              return Image.file(
+                File(imagePath),
+                width: 100,
+                height: 100,
+                fit: BoxFit.cover,
+              );
+            }).toList(),
+          )
               : Text(
-                  "No images selected",
-                  style: TextStyle(
-                    fontSize: 12.0,
-                    fontWeight: FontWeight.w700,
-                    color: kPrimaryTextColourTwo,
-                    fontStyle: FontStyle.italic,
-                  ),
-                ),
+            "No images selected",
+            style: TextStyle(
+              fontSize: 12.0,
+              fontWeight: FontWeight.w700,
+              color: kPrimaryTextColourTwo,
+              fontStyle: FontStyle.italic,
+            ),
+          ),
           Divider(thickness: 1, color: Color(0xFFC2C2C2)),
         ],
       ),

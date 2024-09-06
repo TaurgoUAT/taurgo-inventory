@@ -12,67 +12,84 @@ import '../../constants/AppColors.dart';
 import '../../widgets/add_action.dart';
 
 class RearGarden extends StatefulWidget {
-  final List<File>? capturedImages;
+  final List<File>? rearGardencapturedImages;
   final String propertyId;
-  const RearGarden({super.key, this.capturedImages, required this.propertyId});
+  const RearGarden(
+      {super.key, this.rearGardencapturedImages, required this.propertyId});
 
   @override
   State<RearGarden> createState() => _RearGardenState();
 }
 
 class _RearGardenState extends State<RearGarden> {
-  String? gardenDescription;
-  String? outsideLighting;
-  String? summerHouse;
-  String? shed;
-  String? additionalInformation;
-  List<String> gardenDescriptionImages = [];
-  List<String> outsideLightingImages = [];
-  List<String> summerHouseImages = [];
-  List<String> shedImages = [];
-  List<String> additionalInformationImages = [];
-  late List<File> capturedImages;
+  String? reargardenDescription;
+  String? rearGardenOutsideLighting;
+  String? rearGardensummerHouse;
+  String? rearGardenshed;
+  String? rearGardenadditionalInformation;
+  List<String> reargardenDescriptionImages = [];
+  List<String> rearGardenOutsideLightingImages = [];
+  List<String> rearGardensummerHouseImages = [];
+  List<String> rearGardenshedImages = [];
+  List<String> rearGardenadditionalInformationImages = [];
+  late List<File> rearGardencapturedImages;
 
-   @override
+  @override
   void initState() {
     super.initState();
-    capturedImages = widget.capturedImages ?? [];
+    rearGardencapturedImages = widget.rearGardencapturedImages ?? [];
     print("Property Id - SOC${widget.propertyId}");
     _loadPreferences(widget.propertyId);
     // Load the saved preferences when the state is initialized
   }
+
   // Function to load preferences
   Future<void> _loadPreferences(String propertyId) async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      gardenDescription = prefs.getString('gardenDescription_${propertyId}');
-      outsideLighting = prefs.getString('outsideLighting_${propertyId}');
-      summerHouse = prefs.getString('summerHouse_${propertyId}');
-      shed = prefs.getString('shed_${propertyId}');
-      additionalInformation = prefs.getString('additionalInformation_${propertyId}');
+      reargardenDescription =
+          prefs.getString('reargardenDescription_${propertyId}');
+      rearGardenOutsideLighting =
+          prefs.getString('rearGardenOutsideLighting_${propertyId}');
+      rearGardensummerHouse =
+          prefs.getString('rearGardensummerHouse_${propertyId}');
+      rearGardenshed = prefs.getString('rearGardenshed_${propertyId}');
+      rearGardenadditionalInformation =
+          prefs.getString('rearGardenadditionalInformation_${propertyId}');
 
-      gardenDescriptionImages = prefs.getStringList('gardenDescriptionImages_${propertyId}') ?? [];
-      outsideLightingImages = prefs.getStringList('outsideLightingImages_${propertyId}') ?? [];
-      summerHouseImages = prefs.getStringList('summerHouseImages_${propertyId}') ?? [];
-      shedImages = prefs.getStringList('shedImages_${propertyId}') ?? [];
-      additionalInformationImages = prefs.getStringList('additionalInformationImages_${propertyId}') ?? [];
+      reargardenDescriptionImages =
+          prefs.getStringList('reargardenDescriptionImages_${propertyId}') ??
+              [];
+      rearGardenOutsideLightingImages = prefs
+          .getStringList('rearGardenOutsideLightingImages_${propertyId}') ??
+          [];
+      rearGardensummerHouseImages =
+          prefs.getStringList('rearGardensummerHouseImages_${propertyId}') ??
+              [];
+      rearGardenshedImages =
+          prefs.getStringList('rearGardenshedImages_${propertyId}') ?? [];
+      rearGardenadditionalInformationImages = prefs.getStringList(
+          'rearGardenadditionalInformationImages_${propertyId}') ??
+          [];
     });
   }
 
   // Function to save a preference
-  Future<void> _savePreference(String propertyId, String key, String value)
-  async {
+  Future<void> _savePreference(
+      String propertyId, String key, String value) async {
     final prefs = await SharedPreferences.getInstance();
     prefs.setString('${key}_$propertyId', value);
   }
 
-  Future<void> _savePreferenceList(String propertyId, String key, List<String> value) async {
+  Future<void> _savePreferenceList(
+      String propertyId, String key, List<String> value) async {
     final prefs = await SharedPreferences.getInstance();
     prefs.setStringList('${key}_$propertyId', value);
   }
+
   @override
   Widget build(BuildContext context) {
-     String propertyId = widget.propertyId;
+    String propertyId = widget.propertyId;
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -86,12 +103,83 @@ class _RearGardenState extends State<RearGarden> {
         centerTitle: true,
         backgroundColor: bWhite,
         leading: GestureDetector(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => EditReportPage(propertyId: '',),
-              ),
+          onTap: (){
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  elevation: 10,
+                  backgroundColor: Colors.white,
+                  title: Row(
+                    children: [
+                      Icon(Icons.info_outline, color: kPrimaryColor),
+                      SizedBox(width: 10),
+                      Text(
+                        'Exit',
+                        style: TextStyle(
+                          color: kPrimaryColor,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                  content: Text(
+                    'You may lost your data if you exit the process '
+                        'without saving',
+                    style: TextStyle(
+                      color: Colors.grey[800],
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                      height: 1.5,
+                    ),
+                  ),
+                  actions: <Widget>[
+                    TextButton(
+                      child: Text('Cancel',
+                        style: TextStyle(
+                          color: kPrimaryColor,
+                          fontSize: 16,
+                        ),
+                      ),
+                      onPressed: () {
+                        Navigator.of(context).pop(); // Close the dialog
+                      },
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        print("SOC -> EP ${widget.propertyId}");
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  EditReportPage(propertyId: widget.propertyId)), // Replace HomePage with your
+                          // home page
+                          // widget
+                        );
+                      },
+                      style: TextButton.styleFrom(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 8),
+                        backgroundColor: kPrimaryColor,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      child: Text(
+                        'Exit',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              },
             );
           },
           child: Icon(
@@ -100,6 +188,100 @@ class _RearGardenState extends State<RearGarden> {
             size: 24,
           ),
         ),
+        actions: [
+          GestureDetector(
+            onTap: (){
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    elevation: 10,
+                    backgroundColor: Colors.white,
+                    title: Row(
+                      children: [
+                        Icon(Icons.info_outline, color: kPrimaryColor),
+                        SizedBox(width: 10),
+                        Text(
+                          'Continue Saving',
+                          style: TextStyle(
+                            color: kPrimaryColor,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                    content: Text(
+                      'Please Make Sure You Have Added All the Necessary '
+                          'Information',
+                      style: TextStyle(
+                        color: Colors.grey[800],
+                        fontSize: 14,
+                        fontWeight: FontWeight.w400,
+                        height: 1.5,
+                      ),
+                    ),
+                    actions: <Widget>[
+                      TextButton(
+                        child: Text('Cancel',
+                          style: TextStyle(
+                            color: kPrimaryColor,
+                            fontSize: 16,
+                          ),
+                        ),
+                        onPressed: () {
+                          Navigator.of(context).pop(); // Close the dialog
+                        },
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          print("SOC -> EP ${widget.propertyId}");
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    EditReportPage(propertyId: widget.propertyId)), // Replace HomePage with your
+                            // home page
+                            // widget
+                          );
+                        },
+                        style: TextButton.styleFrom(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 8),
+                          backgroundColor: kPrimaryColor,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        child: Text(
+                          'Save',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              );
+            },
+            child: Container(
+              margin: EdgeInsets.all(16),
+              child: Text(
+                'Save', // Replace with the actual location
+                style: TextStyle(
+                  color: kPrimaryColor,
+                  fontSize: 14, // Adjust the font size
+                  fontFamily: "Inter",
+                ),
+              ),
+            ),
+          )
+        ],
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -110,130 +292,149 @@ class _RearGardenState extends State<RearGarden> {
               // Garden Description
               ConditionItem(
                 name: "Garden Description",
-                condition: gardenDescription,
-                description: gardenDescription,
-                images: gardenDescriptionImages,
+                condition: reargardenDescription,
+                description: reargardenDescription,
+                images: reargardenDescriptionImages,
                 onConditionSelected: (condition) {
                   setState(() {
-                    gardenDescription = condition;
+                    reargardenDescription = condition;
                   });
-                  _savePreference(propertyId,'gardenDescription', condition!); // Save preference
+                  _savePreference(propertyId, 'reargardenDescription',
+                      condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
-                    gardenDescription = description;
+                    reargardenDescription = description;
                   });
-                  _savePreference(propertyId,'gardenDescription', description!); // Save preference
+                  _savePreference(propertyId, 'reargardenDescription',
+                      description!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
-                    gardenDescriptionImages.add(imagePath);
+                    reargardenDescriptionImages.add(imagePath);
                   });
-                  _savePreferenceList(propertyId,'gardenDescriptionImages', gardenDescriptionImages); // Save preference
+                  _savePreferenceList(propertyId, 'reargardenDescriptionImages',
+                      reargardenDescriptionImages); // Save preference
                 },
               ),
 
               // Outside Lighting
               ConditionItem(
                 name: "Outside Lighting",
-                condition: outsideLighting,
-                description: outsideLighting,
-                images: outsideLightingImages,
+                condition: rearGardenOutsideLighting,
+                description: rearGardenOutsideLighting,
+                images: rearGardenOutsideLightingImages,
                 onConditionSelected: (condition) {
                   setState(() {
-                    outsideLighting = condition;
+                    rearGardenOutsideLighting = condition;
                   });
-                  _savePreference(propertyId,'outsideLighting', condition!); // Save preference
+                  _savePreference(propertyId, 'rearGardenOutsideLighting',
+                      condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
-                    outsideLighting = description;
+                    rearGardenOutsideLighting = description;
                   });
-                  _savePreference(propertyId,'outsideLighting', description!); // Save preference
+                  _savePreference(propertyId, 'rearGardenOutsideLighting',
+                      description!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
-                    outsideLightingImages.add(imagePath);
+                    rearGardenOutsideLightingImages.add(imagePath);
                   });
-                  _savePreferenceList(propertyId,'outsideLightingImages', outsideLightingImages); // Save preference
+                  _savePreferenceList(
+                      propertyId,
+                      'rearGardenOutsideLightingImages',
+                      rearGardenOutsideLightingImages); // Save preference
                 },
               ),
 
               // Summer House
               ConditionItem(
                 name: "Summer House",
-                condition: summerHouse,
-                description: summerHouse,
-                images: summerHouseImages,
+                condition: rearGardensummerHouse,
+                description: rearGardensummerHouse,
+                images: rearGardensummerHouseImages,
                 onConditionSelected: (condition) {
                   setState(() {
-                    summerHouse = condition;
+                    rearGardensummerHouse = condition;
                   });
-                  _savePreference(propertyId,'summerHouse', condition!); // Save preference
+                  _savePreference(propertyId, 'rearGardensummerHouse',
+                      condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
-                    summerHouse = description;
+                    rearGardensummerHouse = description;
                   });
-                  _savePreference(propertyId,'summerHouse', description!); // Save preference
+                  _savePreference(propertyId, 'rearGardensummerHouse',
+                      description!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
-                    summerHouseImages.add(imagePath);
+                    rearGardensummerHouseImages.add(imagePath);
                   });
-                  _savePreferenceList(propertyId,'summerHouseImages', summerHouseImages); // Save preference
+                  _savePreferenceList(propertyId, 'rearGardensummerHouseImages',
+                      rearGardensummerHouseImages); // Save preference
                 },
               ),
 
-              // Shed
+              // rearGardenShed
               ConditionItem(
-                name: "Shed",
-                condition: shed,
-                description: shed,
-                images: shedImages,
+                name: "rearGardenShed",
+                condition: rearGardenshed,
+                description: rearGardenshed,
+                images: rearGardenshedImages,
                 onConditionSelected: (condition) {
                   setState(() {
-                    shed = condition;
+                    rearGardenshed = condition;
                   });
-                  _savePreference(propertyId,'shed', condition!); // Save preference
+                  _savePreference(propertyId, 'rearGardenshed',
+                      condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
-                    shed = description;
+                    rearGardenshed = description;
                   });
-                  _savePreference(propertyId,'shed', description!); // Save preference
+                  _savePreference(propertyId, 'rearGardenshed',
+                      description!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
-                    shedImages.add(imagePath);
+                    rearGardenshedImages.add(imagePath);
                   });
-                  _savePreferenceList(propertyId,'shedImages', shedImages); // Save preference
+                  _savePreferenceList(propertyId, 'rearGardenshedImages',
+                      rearGardenshedImages); // Save preference
                 },
               ),
 
               // Additional Information
               ConditionItem(
                 name: "Additional Information",
-                condition: additionalInformation,
-                description: additionalInformation,
-                images: additionalInformationImages,
+                condition: rearGardenadditionalInformation,
+                description: rearGardenadditionalInformation,
+                images: rearGardenadditionalInformationImages,
                 onConditionSelected: (condition) {
                   setState(() {
-                    additionalInformation = condition;
+                    rearGardenadditionalInformation = condition;
                   });
-                  _savePreference(propertyId,'additionalInformation', condition!); // Save preference
+                  _savePreference(propertyId, 'rearGardenadditionalInformation',
+                      condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
-                    additionalInformation = description;
+                    rearGardenadditionalInformation = description;
                   });
-                  _savePreference(propertyId,'additionalInformation', description!); // Save preference
+                  _savePreference(propertyId, 'rearGardenadditionalInformation',
+                      description!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
-                    additionalInformationImages.add(imagePath);
+                    rearGardenadditionalInformationImages.add(imagePath);
                   });
-                  _savePreferenceList(propertyId,'additionalInformationImages', additionalInformationImages); // Save preference
+                  _savePreferenceList(
+                      propertyId,
+                      'rearGardenadditionalInformationImages',
+                      rearGardenadditionalInformationImages); // Save preference
                 },
               ),
 
@@ -301,21 +502,21 @@ class ConditionItem extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  IconButton(
-                    icon: Icon(
-                      Icons.warning_amber,
-                      size: 24,
-                      color: kAccentColor,
-                    ),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => AddAction(),
-                        ),
-                      );
-                    },
-                  ),
+                  // IconButton(
+                  //   icon: Icon(
+                  //     Icons.warning_amber,
+                  //     size: 24,
+                  //     color: kAccentColor,
+                  //   ),
+                  //   onPressed: () {
+                  //     Navigator.push(
+                  //       context,
+                  //       MaterialPageRoute(
+                  //         builder: (context) => AddAction(),
+                  //       ),
+                  //     );
+                  //   },
+                  // ),
                   IconButton(
                     icon: Icon(
                       Icons.camera_alt_outlined,
@@ -406,26 +607,26 @@ class ConditionItem extends StatelessWidget {
           ),
           images.isNotEmpty
               ? Wrap(
-                  spacing: 8.0,
-                  runSpacing: 8.0,
-                  children: images.map((imagePath) {
-                    return Image.file(
-                      File(imagePath),
-                      width: 100,
-                      height: 100,
-                      fit: BoxFit.cover,
-                    );
-                  }).toList(),
-                )
+            spacing: 8.0,
+            runSpacing: 8.0,
+            children: images.map((imagePath) {
+              return Image.file(
+                File(imagePath),
+                width: 100,
+                height: 100,
+                fit: BoxFit.cover,
+              );
+            }).toList(),
+          )
               : Text(
-                  "No images selected",
-                  style: TextStyle(
-                    fontSize: 12.0,
-                    fontWeight: FontWeight.w700,
-                    color: kPrimaryTextColourTwo,
-                    fontStyle: FontStyle.italic,
-                  ),
-                ),
+            "No images selected",
+            style: TextStyle(
+              fontSize: 12.0,
+              fontWeight: FontWeight.w700,
+              color: kPrimaryTextColourTwo,
+              fontStyle: FontStyle.italic,
+            ),
+          ),
           Divider(thickness: 1, color: Color(0xFFC2C2C2)),
         ],
       ),

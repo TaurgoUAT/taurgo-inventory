@@ -90,7 +90,7 @@ class _EditReportPageState extends State<EditReportPage> {
       'Stairs': Stairs(propertyId: widget.propertyId,),
       'Landing': Landing(propertyId: widget.propertyId,),
       'Bedroom': Bedroom(propertyId: widget.propertyId,),
-      'En Suite': Ensuite(),
+      'En Suite': Ensuite(propertyId: widget.propertyId,),
       'Bathroom': Bathroom(propertyId: widget.propertyId,),
       'Rear Garden': RearGarden(propertyId: widget.propertyId,),
       'Manuals/ Certificates': Manuals(propertyId: widget.propertyId,),

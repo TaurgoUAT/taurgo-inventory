@@ -349,8 +349,207 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
   List<String> toileFflooringImages = [];
   List<String> toiletAdditionalItemsImages = [];
 
+  //Lounge
+  String? lougeDoorCondition;
+  String? loungedoorDescription;
+  String? loungedoorFrameCondition;
+  String? loungedoorFrameDescription;
+  String? loungeceilingCondition;
+  String? loungeceilingDescription;
+  String? loungelightingCondition;
+  String? loungelightingDescription;
+  String? loungewallsCondition;
+  String? loungewallsDescription;
+  String? loungeskirtingCondition;
+  String? loungeskirtingDescription;
+  String? loungewindowSillCondition;
+  String? loungewindowSillDescription;
+  String? loungecurtainsCondition;
+  String? loungecurtainsDescription;
+  String? loungeblindsCondition;
+  String? loungeblindsDescription;
+  String? loungelightSwitchesCondition;
+  String? loungelightSwitchesDescription;
+  String? loungesocketsCondition;
+  String? loungesocketsDescription;
+  String? loungeflooringCondition;
+  String? loungeflooringDescription;
+  String? loungeadditionalItemsCondition;
+  String? loungeadditionalItemsDescription;
+  List<String> loungedoorImages = [];
+  List<String> loungedoorFrameImages = [];
+  List<String> loungeceilingImages = [];
+  List<String> loungelightingImages = [];
+  List<String> loungewallsImages = [];
+  List<String> loungeskirtingImages = [];
+  List<String> loungewindowSillImages = [];
+  List<String> loungecurtainsImages = [];
+  List<String> loungeblindsImages = [];
+  List<String> loungelightSwitchesImages = [];
+  List<String> loungesocketsImages = [];
+  List<String> loungeflooringImages = [];
+  List<String> loungeadditionalItemsImages = [];
+
+
+  //Dining Room
+  String? diningGasMeterCondition;
+  String? diningGasMeterLocation;
+  String? diningElectricMeterCondition;
+  String? diningElectricMeterLocation;
+  String? diningWaterMeterCondition;
+  String? diningWaterMeterLocation;
+  String? diningOilMeterCondition;
+  String? diningOilMeterLocation;
+  List<String> diningGasMeterImages = [];
+  List<String> diningElectricMeterImages = [];
+  List<String> diningWaterMeterImages = [];
+  List<String> diningOilMeterImages = [];
+
+  //Ensuite
+  String? ensuitdoorCondition;
+  String? ensuitdoorLocation;
+  String? ensuitdoorFrameCondition;
+  String? ensuitedoorFrameLocation;
+  String? ensuiteceilingCondition;
+  String? ensuitceilingLocation;
+  String? ensuitlightingCondition;
+  String? ensuitelightingLocation;
+  String? ensuitewallsCondition;
+  String? ensuitewallsLocation;
+  String? ensuiteskirtingCondition;
+  String? ensuiteskirtingLocation;
+  String? ensuitewindowSillCondition;
+  String? ensuitewindowSillLocation;
+  String? ensuitecurtainsCondition;
+  String? ensuitecurtainsLocation;
+  String? ensuiteblindsCondition;
+  String? ensuiteblindsLocation;
+  String? ensuitelightSwitchesCondition;
+  String? ensuitelightSwitchesLocation;
+  String? ensuitesocketsCondition;
+  String? ensuitesocketsLocation;
+  String? ensuiteflooringCondition;
+  String? ensuiteflooringLocation;
+  String? ensuiteadditionalItemsCondition;
+  String? ensuiteadditionalItemsLocation;
+  List<String> ensuitedoorImages = [];
+  List<String> ensuitedoorFrameImages = [];
+  List<String> ensuiteceilingImages = [];
+  List<String> ensuitelightingImages = [];
+  List<String> ensuitewallsImages = [];
+  List<String> ensuiteskirtingImages = [];
+  List<String> ensuitewindowSillImages = [];
+  List<String> ensuitecurtainsImages = [];
+  List<String> ensuiteblindsImages = [];
+  List<String> ensuitelightSwitchesImages = [];
+  List<String> ensuitesocketsImages = [];
+  List<String> ensuiteflooringImages = [];
+  List<String> ensuiteadditionalItemsImages = [];
   //Kitchen
 
+  String? kitchenNewDoor;
+  String? kitchenDoorCondition;
+  String? kitchenDoorDescription;
+  String? kitchenDoorFrameCondition;
+  String? kitchenDoorFrameDescription;
+  String? kitchenCeilingCondition;
+  String? kitchenCeilingDescription;
+  String? kitchenExtractorFanCondition;
+  String? kitchenExtractorFanDescription;
+  String? kitchenLightingCondition;
+  String? kitchenLightingDescription;
+  String? kitchenWallsCondition;
+  String? kitchenWallsDescription;
+  String? kitchenSkirtingCondition;
+  String? kitchenSkirtingDescription;
+  String? kitchenWindowSillCondition;
+  String? kitchenWindowSillDescription;
+  String? kitchenCurtainsCondition;
+  String? kitchenCurtainsDescription;
+  String? kitchenBlindsCondition;
+  String? kitchenBlindsDescription;
+  String? kitchenToiletCondition;
+  String? kitchenToiletDescription;
+  String? kitchenBasinCondition;
+  String? kitchenBasinDescription;
+  String? kitchenShowerCubicleCondition;
+  String? kitchenShowerCubicleDescription;
+  String? kitchenBathCondition;
+  String? kitchenBathDescription;
+  String? kitchenSwitchBoardCondition;
+  String? kitchenSwitchBoardDescription;
+  String? kitchenSocketCondition;
+  String? kitchenSocketDescription;
+  String? kitchenHeatingCondition;
+  String? kitchenHeatingDescription;
+  String? kitchenAccessoriesCondition;
+  String? kitchenAccessoriesDescription;
+  String? kitchenFlooringCondition;
+  String? kitchenFlooringDescription;
+  String? kitchenAdditionItemsCondition;
+  String? kitchenAdditionItemsDescription;
+  List<String> kitchenDoorImages = [];
+  List<String> kitchenDoorFrameImages = [];
+  List<String> kitchenCeilingImages = [];
+  List<String> kitchenExtractorFanImages = [];
+  List<String> kitchenLightingImages = [];
+  List<String> kitchenWallsImages = [];
+  List<String> kitchenSkirtingImages = [];
+  List<String> kitchenWindowSillImages = [];
+  List<String> ktichenCurtainsImages = [];
+  List<String> kitchenBlindsImages = [];
+  List<String> kitchenToiletImages = [];
+  List<String> kitchenBasinImages = [];
+  List<String> kitchenShowerCubicleImages = [];
+  List<String> kitchenBathImages = [];
+  List<String> kitchenSwitchBoardImages = [];
+  List<String> kitchenSocketImages = [];
+  List<String> kitchenHeatingImages = [];
+  List<String> kitchenAccessoriesImages = [];
+  List<String> kitchenFlooringImages = [];
+  List<String> kitchenAdditionItemsImages = [];
+
+  //Landing
+  String? landingnewdoor;
+  String? landingdoorCondition;
+  String? landingdoorDescription;
+  String? landingdoorFrameCondition;
+  String? landingdoorFrameDescription;
+  String? landingceilingCondition;
+  String? landingceilingDescription;
+  String? landinglightingCondition;
+  String? landinglightingDescription;
+  String? landingwallsCondition;
+  String? landingwallsDescription;
+  String? landingskirtingCondition;
+  String? landingskirtingDescription;
+  String? landingwindowSillCondition;
+  String? landingwindowSillDescription;
+  String? landingcurtainsCondition;
+  String? landingcurtainsDescription;
+  String? landingblindsCondition;
+  String? landingblindsDescription;
+  String? landinglightSwitchesCondition;
+  String? landinglightSwitchesDescription;
+  String? landingsocketsCondition;
+  String? landingsocketsDescription;
+  String? landingflooringCondition;
+  String? landingflooringDescription;
+  String? landingadditionalItemsCondition;
+  String? landingadditionalItemsDescription;
+  List<String> landingdoorImages = [];
+  List<String> landingdoorFrameImages = [];
+  List<String> landingceilingImages = [];
+  List<String> landinglightingImages = [];
+  List<String> ladingwallsImages = [];
+  List<String> landingskirtingImages = [];
+  List<String> landingwindowSillImages = [];
+  List<String> landingcurtainsImages = [];
+  List<String> landingblindsImages = [];
+  List<String> landinglightSwitchesImages = [];
+  List<String> landingsocketsImages = [];
+  List<String> landingflooringImages = [];
+  List<String> landingadditionalItemsImages = [];
 
   //Bedroom
   String? bedRoomDoorLocation;
@@ -406,6 +605,58 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
   List<String> bedRoomFlooringImages = [];
   List<String> bedRoomAdditionalItemsImages = [];
 
+  // REar Garden
+  String? reargardenDescription;
+  String? rearGardenOutsideLighting;
+  String? rearGardensummerHouse;
+  String? rearGardenshed;
+  String? rearGardenadditionalInformation;
+  List<String> reargardenDescriptionImages = [];
+  List<String> rearGardenOutsideLightingImages = [];
+  List<String> rearGardensummerHouseImages = [];
+  List<String> rearGardenshedImages = [];
+  List<String> rearGardenadditionalInformationImages = [];
+
+  //Stairs
+  String? stairsdoorCondition;
+  String? stairsdoorDescription;
+  String? stairsdoorFrameCondition;
+  String? stairsdoorFrameDescription;
+  String? stairsceilingCondition;
+  String? stairsceilingDescription;
+  String? stairslightingCondition;
+  String? stairslightingDescription;
+  String? stairswallsCondition;
+  String? stairswallsDescription;
+  String? stairsskirtingCondition;
+  String? stairsskirtingDescription;
+  String? stairswindowSillCondition;
+  String? stairswindowSillDescription;
+  String? stairscurtainsCondition;
+  String? stairscurtainsDescription;
+  String? stairsblindsCondition;
+  String? stairsblindsDescription;
+  String? stairslightSwitchesCondition;
+  String? stairslightSwitchesDescription;
+  String? stairssocketsCondition;
+  String? stairssocketsDescription;
+  String? stairsflooringCondition;
+  String? stairsflooringDescription;
+  String? stairsadditionalItemsCondition;
+  String? stairsadditionalItemsDescription;
+  List<String> stairsdoorImages = [];
+  List<String> stairsdoorFrameImages = [];
+  List<String> stairsceilingImages = [];
+  List<String> stairslightingImages = [];
+  List<String> stairswallsImages = [];
+  List<String> stairsskirtingImages = [];
+  List<String> stairswindowSillImages = [];
+  List<String> stairscurtainsImages = [];
+  List<String> stairsblindsImages = [];
+  List<String> stairslightSwitchesImages = [];
+  List<String> stairssocketsImages = [];
+  List<String> stairslooringImages = [];
+  List<String> stairsadditionalItemsImages = [];
   //Manuals and Certificates
 
   String? houseApplinceManual;
@@ -432,6 +683,130 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
   List<String> electricalSafetyCertificateImages = [];
   List<String> energyPerformanceCertificateImages = [];
   List<String> moveInChecklistImages = [];
+
+  //Utility Area
+  String? utilityNewdoor;
+  String? utilityDoorCondition;
+  String? utilityDoorDescription;
+  String? utilityDoorFrameCondition;
+  String? utilityDoorFrameDescription;
+  String? utilityCeilingCondition;
+  String? utilityCeilingDescription;
+  String? utilityLightingCondition;
+  String? utilitylightingDescription;
+  String? utilitywallsCondition;
+  String? utilitywallsDescription;
+  String? utilityskirtingCondition;
+  String? utilityskirtingDescription;
+  String? utilitywindowSillCondition;
+  String? utilitywindowSillDescription;
+  String? utilitycurtainsCondition;
+  String? utilitycurtainsDescription;
+  String? utilityblindsCondition;
+  String? utilityblindsDescription;
+  String? utilitylightSwitchesCondition;
+  String? utilitylightSwitchesDescription;
+  String? utilitysocketsCondition;
+  String? utilitysocketsDescription;
+  String? utilityflooringCondition;
+  String? utilityflooringDescription;
+  String? utilityadditionalItemsCondition;
+  String? utilityadditionalItemsDescription;
+  List<String> utilitydoorImages = [];
+  List<String> utilitydoorFrameImages = [];
+  List<String> utilityceilingImages = [];
+  List<String> utilitylightingImages = [];
+  List<String> utilitywallsImages = [];
+  List<String> utilityskirtingImages = [];
+  List<String> utilitywindowSillImages = [];
+  List<String> utilitycurtainsImages = [];
+  List<String> utilityblindsImages = [];
+  List<String> utilitylightSwitchesImages = [];
+  List<String> utilitysocketsImages = [];
+  List<String> utilityflooringImages = [];
+  List<String> utilityadditionalItemsImages = [];
+
+  //Bath Room
+  String? bathroomdoorCondition;
+  String? bathroomdoorDescription;
+  String? bathroomdoorFrameCondition;
+  String? bathroomdoorFrameDescription;
+  String? bathroomceilingCondition;
+  String? bathroomceilingDescription;
+  String? bathroomextractorFanCondition;
+  String? bathroomextractorFanDescription;
+  String? bathroomlightingCondition;
+  String? bathroomlightingDescription;
+  String? bathroomwallsCondition;
+  String? bathroomwallsDescription;
+  String? bathroomskirtingCondition;
+  String? bathroomskirtingDescription;
+  String? bathroomwindowSillCondition;
+  String? bathroomwindowSillDescription;
+  String? bathroomcurtainsCondition;
+  String? bathroomcurtainsDescription;
+  String? bathroomblindsCondition;
+  String? bathroomblindsDescription;
+  String? bathroomtoiletCondition;
+  String? bathroomtoiletDescription;
+  String? bathroombasinCondition;
+  String? bathroombasinDescription;
+  String? bathroomshowerCubicleCondition;
+  String? bathroomshowerCubicleDescription;
+  String? bathroombathCondition;
+  String? bathroombathDescription;
+  String? bathroomswitchBoardCondition;
+  String? bathroomswitchBoardDescription;
+  String? bathroomsocketCondition;
+  String? bathroomsocketDescription;
+  String? bathroomheatingCondition;
+  String? bathroomheatingDescription;
+  String? bathroomaccessoriesCondition;
+  String? bathroomaccessoriesDescription;
+  String? bathroomflooringCondition;
+  String? bathroomflooringDescription;
+  String? bathroomadditionItemsCondition;
+  String? bathroomadditionItemsDescription;
+  String? doorImagePath;
+  String? doorFrameImagePath;
+  String? ceilingImagePath;
+  String? extractorFanImagePath;
+  String? lightingImagePath;
+  String? wallsImagePath;
+  String? skirtingImagePath;
+  String? windowSillImagePath;
+  String? curtainsImagePath;
+  String? blindsImagePath;
+  String? toiletImagePath;
+  String? basinImagePath;
+  String? showerCubicleImagePath;
+  String? bathImagePath;
+  String? switchBoardImagePath;
+  String? socketImagePath;
+  String? heatingImagePath;
+  String? accessoriesImagePath;
+  String? flooringImagePath;
+  String? additionItemsImagePath;
+  List<String> bathroomdoorImages = [];
+  List<String> bathroomdoorFrameImages = [];
+  List<String> bathroomceilingImages = [];
+  List<String> bathroomextractorFanImages = [];
+  List<String> bathroomlightingImages = [];
+  List<String> bathroomwallsImages = [];
+  List<String> bathroomskirtingImages = [];
+  List<String> bathroomwindowSillImages = [];
+  List<String> bathroomcurtainsImages = [];
+  List<String> bathroomblindsImages = [];
+  List<String> bathroomtoiletImages = [];
+  List<String> bathroombasinImages = [];
+  List<String> bathroomshowerCubicleImages = [];
+  List<String> bathroombathImages = [];
+  List<String> bathroomswitchBoardImages = [];
+  List<String> bathroomsocketImages = [];
+  List<String> bathroom = [];
+  List<String> bathroomaccessoriesImages = [];
+  List<String> bathroomflooringImages = [];
+  List<String> bathroomadditionItemsImages = [];
   @override
   void initState() {
     super.initState();
@@ -747,6 +1122,376 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           prefs.getStringList('additionalItemsImages_${propertyId}') ?? [];
 
 
+      //Lounge
+      lougeDoorCondition = prefs.getString('doorCondition_${propertyId}');
+      loungedoorDescription =
+          prefs.getString('loungedoorDescription_${propertyId}');
+      loungedoorFrameCondition =
+          prefs.getString('loungedoorFrameCondition_${propertyId}');
+      loungedoorFrameDescription =
+          prefs.getString('loungedoorFrameDescription_${propertyId}');
+      loungeceilingCondition =
+          prefs.getString('loungeceilingCondition_${propertyId}');
+      loungeceilingDescription =
+          prefs.getString('loungeceilingDescription_${propertyId}');
+      loungelightingCondition =
+          prefs.getString('loungelightingCondition_${propertyId}');
+      loungelightingDescription =
+          prefs.getString('loungelightingDescription_${propertyId}');
+      loungewallsCondition =
+          prefs.getString('loungewallsCondition_${propertyId}');
+      loungewallsDescription =
+          prefs.getString('loungewallsDescription_${propertyId}');
+      loungeskirtingCondition =
+          prefs.getString('loungeskirtingCondition_${propertyId}');
+      loungeskirtingDescription =
+          prefs.getString('loungeskirtingDescription_${propertyId}');
+      loungewindowSillCondition =
+          prefs.getString('loungewindowSillCondition_${propertyId}');
+      loungewindowSillDescription =
+          prefs.getString('loungewindowSillDescription_${propertyId}');
+      loungecurtainsCondition =
+          prefs.getString('loungecurtainsCondition_${propertyId}');
+      loungecurtainsDescription =
+          prefs.getString('loungecurtainsDescription_${propertyId}');
+      loungeblindsCondition =
+          prefs.getString('loungeblindsCondition_${propertyId}');
+      loungeblindsDescription =
+          prefs.getString('loungeblindsDescription_${propertyId}');
+      loungelightSwitchesCondition =
+          prefs.getString('loungelightSwitchesCondition_${propertyId}');
+      loungelightSwitchesDescription =
+          prefs.getString('loungelightSwitchesDescription_${propertyId}');
+      loungesocketsCondition =
+          prefs.getString('loungesocketsCondition_${propertyId}');
+      loungesocketsDescription =
+          prefs.getString('loungesocketsDescription_${propertyId}');
+      loungeflooringCondition =
+          prefs.getString('loungeflooringCondition_${propertyId}');
+      loungeflooringDescription =
+          prefs.getString('loungeflooringDescription_${propertyId}');
+      loungeadditionalItemsCondition =
+          prefs.getString('loungeadditionalItemsCondition_${propertyId}');
+      loungeadditionalItemsDescription =
+          prefs.getString('loungeadditionalItemsDescription_${propertyId}');
+
+      loungedoorImages =
+          prefs.getStringList('loungedoorImages_${propertyId}') ?? [];
+      loungedoorFrameImages =
+          prefs.getStringList('loungedoorFrameImages_${propertyId}') ?? [];
+      loungeceilingImages =
+          prefs.getStringList('loungeceilingImages_${propertyId}') ?? [];
+      loungelightingImages =
+          prefs.getStringList('loungelightingImages_${propertyId}') ?? [];
+      loungewallsImages =
+          prefs.getStringList('loungewallsImages_${propertyId}') ?? [];
+      loungeskirtingImages =
+          prefs.getStringList('loungeskirtingImages_${propertyId}') ?? [];
+      loungewindowSillImages =
+          prefs.getStringList('loungewindowSillImages_${propertyId}') ?? [];
+      loungecurtainsImages =
+          prefs.getStringList('loungecurtainsImages_${propertyId}') ?? [];
+      loungeblindsImages =
+          prefs.getStringList('loungeblindsImages_${propertyId}') ?? [];
+      loungelightSwitchesImages =
+          prefs.getStringList('loungelightSwitchesImages_${propertyId}') ?? [];
+      loungesocketsImages =
+          prefs.getStringList('loungesocketsImages_${propertyId}') ?? [];
+      loungeflooringImages =
+          prefs.getStringList('loungeflooringImages_${propertyId}') ?? [];
+      loungeadditionalItemsImages =
+          prefs.getStringList('loungeadditionalItemsImages_${propertyId}') ??
+              [];
+
+      //Dining Room
+      diningGasMeterCondition =
+          prefs.getString('diningGasMeterCondition_${propertyId}');
+      diningGasMeterLocation =
+          prefs.getString('diningGasMeterLocation_${propertyId}');
+      diningElectricMeterCondition =
+          prefs.getString('diningElectricMeterCondition_${propertyId}');
+      diningElectricMeterLocation =
+          prefs.getString('diningElectricMeterLocation_${propertyId}');
+      diningWaterMeterCondition =
+          prefs.getString('diningWaterMeterCondition_${propertyId}');
+      diningWaterMeterLocation =
+          prefs.getString('diningWaterMeterLocation_${propertyId}');
+      diningOilMeterCondition =
+          prefs.getString('diningOilMeterCondition_${propertyId}');
+      diningOilMeterLocation =
+          prefs.getString('diningOilMeterLocation_${propertyId}');
+      diningGasMeterImages =
+          prefs.getStringList('diningGasMeterImages_${propertyId}') ?? [];
+      diningElectricMeterImages =
+          prefs.getStringList('diningElectricMeterImages_${propertyId}') ?? [];
+      diningWaterMeterImages =
+          prefs.getStringList('diningWaterMeterImages_${propertyId}') ?? [];
+      diningOilMeterImages =
+          prefs.getStringList('diningOilMeterImages_${propertyId}') ?? [];
+
+      //En Suite
+      ensuitdoorCondition = prefs.getString('ensuitdoorCondition');
+      ensuitdoorLocation = prefs.getString('ensuitdoorLocation');
+      ensuitdoorFrameCondition = prefs.getString('ensuitdoorFrameCondition');
+      ensuitedoorFrameLocation = prefs.getString('ensuitedoorFrameLocation');
+      ensuiteceilingCondition = prefs.getString('ensuiteceilingCondition');
+      ensuitceilingLocation = prefs.getString('ensuitceilingLocation');
+      ensuitlightingCondition = prefs.getString('ensuitlightingCondition');
+      ensuitelightingLocation = prefs.getString('ensuitelightingLocation');
+      ensuitewallsCondition = prefs.getString('ensuitewallsCondition');
+      ensuitewallsLocation = prefs.getString('ensuitewallsLocation');
+      ensuiteskirtingCondition = prefs.getString('ensuiteskirtingCondition');
+      ensuiteskirtingLocation = prefs.getString('ensuiteskirtingLocation');
+      ensuitewindowSillCondition =
+          prefs.getString('ensuitewindowSillCondition');
+      ensuitewindowSillLocation = prefs.getString('ensuitewindowSillLocation');
+      ensuitecurtainsCondition = prefs.getString('ensuitecurtainsCondition');
+      ensuitecurtainsLocation = prefs.getString('ensuitecurtainsLocation');
+      ensuiteblindsCondition = prefs.getString('ensuiteblindsCondition');
+      ensuiteblindsLocation = prefs.getString('ensuiteblindsLocation');
+      ensuitelightSwitchesCondition =
+          prefs.getString('ensuitelightSwitchesCondition');
+      ensuitelightSwitchesLocation =
+          prefs.getString('ensuitelightSwitchesLocation');
+      ensuitesocketsCondition = prefs.getString('ensuitesocketsCondition');
+      ensuitesocketsLocation = prefs.getString('ensuitesocketsLocation');
+      ensuiteflooringCondition = prefs.getString('ensuiteflooringCondition');
+      ensuiteflooringLocation = prefs.getString('ensuiteflooringLocation');
+      ensuiteadditionalItemsCondition =
+          prefs.getString('ensuiteadditionalItemsCondition');
+      ensuiteadditionalItemsLocation =
+          prefs.getString('ensuiteadditionalItemsLocation');
+
+      ensuitedoorImages = prefs.getStringList('ensuitedoorImages') ?? [];
+      ensuitedoorFrameImages =
+          prefs.getStringList('ensuitedoorFrameImages') ?? [];
+      ensuiteceilingImages = prefs.getStringList('ensuiteceilingImages') ?? [];
+      ensuitelightingImages =
+          prefs.getStringList('ensuitelightingImages') ?? [];
+      ensuitewallsImages = prefs.getStringList('ensuitewallsImages') ?? [];
+      ensuiteskirtingImages =
+          prefs.getStringList('ensuiteskirtingImages') ?? [];
+      ensuitewindowSillImages =
+          prefs.getStringList('ensuitewindowSillImages') ?? [];
+      ensuitecurtainsImages =
+          prefs.getStringList('ensuitecurtainsImages') ?? [];
+      ensuiteblindsImages = prefs.getStringList('ensuiteblindsImages') ?? [];
+      ensuitelightSwitchesImages =
+          prefs.getStringList('ensuitelightSwitchesImages') ?? [];
+      ensuitesocketsImages = prefs.getStringList('ensuitesocketsImages') ?? [];
+      ensuiteflooringImages =
+          prefs.getStringList('ensuiteflooringImages') ?? [];
+      ensuiteadditionalItemsImages =
+          prefs.getStringList('ensuiteadditionalItemsImages') ?? [];
+
+
+      //Kitchen
+      kitchenNewDoor = prefs.getString('kitchenNewDoor_${propertyId}');
+      kitchenDoorCondition =
+          prefs.getString('kitchenDoorCondition_${propertyId}');
+      kitchenDoorDescription =
+          prefs.getString('kitchenDoorDescription_${propertyId}');
+      kitchenDoorFrameCondition =
+          prefs.getString('kitchenDoorFrameCondition_${propertyId}');
+      kitchenDoorFrameDescription =
+          prefs.getString('kitchenDoorFrameDescription_${propertyId}');
+      kitchenCeilingCondition =
+          prefs.getString('kitchenCeilingCondition_${propertyId}');
+      kitchenCeilingDescription =
+          prefs.getString('kitchenCeilingDescription_${propertyId}');
+      kitchenExtractorFanCondition =
+          prefs.getString('kitchenExtractorFanCondition_${propertyId}');
+      kitchenExtractorFanDescription =
+          prefs.getString('kitchenExtractorFanDescription_${propertyId}');
+      kitchenLightingCondition =
+          prefs.getString('kitchenLightingCondition_${propertyId}');
+      kitchenLightingDescription =
+          prefs.getString('kitchenLightingDescription_${propertyId}');
+      kitchenWallsCondition =
+          prefs.getString('kitchenWallsCondition_${propertyId}');
+      kitchenWallsDescription =
+          prefs.getString('kitchenWallsDescription_${propertyId}');
+      kitchenSkirtingCondition =
+          prefs.getString('kitchenSkirtingCondition_${propertyId}');
+      kitchenSkirtingDescription =
+          prefs.getString('kitchenSkirtingDescription_${propertyId}');
+      kitchenWindowSillCondition =
+          prefs.getString('kitchenWindowSillCondition_${propertyId}');
+      kitchenWindowSillDescription =
+          prefs.getString('kitchenWindowSillDescription_${propertyId}');
+      kitchenCurtainsCondition =
+          prefs.getString('kitchenCurtainsCondition_${propertyId}');
+      kitchenCurtainsDescription =
+          prefs.getString('kitchenCurtainsDescription_${propertyId}');
+      kitchenBlindsCondition =
+          prefs.getString('kitchenBlindsCondition_${propertyId}');
+      kitchenBlindsDescription =
+          prefs.getString('kitchenBlindsDescription_${propertyId}');
+      kitchenToiletCondition =
+          prefs.getString('kitchenToiletCondition_${propertyId}');
+      kitchenToiletDescription =
+          prefs.getString('kitchenToiletDescription_${propertyId}');
+      kitchenBasinCondition =
+          prefs.getString('kitchenBasinCondition_${propertyId}');
+      kitchenBasinDescription =
+          prefs.getString('kitchenBasinDescription_${propertyId}');
+      kitchenShowerCubicleCondition =
+          prefs.getString('kitchenShowerCubicleCondition_${propertyId}');
+      kitchenShowerCubicleDescription =
+          prefs.getString('kitchenShowerCubicleDescription_${propertyId}');
+      kitchenBathCondition =
+          prefs.getString('kitchenBathCondition_${propertyId}');
+      kitchenBathDescription =
+          prefs.getString('kitchenBathDescription_${propertyId}');
+      kitchenSwitchBoardCondition =
+          prefs.getString('kitchenSwitchBoardCondition_${propertyId}');
+      kitchenSwitchBoardDescription =
+          prefs.getString('kitchenSwitchBoardDescription_${propertyId}');
+      kitchenSocketCondition =
+          prefs.getString('kitchenSocketCondition_${propertyId}');
+      kitchenSocketDescription =
+          prefs.getString('kitchenSocketDescription_${propertyId}');
+      kitchenHeatingCondition =
+          prefs.getString('kitchenHeatingCondition_${propertyId}');
+      kitchenHeatingDescription =
+          prefs.getString('kitchenHeatingDescription_${propertyId}');
+      kitchenAccessoriesCondition =
+          prefs.getString('kitchenAccessoriesCondition_${propertyId}');
+      kitchenAccessoriesDescription =
+          prefs.getString('kitchenAccessoriesDescription_${propertyId}');
+      kitchenFlooringCondition =
+          prefs.getString('kitchenFlooringCondition_${propertyId}');
+      kitchenFlooringDescription =
+          prefs.getString('kitchenFlooringDescription_${propertyId}');
+      kitchenAdditionItemsCondition =
+          prefs.getString('kitchenAdditionItemsCondition_${propertyId}');
+      kitchenAdditionItemsDescription =
+          prefs.getString('kitchenAdditionItemsDescription_${propertyId}');
+
+      kitchenDoorImages =
+          prefs.getStringList('kitchenDoorImages_${propertyId}') ?? [];
+      kitchenDoorFrameImages =
+          prefs.getStringList('kitchenDoorFrameImages_${propertyId}') ?? [];
+      kitchenCeilingImages =
+          prefs.getStringList('kitchenCeilingImages_${propertyId}') ?? [];
+      kitchenExtractorFanImages =
+          prefs.getStringList('kitchenExtractorFanImages_${propertyId}') ?? [];
+      kitchenLightingImages =
+          prefs.getStringList('kitchenLightingImages_${propertyId}') ?? [];
+      kitchenWallsImages =
+          prefs.getStringList('kitchenWallsImages_${propertyId}') ?? [];
+      kitchenSkirtingImages =
+          prefs.getStringList('kitchenSkirtingImages_${propertyId}') ?? [];
+      kitchenWindowSillImages =
+          prefs.getStringList('kitchenWindowSillImages_${propertyId}') ?? [];
+      ktichenCurtainsImages =
+          prefs.getStringList('ktichenCurtainsImages_${propertyId}') ?? [];
+      kitchenBlindsImages =
+          prefs.getStringList('blindsImages_${propertyId}') ?? [];
+      kitchenToiletImages =
+          prefs.getStringList('kitchenToiletImages_${propertyId}') ?? [];
+      kitchenBasinImages =
+          prefs.getStringList('kitchenBasinImages_${propertyId}') ?? [];
+      kitchenShowerCubicleImages =
+          prefs.getStringList('kitchenShowerCubicleImages_${propertyId}') ?? [];
+      kitchenBathImages =
+          prefs.getStringList('kitchenBathImages_${propertyId}') ?? [];
+      kitchenSwitchBoardImages =
+          prefs.getStringList('kitchenSwitchBoardImages_${propertyId}') ?? [];
+      kitchenSocketImages =
+          prefs.getStringList('kitchenSocketImages_${propertyId}') ?? [];
+      kitchenHeatingImages =
+          prefs.getStringList('kitchenHeatingImages_${propertyId}') ?? [];
+      kitchenAccessoriesImages =
+          prefs.getStringList('kitchenAccessoriesImages_${propertyId}') ?? [];
+      kitchenFlooringImages =
+          prefs.getStringList('kitchenFlooringImages_${propertyId}') ?? [];
+      kitchenAdditionItemsImages =
+          prefs.getStringList('kitchenAdditionItemsImages_${propertyId}') ?? [];
+
+
+      //Landing
+      landingnewdoor = prefs.getString('landingnewdoor_${propertyId}');
+      landingdoorCondition =
+          prefs.getString('landingdoorCondition_${propertyId}');
+      landingdoorDescription =
+          prefs.getString('landingdoorDescription_${propertyId}');
+      landingdoorFrameCondition =
+          prefs.getString('landingdoorFrameCondition_${propertyId}');
+      landingdoorFrameDescription =
+          prefs.getString('landingdoorFrameDescription_${propertyId}');
+      landingceilingCondition =
+          prefs.getString('landingceilingCondition_${propertyId}');
+      landingceilingDescription =
+          prefs.getString('landingceilingDescription_${propertyId}');
+      landinglightingCondition =
+          prefs.getString('landinglightingCondition_${propertyId}');
+      landinglightingDescription =
+          prefs.getString('landinglightingDescription_${propertyId}');
+      landingwallsCondition =
+          prefs.getString('landingwallsCondition_${propertyId}');
+      landingwallsDescription =
+          prefs.getString('landingwallsDescription_${propertyId}');
+      landingskirtingCondition =
+          prefs.getString('landingskirtingCondition_${propertyId}');
+      landingskirtingDescription =
+          prefs.getString('landingskirtingDescription_${propertyId}');
+      landingwindowSillCondition =
+          prefs.getString('landingwindowSillCondition_${propertyId}');
+      landingwindowSillDescription =
+          prefs.getString('landingwindowSillDescription_${propertyId}');
+      landingcurtainsCondition =
+          prefs.getString('landingcurtainsCondition_${propertyId}');
+      landingcurtainsDescription =
+          prefs.getString('landingcurtainsDescription_${propertyId}');
+      landingblindsCondition =
+          prefs.getString('landingblindsCondition_${propertyId}');
+      landingblindsDescription =
+          prefs.getString('landingblindsDescription_${propertyId}');
+      landinglightSwitchesCondition =
+          prefs.getString('landinglightSwitchesCondition_${propertyId}');
+      landinglightSwitchesDescription =
+          prefs.getString('landinglightSwitchesDescription_${propertyId}');
+      landingsocketsCondition =
+          prefs.getString('landingsocketsCondition_${propertyId}');
+      landingsocketsDescription =
+          prefs.getString('landingsocketsDescription_${propertyId}');
+      landingflooringCondition =
+          prefs.getString('landingflooringCondition_${propertyId}');
+      landingflooringDescription =
+          prefs.getString('landingflooringDescription_${propertyId}');
+      landingadditionalItemsCondition =
+          prefs.getString('landingadditionalItemsCondition_${propertyId}');
+      landingadditionalItemsDescription =
+          prefs.getString('landingadditionalItemsDescription_${propertyId}');
+      landingdoorImages =
+          prefs.getStringList('landingdoorImages_${propertyId}') ?? [];
+      landingdoorFrameImages =
+          prefs.getStringList('landingdoorFrameImages_${propertyId}') ?? [];
+      landingceilingImages =
+          prefs.getStringList('landingceilingImages_${propertyId}') ?? [];
+      landinglightingImages =
+          prefs.getStringList('landinglightingImages_${propertyId}') ?? [];
+      ladingwallsImages =
+          prefs.getStringList('ladingwallsImages_${propertyId}') ?? [];
+      landingskirtingImages =
+          prefs.getStringList('landingskirtingImages_${propertyId}') ?? [];
+      landingwindowSillImages =
+          prefs.getStringList('landingwindowSillImages_${propertyId}') ?? [];
+      landingcurtainsImages =
+          prefs.getStringList('landingcurtainsImages_${propertyId}') ?? [];
+      landingblindsImages =
+          prefs.getStringList('landingblindsImages_${propertyId}') ?? [];
+      landinglightSwitchesImages =
+          prefs.getStringList('landinglightSwitchesImages_${propertyId}') ?? [];
+      landingsocketsImages =
+          prefs.getStringList('landingsocketsImages_${propertyId}') ?? [];
+      landingflooringImages =
+          prefs.getStringList('landingflooringImages_${propertyId}') ?? [];
+      landingadditionalItemsImages =
+          prefs.getStringList('landingadditionalItemsImages_${propertyId}') ??
+              [];
+
       //Bedroom
       bedRoomDoorLocation = prefs.getString('doorLocation_${propertyId}');
       bedRoomDoorCondition = prefs.getString('doorCondition_${propertyId}');
@@ -789,6 +1534,113 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
       bedRoomAdditionalItemsImages =
           prefs.getStringList('additionalItemsImages_${propertyId}') ?? [];
 
+      //Rear Garden
+      reargardenDescription =
+          prefs.getString('reargardenDescription_${propertyId}');
+      rearGardenOutsideLighting =
+          prefs.getString('rearGardenOutsideLighting_${propertyId}');
+      rearGardensummerHouse =
+          prefs.getString('rearGardensummerHouse_${propertyId}');
+      rearGardenshed = prefs.getString('rearGardenshed_${propertyId}');
+      rearGardenadditionalInformation =
+          prefs.getString('rearGardenadditionalInformation_${propertyId}');
+
+      reargardenDescriptionImages =
+          prefs.getStringList('reargardenDescriptionImages_${propertyId}') ??
+              [];
+      rearGardenOutsideLightingImages = prefs
+          .getStringList('rearGardenOutsideLightingImages_${propertyId}') ??
+          [];
+      rearGardensummerHouseImages =
+          prefs.getStringList('rearGardensummerHouseImages_${propertyId}') ??
+              [];
+      rearGardenshedImages =
+          prefs.getStringList('rearGardenshedImages_${propertyId}') ?? [];
+      rearGardenadditionalInformationImages = prefs.getStringList(
+          'rearGardenadditionalInformationImages_${propertyId}') ??
+          [];
+
+      //Stairs
+      stairsdoorCondition =
+          prefs.getString('stairsdoorCondition_${propertyId}');
+      stairsdoorDescription =
+          prefs.getString('stairsdoorDescription_${propertyId}');
+      stairsdoorFrameCondition =
+          prefs.getString('doorFrameCondition_${propertyId}');
+      stairsdoorFrameDescription =
+          prefs.getString('stairsdoorFrameDescription_${propertyId}');
+      stairsceilingCondition =
+          prefs.getString('stairsceilingCondition_${propertyId}');
+      stairsceilingDescription =
+          prefs.getString('stairsceilingDescription_${propertyId}');
+      stairslightingCondition =
+          prefs.getString('stairslightingCondition_${propertyId}');
+      stairslightingDescription =
+          prefs.getString('stairslightingDescription_${propertyId}');
+      stairswallsCondition =
+          prefs.getString('stairswallsCondition_${propertyId}');
+      stairswallsDescription =
+          prefs.getString('stairswallsDescription_${propertyId}');
+      stairsskirtingCondition =
+          prefs.getString('stairsskirtingCondition_${propertyId}');
+      stairsskirtingDescription =
+          prefs.getString('stairsskirtingDescription_${propertyId}');
+      stairswindowSillCondition =
+          prefs.getString('stairswindowSillCondition_${propertyId}');
+      stairswindowSillDescription =
+          prefs.getString('stairswindowSillDescription_${propertyId}');
+      stairscurtainsCondition =
+          prefs.getString('stairscurtainsCondition_${propertyId}');
+      stairscurtainsDescription =
+          prefs.getString('stairscurtainsDescription_${propertyId}');
+      stairsblindsCondition =
+          prefs.getString('stairsblindsCondition_${propertyId}');
+      stairsblindsDescription =
+          prefs.getString('stairsblindsDescription_${propertyId}');
+      stairslightSwitchesCondition =
+          prefs.getString('stairslightSwitchesCondition_${propertyId}');
+      stairslightSwitchesDescription =
+          prefs.getString('stairsstairslightSwitchesDescription_${propertyId}');
+      stairssocketsCondition =
+          prefs.getString('stairssocketsCondition_${propertyId}');
+      stairssocketsDescription =
+          prefs.getString('socketsDescription_${propertyId}');
+      stairsflooringCondition =
+          prefs.getString('stairsflooringCondition_${propertyId}');
+      stairsflooringDescription =
+          prefs.getString('stairsflooringDescription_${propertyId}');
+      stairsadditionalItemsCondition =
+          prefs.getString('stairsadditionalItemsCondition_${propertyId}');
+      stairsadditionalItemsDescription =
+          prefs.getString('stairsadditionalItemsDescription_${propertyId}');
+
+      stairsdoorImages =
+          prefs.getStringList('stairsdoorImages_${propertyId}') ?? [];
+      stairsdoorFrameImages =
+          prefs.getStringList('stairsdoorFrameImages_${propertyId}') ?? [];
+      stairsceilingImages =
+          prefs.getStringList('stairsceilingImages_${propertyId}') ?? [];
+      stairslightingImages =
+          prefs.getStringList('stairslightingImages_${propertyId}') ?? [];
+      stairswallsImages =
+          prefs.getStringList('stairswallsImages_${propertyId}') ?? [];
+      stairsskirtingImages =
+          prefs.getStringList('stairsskirtingImages_${propertyId}') ?? [];
+      stairswindowSillImages =
+          prefs.getStringList('stairswindowSillImages_${propertyId}') ?? [];
+      stairscurtainsImages =
+          prefs.getStringList('stairscurtainsImages_${propertyId}') ?? [];
+      stairsblindsImages =
+          prefs.getStringList('stairsblindsImages_${propertyId}') ?? [];
+      stairslightSwitchesImages =
+          prefs.getStringList('stairslightSwitchesImages_${propertyId}') ?? [];
+      stairssocketsImages =
+          prefs.getStringList('stairssocketsImages_${propertyId}') ?? [];
+      stairslooringImages =
+          prefs.getStringList('fstairslooringImages_${propertyId}') ?? [];
+      stairsadditionalItemsImages =
+          prefs.getStringList('stairsadditionalItemsImages_${propertyId}') ??
+              [];
       // Manuals And Certificates
       houseApplinceManual = prefs.getString('houseApplinceManual_${propertyId}');
       houseApplinceManualDescription = prefs.getString('houseApplinceManualDescription_${propertyId}');
@@ -816,6 +1668,202 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
       energyPerformanceCertificateImages = prefs.getStringList('energyPerformanceCertificateImages_${propertyId}') ?? [];
       moveInChecklistImages = prefs.getStringList('moveInChecklistImages_${propertyId}') ?? [];
 
+      //Utility Area
+      utilityNewdoor = prefs.getString('utilityNewdoor_${propertyId}');
+      utilityDoorCondition =
+          prefs.getString('utilityDoorCondition_${propertyId}');
+      utilityDoorDescription =
+          prefs.getString('utilityDoorDescription_${propertyId}');
+      utilityDoorFrameCondition =
+          prefs.getString('utilityDoorFrameCondition_${propertyId}');
+      utilityDoorFrameDescription =
+          prefs.getString('utilityDoorFrameDescription_${propertyId}');
+      utilityCeilingCondition =
+          prefs.getString('utilityCeilingCondition_${propertyId}');
+      utilityCeilingDescription =
+          prefs.getString('utilityCeilingDescription_${propertyId}');
+      utilityLightingCondition =
+          prefs.getString('utilityLightingCondition_${propertyId}');
+      utilitylightingDescription =
+          prefs.getString('utilitylightingDescription_${propertyId}');
+      utilitywallsCondition =
+          prefs.getString('utilitywallsCondition_${propertyId}');
+      utilitywallsDescription =
+          prefs.getString('utilitywallsDescription_${propertyId}');
+      utilityskirtingCondition =
+          prefs.getString('utilityskirtingCondition_${propertyId}');
+      utilityskirtingDescription =
+          prefs.getString('utilityskirtingDescription_${propertyId}');
+      utilitywindowSillCondition =
+          prefs.getString('utilitywindowSillCondition_${propertyId}');
+      utilitywindowSillDescription =
+          prefs.getString('utilitywindowSillDescription_${propertyId}');
+      utilitycurtainsCondition =
+          prefs.getString('utilitycurtainsCondition_${propertyId}');
+      utilitycurtainsDescription =
+          prefs.getString('utilitycurtainsDescription_${propertyId}');
+      utilityblindsCondition =
+          prefs.getString('utilityblindsCondition_${propertyId}');
+      utilityblindsDescription =
+          prefs.getString('utilityblindsDescription_${propertyId}');
+      utilitylightSwitchesCondition =
+          prefs.getString('utilitylightSwitchesCondition_${propertyId}');
+      utilitylightSwitchesDescription =
+          prefs.getString('utilitylightSwitchesDescription_${propertyId}');
+      utilitysocketsCondition =
+          prefs.getString('utilitysocketsCondition_${propertyId}');
+      utilitysocketsDescription =
+          prefs.getString('utilitysocketsDescription_${propertyId}');
+      utilityflooringCondition =
+          prefs.getString('utilityflooringCondition_${propertyId}');
+      utilityflooringDescription =
+          prefs.getString('utilityflooringDescription_${propertyId}');
+      utilityadditionalItemsCondition =
+          prefs.getString('utilityadditionalItemsCondition_${propertyId}');
+      utilityadditionalItemsDescription =
+          prefs.getString('utilityadditionalItemsDescription_${propertyId}');
+      utilitydoorImages =
+          prefs.getStringList('utilitydoorImages_${propertyId}') ?? [];
+      utilitydoorFrameImages =
+          prefs.getStringList('utilitydoorFrameImages_${propertyId}') ?? [];
+      utilityceilingImages =
+          prefs.getStringList('utilityceilingImages_${propertyId}') ?? [];
+      utilitylightingImages =
+          prefs.getStringList('utilitylightingImages_${propertyId}') ?? [];
+      utilitywallsImages =
+          prefs.getStringList('utilitywallsImages_${propertyId}') ?? [];
+      utilityskirtingImages =
+          prefs.getStringList('utilityskirtingImages_${propertyId}') ?? [];
+      utilitywindowSillImages =
+          prefs.getStringList('utilitywindowSillImages_${propertyId}') ?? [];
+      utilitycurtainsImages =
+          prefs.getStringList('utilitycurtainsImages_${propertyId}') ?? [];
+      utilityblindsImages =
+          prefs.getStringList('utilityblindsImages_${propertyId}') ?? [];
+      utilitylightSwitchesImages =
+          prefs.getStringList('utilitylightSwitchesImages_${propertyId}') ?? [];
+      utilitysocketsImages =
+          prefs.getStringList('utilitysocketsImages_${propertyId}') ?? [];
+      utilityflooringImages =
+          prefs.getStringList('utilityflooringImages_${propertyId}') ?? [];
+      utilityadditionalItemsImages =
+          prefs.getStringList('utilityadditionalItemsImages_${propertyId}') ??
+              [];
+
+      //BATH ROOM
+      bathroomdoorCondition =
+          prefs.getString('bathroomdoorCondition_${propertyId}');
+      bathroomdoorDescription =
+          prefs.getString('bathroomdoorDescription_${propertyId}');
+      bathroomdoorFrameCondition =
+          prefs.getString('bathroomdoorFrameCondition_${propertyId}');
+      bathroomdoorFrameDescription =
+          prefs.getString('bathroomdoorFrameDescription_${propertyId}');
+      bathroomceilingCondition =
+          prefs.getString('bathroomceilingCondition_${propertyId}');
+      bathroomceilingDescription =
+          prefs.getString('bathroomceilingDescription_${propertyId}');
+      bathroomextractorFanCondition =
+          prefs.getString('bathroomextractorFanCondition_${propertyId}');
+      bathroomextractorFanDescription =
+          prefs.getString('bathroomextractorFanDescription_${propertyId}');
+      bathroomlightingCondition =
+          prefs.getString('bathroomlightingCondition_${propertyId}');
+      bathroomlightingDescription =
+          prefs.getString('bathroomlightingDescription_${propertyId}');
+      bathroomwallsCondition =
+          prefs.getString('bathroomwallsCondition_${propertyId}');
+      bathroomwallsDescription =
+          prefs.getString('bathroomwallsDescription_${propertyId}');
+      bathroomskirtingCondition =
+          prefs.getString('bathroomskirtingCondition_${propertyId}');
+      bathroomskirtingDescription =
+          prefs.getString('bathroomskirtingDescription_${propertyId}');
+      bathroomwindowSillCondition =
+          prefs.getString('bathroomwindowSillCondition_${propertyId}');
+      bathroomwindowSillDescription =
+          prefs.getString('bathroomwindowSillDescription_${propertyId}');
+      bathroomcurtainsCondition =
+          prefs.getString('bathroomcurtainsCondition_${propertyId}');
+      bathroomcurtainsDescription =
+          prefs.getString('bathroomcurtainsDescription_${propertyId}');
+      bathroomblindsCondition =
+          prefs.getString('bathroomblindsCondition_${propertyId}');
+      bathroomblindsDescription =
+          prefs.getString('bathroomblindsDescription_${propertyId}');
+      bathroomtoiletCondition =
+          prefs.getString('bathroomtoiletCondition_${propertyId}');
+      bathroomtoiletDescription =
+          prefs.getString('bathroomtoiletDescription_${propertyId}');
+      bathroombasinCondition =
+          prefs.getString('bathroombasinCondition_${propertyId}');
+      bathroombasinDescription =
+          prefs.getString('bathroombasinDescription_${propertyId}');
+      bathroomshowerCubicleCondition =
+          prefs.getString('bathroomshowerCubicleCondition_${propertyId}');
+      bathroomshowerCubicleDescription =
+          prefs.getString('bathroomshowerCubicleDescription_${propertyId}');
+      bathroombathCondition =
+          prefs.getString('bathroombathCondition_${propertyId}');
+      bathroombathDescription =
+          prefs.getString('bathroombathDescription_${propertyId}');
+      bathroomswitchBoardCondition =
+          prefs.getString('bathroomswitchBoardCondition_${propertyId}');
+      bathroomswitchBoardDescription =
+          prefs.getString('bathroomswitchBoardDescription_${propertyId}');
+      bathroomsocketCondition =
+          prefs.getString('bathroomsocketCondition_${propertyId}');
+      bathroomsocketDescription =
+          prefs.getString('bathroomsocketDescription_${propertyId}');
+      bathroomheatingCondition =
+          prefs.getString('bathroomheatingCondition_${propertyId}');
+      bathroomheatingDescription =
+          prefs.getString('bathroomheatingDescription_${propertyId}');
+      bathroomaccessoriesCondition =
+          prefs.getString('bathroomaccessoriesCondition_${propertyId}');
+      bathroomaccessoriesDescription =
+          prefs.getString('bathroomaccessoriesDescription_${propertyId}');
+      bathroomflooringCondition =
+          prefs.getString('bathroomflooringCondition_${propertyId}');
+      bathroomflooringDescription =
+          prefs.getString('bathroomflooringDescription_${propertyId}');
+      bathroomadditionItemsCondition =
+          prefs.getString('bathroomadditionItemsCondition_${propertyId}');
+      bathroomadditionItemsDescription =
+          prefs.getString('bathroomadditionItemsDescription_${propertyId}');
+
+      bathroomdoorImages = prefs.getStringList('bathroomdoorImages') ?? [];
+      bathroomdoorFrameImages =
+          prefs.getStringList('bathroomdoorFrameImages') ?? [];
+      bathroomceilingImages =
+          prefs.getStringList('bathroomceilingImages') ?? [];
+      bathroomextractorFanImages =
+          prefs.getStringList('bathroomextractorFanImages') ?? [];
+      bathroomlightingImages =
+          prefs.getStringList('bathroomlightingImages') ?? [];
+      bathroomwallsImages = prefs.getStringList('bathroomwallsImages') ?? [];
+      bathroomskirtingImages =
+          prefs.getStringList('bathroomskirtingImages') ?? [];
+      bathroomwindowSillImages =
+          prefs.getStringList('bathroomwindowSillImages') ?? [];
+      bathroomcurtainsImages =
+          prefs.getStringList('bathroomcurtainsImages') ?? [];
+      bathroomblindsImages = prefs.getStringList('bathroomblindsImages') ?? [];
+      bathroomtoiletImages = prefs.getStringList('bathroomtoiletImages') ?? [];
+      bathroombasinImages = prefs.getStringList('bathroombasinImages') ?? [];
+      bathroomshowerCubicleImages =
+          prefs.getStringList('bathroomshowerCubicleImages') ?? [];
+      bathroombathImages = prefs.getStringList('bathroombathImages') ?? [];
+      bathroomswitchBoardImages =
+          prefs.getStringList('bathroomswitchBoardImages') ?? [];
+      bathroomsocketImages = prefs.getStringList('bathroomsocketImages') ?? [];
+      bathroom = prefs.getStringList('bathroom') ?? [];
+      bathroomaccessoriesImages =
+          prefs.getStringList('bathroomaccessoriesImages') ?? [];
+      bathroomflooringImages =
+          prefs.getStringList('bathroomflooringImages') ?? [];
+      bathroomadditionItemsImages =
+          prefs.getStringList('bathroomadditionItemsImages') ?? [];
     });
   }
 

@@ -8,89 +8,88 @@ import 'package:taurgo_inventory/pages/conditions/condition_details.dart';
 import 'package:taurgo_inventory/pages/edit_report_page.dart';
 import 'package:taurgo_inventory/pages/reportPages/camera_preview_page.dart';
 
-
 import '../../constants/AppColors.dart';
 import '../../widgets/add_action.dart';
 
-
 class KitchenPage extends StatefulWidget {
-  final List<File>? capturedImages;
+  final List<File>? kitchenCapturedImages;
   final String propertyId;
 
-  const KitchenPage({super.key, this.capturedImages, required this.propertyId});
+  const KitchenPage(
+      {super.key, this.kitchenCapturedImages, required this.propertyId});
 
   @override
   State<KitchenPage> createState() => _KitchenPageState();
 }
 
 class _KitchenPageState extends State<KitchenPage> {
-  String? newdoor;
-  String? doorCondition;
-  String? doorDescription;
-  String? doorFrameCondition;
-  String? doorFrameDescription;
-  String? ceilingCondition;
-  String? ceilingDescription;
-  String? extractorFanCondition;
-  String? extractorFanDescription;
-  String? lightingCondition;
-  String? lightingDescription;
-  String? wallsCondition;
-  String? wallsDescription;
-  String? skirtingCondition;
-  String? skirtingDescription;
-  String? windowSillCondition;
-  String? windowSillDescription;
-  String? curtainsCondition;
-  String? curtainsDescription;
-  String? blindsCondition;
-  String? blindsDescription;
-  String? toiletCondition;
-  String? toiletDescription;
-  String? basinCondition;
-  String? basinDescription;
-  String? showerCubicleCondition;
-  String? showerCubicleDescription;
-  String? bathCondition;
-  String? bathDescription;
-  String? switchBoardCondition;
-  String? switchBoardDescription;
-  String? socketCondition;
-  String? socketDescription;
-  String? heatingCondition;
-  String? heatingDescription;
-  String? accessoriesCondition;
-  String? accessoriesDescription;
-  String? flooringCondition;
-  String? flooringDescription;
-  String? additionItemsCondition;
-  String? additionItemsDescription;
-  List<String> doorImages = [];
-  List<String> doorFrameImages = [];
-  List<String> ceilingImages = [];
-  List<String> extractorFanImages = [];
-  List<String> lightingImages = [];
-  List<String> wallsImages = [];
-  List<String> skirtingImages = [];
-  List<String> windowSillImages = [];
-  List<String> curtainsImages = [];
-  List<String> blindsImages = [];
-  List<String> toiletImages = [];
-  List<String> basinImages = [];
-  List<String> showerCubicleImages = [];
-  List<String> bathImages = [];
-  List<String> switchBoardImages = [];
-  List<String> socketImages = [];
-  List<String> heatingImages = [];
-  List<String> accessoriesImages = [];
-  List<String> flooringImages = [];
-  List<String> additionItemsImages = [];
-  late List<File> capturedImages;
+  String? kitchenNewDoor;
+  String? kitchenDoorCondition;
+  String? kitchenDoorDescription;
+  String? kitchenDoorFrameCondition;
+  String? kitchenDoorFrameDescription;
+  String? kitchenCeilingCondition;
+  String? kitchenCeilingDescription;
+  String? kitchenExtractorFanCondition;
+  String? kitchenExtractorFanDescription;
+  String? kitchenLightingCondition;
+  String? kitchenLightingDescription;
+  String? kitchenWallsCondition;
+  String? kitchenWallsDescription;
+  String? kitchenSkirtingCondition;
+  String? kitchenSkirtingDescription;
+  String? kitchenWindowSillCondition;
+  String? kitchenWindowSillDescription;
+  String? kitchenCurtainsCondition;
+  String? kitchenCurtainsDescription;
+  String? kitchenBlindsCondition;
+  String? kitchenBlindsDescription;
+  String? kitchenToiletCondition;
+  String? kitchenToiletDescription;
+  String? kitchenBasinCondition;
+  String? kitchenBasinDescription;
+  String? kitchenShowerCubicleCondition;
+  String? kitchenShowerCubicleDescription;
+  String? kitchenBathCondition;
+  String? kitchenBathDescription;
+  String? kitchenSwitchBoardCondition;
+  String? kitchenSwitchBoardDescription;
+  String? kitchenSocketCondition;
+  String? kitchenSocketDescription;
+  String? kitchenHeatingCondition;
+  String? kitchenHeatingDescription;
+  String? kitchenAccessoriesCondition;
+  String? kitchenAccessoriesDescription;
+  String? kitchenFlooringCondition;
+  String? kitchenFlooringDescription;
+  String? kitchenAdditionItemsCondition;
+  String? kitchenAdditionItemsDescription;
+  List<String> kitchenDoorImages = [];
+  List<String> kitchenDoorFrameImages = [];
+  List<String> kitchenCeilingImages = [];
+  List<String> kitchenExtractorFanImages = [];
+  List<String> kitchenLightingImages = [];
+  List<String> kitchenWallsImages = [];
+  List<String> kitchenSkirtingImages = [];
+  List<String> kitchenWindowSillImages = [];
+  List<String> ktichenCurtainsImages = [];
+  List<String> kitchenBlindsImages = [];
+  List<String> kitchenToiletImages = [];
+  List<String> kitchenBasinImages = [];
+  List<String> kitchenShowerCubicleImages = [];
+  List<String> kitchenBathImages = [];
+  List<String> kitchenSwitchBoardImages = [];
+  List<String> kitchenSocketImages = [];
+  List<String> kitchenHeatingImages = [];
+  List<String> kitchenAccessoriesImages = [];
+  List<String> kitchenFlooringImages = [];
+  List<String> kitchenAdditionItemsImages = [];
+  late List<File> kitchenCapturedImages;
 
-   @override
+  @override
   void initState() {
     super.initState();
-    capturedImages = widget.capturedImages ?? [];
+    kitchenCapturedImages = widget.kitchenCapturedImages ?? [];
     print("Property Id - SOC${widget.propertyId}");
     _loadPreferences(widget.propertyId);
     // Load the saved preferences when the state is initialized
@@ -100,86 +99,147 @@ class _KitchenPageState extends State<KitchenPage> {
   Future<void> _loadPreferences(String propertyId) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
-      newdoor = prefs.getString('newdoor_${propertyId}');
-      doorCondition = prefs.getString('doorCondition_${propertyId}');
-      doorDescription = prefs.getString('doorDescription_${propertyId}');
-      doorFrameCondition = prefs.getString('doorFrameCondition_${propertyId}');
-      doorFrameDescription = prefs.getString('doorFrameDescription_${propertyId}');
-      ceilingCondition = prefs.getString('ceilingCondition_${propertyId}');
-      ceilingDescription = prefs.getString('ceilingDescription_${propertyId}');
-      extractorFanCondition = prefs.getString('extractorFanCondition_${propertyId}');
-      extractorFanDescription = prefs.getString('extractorFanDescription_${propertyId}');
-      lightingCondition = prefs.getString('lightingCondition_${propertyId}');
-      lightingDescription = prefs.getString('lightingDescription_${propertyId}');
-      wallsCondition = prefs.getString('wallsCondition_${propertyId}');
-      wallsDescription = prefs.getString('wallsDescription_${propertyId}');
-      skirtingCondition = prefs.getString('skirtingCondition_${propertyId}');
-      skirtingDescription = prefs.getString('skirtingDescription_${propertyId}');
-      windowSillCondition = prefs.getString('windowSillCondition_${propertyId}');
-      windowSillDescription = prefs.getString('windowSillDescription_${propertyId}');
-      curtainsCondition = prefs.getString('curtainsCondition_${propertyId}');
-      curtainsDescription = prefs.getString('curtainsDescription_${propertyId}');
-      blindsCondition = prefs.getString('blindsCondition_${propertyId}');
-      blindsDescription = prefs.getString('blindsDescription_${propertyId}');
-      toiletCondition = prefs.getString('toiletCondition_${propertyId}');
-      toiletDescription = prefs.getString('toiletDescription_${propertyId}');
-      basinCondition = prefs.getString('basinCondition_${propertyId}');
-      basinDescription = prefs.getString('basinDescription_${propertyId}');
-      showerCubicleCondition = prefs.getString('showerCubicleCondition_${propertyId}');
-      showerCubicleDescription = prefs.getString('showerCubicleDescription_${propertyId}');
-      bathCondition = prefs.getString('bathCondition_${propertyId}');
-      bathDescription = prefs.getString('bathDescription_${propertyId}');
-      switchBoardCondition = prefs.getString('switchBoardCondition_${propertyId}');
-      switchBoardDescription = prefs.getString('switchBoardDescription_${propertyId}');
-      socketCondition = prefs.getString('socketCondition_${propertyId}');
-      socketDescription = prefs.getString('socketDescription_${propertyId}');
-      heatingCondition = prefs.getString('heatingCondition_${propertyId}');
-      heatingDescription = prefs.getString('heatingDescription_${propertyId}');
-      accessoriesCondition = prefs.getString('accessoriesCondition_${propertyId}');
-      accessoriesDescription = prefs.getString('accessoriesDescription_${propertyId}');
-      flooringCondition = prefs.getString('flooringCondition_${propertyId}');
-      flooringDescription = prefs.getString('flooringDescription_${propertyId}');
-      additionItemsCondition = prefs.getString('additionItemsCondition_${propertyId}');
-      additionItemsDescription = prefs.getString('additionItemsDescription_${propertyId}');
+      kitchenNewDoor = prefs.getString('kitchenNewDoor_${propertyId}');
+      kitchenDoorCondition =
+          prefs.getString('kitchenDoorCondition_${propertyId}');
+      kitchenDoorDescription =
+          prefs.getString('kitchenDoorDescription_${propertyId}');
+      kitchenDoorFrameCondition =
+          prefs.getString('kitchenDoorFrameCondition_${propertyId}');
+      kitchenDoorFrameDescription =
+          prefs.getString('kitchenDoorFrameDescription_${propertyId}');
+      kitchenCeilingCondition =
+          prefs.getString('kitchenCeilingCondition_${propertyId}');
+      kitchenCeilingDescription =
+          prefs.getString('kitchenCeilingDescription_${propertyId}');
+      kitchenExtractorFanCondition =
+          prefs.getString('kitchenExtractorFanCondition_${propertyId}');
+      kitchenExtractorFanDescription =
+          prefs.getString('kitchenExtractorFanDescription_${propertyId}');
+      kitchenLightingCondition =
+          prefs.getString('kitchenLightingCondition_${propertyId}');
+      kitchenLightingDescription =
+          prefs.getString('kitchenLightingDescription_${propertyId}');
+      kitchenWallsCondition =
+          prefs.getString('kitchenWallsCondition_${propertyId}');
+      kitchenWallsDescription =
+          prefs.getString('kitchenWallsDescription_${propertyId}');
+      kitchenSkirtingCondition =
+          prefs.getString('kitchenSkirtingCondition_${propertyId}');
+      kitchenSkirtingDescription =
+          prefs.getString('kitchenSkirtingDescription_${propertyId}');
+      kitchenWindowSillCondition =
+          prefs.getString('kitchenWindowSillCondition_${propertyId}');
+      kitchenWindowSillDescription =
+          prefs.getString('kitchenWindowSillDescription_${propertyId}');
+      kitchenCurtainsCondition =
+          prefs.getString('kitchenCurtainsCondition_${propertyId}');
+      kitchenCurtainsDescription =
+          prefs.getString('kitchenCurtainsDescription_${propertyId}');
+      kitchenBlindsCondition =
+          prefs.getString('kitchenBlindsCondition_${propertyId}');
+      kitchenBlindsDescription =
+          prefs.getString('kitchenBlindsDescription_${propertyId}');
+      kitchenToiletCondition =
+          prefs.getString('kitchenToiletCondition_${propertyId}');
+      kitchenToiletDescription =
+          prefs.getString('kitchenToiletDescription_${propertyId}');
+      kitchenBasinCondition =
+          prefs.getString('kitchenBasinCondition_${propertyId}');
+      kitchenBasinDescription =
+          prefs.getString('kitchenBasinDescription_${propertyId}');
+      kitchenShowerCubicleCondition =
+          prefs.getString('kitchenShowerCubicleCondition_${propertyId}');
+      kitchenShowerCubicleDescription =
+          prefs.getString('kitchenShowerCubicleDescription_${propertyId}');
+      kitchenBathCondition =
+          prefs.getString('kitchenBathCondition_${propertyId}');
+      kitchenBathDescription =
+          prefs.getString('kitchenBathDescription_${propertyId}');
+      kitchenSwitchBoardCondition =
+          prefs.getString('kitchenSwitchBoardCondition_${propertyId}');
+      kitchenSwitchBoardDescription =
+          prefs.getString('kitchenSwitchBoardDescription_${propertyId}');
+      kitchenSocketCondition =
+          prefs.getString('kitchenSocketCondition_${propertyId}');
+      kitchenSocketDescription =
+          prefs.getString('kitchenSocketDescription_${propertyId}');
+      kitchenHeatingCondition =
+          prefs.getString('kitchenHeatingCondition_${propertyId}');
+      kitchenHeatingDescription =
+          prefs.getString('kitchenHeatingDescription_${propertyId}');
+      kitchenAccessoriesCondition =
+          prefs.getString('kitchenAccessoriesCondition_${propertyId}');
+      kitchenAccessoriesDescription =
+          prefs.getString('kitchenAccessoriesDescription_${propertyId}');
+      kitchenFlooringCondition =
+          prefs.getString('kitchenFlooringCondition_${propertyId}');
+      kitchenFlooringDescription =
+          prefs.getString('kitchenFlooringDescription_${propertyId}');
+      kitchenAdditionItemsCondition =
+          prefs.getString('kitchenAdditionItemsCondition_${propertyId}');
+      kitchenAdditionItemsDescription =
+          prefs.getString('kitchenAdditionItemsDescription_${propertyId}');
 
-      doorImages = prefs.getStringList('doorImages_${propertyId}') ?? [];
-      doorFrameImages = prefs.getStringList('doorFrameImages_${propertyId}') ?? [];
-      ceilingImages = prefs.getStringList('ceilingImages_${propertyId}') ?? [];
-      extractorFanImages = prefs.getStringList('extractorFanImages_${propertyId}') ?? [];
-      lightingImages = prefs.getStringList('lightingImages_${propertyId}') ?? [];
-      wallsImages = prefs.getStringList('wallsImages_${propertyId}') ?? [];
-      skirtingImages = prefs.getStringList('skirtingImages_${propertyId}') ?? [];
-      windowSillImages = prefs.getStringList('windowSillImages_${propertyId}') ?? [];
-      curtainsImages = prefs.getStringList('curtainsImages_${propertyId}') ?? [];
-      blindsImages = prefs.getStringList('blindsImages_${propertyId}') ?? [];
-      toiletImages = prefs.getStringList('toiletImages_${propertyId}') ?? [];
-      basinImages = prefs.getStringList('basinImages_${propertyId}') ?? [];
-      showerCubicleImages = prefs.getStringList('showerCubicleImages_${propertyId}') ?? [];
-      bathImages = prefs.getStringList('bathImages_${propertyId}') ?? [];
-      switchBoardImages = prefs.getStringList('switchBoardImages_${propertyId}') ?? [];
-      socketImages = prefs.getStringList('socketImages_${propertyId}') ?? [];
-      heatingImages = prefs.getStringList('heatingImages_${propertyId}') ?? [];
-      accessoriesImages = prefs.getStringList('accessoriesImages_${propertyId}') ?? [];
-      flooringImages = prefs.getStringList('flooringImages_${propertyId}') ?? [];
-      additionItemsImages = prefs.getStringList('additionItemsImages_${propertyId}') ?? [];
+      kitchenDoorImages =
+          prefs.getStringList('kitchenDoorImages_${propertyId}') ?? [];
+      kitchenDoorFrameImages =
+          prefs.getStringList('kitchenDoorFrameImages_${propertyId}') ?? [];
+      kitchenCeilingImages =
+          prefs.getStringList('kitchenCeilingImages_${propertyId}') ?? [];
+      kitchenExtractorFanImages =
+          prefs.getStringList('kitchenExtractorFanImages_${propertyId}') ?? [];
+      kitchenLightingImages =
+          prefs.getStringList('kitchenLightingImages_${propertyId}') ?? [];
+      kitchenWallsImages =
+          prefs.getStringList('kitchenWallsImages_${propertyId}') ?? [];
+      kitchenSkirtingImages =
+          prefs.getStringList('kitchenSkirtingImages_${propertyId}') ?? [];
+      kitchenWindowSillImages =
+          prefs.getStringList('kitchenWindowSillImages_${propertyId}') ?? [];
+      ktichenCurtainsImages =
+          prefs.getStringList('ktichenCurtainsImages_${propertyId}') ?? [];
+      kitchenBlindsImages =
+          prefs.getStringList('blindsImages_${propertyId}') ?? [];
+      kitchenToiletImages =
+          prefs.getStringList('kitchenToiletImages_${propertyId}') ?? [];
+      kitchenBasinImages =
+          prefs.getStringList('kitchenBasinImages_${propertyId}') ?? [];
+      kitchenShowerCubicleImages =
+          prefs.getStringList('kitchenShowerCubicleImages_${propertyId}') ?? [];
+      kitchenBathImages =
+          prefs.getStringList('kitchenBathImages_${propertyId}') ?? [];
+      kitchenSwitchBoardImages =
+          prefs.getStringList('kitchenSwitchBoardImages_${propertyId}') ?? [];
+      kitchenSocketImages =
+          prefs.getStringList('kitchenSocketImages_${propertyId}') ?? [];
+      kitchenHeatingImages =
+          prefs.getStringList('kitchenHeatingImages_${propertyId}') ?? [];
+      kitchenAccessoriesImages =
+          prefs.getStringList('kitchenAccessoriesImages_${propertyId}') ?? [];
+      kitchenFlooringImages =
+          prefs.getStringList('kitchenFlooringImages_${propertyId}') ?? [];
+      kitchenAdditionItemsImages =
+          prefs.getStringList('kitchenAdditionItemsImages_${propertyId}') ?? [];
     });
   }
 
   // Save preferences when a condition is selected
-Future<void> _savePreference(String propertyId, String key, String value)
-  async {
+  Future<void> _savePreference(
+      String propertyId, String key, String value) async {
     final prefs = await SharedPreferences.getInstance();
     prefs.setString('${key}_$propertyId', value);
   }
 
-  Future<void> _savePreferenceList(String propertyId, String key, List<String> value) async {
+  Future<void> _savePreferenceList(
+      String propertyId, String key, List<String> value) async {
     final prefs = await SharedPreferences.getInstance();
     prefs.setStringList('${key}_$propertyId', value);
   }
 
   @override
   Widget build(BuildContext context) {
-     String propertyId = widget.propertyId;
+    String propertyId = widget.propertyId;
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -193,12 +253,83 @@ Future<void> _savePreference(String propertyId, String key, String value)
         centerTitle: true,
         backgroundColor: bWhite,
         leading: GestureDetector(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => EditReportPage(propertyId: '',),
-              ),
+          onTap: (){
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  elevation: 10,
+                  backgroundColor: Colors.white,
+                  title: Row(
+                    children: [
+                      Icon(Icons.info_outline, color: kPrimaryColor),
+                      SizedBox(width: 10),
+                      Text(
+                        'Exit',
+                        style: TextStyle(
+                          color: kPrimaryColor,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                  content: Text(
+                    'You may lost your data if you exit the process '
+                        'without saving',
+                    style: TextStyle(
+                      color: Colors.grey[800],
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                      height: 1.5,
+                    ),
+                  ),
+                  actions: <Widget>[
+                    TextButton(
+                      child: Text('Cancel',
+                        style: TextStyle(
+                          color: kPrimaryColor,
+                          fontSize: 16,
+                        ),
+                      ),
+                      onPressed: () {
+                        Navigator.of(context).pop(); // Close the dialog
+                      },
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        print("SOC -> EP ${widget.propertyId}");
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  EditReportPage(propertyId: widget.propertyId)), // Replace HomePage with your
+                          // home page
+                          // widget
+                        );
+                      },
+                      style: TextButton.styleFrom(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 8),
+                        backgroundColor: kPrimaryColor,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      child: Text(
+                        'Exit',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              },
             );
           },
           child: Icon(
@@ -207,6 +338,100 @@ Future<void> _savePreference(String propertyId, String key, String value)
             size: 24,
           ),
         ),
+        actions: [
+          GestureDetector(
+            onTap: (){
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    elevation: 10,
+                    backgroundColor: Colors.white,
+                    title: Row(
+                      children: [
+                        Icon(Icons.info_outline, color: kPrimaryColor),
+                        SizedBox(width: 10),
+                        Text(
+                          'Continue Saving',
+                          style: TextStyle(
+                            color: kPrimaryColor,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                    content: Text(
+                      'Please Make Sure You Have Added All the Necessary '
+                          'Information',
+                      style: TextStyle(
+                        color: Colors.grey[800],
+                        fontSize: 14,
+                        fontWeight: FontWeight.w400,
+                        height: 1.5,
+                      ),
+                    ),
+                    actions: <Widget>[
+                      TextButton(
+                        child: Text('Cancel',
+                          style: TextStyle(
+                            color: kPrimaryColor,
+                            fontSize: 16,
+                          ),
+                        ),
+                        onPressed: () {
+                          Navigator.of(context).pop(); // Close the dialog
+                        },
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          print("SOC -> EP ${widget.propertyId}");
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    EditReportPage(propertyId: widget.propertyId)), // Replace HomePage with your
+                            // home page
+                            // widget
+                          );
+                        },
+                        style: TextButton.styleFrom(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 8),
+                          backgroundColor: kPrimaryColor,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        child: Text(
+                          'Save',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              );
+            },
+            child: Container(
+              margin: EdgeInsets.all(16),
+              child: Text(
+                'Save', // Replace with the actual location
+                style: TextStyle(
+                  color: kPrimaryColor,
+                  fontSize: 14, // Adjust the font size
+                  fontFamily: "Inter",
+                ),
+              ),
+            ),
+          )
+        ],
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -217,520 +442,579 @@ Future<void> _savePreference(String propertyId, String key, String value)
               // Door
               ConditionItem(
                 name: "Door",
-                condition: doorCondition,
-                description: newdoor,
-                images: doorImages,
+                condition: kitchenDoorCondition,
+                description: kitchenNewDoor,
+                images: kitchenDoorImages,
                 onConditionSelected: (condition) {
                   setState(() {
-                    doorCondition = condition;
+                    kitchenDoorCondition = condition;
                   });
-                  _savePreference(propertyId,'doorCondition', condition!);
+                  _savePreference(
+                      propertyId, 'kitchenDoorCondition', condition!);
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
-                    newdoor = description;
+                    kitchenNewDoor = description;
                   });
-                  _savePreference(propertyId,'newdoor', description!);
+                  _savePreference(propertyId, 'kitchenNewDoor', description!);
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
-                    doorImages.add(imagePath);
+                    kitchenDoorImages.add(imagePath);
                   });
-                  _savePreferenceList(propertyId,'doorImages', doorImages);
+                  _savePreferenceList(
+                      propertyId, 'kitchenDoorImages', kitchenDoorImages);
                 },
               ),
 
               // Door Frame
               ConditionItem(
                 name: "Door Frame",
-                condition: doorFrameCondition,
-                description: doorFrameDescription,
-                images: doorFrameImages,
+                condition: kitchenDoorFrameCondition,
+                description: kitchenDoorFrameDescription,
+                images: kitchenDoorFrameImages,
                 onConditionSelected: (condition) {
                   setState(() {
-                    doorFrameCondition = condition;
+                    kitchenDoorFrameCondition = condition;
                   });
-                  _savePreference(propertyId,'doorFrameCondition', condition!);
+                  _savePreference(
+                      propertyId, 'kitchenDoorFrameCondition', condition!);
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
-                    doorFrameDescription = description;
+                    kitchenDoorFrameDescription = description;
                   });
-                  _savePreference(propertyId,'doorFrameDescription', description!);
+                  _savePreference(
+                      propertyId, 'kitchenDoorFrameDescription', description!);
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
-                    doorFrameImages.add(imagePath);
+                    kitchenDoorFrameImages.add(imagePath);
                   });
-                  _savePreferenceList(propertyId,'doorFrameImages', doorFrameImages);
+                  _savePreferenceList(propertyId, 'kitchenDoorFrameImages',
+                      kitchenDoorFrameImages);
                 },
               ),
 
               // Ceiling
               ConditionItem(
                 name: "Ceiling",
-                condition: ceilingCondition,
-                description: ceilingDescription,
-                images: ceilingImages,
+                condition: kitchenCeilingCondition,
+                description: kitchenCeilingDescription,
+                images: kitchenCeilingImages,
                 onConditionSelected: (condition) {
                   setState(() {
-                    ceilingCondition = condition;
+                    kitchenCeilingCondition = condition;
                   });
-                  _savePreference(propertyId,'ceilingCondition', condition!);
+                  _savePreference(
+                      propertyId, 'kitchenCeilingCondition', condition!);
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
-                    ceilingDescription = description;
+                    kitchenCeilingDescription = description;
                   });
-                  _savePreference(propertyId,'ceilingDescription', description!);
+                  _savePreference(
+                      propertyId, 'kitchenCeilingDescription', description!);
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
-                    ceilingImages.add(imagePath);
+                    kitchenCeilingImages.add(imagePath);
                   });
-                  _savePreferenceList(propertyId,'ceilingImages', ceilingImages);
+                  _savePreferenceList(
+                      propertyId, 'kitchenCeilingImages', kitchenCeilingImages);
                 },
               ),
 
               // Extractor Fan
               ConditionItem(
                 name: "Extractor Fan",
-                condition: extractorFanCondition,
-                description: extractorFanDescription,
-                images: extractorFanImages,
+                condition: kitchenExtractorFanCondition,
+                description: kitchenExtractorFanDescription,
+                images: kitchenExtractorFanImages,
                 onConditionSelected: (condition) {
                   setState(() {
-                    extractorFanCondition = condition;
+                    kitchenExtractorFanCondition = condition;
                   });
-                  _savePreference(propertyId,'extractorFanCondition', condition!);
+                  _savePreference(
+                      propertyId, 'kitchenExtractorFanCondition', condition!);
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
-                    extractorFanDescription = description;
+                    kitchenExtractorFanDescription = description;
                   });
-                  _savePreference(propertyId,'extractorFanDescription', description!);
+                  _savePreference(propertyId, 'kitchenExtractorFanDescription',
+                      description!);
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
-                    extractorFanImages.add(imagePath);
+                    kitchenExtractorFanImages.add(imagePath);
                   });
-                  _savePreferenceList(propertyId,'extractorFanImages', extractorFanImages);
+                  _savePreferenceList(propertyId, 'kitchenExtractorFanImages',
+                      kitchenExtractorFanImages);
                 },
               ),
 
               // Lighting
               ConditionItem(
                 name: "Lighting",
-                condition: lightingCondition,
-                description: lightingDescription,
-                images: lightingImages,
+                condition: kitchenLightingCondition,
+                description: kitchenLightingDescription,
+                images: kitchenLightingImages,
                 onConditionSelected: (condition) {
                   setState(() {
-                    lightingCondition = condition;
+                    kitchenLightingCondition = condition;
                   });
-                  _savePreference(propertyId,'lightingCondition', condition!);
+                  _savePreference(
+                      propertyId, 'kitchenLightingCondition', condition!);
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
-                    lightingDescription = description;
+                    kitchenLightingDescription = description;
                   });
-                  _savePreference(propertyId,'lightingDescription', description!);
+                  _savePreference(
+                      propertyId, 'kitchenLightingDescription', description!);
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
-                    lightingImages.add(imagePath);
+                    kitchenLightingImages.add(imagePath);
                   });
-                  _savePreferenceList(propertyId,'lightingImages', lightingImages);
+                  _savePreferenceList(propertyId, 'kitchenLightingImages',
+                      kitchenLightingImages);
                 },
               ),
 
               // Walls
               ConditionItem(
                 name: "Walls",
-                condition: wallsCondition,
-                description: wallsDescription,
-                images: wallsImages,
+                condition: kitchenWallsCondition,
+                description: kitchenWallsDescription,
+                images: kitchenWallsImages,
                 onConditionSelected: (condition) {
                   setState(() {
-                    wallsCondition = condition;
+                    kitchenWallsCondition = condition;
                   });
-                  _savePreference(propertyId,'wallsCondition', condition!);
+                  _savePreference(
+                      propertyId, 'kitchenWallsCondition', condition!);
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
-                    wallsDescription = description;
+                    kitchenWallsDescription = description;
                   });
-                  _savePreference(propertyId,'wallsDescription', description!);
+                  _savePreference(
+                      propertyId, 'kitchenWallsDescription', description!);
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
-                    wallsImages.add(imagePath);
+                    kitchenWallsImages.add(imagePath);
                   });
-                  _savePreferenceList(propertyId,'wallsImages', wallsImages);
+                  _savePreferenceList(
+                      propertyId, 'kitchenWallsImages', kitchenWallsImages);
                 },
               ),
 
               // Skirting
               ConditionItem(
                 name: "Skirting",
-                condition: skirtingCondition,
-                description: skirtingDescription,
-                images: skirtingImages,
+                condition: kitchenSkirtingCondition,
+                description: kitchenSkirtingDescription,
+                images: kitchenSkirtingImages,
                 onConditionSelected: (condition) {
                   setState(() {
-                    skirtingCondition = condition;
+                    kitchenSkirtingCondition = condition;
                   });
-                  _savePreference(propertyId,'skirtingCondition', condition!);
+                  _savePreference(
+                      propertyId, 'kitchenSkirtingCondition', condition!);
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
-                    skirtingDescription = description;
+                    kitchenSkirtingDescription = description;
                   });
-                  _savePreference(propertyId,'skirtingDescription', description!);
+                  _savePreference(
+                      propertyId, 'kitchenSkirtingDescription', description!);
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
-                    skirtingImages.add(imagePath);
+                    kitchenSkirtingImages.add(imagePath);
                   });
-                  _savePreferenceList(propertyId,'skirtingImages', skirtingImages);
+                  _savePreferenceList(propertyId, 'kitchenSkirtingImages',
+                      kitchenSkirtingImages);
                 },
               ),
 
               // Window Sill
               ConditionItem(
                 name: "Window Sill",
-                condition: windowSillCondition,
-                description: windowSillDescription,
-                images: windowSillImages,
+                condition: kitchenWindowSillCondition,
+                description: kitchenWindowSillDescription,
+                images: kitchenWindowSillImages,
                 onConditionSelected: (condition) {
                   setState(() {
-                    windowSillCondition = condition;
+                    kitchenWindowSillCondition = condition;
                   });
-                  _savePreference(propertyId,'windowSillCondition', condition!);
+                  _savePreference(
+                      propertyId, 'kitchenWindowSillCondition', condition!);
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
-                    windowSillDescription = description;
+                    kitchenWindowSillDescription = description;
                   });
-                  _savePreference(propertyId,'windowSillDescription', description!);
+                  _savePreference(
+                      propertyId, 'kitchenWindowSillDescription', description!);
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
-                    windowSillImages.add(imagePath);
+                    kitchenWindowSillImages.add(imagePath);
                   });
-                  _savePreferenceList(propertyId,'windowSillImages', windowSillImages);
+                  _savePreferenceList(propertyId, 'kitchenWindowSillImages',
+                      kitchenWindowSillImages);
                 },
               ),
 
               // Curtains
               ConditionItem(
                 name: "Curtains",
-                condition: curtainsCondition,
-                description: curtainsDescription,
-                images: curtainsImages,
+                condition: kitchenCurtainsCondition,
+                description: kitchenCurtainsDescription,
+                images: ktichenCurtainsImages,
                 onConditionSelected: (condition) {
                   setState(() {
-                    curtainsCondition = condition;
+                    kitchenCurtainsCondition = condition;
                   });
-                  _savePreference(propertyId,'curtainsCondition', condition!);
+                  _savePreference(
+                      propertyId, 'kitchenCurtainsCondition', condition!);
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
-                    curtainsDescription = description;
+                    kitchenCurtainsDescription = description;
                   });
-                  _savePreference(propertyId,'curtainsDescription', description!);
+                  _savePreference(
+                      propertyId, 'kitchenCurtainsDescription', description!);
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
-                    curtainsImages.add(imagePath);
+                    ktichenCurtainsImages.add(imagePath);
                   });
-                  _savePreferenceList(propertyId,'curtainsImages', curtainsImages);
+                  _savePreferenceList(propertyId, 'ktichenCurtainsImages',
+                      ktichenCurtainsImages);
                 },
               ),
 
               // Blinds
               ConditionItem(
                 name: "Blinds",
-                condition: blindsCondition,
-                description: blindsDescription,
-                images: blindsImages,
+                condition: kitchenBlindsCondition,
+                description: kitchenBlindsDescription,
+                images: kitchenBlindsImages,
                 onConditionSelected: (condition) {
                   setState(() {
-                    blindsCondition = condition;
+                    kitchenBlindsCondition = condition;
                   });
-                  _savePreference(propertyId,'blindsCondition', condition!);
+                  _savePreference(
+                      propertyId, 'kitchenBlindsCondition', condition!);
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
-                    blindsDescription = description;
+                    kitchenBlindsDescription = description;
                   });
-                  _savePreference(propertyId,'blindsDescription', description!);
+                  _savePreference(
+                      propertyId, 'kitchenBlindsDescription', description!);
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
-                    blindsImages.add(imagePath);
+                    kitchenBlindsImages.add(imagePath);
                   });
-                  _savePreferenceList(propertyId,'blindsImages', blindsImages);
+                  _savePreferenceList(
+                      propertyId, 'blindsImages', kitchenBlindsImages);
                 },
               ),
 
               // Toilet
               ConditionItem(
                 name: "Toilet",
-                condition: toiletCondition,
-                description: toiletDescription,
-                images: toiletImages,
+                condition: kitchenToiletCondition,
+                description: kitchenToiletDescription,
+                images: kitchenToiletImages,
                 onConditionSelected: (condition) {
                   setState(() {
-                    toiletCondition = condition;
+                    kitchenToiletCondition = condition;
                   });
-                  _savePreference(propertyId,'toiletCondition', condition!);
+                  _savePreference(
+                      propertyId, 'kitchenToiletCondition', condition!);
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
-                    toiletDescription = description;
+                    kitchenToiletDescription = description;
                   });
-                  _savePreference(propertyId,'toiletDescription', description!);
+                  _savePreference(
+                      propertyId, 'kitchenToiletDescription', description!);
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
-                    toiletImages.add(imagePath);
+                    kitchenToiletImages.add(imagePath);
                   });
-                  _savePreferenceList(propertyId,'toiletImages', toiletImages);
+                  _savePreferenceList(
+                      propertyId, 'kitchenToiletImages', kitchenToiletImages);
                 },
               ),
 
               // Basin
               ConditionItem(
                 name: "Basin",
-                condition: basinCondition,
-                description: basinDescription,
-                images: basinImages,
+                condition: kitchenBasinCondition,
+                description: kitchenBasinDescription,
+                images: kitchenBasinImages,
                 onConditionSelected: (condition) {
                   setState(() {
-                    basinCondition = condition;
+                    kitchenBasinCondition = condition;
                   });
-                  _savePreference(propertyId,'basinCondition', condition!);
+                  _savePreference(
+                      propertyId, 'kitchenBasinCondition', condition!);
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
-                    basinDescription = description;
+                    kitchenBasinDescription = description;
                   });
-                  _savePreference(propertyId,'basinDescription', description!);
+                  _savePreference(
+                      propertyId, 'kitchenBasinDescription', description!);
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
-                    basinImages.add(imagePath);
+                    kitchenBasinImages.add(imagePath);
                   });
-                  _savePreferenceList(propertyId,'basinImages', basinImages);
+                  _savePreferenceList(
+                      propertyId, 'kitchenBasinImages', kitchenBasinImages);
                 },
               ),
 
               // Shower Cubicle
               ConditionItem(
                 name: "Shower Cubicle",
-                condition: showerCubicleCondition,
-                description: showerCubicleDescription,
-                images: showerCubicleImages,
+                condition: kitchenShowerCubicleCondition,
+                description: kitchenShowerCubicleDescription,
+                images: kitchenShowerCubicleImages,
                 onConditionSelected: (condition) {
                   setState(() {
-                    showerCubicleCondition = condition;
+                    kitchenShowerCubicleCondition = condition;
                   });
-                  _savePreference(propertyId,'showerCubicleCondition', condition!);
+                  _savePreference(
+                      propertyId, 'kitchenShowerCubicleCondition', condition!);
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
-                    showerCubicleDescription = description;
+                    kitchenShowerCubicleDescription = description;
                   });
-                  _savePreference(propertyId,'showerCubicleDescription', description!);
+                  _savePreference(propertyId, 'kitchenShowerCubicleDescription',
+                      description!);
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
-                    showerCubicleImages.add(imagePath);
+                    kitchenShowerCubicleImages.add(imagePath);
                   });
-                  _savePreferenceList(propertyId,'showerCubicleImages', showerCubicleImages);
+                  _savePreferenceList(propertyId, 'kitchenShowerCubicleImages',
+                      kitchenShowerCubicleImages);
                 },
               ),
 
               // Bath
               ConditionItem(
                 name: "Bath",
-                condition: bathCondition,
-                description: bathDescription,
-                images: bathImages,
+                condition: kitchenBathCondition,
+                description: kitchenBathDescription,
+                images: kitchenBathImages,
                 onConditionSelected: (condition) {
                   setState(() {
-                    bathCondition = condition;
+                    kitchenBathCondition = condition;
                   });
-                  _savePreference(propertyId,'bathCondition', condition!);
+                  _savePreference(
+                      propertyId, 'kitchenBathCondition', condition!);
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
-                    bathDescription = description;
+                    kitchenBathDescription = description;
                   });
-                  _savePreference(propertyId,'bathDescription', description!);
+                  _savePreference(
+                      propertyId, 'kitchenBathDescription', description!);
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
-                    bathImages.add(imagePath);
+                    kitchenBathImages.add(imagePath);
                   });
-                  _savePreferenceList(propertyId,'bathImages', bathImages);
+                  _savePreferenceList(
+                      propertyId, 'kitchenBathImages', kitchenBathImages);
                 },
               ),
 
               // Switch Board
               ConditionItem(
                 name: "Switch Board",
-                condition: switchBoardCondition,
-                description: switchBoardDescription,
-                images: switchBoardImages,
+                condition: kitchenSwitchBoardCondition,
+                description: kitchenSwitchBoardDescription,
+                images: kitchenSwitchBoardImages,
                 onConditionSelected: (condition) {
                   setState(() {
-                    switchBoardCondition = condition;
+                    kitchenSwitchBoardCondition = condition;
                   });
-                  _savePreference(propertyId,'switchBoardCondition', condition!);
+                  _savePreference(
+                      propertyId, 'kitchenSwitchBoardCondition', condition!);
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
-                    switchBoardDescription = description;
+                    kitchenSwitchBoardDescription = description;
                   });
-                  _savePreference(propertyId,'switchBoardDescription', description!);
+                  _savePreference(propertyId, 'kitchenSwitchBoardDescription',
+                      description!);
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
-                    switchBoardImages.add(imagePath);
+                    kitchenSwitchBoardImages.add(imagePath);
                   });
-                  _savePreferenceList(propertyId,'switchBoardImages', switchBoardImages);
+                  _savePreferenceList(propertyId, 'kitchenSwitchBoardImages',
+                      kitchenSwitchBoardImages);
                 },
               ),
 
               // Socket
               ConditionItem(
                 name: "Socket",
-                condition: socketCondition,
-                description: socketDescription,
-                images: socketImages,
+                condition: kitchenSocketCondition,
+                description: kitchenSocketDescription,
+                images: kitchenSocketImages,
                 onConditionSelected: (condition) {
                   setState(() {
-                    socketCondition = condition;
+                    kitchenSocketCondition = condition;
                   });
-                  _savePreference(propertyId,'socketCondition', condition!);
+                  _savePreference(
+                      propertyId, 'kitchenSocketCondition', condition!);
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
-                    socketDescription = description;
+                    kitchenSocketDescription = description;
                   });
-                  _savePreference(propertyId,'socketDescription', description!);
+                  _savePreference(
+                      propertyId, 'kitchenSocketDescription', description!);
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
-                    socketImages.add(imagePath);
+                    kitchenSocketImages.add(imagePath);
                   });
-                  _savePreferenceList(propertyId,'socketImages', socketImages);
+                  _savePreferenceList(
+                      propertyId, 'kitchenSocketImages', kitchenSocketImages);
                 },
               ),
 
               // Heating
               ConditionItem(
                 name: "Heating",
-                condition: heatingCondition,
-                description: heatingDescription,
-                images: heatingImages,
+                condition: kitchenHeatingCondition,
+                description: kitchenHeatingDescription,
+                images: kitchenHeatingImages,
                 onConditionSelected: (condition) {
                   setState(() {
-                    heatingCondition = condition;
+                    kitchenHeatingCondition = condition;
                   });
-                  _savePreference(propertyId,'heatingCondition', condition!);
+                  _savePreference(
+                      propertyId, 'kitchenHeatingCondition', condition!);
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
-                    heatingDescription = description;
+                    kitchenHeatingDescription = description;
                   });
-                  _savePreference(propertyId,'heatingDescription', description!);
+                  _savePreference(
+                      propertyId, 'kitchenHeatingDescription', description!);
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
-                    heatingImages.add(imagePath);
+                    kitchenHeatingImages.add(imagePath);
                   });
-                  _savePreferenceList(propertyId,'heatingImages', heatingImages);
+                  _savePreferenceList(
+                      propertyId, 'kitchenHeatingImages', kitchenHeatingImages);
                 },
               ),
 
               // Accessories
               ConditionItem(
                 name: "Accessories",
-                condition: accessoriesCondition,
-                description: accessoriesDescription,
-                images: accessoriesImages,
+                condition: kitchenAccessoriesCondition,
+                description: kitchenAccessoriesDescription,
+                images: kitchenAccessoriesImages,
                 onConditionSelected: (condition) {
                   setState(() {
-                    accessoriesCondition = condition;
+                    kitchenAccessoriesCondition = condition;
                   });
-                  _savePreference(propertyId,'accessoriesCondition', condition!);
+                  _savePreference(
+                      propertyId, 'kitchenAccessoriesCondition', condition!);
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
-                    accessoriesDescription = description;
+                    kitchenAccessoriesDescription = description;
                   });
-                  _savePreference(propertyId,'accessoriesDescription', description!);
+                  _savePreference(propertyId, 'kitchenAccessoriesDescription',
+                      description!);
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
-                    accessoriesImages.add(imagePath);
+                    kitchenAccessoriesImages.add(imagePath);
                   });
-                  _savePreferenceList(propertyId,'accessoriesImages', accessoriesImages);
+                  _savePreferenceList(propertyId, 'kitchenAccessoriesImages',
+                      kitchenAccessoriesImages);
                 },
               ),
 
               // Flooring
               ConditionItem(
                 name: "Flooring",
-                condition: flooringCondition,
-                description: flooringDescription,
-                images: flooringImages,
+                condition: kitchenFlooringCondition,
+                description: kitchenFlooringDescription,
+                images: kitchenFlooringImages,
                 onConditionSelected: (condition) {
                   setState(() {
-                    flooringCondition = condition;
+                    kitchenFlooringCondition = condition;
                   });
-                  _savePreference(propertyId,'flooringCondition', condition!);
+                  _savePreference(
+                      propertyId, 'kitchenFlooringCondition', condition!);
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
-                    flooringDescription = description;
+                    kitchenFlooringDescription = description;
                   });
-                  _savePreference(propertyId,'flooringDescription', description!);
+                  _savePreference(
+                      propertyId, 'kitchenFlooringDescription', description!);
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
-                    flooringImages.add(imagePath);
+                    kitchenFlooringImages.add(imagePath);
                   });
-                  _savePreferenceList(propertyId,'flooringImages', flooringImages);
+                  _savePreferenceList(propertyId, 'kitchenFlooringImages',
+                      kitchenFlooringImages);
                 },
               ),
 
               // Addition Items
               ConditionItem(
                 name: "Addition Items",
-                condition: additionItemsCondition,
-                description: additionItemsDescription,
-                images: additionItemsImages,
+                condition: kitchenAdditionItemsCondition,
+                description: kitchenAdditionItemsDescription,
+                images: kitchenAdditionItemsImages,
                 onConditionSelected: (condition) {
                   setState(() {
-                    additionItemsCondition = condition;
+                    kitchenAdditionItemsCondition = condition;
                   });
-                  _savePreference(propertyId,'additionItemsCondition', condition!);
+                  _savePreference(
+                      propertyId, 'kitchenAdditionItemsCondition', condition!);
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
-                    additionItemsDescription = description;
+                    kitchenAdditionItemsDescription = description;
                   });
-                  _savePreference(propertyId,'additionItemsDescription', description!);
+                  _savePreference(propertyId, 'kitchenAdditionItemsDescription',
+                      description!);
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
-                    additionItemsImages.add(imagePath);
+                    kitchenAdditionItemsImages.add(imagePath);
                   });
-                  _savePreferenceList(propertyId,'additionItemsImages', additionItemsImages);
+                  _savePreferenceList(propertyId, 'kitchenAdditionItemsImages',
+                      kitchenAdditionItemsImages);
                 },
               ),
 
@@ -798,21 +1082,21 @@ class ConditionItem extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  IconButton(
-                    icon: Icon(
-                      Icons.warning_amber,
-                      size: 24,
-                      color: kAccentColor,
-                    ),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => AddAction(),
-                        ),
-                      );
-                    },
-                  ),
+                  // IconButton(
+                  //   icon: Icon(
+                  //     Icons.warning_amber,
+                  //     size: 24,
+                  //     color: kAccentColor,
+                  //   ),
+                  //   onPressed: () {
+                  //     Navigator.push(
+                  //       context,
+                  //       MaterialPageRoute(
+                  //         builder: (context) => AddAction(),
+                  //       ),
+                  //     );
+                  //   },
+                  // ),
                   IconButton(
                     icon: Icon(
                       Icons.camera_alt_outlined,
@@ -903,26 +1187,26 @@ class ConditionItem extends StatelessWidget {
           ),
           images.isNotEmpty
               ? Wrap(
-                  spacing: 8.0,
-                  runSpacing: 8.0,
-                  children: images.map((imagePath) {
-                    return Image.file(
-                      File(imagePath),
-                      width: 100,
-                      height: 100,
-                      fit: BoxFit.cover,
-                    );
-                  }).toList(),
-                )
+            spacing: 8.0,
+            runSpacing: 8.0,
+            children: images.map((imagePath) {
+              return Image.file(
+                File(imagePath),
+                width: 100,
+                height: 100,
+                fit: BoxFit.cover,
+              );
+            }).toList(),
+          )
               : Text(
-                  "No images selected",
-                  style: TextStyle(
-                    fontSize: 12.0,
-                    fontWeight: FontWeight.w700,
-                    color: kPrimaryTextColourTwo,
-                    fontStyle: FontStyle.italic,
-                  ),
-                ),
+            "No images selected",
+            style: TextStyle(
+              fontSize: 12.0,
+              fontWeight: FontWeight.w700,
+              color: kPrimaryTextColourTwo,
+              fontStyle: FontStyle.italic,
+            ),
+          ),
           Divider(thickness: 1, color: Color(0xFFC2C2C2)),
         ],
       ),
