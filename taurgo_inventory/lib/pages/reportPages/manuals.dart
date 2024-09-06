@@ -102,7 +102,7 @@ class _ManualsState extends State<Manuals> {
   @override
   Widget build(BuildContext context) {
      String propertyId = widget.propertyId;
-    return Scaffold(
+    return PopScope(child: Scaffold(
       appBar: AppBar(
         title: Text(
           'Manuals',
@@ -349,7 +349,7 @@ class _ManualsState extends State<Manuals> {
           ),
         ),
       ),
-    );
+    ),canPop: false,);
   }
 }
 class ConditionItem extends StatelessWidget {
@@ -407,21 +407,21 @@ class ConditionItem extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  IconButton(
-                    icon: Icon(
-                      Icons.warning_amber,
-                      size: 24,
-                      color: kAccentColor,
-                    ),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => AddAction(),
-                        ),
-                      );
-                    },
-                  ),
+                  // IconButton(
+                  //   icon: Icon(
+                  //     Icons.warning_amber,
+                  //     size: 24,
+                  //     color: kAccentColor,
+                  //   ),
+                  //   onPressed: () {
+                  //     Navigator.push(
+                  //       context,
+                  //       MaterialPageRoute(
+                  //         builder: (context) => AddAction(),
+                  //       ),
+                  //     );
+                  //   },
+                  // ),
                   IconButton(
                     icon: Icon(
                       Icons.camera_alt_outlined,
@@ -452,35 +452,35 @@ class ConditionItem extends StatelessWidget {
           SizedBox(
             height: 12,
           ),
-          GestureDetector(
-            onTap: () async {
-              final result = await Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ConditionDetails(
-                    initialCondition: condition,
-                    type: name,
-                  ),
-                ),
-              );
-
-              if (result != null) {
-                onConditionSelected(result);
-              }
-            },
-            child: Text(
-              condition?.isNotEmpty == true ? condition! : "Condition",
-              style: TextStyle(
-                fontSize: 12.0,
-                fontWeight: FontWeight.w700,
-                color: kPrimaryTextColourTwo,
-                fontStyle: FontStyle.italic,
-              ),
-            ),
-          ),
-          SizedBox(
-            height: 12,
-          ),
+          // GestureDetector(
+          //   onTap: () async {
+          //     final result = await Navigator.push(
+          //       context,
+          //       MaterialPageRoute(
+          //         builder: (context) => ConditionDetails(
+          //           initialCondition: condition,
+          //           type: name,
+          //         ),
+          //       ),
+          //     );
+          //
+          //     if (result != null) {
+          //       onConditionSelected(result);
+          //     }
+          //   },
+          //   child: Text(
+          //     condition?.isNotEmpty == true ? condition! : "Condition",
+          //     style: TextStyle(
+          //       fontSize: 12.0,
+          //       fontWeight: FontWeight.w700,
+          //       color: kPrimaryTextColourTwo,
+          //       fontStyle: FontStyle.italic,
+          //     ),
+          //   ),
+          // ),
+          // SizedBox(
+          //   height: 12,
+          // ),
           GestureDetector(
             onTap: () async {
               final result = await Navigator.push(

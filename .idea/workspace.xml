@@ -9,34 +9,12 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9cfeb956-5354-4366-ab84-34804ef25cb7" name="Changes" comment="Sample DTO-SP Method Completed">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/ios/Runner.xcodeproj/project.pbxproj" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/ios/Runner.xcodeproj/project.pbxproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/constants/UrlConstants.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/constants/UrlConstants.dart" afterDir="false" />
+    <list default="true" id="9cfeb956-5354-4366-ab84-34804ef25cb7" name="Changes" comment="DTO Upgrade">
       <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/edit_report_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/edit_report_page.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/inspection_confimation_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/inspection_confimation_page.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/ExteriorFront.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/ExteriorFront.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/bathroom.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/bathroom.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/bedroom.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/bedroom.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/camera_preview_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/camera_preview_page.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/dining_room.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/dining_room.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/entrance_hallway.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/entrance_hallway.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/ev_charger.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/ev_charger.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/front_garden.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/front_garden.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/garage.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/garage.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/health_and_safety.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/health_and_safety.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/key_handed_over.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/key_handed_over.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/keys.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/keys.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/kitchen_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/kitchen_page.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/landing.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/landing.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/lounge.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/lounge.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/manuals.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/manuals.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/rear_garden.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/rear_garden.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/receripts.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/receripts.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/schedule_of_condition.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/schedule_of_condition.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/stairs.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/stairs.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/toilet.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/toilet.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/utility_room.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages/utility_room.dart" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -316,7 +294,14 @@
       <option name="project" value="LOCAL" />
       <updated>1725534665438</updated>
     </task>
-    <option name="localTasksCounter" value="31" />
+    <task id="LOCAL-00031" summary="DTO Upgrade">
+      <created>1725597652823</created>
+      <option name="number" value="00031" />
+      <option name="presentableId" value="LOCAL-00031" />
+      <option name="project" value="LOCAL" />
+      <updated>1725597652823</updated>
+    </task>
+    <option name="localTasksCounter" value="32" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -352,7 +337,8 @@
     <MESSAGE value="Share References for Mete&#10;r Reading is Done" />
     <MESSAGE value="Share References for Keys is Done" />
     <MESSAGE value="Sample DTO-SP Method Completed" />
-    <option name="LAST_COMMIT_MESSAGE" value="Sample DTO-SP Method Completed" />
+    <MESSAGE value="DTO Upgrade" />
+    <option name="LAST_COMMIT_MESSAGE" value="DTO Upgrade" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
