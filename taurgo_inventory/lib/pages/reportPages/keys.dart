@@ -15,7 +15,6 @@ class Keys extends StatefulWidget {
   final List<File>? capturedImages;
   final String propertyId;
 
-
   const Keys({super.key, this.capturedImages, required this.propertyId});
 
   @override
@@ -75,8 +74,10 @@ class _KeysState extends State<Keys> {
 
       yaleImages = prefs.getStringList('yaleImages_${propertyId}') ?? [];
       morticeImages = prefs.getStringList('morticeImages_${propertyId}') ?? [];
-      windowLockImages = prefs.getStringList('windowLockImages_${propertyId}') ?? [];
-      gasMeterImages = prefs.getStringList('gasMeterImages_${propertyId}') ?? [];
+      windowLockImages =
+          prefs.getStringList('windowLockImages_${propertyId}') ?? [];
+      gasMeterImages =
+          prefs.getStringList('gasMeterImages_${propertyId}') ?? [];
       carPassImages = prefs.getStringList('carPassImages_${propertyId}') ?? [];
       remoteImages = prefs.getStringList('remoteImages_${propertyId}') ?? [];
       otherImages = prefs.getStringList('otherImages_${propertyId}') ?? [];
@@ -84,13 +85,14 @@ class _KeysState extends State<Keys> {
   }
 
   // Function to save a preference
-  Future<void> _savePreference(String propertyId, String key, String value)
-  async {
+  Future<void> _savePreference(
+      String propertyId, String key, String value) async {
     final prefs = await SharedPreferences.getInstance();
     prefs.setString('${key}_$propertyId', value);
   }
 
-  Future<void> _savePreferenceList(String propertyId, String key, List<String> value) async {
+  Future<void> _savePreferenceList(
+      String propertyId, String key, List<String> value) async {
     final prefs = await SharedPreferences.getInstance();
     prefs.setStringList('${key}_$propertyId', value);
   }
@@ -98,243 +100,253 @@ class _KeysState extends State<Keys> {
   @override
   Widget build(BuildContext context) {
     String propertyId = widget.propertyId;
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Keys',
-          style: TextStyle(
-            color: kPrimaryColor,
-            fontSize: 14,
-            fontFamily: "Inter",
+    return PopScope(
+        canPop: false,
+        child: Scaffold(
+          appBar: AppBar(
+            title: Text(
+              'Keys',
+              style: TextStyle(
+                color: kPrimaryColor,
+                fontSize: 14,
+                fontFamily: "Inter",
+              ),
+            ),
+            centerTitle: true,
+            backgroundColor: bWhite,
+            leading: GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => EditReportPage(
+                      propertyId: '',
+                    ),
+                  ),
+                );
+              },
+              child: Icon(
+                Icons.arrow_back_ios_new,
+                color: kPrimaryColor,
+                size: 24,
+              ),
+            ),
           ),
-        ),
-        centerTitle: true,
-        backgroundColor: bWhite,
-        leading: GestureDetector(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => EditReportPage(propertyId: '',),
+          body: SingleChildScrollView(
+            child: Padding(
+              padding: EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Yale
+                  ConditionItem(
+                    name: "Yale",
+                    location: yaleLocation,
+                    reading: yaleReading,
+                    images: yaleImages,
+                    onLocationSelected: (location) {
+                      setState(() {
+                        yaleLocation = location;
+                      });
+                      _savePreference(propertyId, 'yaleLocation', location!); //
+                      // Save preference
+                    },
+                    onReadingSelected: (reading) {
+                      setState(() {
+                        yaleReading = reading;
+                      });
+                      _savePreference(propertyId, 'yaleReading',
+                          reading!); // Save preference
+                    },
+                    onImageAdded: (imagePath) {
+                      setState(() {
+                        yaleImages.add(imagePath);
+                      });
+                      _savePreferenceList(propertyId, 'yaleImages',
+                          yaleImages); // Save preference
+                    },
+                  ),
+
+                  // Mortice
+                  ConditionItem(
+                    name: "Mortice",
+                    location: morticeLocation,
+                    reading: morticeReading,
+                    images: morticeImages,
+                    onLocationSelected: (location) {
+                      setState(() {
+                        morticeLocation = location;
+                      });
+                      _savePreference(propertyId, 'morticeLocation',
+                          location!); // Save preference
+                    },
+                    onReadingSelected: (reading) {
+                      setState(() {
+                        morticeReading = reading;
+                      });
+                      _savePreference(propertyId, 'morticeReading',
+                          reading!); // Save preference
+                    },
+                    onImageAdded: (imagePath) {
+                      setState(() {
+                        morticeImages.add(imagePath);
+                      });
+                      _savePreferenceList(propertyId, 'morticeImages',
+                          morticeImages); // Save preference
+                    },
+                  ),
+
+                  // Window Lock
+                  ConditionItem(
+                    name: "Window Lock",
+                    location: windowLockLocation,
+                    reading: windowLockReading,
+                    images: windowLockImages,
+                    onLocationSelected: (location) {
+                      setState(() {
+                        windowLockLocation = location;
+                      });
+                      _savePreference(propertyId, 'windowLockLocation',
+                          location!); // Save preference
+                    },
+                    onReadingSelected: (reading) {
+                      setState(() {
+                        windowLockReading = reading;
+                      });
+                      _savePreference(propertyId, 'windowLockReading',
+                          reading!); // Save preference
+                    },
+                    onImageAdded: (imagePath) {
+                      setState(() {
+                        windowLockImages.add(imagePath);
+                      });
+                      _savePreferenceList(propertyId, 'windowLockImages',
+                          windowLockImages); // Save preference
+                    },
+                  ),
+
+                  // Gas Meter
+                  ConditionItem(
+                    name: "Gas Meter",
+                    location: gasMeterLocation,
+                    reading: gasMeterReading,
+                    images: gasMeterImages,
+                    onLocationSelected: (location) {
+                      setState(() {
+                        gasMeterLocation = location;
+                      });
+                      _savePreference(propertyId, 'gasMeterLocation',
+                          location!); // Save preference
+                    },
+                    onReadingSelected: (reading) {
+                      setState(() {
+                        gasMeterReading = reading;
+                      });
+                      _savePreference(propertyId, 'gasMeterReading',
+                          reading!); // Save preference
+                    },
+                    onImageAdded: (imagePath) {
+                      setState(() {
+                        gasMeterImages.add(imagePath);
+                      });
+                      _savePreferenceList(propertyId, 'gasMeterImages',
+                          gasMeterImages); // Save preference
+                    },
+                  ),
+
+                  // Car Pass
+                  ConditionItem(
+                    name: "Car Pass",
+                    location: carPassLocation,
+                    reading: carPassReading,
+                    images: carPassImages,
+                    onLocationSelected: (location) {
+                      setState(() {
+                        carPassLocation = location;
+                      });
+                      _savePreference(propertyId, 'carPassLocation',
+                          location!); // Save preference
+                    },
+                    onReadingSelected: (reading) {
+                      setState(() {
+                        carPassReading = reading;
+                      });
+                      _savePreference(propertyId, 'carPassReading',
+                          reading!); // Save preference
+                    },
+                    onImageAdded: (imagePath) {
+                      setState(() {
+                        carPassImages.add(imagePath);
+                      });
+                      _savePreferenceList(propertyId, 'carPassImages',
+                          carPassImages); // Save preference
+                    },
+                  ),
+
+                  // Remote
+                  ConditionItem(
+                    name: "Remote",
+                    location: remoteLocation,
+                    reading: remoteReading,
+                    images: remoteImages,
+                    onLocationSelected: (location) {
+                      setState(() {
+                        remoteLocation = location;
+                      });
+                      _savePreference(propertyId, 'remoteLocation',
+                          location!); // Save preference
+                    },
+                    onReadingSelected: (reading) {
+                      setState(() {
+                        remoteReading = reading;
+                      });
+                      _savePreference(propertyId, 'remoteReading',
+                          reading!); // Save preference
+                    },
+                    onImageAdded: (imagePath) {
+                      setState(() {
+                        remoteImages.add(imagePath);
+                      });
+                      _savePreferenceList(propertyId, 'remoteImages',
+                          remoteImages); // Save preference
+                    },
+                  ),
+
+                  // Other
+                  ConditionItem(
+                    name: "Other",
+                    location: otherLocation,
+                    reading: otherReading,
+                    images: otherImages,
+                    onLocationSelected: (location) {
+                      setState(() {
+                        otherLocation = location;
+                      });
+                      _savePreference(propertyId, 'otherLocation',
+                          location!); // Save preference
+                    },
+                    onReadingSelected: (reading) {
+                      setState(() {
+                        otherReading = reading;
+                      });
+                      _savePreference(propertyId, 'otherReading',
+                          reading!); // Save preference
+                    },
+                    onImageAdded: (imagePath) {
+                      setState(() {
+                        otherImages.add(imagePath);
+                      });
+                      _savePreferenceList(propertyId, 'otherImages',
+                          otherImages); // Save preference
+                    },
+                  ),
+
+                  // Add more ConditionItem widgets as needed
+                ],
               ),
-            );
-          },
-          child: Icon(
-            Icons.arrow_back_ios_new,
-            color: kPrimaryColor,
-            size: 24,
+            ),
           ),
-        ),
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Yale
-              ConditionItem(
-                name: "Yale",
-                location: yaleLocation,
-                reading: yaleReading,
-                images: yaleImages,
-                onLocationSelected: (location) {
-                  setState(() {
-                    yaleLocation = location;
-                  });
-                  _savePreference(propertyId,'yaleLocation', location!); //
-                  // Save preference
-                },
-                onReadingSelected: (reading) {
-                  setState(() {
-                    yaleReading = reading;
-                  });
-                  _savePreference(propertyId,'yaleReading', reading!); // Save preference
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    yaleImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId,
-                      'yaleImages', yaleImages); // Save preference
-                },
-              ),
-
-              // Mortice
-              ConditionItem(
-                name: "Mortice",
-                location: morticeLocation,
-                reading: morticeReading,
-                images: morticeImages,
-                onLocationSelected: (location) {
-                  setState(() {
-                    morticeLocation = location;
-                  });
-                  _savePreference(propertyId,
-                      'morticeLocation', location!); // Save preference
-                },
-                onReadingSelected: (reading) {
-                  setState(() {
-                    morticeReading = reading;
-                  });
-                  _savePreference(propertyId, 'morticeReading', reading!); // Save preference
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    morticeImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId,
-                      'morticeImages', morticeImages); // Save preference
-                },
-              ),
-
-              // Window Lock
-              ConditionItem(
-                name: "Window Lock",
-                location: windowLockLocation,
-                reading: windowLockReading,
-                images: windowLockImages,
-                onLocationSelected: (location) {
-                  setState(() {
-                    windowLockLocation = location;
-                  });
-                  _savePreference(propertyId,
-                      'windowLockLocation', location!); // Save preference
-                },
-                onReadingSelected: (reading) {
-                  setState(() {
-                    windowLockReading = reading;
-                  });
-                  _savePreference(propertyId,
-                      'windowLockReading', reading!); // Save preference
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    windowLockImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId,
-                      'windowLockImages', windowLockImages); // Save preference
-                },
-              ),
-
-              // Gas Meter
-              ConditionItem(
-                name: "Gas Meter",
-                location: gasMeterLocation,
-                reading: gasMeterReading,
-                images: gasMeterImages,
-                onLocationSelected: (location) {
-                  setState(() {
-                    gasMeterLocation = location;
-                  });
-                  _savePreference(propertyId,
-                      'gasMeterLocation', location!); // Save preference
-                },
-                onReadingSelected: (reading) {
-                  setState(() {
-                    gasMeterReading = reading;
-                  });
-                  _savePreference(propertyId,
-                      'gasMeterReading', reading!); // Save preference
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    gasMeterImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId,
-                      'gasMeterImages', gasMeterImages); // Save preference
-                },
-              ),
-
-              // Car Pass
-              ConditionItem(
-                name: "Car Pass",
-                location: carPassLocation,
-                reading: carPassReading,
-                images: carPassImages,
-                onLocationSelected: (location) {
-                  setState(() {
-                    carPassLocation = location;
-                  });
-                  _savePreference(propertyId,
-                      'carPassLocation', location!); // Save preference
-                },
-                onReadingSelected: (reading) {
-                  setState(() {
-                    carPassReading = reading;
-                  });
-                  _savePreference(propertyId, 'carPassReading', reading!); // Save preference
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    carPassImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId,
-                      'carPassImages', carPassImages); // Save preference
-                },
-              ),
-
-              // Remote
-              ConditionItem(
-                name: "Remote",
-                location: remoteLocation,
-                reading: remoteReading,
-                images: remoteImages,
-                onLocationSelected: (location) {
-                  setState(() {
-                    remoteLocation = location;
-                  });
-                  _savePreference(propertyId,
-                      'remoteLocation', location!); // Save preference
-                },
-                onReadingSelected: (reading) {
-                  setState(() {
-                    remoteReading = reading;
-                  });
-                  _savePreference(propertyId, 'remoteReading', reading!); // Save preference
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    remoteImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId,
-                      'remoteImages', remoteImages); // Save preference
-                },
-              ),
-
-              // Other
-              ConditionItem(
-                name: "Other",
-                location: otherLocation,
-                reading: otherReading,
-                images: otherImages,
-                onLocationSelected: (location) {
-                  setState(() {
-                    otherLocation = location;
-                  });
-                  _savePreference(propertyId, 'otherLocation', location!); // Save preference
-                },
-                onReadingSelected: (reading) {
-                  setState(() {
-                    otherReading = reading;
-                  });
-                  _savePreference(propertyId, 'otherReading', reading!); // Save preference
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    otherImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId,
-                      'otherImages', otherImages); // Save preference
-                },
-              ),
-
-              // Add more ConditionItem widgets as needed
-            ],
-          ),
-        ),
-      ),
-    );
+        ));
   }
 }
 
@@ -393,21 +405,21 @@ class ConditionItem extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  IconButton(
-                    icon: Icon(
-                      Icons.warning_amber,
-                      size: 24,
-                      color: kAccentColor,
-                    ),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => AddAction(),
-                        ),
-                      );
-                    },
-                  ),
+                  // IconButton(
+                  //   icon: Icon(
+                  //     Icons.warning_amber,
+                  //     size: 24,
+                  //     color: kAccentColor,
+                  //   ),
+                  //   onPressed: () {
+                  //     Navigator.push(
+                  //       context,
+                  //       MaterialPageRoute(
+                  //         builder: (context) => AddAction(),
+                  //       ),
+                  //     );
+                  //   },
+                  // ),
                   IconButton(
                     icon: Icon(
                       Icons.camera_alt_outlined,
@@ -467,35 +479,35 @@ class ConditionItem extends StatelessWidget {
           SizedBox(
             height: 12,
           ),
-          GestureDetector(
-            onTap: () async {
-              final result = await Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ConditionDetails(
-                    initialCondition: reading,
-                    type: name,
-                  ),
-                ),
-              );
-
-              if (result != null) {
-                onReadingSelected(result);
-              }
-            },
-            child: Text(
-              reading?.isNotEmpty == true ? reading! : "Reading",
-              style: TextStyle(
-                fontSize: 12.0,
-                fontWeight: FontWeight.w700,
-                color: kPrimaryTextColourTwo,
-                fontStyle: FontStyle.italic,
-              ),
-            ),
-          ),
-          SizedBox(
-            height: 12,
-          ),
+          // GestureDetector(
+          //   onTap: () async {
+          //     final result = await Navigator.push(
+          //       context,
+          //       MaterialPageRoute(
+          //         builder: (context) => ConditionDetails(
+          //           initialCondition: reading,
+          //           type: name,
+          //         ),
+          //       ),
+          //     );
+          //
+          //     if (result != null) {
+          //       onReadingSelected(result);
+          //     }
+          //   },
+          //   child: Text(
+          //     reading?.isNotEmpty == true ? reading! : "Reading",
+          //     style: TextStyle(
+          //       fontSize: 12.0,
+          //       fontWeight: FontWeight.w700,
+          //       color: kPrimaryTextColourTwo,
+          //       fontStyle: FontStyle.italic,
+          //     ),
+          //   ),
+          // ),
+          // SizedBox(
+          //   height: 12,
+          // ),
           images.isNotEmpty
               ? Wrap(
                   spacing: 8.0,

@@ -13,8 +13,8 @@ import '../../widgets/add_action.dart';
 
 class DiningRoom extends StatefulWidget {
   final List<File>? capturedImages;
-
-  const DiningRoom({super.key, this.capturedImages});
+  final String propertyId;
+  const DiningRoom({super.key, this.capturedImages, required this.propertyId});
 
   @override
   State<DiningRoom> createState() => _DiningRoomState();
@@ -43,41 +43,45 @@ class _DiningRoomState extends State<DiningRoom> {
   void initState() {
     super.initState();
     capturedImages = widget.capturedImages ?? [];
-    _loadPreferences(); // Load the saved preferences when the state is initialized
+    print("Property Id - SOC${widget.propertyId}");
+    _loadPreferences(widget.propertyId);
+    // Load the saved preferences when the state is initialized
   }
 
   // Function to load preferences
-  Future<void> _loadPreferences() async {
+  Future<void> _loadPreferences(String propertyId) async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      gasMeterCondition = prefs.getString('gasMeterCondition');
-      gasMeterLocation = prefs.getString('gasMeterLocation');
-      electricMeterCondition = prefs.getString('electricMeterCondition');
-      electricMeterLocation = prefs.getString('electricMeterLocation');
-      waterMeterCondition = prefs.getString('waterMeterCondition');
-      waterMeterLocation = prefs.getString('waterMeterLocation');
-      oilMeterCondition = prefs.getString('oilMeterCondition');
-      oilMeterLocation = prefs.getString('oilMeterLocation');
-      gasMeterImages = prefs.getStringList('gasMeterImages') ?? [];
-      electricMeterImages = prefs.getStringList('electricMeterImages') ?? [];
-      waterMeterImages = prefs.getStringList('waterMeterImages') ?? [];
-      oilMeterImages = prefs.getStringList('oilMeterImages') ?? [];
+      gasMeterCondition = prefs.getString('gasMeterCondition_${propertyId}');
+      gasMeterLocation = prefs.getString('gasMeterLocation_${propertyId}');
+      electricMeterCondition = prefs.getString('electricMeterCondition_${propertyId}');
+      electricMeterLocation = prefs.getString('electricMeterLocation_${propertyId}');
+      waterMeterCondition = prefs.getString('waterMeterCondition_${propertyId}');
+      waterMeterLocation = prefs.getString('waterMeterLocation_${propertyId}');
+      oilMeterCondition = prefs.getString('oilMeterCondition_${propertyId}');
+      oilMeterLocation = prefs.getString('oilMeterLocation_${propertyId}');
+      gasMeterImages = prefs.getStringList('gasMeterImages_${propertyId}') ?? [];
+      electricMeterImages = prefs.getStringList('electricMeterImages_${propertyId}') ?? [];
+      waterMeterImages = prefs.getStringList('waterMeterImages_${propertyId}') ?? [];
+      oilMeterImages = prefs.getStringList('oilMeterImages_${propertyId}') ?? [];
     });
   }
 
   // Function to save a preference
-  Future<void> _savePreference(String key, String value) async {
+  Future<void> _savePreference(String propertyId, String key, String value)
+  async {
     final prefs = await SharedPreferences.getInstance();
-    prefs.setString(key, value);
+    prefs.setString('${key}_$propertyId', value);
   }
 
-  Future<void> _savePreferenceList(String key, List<String> value) async {
+  Future<void> _savePreferenceList(String propertyId, String key, List<String> value) async {
     final prefs = await SharedPreferences.getInstance();
-    prefs.setStringList(key, value);
+    prefs.setStringList('${key}_$propertyId', value);
   }
 
   @override
   Widget build(BuildContext context) {
+     String propertyId = widget.propertyId;
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -123,21 +127,21 @@ class _DiningRoomState extends State<DiningRoom> {
                     gasMeterCondition = condition;
                   });
                   _savePreference(
-                      'gasMeterCondition', condition!); // Save preference
+                     propertyId, 'gasMeterCondition', condition!); // Save preference
                 },
                 onlocationSelected: (location) {
                   setState(() {
                     gasMeterLocation = location;
                   });
                   _savePreference(
-                      'gasMeterLocation', location!); // Save preference
+                      propertyId,'gasMeterLocation', location!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     gasMeterImages.add(imagePath);
                   });
                   _savePreferenceList(
-                      'gasMeterImages', gasMeterImages); // Save preference
+                     propertyId, 'gasMeterImages', gasMeterImages); // Save preference
                 },
               ),
               // Electric Meter
@@ -151,20 +155,20 @@ class _DiningRoomState extends State<DiningRoom> {
                     electricMeterCondition = condition;
                   });
                   _savePreference(
-                      'electricMeterCondition', condition!); // Save preference
+                     propertyId, 'electricMeterCondition', condition!); // Save preference
                 },
                 onlocationSelected: (location) {
                   setState(() {
                     electricMeterLocation = location;
                   });
                   _savePreference(
-                      'electricMeterLocation', location!); // Save preference
+                     propertyId, 'electricMeterLocation', location!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     electricMeterImages.add(imagePath);
                   });
-                  _savePreferenceList('electricMeterImages',
+                  _savePreferenceList(propertyId,'electricMeterImages',
                       electricMeterImages); // Save preference
                 },
               ),
@@ -179,21 +183,21 @@ class _DiningRoomState extends State<DiningRoom> {
                     waterMeterCondition = condition;
                   });
                   _savePreference(
-                      'waterMeterCondition', condition!); // Save preference
+                     propertyId, 'waterMeterCondition', condition!); // Save preference
                 },
                 onlocationSelected: (location) {
                   setState(() {
                     waterMeterLocation = location;
                   });
                   _savePreference(
-                      'waterMeterLocation', location!); // Save preference
+                     propertyId, 'waterMeterLocation', location!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     waterMeterImages.add(imagePath);
                   });
                   _savePreferenceList(
-                      'waterMeterImages', waterMeterImages); // Save preference
+                     propertyId, 'waterMeterImages', waterMeterImages); // Save preference
                 },
               ),
               // Oil Meter
@@ -207,21 +211,21 @@ class _DiningRoomState extends State<DiningRoom> {
                     oilMeterCondition = condition;
                   });
                   _savePreference(
-                      'oilMeterCondition', condition!); // Save preference
+                     propertyId, 'oilMeterCondition', condition!); // Save preference
                 },
                 onlocationSelected: (location) {
                   setState(() {
                     oilMeterLocation = location;
                   });
                   _savePreference(
-                      'oilMeterLocation', location!); // Save preference
+                     propertyId, 'oilMeterLocation', location!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     oilMeterImages.add(imagePath);
                   });
                   _savePreferenceList(
-                      'oilMeterImages', oilMeterImages); // Save preference
+                      propertyId,'oilMeterImages', oilMeterImages); // Save preference
                 },
               ),
               // Add more ConditionItem widgets as needed

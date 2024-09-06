@@ -13,8 +13,8 @@ import '../../widgets/add_action.dart';
 
 class Manuals extends StatefulWidget {
   final List<File>? capturedImages;
-
-  const Manuals({super.key, this.capturedImages});
+  final String propertyId;
+  const Manuals({super.key, this.capturedImages, required this.propertyId});
 
   @override
   State<Manuals> createState() => _ManualsState();
@@ -47,58 +47,61 @@ class _ManualsState extends State<Manuals> {
   List<String> moveInChecklistImages = [];
   late List<File> capturedImages;
 
-  @override
+   @override
   void initState() {
     super.initState();
     capturedImages = widget.capturedImages ?? [];
-    _loadPreferences(); // Load the saved preferences when the state is initialized
+    print("Property Id - SOC${widget.propertyId}");
+    _loadPreferences(widget.propertyId);
+    // Load the saved preferences when the state is initialized
   }
 
   // Function to load preferences
-  Future<void> _loadPreferences() async {
+  Future<void> _loadPreferences(String propertyId) async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      houseApplinceManual = prefs.getString('houseApplinceManual');
-      houseApplinceManualDescription = prefs.getString('houseApplinceManualDescription');
-      kitchenApplinceManual = prefs.getString('kitchenApplinceManual');
-      kitchenApplinceManualDescription = prefs.getString('kitchenApplinceManualDescription');
-      heatingManual = prefs.getString('heatingManual');
-      heatingManualDescription = prefs.getString('heatingManualDescription');
-      landlordGasSafetyCertificate = prefs.getString('landlordGasSafetyCertificate');
-      landlordGasSafetyCertificateDescription = prefs.getString('landlordGasSafetyCertificateDescription');
-      legionellaRiskAssessment = prefs.getString('legionellaRiskAssessment');
-      legionellaRiskAssessmentDescription = prefs.getString('legionellaRiskAssessmentDescription');
-      electricalSafetyCertificate = prefs.getString('electricalSafetyCertificate');
-      electricalSafetyCertificateDescription = prefs.getString('electricalSafetyCertificateDescription');
-      energyPerformanceCertificate = prefs.getString('energyPerformanceCertificate');
-      energyPerformanceCertificateDescription = prefs.getString('energyPerformanceCertificateDescription');
-      moveInChecklist = prefs.getString('moveInChecklist');
-      moveInChecklistDescription = prefs.getString('moveInChecklistDescription');
+      houseApplinceManual = prefs.getString('houseApplinceManual_${propertyId}');
+      houseApplinceManualDescription = prefs.getString('houseApplinceManualDescription_${propertyId}');
+      kitchenApplinceManual = prefs.getString('kitchenApplinceManual_${propertyId}');
+      kitchenApplinceManualDescription = prefs.getString('kitchenApplinceManualDescription_${propertyId}');
+      heatingManual = prefs.getString('heatingManual_${propertyId}');
+      heatingManualDescription = prefs.getString('heatingManualDescription_${propertyId}');
+      landlordGasSafetyCertificate = prefs.getString('landlordGasSafetyCertificate_${propertyId}');
+      landlordGasSafetyCertificateDescription = prefs.getString('landlordGasSafetyCertificateDescription_${propertyId}');
+      legionellaRiskAssessment = prefs.getString('legionellaRiskAssessment_${propertyId}');
+      legionellaRiskAssessmentDescription = prefs.getString('legionellaRiskAssessmentDescription_${propertyId}');
+      electricalSafetyCertificate = prefs.getString('electricalSafetyCertificate_${propertyId}');
+      electricalSafetyCertificateDescription = prefs.getString('electricalSafetyCertificateDescription_${propertyId}');
+      energyPerformanceCertificate = prefs.getString('energyPerformanceCertificate_${propertyId}');
+      energyPerformanceCertificateDescription = prefs.getString('energyPerformanceCertificateDescription_${propertyId}');
+      moveInChecklist = prefs.getString('moveInChecklist_${propertyId}');
+      moveInChecklistDescription = prefs.getString('moveInChecklistDescription_${propertyId}');
 
-      houseApplinceManualImages = prefs.getStringList('houseApplinceManualImages') ?? [];
-      kitchenApplinceManualImages = prefs.getStringList('kitchenApplinceManualImages') ?? [];
-      heatingManualImages = prefs.getStringList('heatingManualImages') ?? [];
-      landlordGasSafetyCertificateImages = prefs.getStringList('landlordGasSafetyCertificateImages') ?? [];
-      legionellaRiskAssessmentImages = prefs.getStringList('legionellaRiskAssessmentImages') ?? [];
-      electricalSafetyCertificateImages = prefs.getStringList('electricalSafetyCertificateImages') ?? [];
-      energyPerformanceCertificateImages = prefs.getStringList('energyPerformanceCertificateImages') ?? [];
-      moveInChecklistImages = prefs.getStringList('moveInChecklistImages') ?? [];
+      houseApplinceManualImages = prefs.getStringList('houseApplinceManualImages_${propertyId}') ?? [];
+      kitchenApplinceManualImages = prefs.getStringList('kitchenApplinceManualImages_${propertyId}') ?? [];
+      heatingManualImages = prefs.getStringList('heatingManualImages_${propertyId}') ?? [];
+      landlordGasSafetyCertificateImages = prefs.getStringList('landlordGasSafetyCertificateImages_${propertyId}') ?? [];
+      legionellaRiskAssessmentImages = prefs.getStringList('legionellaRiskAssessmentImages_${propertyId}') ?? [];
+      electricalSafetyCertificateImages = prefs.getStringList('electricalSafetyCertificateImages_${propertyId}') ?? [];
+      energyPerformanceCertificateImages = prefs.getStringList('energyPerformanceCertificateImages_${propertyId}') ?? [];
+      moveInChecklistImages = prefs.getStringList('moveInChecklistImages_${propertyId}') ?? [];
     });
   }
 
   // Function to save a preference
-  Future<void> _savePreference(String key, String? value) async {
+  Future<void> _savePreference(String propertyId, String key, String value)
+  async {
     final prefs = await SharedPreferences.getInstance();
-    prefs.setString(key, value ?? '');
+    prefs.setString('${key}_$propertyId', value);
   }
 
-  Future<void> _savePreferenceList(String key, List<String> value) async {
+  Future<void> _savePreferenceList(String propertyId, String key, List<String> value) async {
     final prefs = await SharedPreferences.getInstance();
-    prefs.setStringList(key, value);
+    prefs.setStringList('${key}_$propertyId', value);
   }
-
   @override
   Widget build(BuildContext context) {
+     String propertyId = widget.propertyId;
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -143,19 +146,19 @@ class _ManualsState extends State<Manuals> {
                   setState(() {
                     houseApplinceManual = condition;
                   });
-                  _savePreference('houseApplinceManual', condition); // Save preference
+                  _savePreference(propertyId,'houseApplinceManual', condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     houseApplinceManualDescription = description;
                   });
-                  _savePreference('houseApplinceManualDescription', description); // Save preference
+                  _savePreference(propertyId,'houseApplinceManualDescription', description!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     houseApplinceManualImages.add(imagePath);
                   });
-                  _savePreferenceList('houseApplinceManualImages', houseApplinceManualImages);
+                  _savePreferenceList(propertyId,'houseApplinceManualImages', houseApplinceManualImages);
                 },
               ),
 
@@ -169,19 +172,19 @@ class _ManualsState extends State<Manuals> {
                   setState(() {
                     kitchenApplinceManual = condition;
                   });
-                  _savePreference('kitchenApplinceManual', condition); // Save preference
+                  _savePreference(propertyId,'kitchenApplinceManual', condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     kitchenApplinceManualDescription = description;
                   });
-                  _savePreference('kitchenApplinceManualDescription', description); // Save preference
+                  _savePreference(propertyId,'kitchenApplinceManualDescription', description!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     kitchenApplinceManualImages.add(imagePath);
                   });
-                  _savePreferenceList('kitchenApplinceManualImages', kitchenApplinceManualImages);
+                  _savePreferenceList(propertyId,'kitchenApplinceManualImages', kitchenApplinceManualImages);
                 },
               ),
 
@@ -195,19 +198,19 @@ class _ManualsState extends State<Manuals> {
                   setState(() {
                     heatingManual = condition;
                   });
-                  _savePreference('heatingManual', condition); // Save preference
+                  _savePreference(propertyId,'heatingManual', condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     heatingManualDescription = description;
                   });
-                  _savePreference('heatingManualDescription', description); // Save preference
+                  _savePreference(propertyId,'heatingManualDescription', description!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     heatingManualImages.add(imagePath);
                   });
-                  _savePreferenceList('heatingManualImages', heatingManualImages);
+                  _savePreferenceList(propertyId,'heatingManualImages', heatingManualImages);
                 },
               ),
 
@@ -221,19 +224,19 @@ class _ManualsState extends State<Manuals> {
                   setState(() {
                     landlordGasSafetyCertificate = condition;
                   });
-                  _savePreference('landlordGasSafetyCertificate', condition); // Save preference
+                  _savePreference(propertyId,'landlordGasSafetyCertificate', condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     landlordGasSafetyCertificateDescription = description;
                   });
-                  _savePreference('landlordGasSafetyCertificateDescription', description); // Save preference
+                  _savePreference(propertyId,'landlordGasSafetyCertificateDescription', description!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     landlordGasSafetyCertificateImages.add(imagePath);
                   });
-                  _savePreferenceList('landlordGasSafetyCertificateImages', landlordGasSafetyCertificateImages);
+                  _savePreferenceList(propertyId,'landlordGasSafetyCertificateImages', landlordGasSafetyCertificateImages);
                 },
               ),
 
@@ -247,19 +250,19 @@ class _ManualsState extends State<Manuals> {
                   setState(() {
                     legionellaRiskAssessment = condition;
                   });
-                  _savePreference('legionellaRiskAssessment', condition); // Save preference
+                  _savePreference(propertyId,'legionellaRiskAssessment', condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     legionellaRiskAssessmentDescription = description;
                   });
-                  _savePreference('legionellaRiskAssessmentDescription', description); // Save preference
+                  _savePreference(propertyId,'legionellaRiskAssessmentDescription', description!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     legionellaRiskAssessmentImages.add(imagePath);
                   });
-                  _savePreferenceList('legionellaRiskAssessmentImages', legionellaRiskAssessmentImages);
+                  _savePreferenceList(propertyId,'legionellaRiskAssessmentImages', legionellaRiskAssessmentImages);
                 },
               ),
 
@@ -273,19 +276,19 @@ class _ManualsState extends State<Manuals> {
                   setState(() {
                     electricalSafetyCertificate = condition;
                   });
-                  _savePreference('electricalSafetyCertificate', condition); // Save preference
+                  _savePreference(propertyId,'electricalSafetyCertificate', condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     electricalSafetyCertificateDescription = description;
                   });
-                  _savePreference('electricalSafetyCertificateDescription', description); // Save preference
+                  _savePreference(propertyId,'electricalSafetyCertificateDescription', description!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     electricalSafetyCertificateImages.add(imagePath);
                   });
-                  _savePreferenceList('electricalSafetyCertificateImages', electricalSafetyCertificateImages);
+                  _savePreferenceList(propertyId,'electricalSafetyCertificateImages', electricalSafetyCertificateImages);
                 },
               ),
 
@@ -299,19 +302,19 @@ class _ManualsState extends State<Manuals> {
                   setState(() {
                     energyPerformanceCertificate = condition;
                   });
-                  _savePreference('energyPerformanceCertificate', condition); // Save preference
+                  _savePreference(propertyId,'energyPerformanceCertificate', condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     energyPerformanceCertificateDescription = description;
                   });
-                  _savePreference('energyPerformanceCertificateDescription', description); // Save preference
+                  _savePreference(propertyId,'energyPerformanceCertificateDescription', description!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     energyPerformanceCertificateImages.add(imagePath);
                   });
-                  _savePreferenceList('energyPerformanceCertificateImages', energyPerformanceCertificateImages);
+                  _savePreferenceList(propertyId,'energyPerformanceCertificateImages', energyPerformanceCertificateImages);
                 },
               ),
 
@@ -325,19 +328,19 @@ class _ManualsState extends State<Manuals> {
                   setState(() {
                     moveInChecklist = condition;
                   });
-                  _savePreference('moveInChecklist', condition); // Save preference
+                  _savePreference(propertyId,'moveInChecklist', condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     moveInChecklistDescription = description;
                   });
-                  _savePreference('moveInChecklistDescription', description); // Save preference
+                  _savePreference(propertyId,'moveInChecklistDescription', description!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     moveInChecklistImages.add(imagePath);
                   });
-                  _savePreferenceList('moveInChecklistImages', moveInChecklistImages);
+                  _savePreferenceList(propertyId,'moveInChecklistImages', moveInChecklistImages);
                 },
               ),
 

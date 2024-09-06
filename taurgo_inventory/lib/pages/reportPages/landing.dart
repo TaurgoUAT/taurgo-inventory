@@ -13,8 +13,8 @@ import '../../widgets/add_action.dart';
 
 class Landing extends StatefulWidget {
   final List<File>? capturedImages;
-
-  const Landing({super.key, this.capturedImages});
+  final String propertyId;
+  const Landing({super.key, this.capturedImages, required this.propertyId});
 
   @override
   State<Landing> createState() => _LandingState();
@@ -76,75 +76,79 @@ class _LandingState extends State<Landing> {
   List<String> additionalItemsImages = [];
   late List<File> capturedImages;
 
-  @override
+   @override
   void initState() {
     super.initState();
     capturedImages = widget.capturedImages ?? [];
-    _loadPreferences(); // Load the saved preferences when the state is initialized
+    print("Property Id - SOC${widget.propertyId}");
+    _loadPreferences(widget.propertyId);
+    // Load the saved preferences when the state is initialized
   }
 
   // Function to load preferences
-  Future<void> _loadPreferences() async {
+  Future<void> _loadPreferences(String propertyId) async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      newdoor = prefs.getString('newdoor');
-      doorCondition = prefs.getString('doorCondition');
-      doorDescription = prefs.getString('doorDescription');
-      doorFrameCondition = prefs.getString('doorFrameCondition');
-      doorFrameDescription = prefs.getString('doorFrameDescription');
-      ceilingCondition = prefs.getString('ceilingCondition');
-      ceilingDescription = prefs.getString('ceilingDescription');
-      lightingCondition = prefs.getString('lightingCondition');
-      lightingDescription = prefs.getString('lightingDescription');
-      wallsCondition = prefs.getString('wallsCondition');
-      wallsDescription = prefs.getString('wallsDescription');
-      skirtingCondition = prefs.getString('skirtingCondition');
-      skirtingDescription = prefs.getString('skirtingDescription');
-      windowSillCondition = prefs.getString('windowSillCondition');
-      windowSillDescription = prefs.getString('windowSillDescription');
-      curtainsCondition = prefs.getString('curtainsCondition');
-      curtainsDescription = prefs.getString('curtainsDescription');
-      blindsCondition = prefs.getString('blindsCondition');
-      blindsDescription = prefs.getString('blindsDescription');
-      lightSwitchesCondition = prefs.getString('lightSwitchesCondition');
-      lightSwitchesDescription = prefs.getString('lightSwitchesDescription');
-      socketsCondition = prefs.getString('socketsCondition');
-      socketsDescription = prefs.getString('socketsDescription');
-      flooringCondition = prefs.getString('flooringCondition');
-      flooringDescription = prefs.getString('flooringDescription');
-      additionalItemsCondition = prefs.getString('additionalItemsCondition');
+      newdoor = prefs.getString('newdoor_${propertyId}');
+      doorCondition = prefs.getString('doorCondition_${propertyId}');
+      doorDescription = prefs.getString('doorDescription_${propertyId}');
+      doorFrameCondition = prefs.getString('doorFrameCondition_${propertyId}');
+      doorFrameDescription = prefs.getString('doorFrameDescription_${propertyId}');
+      ceilingCondition = prefs.getString('ceilingCondition_${propertyId}');
+      ceilingDescription = prefs.getString('ceilingDescription_${propertyId}');
+      lightingCondition = prefs.getString('lightingCondition_${propertyId}');
+      lightingDescription = prefs.getString('lightingDescription_${propertyId}');
+      wallsCondition = prefs.getString('wallsCondition_${propertyId}');
+      wallsDescription = prefs.getString('wallsDescription_${propertyId}');
+      skirtingCondition = prefs.getString('skirtingCondition_${propertyId}');
+      skirtingDescription = prefs.getString('skirtingDescription_${propertyId}');
+      windowSillCondition = prefs.getString('windowSillCondition_${propertyId}');
+      windowSillDescription = prefs.getString('windowSillDescription_${propertyId}');
+      curtainsCondition = prefs.getString('curtainsCondition_${propertyId}');
+      curtainsDescription = prefs.getString('curtainsDescription_${propertyId}');
+      blindsCondition = prefs.getString('blindsCondition_${propertyId}');
+      blindsDescription = prefs.getString('blindsDescription_${propertyId}');
+      lightSwitchesCondition = prefs.getString('lightSwitchesCondition_${propertyId}');
+      lightSwitchesDescription = prefs.getString('lightSwitchesDescription_${propertyId}');
+      socketsCondition = prefs.getString('socketsCondition_${propertyId}');
+      socketsDescription = prefs.getString('socketsDescription_${propertyId}');
+      flooringCondition = prefs.getString('flooringCondition_${propertyId}');
+      flooringDescription = prefs.getString('flooringDescription_${propertyId}');
+      additionalItemsCondition = prefs.getString('additionalItemsCondition_${propertyId}');
       additionalItemsDescription =
-          prefs.getString('additionalItemsDescription');
-      doorImages = prefs.getStringList('doorImages') ?? [];
-      doorFrameImages = prefs.getStringList('doorFrameImages') ?? [];
-      ceilingImages = prefs.getStringList('ceilingImages') ?? [];
-      lightingImages = prefs.getStringList('lightingImages') ?? [];
-      wallsImages = prefs.getStringList('wallsImages') ?? [];
-      skirtingImages = prefs.getStringList('skirtingImages') ?? [];
-      windowSillImages = prefs.getStringList('windowSillImages') ?? [];
-      curtainsImages = prefs.getStringList('curtainsImages') ?? [];
-      blindsImages = prefs.getStringList('blindsImages') ?? [];
-      lightSwitchesImages = prefs.getStringList('lightSwitchesImages') ?? [];
-      socketsImages = prefs.getStringList('socketsImages') ?? [];
-      flooringImages = prefs.getStringList('flooringImages') ?? [];
+          prefs.getString('additionalItemsDescription_${propertyId}');
+      doorImages = prefs.getStringList('doorImages_${propertyId}') ?? [];
+      doorFrameImages = prefs.getStringList('doorFrameImages_${propertyId}') ?? [];
+      ceilingImages = prefs.getStringList('ceilingImages_${propertyId}') ?? [];
+      lightingImages = prefs.getStringList('lightingImages_${propertyId}') ?? [];
+      wallsImages = prefs.getStringList('wallsImages_${propertyId}') ?? [];
+      skirtingImages = prefs.getStringList('skirtingImages_${propertyId}') ?? [];
+      windowSillImages = prefs.getStringList('windowSillImages_${propertyId}') ?? [];
+      curtainsImages = prefs.getStringList('curtainsImages_${propertyId}') ?? [];
+      blindsImages = prefs.getStringList('blindsImages_${propertyId}') ?? [];
+      lightSwitchesImages = prefs.getStringList('lightSwitchesImages_${propertyId}') ?? [];
+      socketsImages = prefs.getStringList('socketsImages_${propertyId}') ?? [];
+      flooringImages = prefs.getStringList('flooringImages_${propertyId}') ?? [];
       additionalItemsImages =
-          prefs.getStringList('additionalItemsImages') ?? [];
+          prefs.getStringList('additionalItemsImages_${propertyId}') ?? [];
     });
   }
 
   // Function to save a preference
-  Future<void> _savePreference(String key, String value) async {
+  Future<void> _savePreference(String propertyId, String key, String value)
+  async {
     final prefs = await SharedPreferences.getInstance();
-    prefs.setString(key, value);
+    prefs.setString('${key}_$propertyId', value);
   }
 
-  Future<void> _savePreferenceList(String key, List<String> value) async {
+  Future<void> _savePreferenceList(String propertyId, String key, List<String> value) async {
     final prefs = await SharedPreferences.getInstance();
-    prefs.setStringList(key, value);
+    prefs.setStringList('${key}_$propertyId', value);
   }
 
   @override
   Widget build(BuildContext context) {
+     String propertyId = widget.propertyId;
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -189,19 +193,19 @@ class _LandingState extends State<Landing> {
                   setState(() {
                     doorCondition = condition;
                   });
-                  _savePreference('doorCondition', condition!);
+                  _savePreference(propertyId,'doorCondition', condition!);
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     newdoor = description;
                   });
-                  _savePreference('newdoor', description!);
+                  _savePreference(propertyId,'newdoor', description!);
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     doorImages.add(imagePath);
                   });
-                  _savePreferenceList('doorImages', doorImages);
+                  _savePreferenceList(propertyId,'doorImages', doorImages);
                 },
               ),
               // Door Frame
@@ -215,20 +219,20 @@ class _LandingState extends State<Landing> {
                     doorFrameCondition = condition;
                   });
                   _savePreference(
-                      'doorFrameCondition', condition!); // Save preference
+                      propertyId,'doorFrameCondition', condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     doorFrameDescription = description;
                   });
                   _savePreference(
-                      'doorFrameDescription', description!); // Save preference
+                      propertyId,'doorFrameDescription', description!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     doorFrameImages.add(imagePath);
                   });
-                  _savePreferenceList('doorFrameImages', doorFrameImages);
+                  _savePreferenceList(propertyId,'doorFrameImages', doorFrameImages);
                 },
               ),
 
@@ -243,20 +247,20 @@ class _LandingState extends State<Landing> {
                     ceilingCondition = condition;
                   });
                   _savePreference(
-                      'ceilingCondition', condition!); // Save preference
+                     propertyId, 'ceilingCondition', condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     ceilingDescription = description;
                   });
                   _savePreference(
-                      'ceilingDescription', description!); // Save preference
+                     propertyId, 'ceilingDescription', description!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     ceilingImages.add(imagePath);
                   });
-                  _savePreferenceList('ceilingImages', ceilingImages);
+                  _savePreferenceList(propertyId,'ceilingImages', ceilingImages);
                 },
               ),
 
@@ -271,20 +275,20 @@ class _LandingState extends State<Landing> {
                     lightingCondition = condition;
                   });
                   _savePreference(
-                      'lightingCondition', condition!); // Save preference
+                     propertyId, 'lightingCondition', condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     lightingDescription = description;
                   });
                   _savePreference(
-                      'lightingDescription', description!); // Save preference
+                      propertyId,'lightingDescription', description!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     lightingImages.add(imagePath);
                   });
-                  _savePreferenceList('lightingImages', lightingImages);
+                  _savePreferenceList(propertyId,'lightingImages', lightingImages);
                 },
               ),
 
@@ -299,20 +303,20 @@ class _LandingState extends State<Landing> {
                     wallsCondition = condition;
                   });
                   _savePreference(
-                      'wallsCondition', condition!); // Save preference
+                      propertyId,'wallsCondition', condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     wallsDescription = description;
                   });
                   _savePreference(
-                      'wallsDescription', description!); // Save preference
+                      propertyId,'wallsDescription', description!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     wallsImages.add(imagePath);
                   });
-                  _savePreferenceList('wallsImages', wallsImages);
+                  _savePreferenceList(propertyId,'wallsImages', wallsImages);
                 },
               ),
 
@@ -327,20 +331,20 @@ class _LandingState extends State<Landing> {
                     skirtingCondition = condition;
                   });
                   _savePreference(
-                      'skirtingCondition', condition!); // Save preference
+                     propertyId, 'skirtingCondition', condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     skirtingDescription = description;
                   });
                   _savePreference(
-                      'skirtingDescription', description!); // Save preference
+                      propertyId,'skirtingDescription', description!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     skirtingImages.add(imagePath);
                   });
-                  _savePreferenceList('skirtingImages', skirtingImages);
+                  _savePreferenceList(propertyId,'skirtingImages', skirtingImages);
                 },
               ),
 
@@ -355,20 +359,20 @@ class _LandingState extends State<Landing> {
                     windowSillCondition = condition;
                   });
                   _savePreference(
-                      'windowSillCondition', condition!); // Save preference
+                      propertyId,'windowSillCondition', condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     windowSillDescription = description;
                   });
                   _savePreference(
-                      'windowSillDescription', description!); // Save preference
+                     propertyId, 'windowSillDescription', description!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     windowSillImages.add(imagePath);
                   });
-                  _savePreferenceList('windowSillImages', windowSillImages);
+                  _savePreferenceList(propertyId,'windowSillImages', windowSillImages);
                 },
               ),
 
@@ -383,20 +387,20 @@ class _LandingState extends State<Landing> {
                     curtainsCondition = condition;
                   });
                   _savePreference(
-                      'curtainsCondition', condition!); // Save preference
+                     propertyId, 'curtainsCondition', condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     curtainsDescription = description;
                   });
                   _savePreference(
-                      'curtainsDescription', description!); // Save preference
+                      propertyId,'curtainsDescription', description!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     curtainsImages.add(imagePath);
                   });
-                  _savePreferenceList('curtainsImages', curtainsImages);
+                  _savePreferenceList(propertyId,'curtainsImages', curtainsImages);
                 },
               ),
 
@@ -411,20 +415,20 @@ class _LandingState extends State<Landing> {
                     blindsCondition = condition;
                   });
                   _savePreference(
-                      'blindsCondition', condition!); // Save preference
+                      propertyId,'blindsCondition', condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     blindsDescription = description;
                   });
                   _savePreference(
-                      'blindsDescription', description!); // Save preference
+                      propertyId,'blindsDescription', description!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     blindsImages.add(imagePath);
                   });
-                  _savePreferenceList('blindsImages', blindsImages);
+                  _savePreferenceList(propertyId,'blindsImages', blindsImages);
                 },
               ),
 
@@ -439,13 +443,13 @@ class _LandingState extends State<Landing> {
                     lightSwitchesCondition = condition;
                   });
                   _savePreference(
-                      'lightSwitchesCondition', condition!); // Save preference
+                     propertyId, 'lightSwitchesCondition', condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     lightSwitchesDescription = description;
                   });
-                  _savePreference('lightSwitchesDescription',
+                  _savePreference(propertyId,'lightSwitchesDescription',
                       description!); // Save preference
                 },
                 onImageAdded: (imagePath) {
@@ -453,7 +457,7 @@ class _LandingState extends State<Landing> {
                     lightSwitchesImages.add(imagePath);
                   });
                   _savePreferenceList(
-                      'lightSwitchesImages', lightSwitchesImages);
+                      propertyId,'lightSwitchesImages', lightSwitchesImages);
                 },
               ),
 
@@ -468,20 +472,20 @@ class _LandingState extends State<Landing> {
                     socketsCondition = condition;
                   });
                   _savePreference(
-                      'socketsCondition', condition!); // Save preference
+                     propertyId, 'socketsCondition', condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     socketsDescription = description;
                   });
                   _savePreference(
-                      'socketsDescription', description!); // Save preference
+                     propertyId, 'socketsDescription', description!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     socketsImages.add(imagePath);
                   });
-                  _savePreferenceList('socketsImages', socketsImages);
+                  _savePreferenceList(propertyId,'socketsImages', socketsImages);
                 },
               ),
 
@@ -496,20 +500,20 @@ class _LandingState extends State<Landing> {
                     flooringCondition = condition;
                   });
                   _savePreference(
-                      'flooringCondition', condition!); // Save preference
+                     propertyId, 'flooringCondition', condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     flooringDescription = description;
                   });
                   _savePreference(
-                      'flooringDescription', description!); // Save preference
+                      propertyId,'flooringDescription', description!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     flooringImages.add(imagePath);
                   });
-                  _savePreferenceList('flooringImages', flooringImages);
+                  _savePreferenceList(propertyId,'flooringImages', flooringImages);
                 },
               ),
 
@@ -523,14 +527,14 @@ class _LandingState extends State<Landing> {
                   setState(() {
                     additionalItemsCondition = condition;
                   });
-                  _savePreference('additionalItemsCondition',
+                  _savePreference(propertyId,'additionalItemsCondition',
                       condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     additionalItemsDescription = description;
                   });
-                  _savePreference('additionalItemsDescription',
+                  _savePreference(propertyId,'additionalItemsDescription',
                       description!); // Save preference
                 },
                 onImageAdded: (imagePath) {
@@ -538,7 +542,7 @@ class _LandingState extends State<Landing> {
                     additionalItemsImages.add(imagePath);
                   });
                   _savePreferenceList(
-                      'additionalItemsImages', additionalItemsImages);
+                      propertyId,'additionalItemsImages', additionalItemsImages);
                 },
               ),
 

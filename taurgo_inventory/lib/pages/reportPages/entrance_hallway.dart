@@ -13,138 +13,142 @@ import '../../widgets/add_action.dart';
 
 class EntranceHallway extends StatefulWidget {
   final List<File>? capturedImages;
-
-  const EntranceHallway({super.key, this.capturedImages});
+  final String propertyId;
+  const EntranceHallway({super.key, this.capturedImages, required this.propertyId});
 
   @override
   State<EntranceHallway> createState() => _EntranceHallwayState();
 }
 
 class _EntranceHallwayState extends State<EntranceHallway> {
-  String? doorCondition;
-  String? doorLocation;
-  String? doorFrameCondition;
-  String? doorFrameLocation;
-  String? ceilingCondition;
-  String? ceilingLocation;
-  String? lightingCondition;
-  String? lightingLocation;
-  String? wallsCondition;
-  String? wallsLocation;
-  String? skirtingCondition;
-  String? skirtingLocation;
-  String? windowSillCondition;
-  String? windowSillLocation;
-  String? curtainsCondition;
-  String? curtainsLocation;
-  String? blindsCondition;
-  String? blindsLocation;
-  String? lightSwitchesCondition;
-  String? lightSwitchesLocation;
-  String? socketsCondition;
-  String? socketsLocation;
-  String? flooringCondition;
-  String? flooringLocation;
-  String? additionalItemsCondition;
-  String? additionalItemsLocation;
-  String? doorImagePaths;
-  String? doorFrameImagePaths;
-  String? ceilingImagePaths;
-  String? lightingImagePaths;
-  String? wallsImagePaths;
-  String? skirtingImagePaths;
-  String? windowSillImagePaths;
-  String? curtainsImagePaths;
-  String? blindsImagePaths;
-  String? lightSwitchesImagePaths;
-  String? socketsImagePaths;
-  String? flooringImagePaths;
-  String? additionalItemsImagePaths;
+  String? entranceDoorCondition;
+  String? entranceDoorLocation;
+  String? entranceDoorFrameCondition;
+  String? entranceDoorFrameLocation;
+  String? entranceCeilingCondition;
+  String? entranceCeilingLocation;
+  String? entranceLightingCondition;
+  String? entranceLightingLocation;
+  String? entranceWallsCondition;
+  String? entranceWallsLocation;
+  String? entranceSkirtingCondition;
+  String? entranceSkirtingLocation;
+  String? entranceWindowSillCondition;
+  String? entranceWindowSillLocation;
+  String? entranceCurtainsCondition;
+  String? entranceCurtainsLocation;
+  String? entranceBlindsCondition;
+  String? entranceBlindsLocation;
+  String? entranceLightSwitchesCondition;
+  String? entranceLightSwitchesLocation;
+  String? entranceSocketsCondition;
+  String? entranceSocketsLocation;
+  String? entranceFlooringCondition;
+  String? entranceFlooringLocation;
+  String? entranceAdditionalItemsCondition;
+  String? entranceAdditionalItemsLocation;
+  // String? entranceDoorImagePaths;
+  // String? doorFrameImagePaths;
+  // String? ceilingImagePaths;
+  // String? lightingImagePaths;
+  // String? wallsImagePaths;
+  // String? skirtingImagePaths;
+  // String? windowSillImagePaths;
+  // String? curtainsImagePaths;
+  // String? blindsImagePaths;
+  // String? lightSwitchesImagePaths;
+  // String? socketsImagePaths;
+  // String? flooringImagePaths;
+  // String? additionalItemsImagePaths;
 
-  List<String> doorImages = [];
-  List<String> doorFrameImages = [];
-  List<String> ceilingImages = [];
-  List<String> lightingImages = [];
-  List<String> wallsImages = [];
-  List<String> skirtingImages = [];
-  List<String> windowSillImages = [];
-  List<String> curtainsImages = [];
-  List<String> blindsImages = [];
-  List<String> lightSwitchesImages = [];
-  List<String> socketsImages = [];
-  List<String> flooringImages = [];
-  List<String> additionalItemsImages = [];
+  List<String> entranceDoorImages = [];
+  List<String> entranceDoorFrameImages = [];
+  List<String> entranceCeilingImages = [];
+  List<String> entranceLightingImages = [];
+  List<String> entranceWallsImages = [];
+  List<String> entranceSkirtingImages = [];
+  List<String> entranceWindowSillImages = [];
+  List<String> entranceCurtainsImages = [];
+  List<String> entranceBlindsImages = [];
+  List<String> entranceLightSwitchesImages = [];
+  List<String> entranceSocketsImages = [];
+  List<String> entranceFlooringImages = [];
+  List<String> entranceAdditionalItemsImages = [];
   late List<File> capturedImages;
 
-  @override
+   @override
   void initState() {
     super.initState();
     capturedImages = widget.capturedImages ?? [];
-    _loadPreferences(); // Load the saved preferences when the state is initialized
+    print("Property Id - SOC${widget.propertyId}");
+    _loadPreferences(widget.propertyId);
+    // Load the saved preferences when the state is initialized
   }
 
   // Function to load preferences
-  Future<void> _loadPreferences() async {
+  Future<void> _loadPreferences(String propertyId) async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      doorCondition = prefs.getString('doorCondition');
-      doorLocation = prefs.getString('doorLocation');
-      doorFrameCondition = prefs.getString('doorFrameCondition');
-      doorFrameLocation = prefs.getString('doorFrameLocation');
-      ceilingCondition = prefs.getString('ceilingCondition');
-      ceilingLocation = prefs.getString('ceilingLocation');
-      lightingCondition = prefs.getString('lightingCondition');
-      lightingLocation = prefs.getString('lightingLocation');
-      wallsCondition = prefs.getString('wallsCondition');
-      wallsLocation = prefs.getString('wallsLocation');
-      skirtingCondition = prefs.getString('skirtingCondition');
-      skirtingLocation = prefs.getString('skirtingLocation');
-      windowSillCondition = prefs.getString('windowSillCondition');
-      windowSillLocation = prefs.getString('windowSillLocation');
-      curtainsCondition = prefs.getString('curtainsCondition');
-      curtainsLocation = prefs.getString('curtainsLocation');
-      blindsCondition = prefs.getString('blindsCondition');
-      blindsLocation = prefs.getString('blindsLocation');
-      lightSwitchesCondition = prefs.getString('lightSwitchesCondition');
-      lightSwitchesLocation = prefs.getString('lightSwitchesLocation');
-      socketsCondition = prefs.getString('socketsCondition');
-      socketsLocation = prefs.getString('socketsLocation');
-      flooringCondition = prefs.getString('flooringCondition');
-      flooringLocation = prefs.getString('flooringLocation');
-      additionalItemsCondition = prefs.getString('additionalItemsCondition');
-      additionalItemsLocation = prefs.getString('additionalItemsLocation');
+      entranceDoorCondition = prefs.getString('doorCondition_${propertyId}');
+      entranceDoorLocation = prefs.getString('doorLocation_${propertyId}');
+      entranceDoorFrameCondition = prefs.getString('doorFrameCondition_${propertyId}');
+      entranceDoorFrameLocation = prefs.getString('doorFrameLocation_${propertyId}');
+      entranceCeilingCondition = prefs.getString('ceilingCondition_${propertyId}');
+      entranceCeilingLocation = prefs.getString('ceilingLocation_${propertyId}');
+      entranceLightingCondition = prefs.getString('lightingCondition_${propertyId}');
+      entranceLightingLocation = prefs.getString('lightingLocation_${propertyId}');
+      entranceWallsCondition = prefs.getString('wallsCondition_${propertyId}');
+      entranceWallsLocation = prefs.getString('wallsLocation_${propertyId}');
+      entranceSkirtingCondition = prefs.getString('skirtingCondition_${propertyId}');
+      entranceSkirtingLocation = prefs.getString('skirtingLocation_${propertyId}');
+      entranceWindowSillCondition = prefs.getString('windowSillCondition_${propertyId}');
+      entranceWindowSillLocation = prefs.getString('windowSillLocation_${propertyId}');
+      entranceCurtainsCondition = prefs.getString('curtainsCondition_${propertyId}');
+      entranceCurtainsLocation = prefs.getString('curtainsLocation_${propertyId}');
+      entranceBlindsCondition = prefs.getString('blindsCondition_${propertyId}');
+      entranceBlindsLocation = prefs.getString('blindsLocation_${propertyId}');
+      entranceLightSwitchesCondition = prefs.getString('lightSwitchesCondition_${propertyId}');
+      entranceLightSwitchesLocation = prefs.getString('lightSwitchesLocation_${propertyId}');
+      entranceSocketsCondition = prefs.getString('socketsCondition_${propertyId}');
+      entranceSocketsLocation = prefs.getString('socketsLocation_${propertyId}');
+      entranceFlooringCondition = prefs.getString('flooringCondition_${propertyId}');
+      entranceFlooringLocation = prefs.getString('flooringLocation_${propertyId}');
+      entranceAdditionalItemsCondition = prefs.getString('additionalItemsCondition_${propertyId}');
+      entranceAdditionalItemsLocation = prefs.getString('additionalItemsLocation_${propertyId}');
 
-      doorImages = prefs.getStringList('doorImages') ?? [];
-      doorFrameImages = prefs.getStringList('doorFrameImages') ?? [];
-      ceilingImages = prefs.getStringList('ceilingImages') ?? [];
-      lightingImages = prefs.getStringList('lightingImages') ?? [];
-      wallsImages = prefs.getStringList('wallsImages') ?? [];
-      skirtingImages = prefs.getStringList('skirtingImages') ?? [];
-      windowSillImages = prefs.getStringList('windowSillImages') ?? [];
-      curtainsImages = prefs.getStringList('curtainsImages') ?? [];
-      blindsImages = prefs.getStringList('blindsImages') ?? [];
-      lightSwitchesImages = prefs.getStringList('lightSwitchesImages') ?? [];
-      socketsImages = prefs.getStringList('socketsImages') ?? [];
-      flooringImages = prefs.getStringList('flooringImages') ?? [];
-      additionalItemsImages =
-          prefs.getStringList('additionalItemsImages') ?? [];
+      entranceDoorImages = prefs.getStringList('doorImages_${propertyId}') ?? [];
+      entranceDoorFrameImages = prefs.getStringList('doorFrameImages_${propertyId}') ?? [];
+      entranceCeilingImages = prefs.getStringList('ceilingImages_${propertyId}') ?? [];
+      entranceLightingImages = prefs.getStringList('lightingImages_${propertyId}') ?? [];
+      entranceWallsImages = prefs.getStringList('wallsImages_${propertyId}') ?? [];
+      entranceSkirtingImages = prefs.getStringList('skirtingImages_${propertyId}') ?? [];
+      entranceWindowSillImages = prefs.getStringList('windowSillImages_${propertyId}') ?? [];
+      entranceCurtainsImages = prefs.getStringList('curtainsImages_${propertyId}') ?? [];
+      entranceBlindsImages = prefs.getStringList('blindsImages_${propertyId}') ?? [];
+      entranceLightSwitchesImages = prefs.getStringList('lightSwitchesImages_${propertyId}') ?? [];
+      entranceSocketsImages = prefs.getStringList('socketsImages_${propertyId}') ?? [];
+      entranceFlooringImages = prefs.getStringList('flooringImages_${propertyId}') ?? [];
+      entranceAdditionalItemsImages =
+          prefs.getStringList('additionalItemsImages_${propertyId}') ?? [];
     });
   }
 
   // Function to save a preference
-  Future<void> _savePreference(String key, String? value) async {
+ Future<void> _savePreference(String propertyId, String key, String value)
+  async {
     final prefs = await SharedPreferences.getInstance();
-    prefs.setString(key, value ?? '');
+    prefs.setString('${key}_$propertyId', value);
   }
 
-  Future<void> _savePreferenceList(String key, List<String> value) async {
+  Future<void> _savePreferenceList(String propertyId, String key, List<String> value) async {
     final prefs = await SharedPreferences.getInstance();
-    prefs.setStringList(key, value);
+    prefs.setStringList('${key}_$propertyId', value);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+     String propertyId = widget.propertyId;
+    return PopScope(child: Scaffold(
       appBar: AppBar(
         title: Text(
           'Entrance Hallway',
@@ -181,371 +185,371 @@ class _EntranceHallwayState extends State<EntranceHallway> {
               // Door
               ConditionItem(
                 name: "Door",
-                condition: doorCondition,
-                location: doorLocation,
-                images: doorImages,
+                condition: entranceDoorCondition,
+                location: entranceDoorLocation,
+                images: entranceDoorImages,
                 onConditionSelected: (condition) {
                   setState(() {
-                    doorCondition = condition;
+                    entranceDoorCondition = condition;
                   });
                   _savePreference(
-                      'doorCondition', condition); // Save preference
+                      propertyId,'doorCondition', condition!); // Save preference
                 },
                 onLocationSelected: (location) {
                   setState(() {
-                    doorLocation = location;
+                    entranceDoorLocation = location;
                   });
-                  _savePreference('doorLocation', location); // Save preference
+                  _savePreference(propertyId,'doorLocation', location!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
-                    doorImages.add(imagePath);
+                    entranceDoorImages.add(imagePath);
                   });
-                  _savePreferenceList('doorImages', doorImages);
+                  _savePreferenceList(propertyId,'doorImages', entranceDoorImages);
                 },
               ),
 
               // Door Frame
               ConditionItem(
                 name: "Door Frame",
-                condition: doorFrameCondition,
-                location: doorFrameLocation,
-                images: doorFrameImages,
+                condition: entranceDoorFrameCondition,
+                location: entranceDoorFrameLocation,
+                images: entranceDoorFrameImages,
                 onConditionSelected: (condition) {
                   setState(() {
-                    doorFrameCondition = condition;
+                    entranceDoorFrameCondition = condition;
                   });
                   _savePreference(
-                      'doorFrameCondition', condition); // Save preference
+                      propertyId,'doorFrameCondition', condition!); // Save preference
                 },
                 onLocationSelected: (location) {
                   setState(() {
-                    doorFrameLocation = location;
+                    entranceDoorFrameLocation = location;
                   });
                   _savePreference(
-                      'doorFrameLocation', location); // Save preference
+                      propertyId,'doorFrameLocation', location!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
-                    doorFrameImages.add(imagePath);
+                    entranceDoorFrameImages.add(imagePath);
                   });
-                  _savePreferenceList('doorFrameImages', doorFrameImages);
+                  _savePreferenceList(propertyId,'doorFrameImages', entranceDoorFrameImages);
                 },
               ),
 
               // Ceiling
               ConditionItem(
                 name: "Ceiling",
-                condition: ceilingCondition,
-                location: ceilingLocation,
-                images: ceilingImages,
+                condition: entranceCeilingCondition,
+                location: entranceCeilingLocation,
+                images: entranceCeilingImages,
                 onConditionSelected: (condition) {
                   setState(() {
-                    ceilingCondition = condition;
+                    entranceCeilingCondition = condition;
                   });
                   _savePreference(
-                      'ceilingCondition', condition); // Save preference
+                      propertyId, 'ceilingCondition', condition!); // Save preference
                 },
                 onLocationSelected: (location) {
                   setState(() {
-                    ceilingLocation = location;
+                    entranceCeilingLocation = location;
                   });
                   _savePreference(
-                      'ceilingLocation', location); // Save preference
+                      propertyId,'ceilingLocation', location!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
-                    ceilingImages.add(imagePath);
+                    entranceCeilingImages.add(imagePath);
                   });
-                  _savePreferenceList('ceilingImages', ceilingImages);
+                  _savePreferenceList(propertyId,'ceilingImages', entranceCeilingImages);
                 },
               ),
 
               // Lighting
               ConditionItem(
                 name: "Lighting",
-                condition: lightingCondition,
-                location: lightingLocation,
-                images: lightingImages,
+                condition: entranceLightingCondition,
+                location: entranceLightingLocation,
+                images: entranceLightingImages,
                 onConditionSelected: (condition) {
                   setState(() {
-                    lightingCondition = condition;
+                    entranceLightingCondition = condition;
                   });
                   _savePreference(
-                      'lightingCondition', condition); // Save preference
+                      propertyId,'lightingCondition', condition!); // Save preference
                 },
                 onLocationSelected: (location) {
                   setState(() {
-                    lightingLocation = location;
+                    entranceLightingLocation = location;
                   });
                   _savePreference(
-                      'lightingLocation', location); // Save preference
+                      propertyId,'lightingLocation', location!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
-                    lightingImages.add(imagePath);
+                    entranceLightingImages.add(imagePath);
                   });
-                  _savePreferenceList('lightingImages', lightingImages);
+                  _savePreferenceList(propertyId,'lightingImages', entranceLightingImages);
                 },
               ),
 
               // Walls
               ConditionItem(
                 name: "Walls",
-                condition: wallsCondition,
-                location: wallsLocation,
-                images: wallsImages,
+                condition: entranceWallsCondition,
+                location: entranceWallsLocation,
+                images: entranceWallsImages,
                 onConditionSelected: (condition) {
                   setState(() {
-                    wallsCondition = condition;
+                    entranceWallsCondition = condition;
                   });
                   _savePreference(
-                      'wallsCondition', condition); // Save preference
+                      propertyId, 'wallsCondition', condition!); // Save preference
                 },
                 onLocationSelected: (location) {
                   setState(() {
-                    wallsLocation = location;
+                    entranceWallsLocation = location;
                   });
-                  _savePreference('wallsLocation', location); // Save preference
+                  _savePreference(propertyId,'wallsLocation', location!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
-                    wallsImages.add(imagePath);
+                    entranceWallsImages.add(imagePath);
                   });
-                  _savePreferenceList('wallsImages', wallsImages);
+                  _savePreferenceList(propertyId,'wallsImages', entranceWallsImages);
                 },
               ),
 
               // Skirting
               ConditionItem(
                 name: "Skirting",
-                condition: skirtingCondition,
-                location: skirtingLocation,
-                images: skirtingImages,
+                condition: entranceSkirtingCondition,
+                location: entranceSkirtingLocation,
+                images: entranceSkirtingImages,
                 onConditionSelected: (condition) {
                   setState(() {
-                    skirtingCondition = condition;
+                    entranceSkirtingCondition = condition;
                   });
                   _savePreference(
-                      'skirtingCondition', condition); // Save preference
+                      propertyId, 'skirtingCondition', condition!); // Save preference
                 },
                 onLocationSelected: (location) {
                   setState(() {
-                    skirtingLocation = location;
+                    entranceSkirtingLocation = location;
                   });
                   _savePreference(
-                      'skirtingLocation', location); // Save preference
+                      propertyId, 'skirtingLocation', location!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
-                    skirtingImages.add(imagePath);
+                    entranceSkirtingImages.add(imagePath);
                   });
-                  _savePreferenceList('skirtingImages', skirtingImages);
+                  _savePreferenceList(propertyId,'skirtingImages', entranceSkirtingImages);
                 },
               ),
 
               // Window Sill
               ConditionItem(
                 name: "Window Sill",
-                condition: windowSillCondition,
-                location: windowSillLocation,
-                images: windowSillImages,
+                condition: entranceWindowSillCondition,
+                location: entranceWindowSillLocation,
+                images: entranceWindowSillImages,
                 onConditionSelected: (condition) {
                   setState(() {
-                    windowSillCondition = condition;
+                    entranceWindowSillCondition = condition;
                   });
                   _savePreference(
-                      'windowSillCondition', condition); // Save preference
+                      propertyId, 'windowSillCondition', condition!); // Save preference
                 },
                 onLocationSelected: (location) {
                   setState(() {
-                    windowSillLocation = location;
+                    entranceWindowSillLocation = location;
                   });
                   _savePreference(
-                      'windowSillLocation', location); // Save preference
+                      propertyId, 'windowSillLocation', location!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
-                    windowSillImages.add(imagePath);
+                    entranceWindowSillImages.add(imagePath);
                   });
-                  _savePreferenceList('windowSillImages', windowSillImages);
+                  _savePreferenceList(propertyId,'windowSillImages', entranceWindowSillImages);
                 },
               ),
 
               // Curtains
               ConditionItem(
                 name: "Curtains",
-                condition: curtainsCondition,
-                location: curtainsLocation,
-                images: curtainsImages,
+                condition: entranceCurtainsCondition,
+                location: entranceCurtainsLocation,
+                images: entranceCurtainsImages,
                 onConditionSelected: (condition) {
                   setState(() {
-                    curtainsCondition = condition;
+                    entranceCurtainsCondition = condition;
                   });
                   _savePreference(
-                      'curtainsCondition', condition); // Save preference
+                      propertyId, 'curtainsCondition', condition!); // Save preference
                 },
                 onLocationSelected: (location) {
                   setState(() {
-                    curtainsLocation = location;
+                    entranceCurtainsLocation = location;
                   });
                   _savePreference(
-                      'curtainsLocation', location); // Save preference
+                      propertyId,'curtainsLocation', location!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
-                    curtainsImages.add(imagePath);
+                    entranceCurtainsImages.add(imagePath);
                   });
-                  _savePreferenceList('curtainsImages', curtainsImages);
+                  _savePreferenceList(propertyId,'curtainsImages', entranceCurtainsImages);
                 },
               ),
 
               // Blinds
               ConditionItem(
                 name: "Blinds",
-                condition: blindsCondition,
-                location: blindsLocation,
-                images: blindsImages,
+                condition: entranceBlindsCondition,
+                location: entranceBlindsLocation,
+                images: entranceBlindsImages,
                 onConditionSelected: (condition) {
                   setState(() {
-                    blindsCondition = condition;
+                    entranceBlindsCondition = condition;
                   });
                   _savePreference(
-                      'blindsCondition', condition); // Save preference
+                      propertyId,'blindsCondition', condition!); // Save preference
                 },
                 onLocationSelected: (location) {
                   setState(() {
-                    blindsLocation = location;
+                    entranceBlindsLocation = location;
                   });
                   _savePreference(
-                      'blindsLocation', location); // Save preference
+                      propertyId,'blindsLocation', location!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
-                    blindsImages.add(imagePath);
+                    entranceBlindsImages.add(imagePath);
                   });
-                  _savePreferenceList('blindsImages', blindsImages);
+                  _savePreferenceList(propertyId,'blindsImages', entranceBlindsImages);
                 },
               ),
 
               // Light Switches
               ConditionItem(
                 name: "Light Switches",
-                condition: lightSwitchesCondition,
-                location: lightSwitchesLocation,
-                images: lightSwitchesImages,
+                condition: entranceLightSwitchesCondition,
+                location: entranceLightSwitchesLocation,
+                images: entranceLightSwitchesImages,
                 onConditionSelected: (condition) {
                   setState(() {
-                    lightSwitchesCondition = condition;
+                    entranceLightSwitchesCondition = condition;
                   });
                   _savePreference(
-                      'lightSwitchesCondition', condition); // Save preference
+                      propertyId, 'lightSwitchesCondition', condition!); // Save preference
                 },
                 onLocationSelected: (location) {
                   setState(() {
-                    lightSwitchesLocation = location;
+                    entranceLightSwitchesLocation = location;
                   });
                   _savePreference(
-                      'lightSwitchesLocation', location); // Save preference
+                      propertyId,'lightSwitchesLocation', location!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
-                    lightSwitchesImages.add(imagePath);
+                    entranceLightSwitchesImages.add(imagePath);
                   });
                   _savePreferenceList(
-                      'lightSwitchesImages', lightSwitchesImages);
+                      propertyId, 'lightSwitchesImages', entranceLightSwitchesImages);
                 },
               ),
 
               // Sockets
               ConditionItem(
                 name: "Sockets",
-                condition: socketsCondition,
-                location: socketsLocation,
-                images: socketsImages,
+                condition: entranceSocketsCondition,
+                location: entranceSocketsLocation,
+                images: entranceSocketsImages,
                 onConditionSelected: (condition) {
                   setState(() {
-                    socketsCondition = condition;
+                    entranceSocketsCondition = condition;
                   });
                   _savePreference(
-                      'socketsCondition', condition); // Save preference
+                      propertyId,'socketsCondition', condition!); // Save preference
                 },
                 onLocationSelected: (location) {
                   setState(() {
-                    socketsLocation = location;
+                    entranceSocketsLocation = location;
                   });
                   _savePreference(
-                      'socketsLocation', location); // Save preference
+                      propertyId, 'socketsLocation', location!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
-                    socketsImages.add(imagePath);
+                    entranceSocketsImages.add(imagePath);
                   });
-                  _savePreferenceList('socketsImages', socketsImages);
+                  _savePreferenceList(propertyId,'socketsImages', entranceSocketsImages);
                 },
               ),
 
               // Flooring
               ConditionItem(
                 name: "Flooring",
-                condition: flooringCondition,
-                location: flooringLocation,
-                images: flooringImages,
+                condition: entranceFlooringCondition,
+                location: entranceFlooringLocation,
+                images: entranceFlooringImages,
                 onConditionSelected: (condition) {
                   setState(() {
-                    flooringCondition = condition;
+                    entranceFlooringCondition = condition;
                   });
                   _savePreference(
-                      'flooringCondition', condition); // Save preference
+                      propertyId,  'flooringCondition', condition!); // Save preference
                 },
                 onLocationSelected: (location) {
                   setState(() {
-                    flooringLocation = location;
+                    entranceFlooringLocation = location;
                   });
                   _savePreference(
-                      'flooringLocation', location); // Save preference
+                      propertyId, 'flooringLocation', location!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
-                    flooringImages.add(imagePath);
+                    entranceFlooringImages.add(imagePath);
                   });
-                  _savePreferenceList('flooringImages', flooringImages);
+                  _savePreferenceList(propertyId,'flooringImages', entranceFlooringImages);
                 },
               ),
 
               // Additional Items
               ConditionItem(
                 name: "Additional Items",
-                condition: additionalItemsCondition,
-                location: additionalItemsLocation,
-                images: additionalItemsImages,
+                condition: entranceAdditionalItemsCondition,
+                location: entranceAdditionalItemsLocation,
+                images: entranceAdditionalItemsImages,
                 onConditionSelected: (condition) {
                   setState(() {
-                    additionalItemsCondition = condition;
+                    entranceAdditionalItemsCondition = condition;
                   });
                   _savePreference(
-                      'additionalItemsCondition', condition); // Save preference
+                      propertyId,'additionalItemsCondition', condition!); // Save preference
                 },
                 onLocationSelected: (location) {
                   setState(() {
-                    additionalItemsLocation = location;
+                    entranceAdditionalItemsLocation = location;
                   });
                   _savePreference(
-                      'additionalItemsLocation', location); // Save preference
+                      propertyId, 'additionalItemsLocation', location!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
-                    additionalItemsImages.add(imagePath);
+                    entranceAdditionalItemsImages.add(imagePath);
                   });
                   _savePreferenceList(
-                      'additionalItemsImages', additionalItemsImages);
+                      propertyId,'additionalItemsImages', entranceAdditionalItemsImages);
                 },
               ),
             ],
           ),
         ),
       ),
-    );
+    ),canPop: false,);
   }
 }
 
@@ -604,21 +608,21 @@ class ConditionItem extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  IconButton(
-                    icon: Icon(
-                      Icons.warning_amber,
-                      size: 24,
-                      color: kAccentColor,
-                    ),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => AddAction(),
-                        ),
-                      );
-                    },
-                  ),
+                  // IconButton(
+                  //   icon: Icon(
+                  //     Icons.warning_amber,
+                  //     size: 24,
+                  //     color: kAccentColor,
+                  //   ),
+                  //   onPressed: () {
+                  //     Navigator.push(
+                  //       context,
+                  //       MaterialPageRoute(
+                  //         builder: (context) => AddAction(),
+                  //       ),
+                  //     );
+                  //   },
+                  // ),
                   IconButton(
                     icon: Icon(
                       Icons.camera_alt_outlined,
@@ -678,35 +682,35 @@ class ConditionItem extends StatelessWidget {
           SizedBox(
             height: 12,
           ),
-          GestureDetector(
-            onTap: () async {
-              final result = await Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ConditionDetails(
-                    initialCondition: location,
-                    type: name,
-                  ),
-                ),
-              );
-
-              if (result != null) {
-                onLocationSelected(result);
-              }
-            },
-            child: Text(
-              location?.isNotEmpty == true ? location! : "Location",
-              style: TextStyle(
-                fontSize: 12.0,
-                fontWeight: FontWeight.w700,
-                color: kPrimaryTextColourTwo,
-                fontStyle: FontStyle.italic,
-              ),
-            ),
-          ),
-          SizedBox(
-            height: 12,
-          ),
+          // GestureDetector(
+          //   onTap: () async {
+          //     final result = await Navigator.push(
+          //       context,
+          //       MaterialPageRoute(
+          //         builder: (context) => ConditionDetails(
+          //           initialCondition: location,
+          //           type: name,
+          //         ),
+          //       ),
+          //     );
+          //
+          //     if (result != null) {
+          //       onLocationSelected(result);
+          //     }
+          //   },
+          //   child: Text(
+          //     location?.isNotEmpty == true ? location! : "Location",
+          //     style: TextStyle(
+          //       fontSize: 12.0,
+          //       fontWeight: FontWeight.w700,
+          //       color: kPrimaryTextColourTwo,
+          //       fontStyle: FontStyle.italic,
+          //     ),
+          //   ),
+          // ),
+          // SizedBox(
+          //   height: 12,
+          // ),
           images.isNotEmpty
               ? Wrap(
                   spacing: 8.0,

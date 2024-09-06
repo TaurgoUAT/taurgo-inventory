@@ -70,6 +70,189 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
   List<String> windowImages = [];
   List<String> woodworkImages = [];
 
+  //EV Charger
+  String? evChargerDescription;
+  List<String> evChargerImages = [];
+
+  //Keys
+  String? yaleLocation;
+  String? yaleReading;
+  String? morticeLocation;
+  String? morticeReading;
+  String? windowLockLocation;
+  String? windowLockReading;
+  String? gasMeterLocation;
+  String? gasMeterReading;
+  String? carPassLocation;
+  String? carPassReading;
+  String? remoteLocation;
+  String? remoteReading;
+  String? otherLocation;
+  String? otherReading;
+  List<String> yaleImages = [];
+  List<String> morticeImages = [];
+  List<String> windowLockImages = [];
+  List<String> gasMeterImages = [];
+  List<String> carPassImages = [];
+  List<String> remoteImages = [];
+  List<String> otherImages = [];
+
+  //Keys Handed Over
+  String? yale;
+  String? mortice;
+  String? other;
+  List<String> keysHandOverYaleImages = [];
+  List<String> keysHandOverMorticeImages = [];
+  List<String> keysHandOverOtherImages = [];
+
+  //Health and Safety
+  String? smokeAlarmCondition;
+  String? smokeAlarmDescription;
+  String? heatSensorCondition;
+  String? heatSensorDescription;
+  String? carbonMonoxideCondition;
+  String? carbonMonoxideDescription;
+  String? smokeAlarmImagePath;
+  String? heatSensorImagePath;
+  String? carbonMonxideImagePath;
+  List<String> smokeAlarmImages = [];
+  List<String> heatSensorImages = [];
+  List<String> carbonMonxideImages = [];
+
+  //Front Garden
+  String? driveWayCondition;
+  String? driveWayDescription;
+  String? outsideLightingCondition;
+  String? outsideLightingDescription;
+  String? additionalItemsCondition;
+  String? additionalItemsDescription;
+  List<String> driveWayImages = [];
+  List<String> outsideLightingImages = [];
+  List<String> additionalItemsImages = [];
+
+  //Garage
+  String? newdoor;
+  String? garageDoorCondition;
+  String? garageDoorDescription;
+  String? garageDoorFrameCondition;
+  String? garageDoorFrameDescription;
+  String? garageceilingCondition;
+  String? garageceilingDescription;
+  String? garagelightingCondition;
+  String? garagelightingDescription;
+  String? garagewallsCondition;
+  String? garagewallsDescription;
+  String? garageskirtingCondition;
+  String? garageskirtingDescription;
+  String? garagewindowSillCondition;
+  String? garagewindowSillDescription;
+  String? garagecurtainsCondition;
+  String? garagecurtainsDescription;
+  String? garageblindsCondition;
+  String? garageblindsDescription;
+  String? garagelightSwitchesCondition;
+  String? garagelightSwitchesDescription;
+  String? garagesocketsCondition;
+  String? garagesocketsDescription;
+  String? garageflooringCondition;
+  String? garageflooringDescription;
+  String? garageadditionalItemsCondition;
+  String? garageadditionalItemsDescription;
+  String? garagedoorImagePath;
+  String? garagedoorFrameImagePath;
+  String? garageceilingImagePath;
+  String? garagelightingImagePath;
+  String? garagewallsImagePath;
+  String? garageskirtingImagePath;
+  String? garagewindowSillImagePath;
+  String? garagecurtainsImagePath;
+  String? garageblindsImagePath;
+  String? garagelightSwitchesImagePath;
+  String? garagesocketsImagePath;
+  String? garageflooringImagePath;
+  String? garageadditionalItemsImagePath;
+  List<String> garagedoorImages = [];
+  List<String> garagedoorFrameImages = [];
+  List<String> garageceilingImages = [];
+  List<String> garagelightingImages = [];
+  List<String> garagewallsImages = [];
+  List<String> garageskirtingImages = [];
+  List<String> garagewindowSillImages = [];
+  List<String> garagecurtainsImages = [];
+  List<String> garageblindsImages = [];
+  List<String> garagelightSwitchesImages = [];
+  List<String> garagesocketsImages = [];
+  List<String> garageflooringImages = [];
+  List<String> garageadditionalItemsImages = [];
+
+  //Exterior Front
+  String? ExteriorFrontDoorCondition;
+  String? exteriorFrontDoorDescription;
+  String? exteriorFrontDoorFrameCondition;
+  String? exteriorFrontDoorFrameDescription;
+  String? exteriorFrontPorchCondition;
+  String? exteriorFrontPorchDescription;
+  String? exteriorFrontAdditionalItemsCondition;
+  String? exteriorFrontAdditionalItemsDescription;
+  List<String> exteriorFrontDoorImages = [];
+  List<String> exteriorFrontDoorFrameImages = [];
+  List<String> exteriorFrontPorchImages = [];
+  List<String> exteriorFrontAdditionalItemsImages = [];
+
+  //Entrance
+  String? entranceDoorCondition;
+  String? entranceDoorLocation;
+  String? entranceDoorFrameCondition;
+  String? entranceDoorFrameLocation;
+  String? entranceCeilingCondition;
+  String? entranceCeilingLocation;
+  String? entranceLightingCondition;
+  String? entranceLightingLocation;
+  String? entranceWallsCondition;
+  String? entranceWallsLocation;
+  String? entranceSkirtingCondition;
+  String? entranceSkirtingLocation;
+  String? entranceWindowSillCondition;
+  String? entranceWindowSillLocation;
+  String? entranceCurtainsCondition;
+  String? entranceCurtainsLocation;
+  String? entranceBlindsCondition;
+  String? entranceBlindsLocation;
+  String? entranceLightSwitchesCondition;
+  String? entranceLightSwitchesLocation;
+  String? entranceSocketsCondition;
+  String? entranceSocketsLocation;
+  String? entranceFlooringCondition;
+  String? entranceFlooringLocation;
+  String? entranceAdditionalItemsCondition;
+  String? entranceAdditionalItemsLocation;
+  // String? entranceDoorImagePaths;
+  // String? doorFrameImagePaths;
+  // String? ceilingImagePaths;
+  // String? lightingImagePaths;
+  // String? wallsImagePaths;
+  // String? skirtingImagePaths;
+  // String? windowSillImagePaths;
+  // String? curtainsImagePaths;
+  // String? blindsImagePaths;
+  // String? lightSwitchesImagePaths;
+  // String? socketsImagePaths;
+  // String? flooringImagePaths;
+  // String? additionalItemsImagePaths;
+
+  List<String> entranceDoorImages = [];
+  List<String> entranceDoorFrameImages = [];
+  List<String> entranceCeilingImages = [];
+  List<String> entranceLightingImages = [];
+  List<String> entranceWallsImages = [];
+  List<String> entranceSkirtingImages = [];
+  List<String> entranceWindowSillImages = [];
+  List<String> entranceCurtainsImages = [];
+  List<String> entranceBlindsImages = [];
+  List<String> entranceLightSwitchesImages = [];
+  List<String> entranceSocketsImages = [];
+  List<String> entranceFlooringImages = [];
+  List<String> entranceAdditionalItemsImages = [];
   @override
   void initState() {
     super.initState();
@@ -80,13 +263,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
     getSharedPreferencesData();
     print(overview);
     _loadPreferences(widget.propertyId);
-
   }
 
   Future<void> _loadPreferences(String propertyId) async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      overview = prefs.getString('overview_${propertyId}' ?? "N/A") ;
+
+      //SOC
+      overview = prefs.getString('overview_${propertyId}' ?? "N/A");
 
       accessoryCleanliness =
           prefs.getString('accessoryCleanliness_${propertyId}' ?? "N/A");
@@ -128,8 +312,185 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
       woodworkImages =
           prefs.getStringList('woodworkImages_${propertyId}') ?? [];
       print(overview);
+
+      //Ev Charger
+      evChargerDescription = prefs.getString
+        ('evChargerDescription_${propertyId}');
+
+      evChargerImages = prefs.getStringList('evChargerImages_${propertyId}')
+          ?? [];
+
+      //Keys
+      yaleLocation = prefs.getString('yaleLocation_${propertyId}');
+      yaleReading = prefs.getString('yaleReading_${propertyId}');
+      morticeLocation = prefs.getString('morticeLocation_${propertyId}');
+      morticeReading = prefs.getString('morticeReading_${propertyId}');
+      windowLockLocation = prefs.getString('windowLockLocation_${propertyId}');
+      windowLockReading = prefs.getString('windowLockReading_${propertyId}');
+      gasMeterLocation = prefs.getString('gasMeterLocation_${propertyId}');
+      gasMeterReading = prefs.getString('gasMeterReading_${propertyId}');
+      carPassLocation = prefs.getString('carPassLocation_${propertyId}');
+      carPassReading = prefs.getString('carPassReading_${propertyId}');
+      remoteLocation = prefs.getString('remoteLocation_${propertyId}');
+      remoteReading = prefs.getString('remoteReading_${propertyId}');
+      otherLocation = prefs.getString('otherLocation_${propertyId}');
+      otherReading = prefs.getString('otherReading_${propertyId}');
+
+      yaleImages = prefs.getStringList('yaleImages_${propertyId}') ?? [];
+      morticeImages = prefs.getStringList('morticeImages_${propertyId}') ?? [];
+      windowLockImages = prefs.getStringList('windowLockImages_${propertyId}') ?? [];
+      gasMeterImages = prefs.getStringList('gasMeterImages_${propertyId}') ?? [];
+      carPassImages = prefs.getStringList('carPassImages_${propertyId}') ?? [];
+      remoteImages = prefs.getStringList('remoteImages_${propertyId}') ?? [];
+      otherImages = prefs.getStringList('otherImages_${propertyId}') ?? [];
+
+      //Keys Hand Over
+      yale = prefs.getString('yale_${propertyId}');
+      mortice = prefs.getString('mortice_${propertyId}');
+      other = prefs.getString('other_${propertyId}');
+
+      keysHandOverYaleImages = prefs.getStringList
+        ('yaleImages_${propertyId}') ?? [];
+      keysHandOverMorticeImages = prefs.getStringList
+        ('morticeImages_${propertyId}') ?? [];
+      keysHandOverOtherImages = prefs.getStringList
+        ('otherImages_${propertyId}') ?? [];
+
+      //Health and Safety
+      heatSensorCondition = prefs.getString('heatSensorCondition');
+      heatSensorDescription = prefs.getString('heatSensorDescription');
+      smokeAlarmCondition = prefs.getString('smokeAlarmCondition');
+      smokeAlarmDescription = prefs.getString('smokeAlarmDescription');
+      carbonMonoxideCondition = prefs.getString('carbonMonoxideCondition');
+      carbonMonoxideDescription = prefs.getString('carbonMonoxideDescription');
+      smokeAlarmImages = prefs.getStringList('smokeAlarmImages') ?? [];
+      heatSensorImages = prefs.getStringList('heatSensorImages') ?? [];
+      carbonMonxideImages = prefs.getStringList('carbonMonxideImages') ?? [];
+
+      //Front Garden
+      driveWayCondition = prefs.getString('driveWayCondition_${propertyId}');
+      driveWayDescription = prefs.getString('driveWayDescription_${propertyId}');
+      outsideLightingCondition = prefs.getString('outsideLightingCondition_${propertyId}');
+      outsideLightingDescription = prefs.getString('outsideLightingDescription_${propertyId}');
+      additionalItemsCondition = prefs.getString('additionalItemsCondition_${propertyId}');
+      additionalItemsDescription = prefs.getString('additionalItemsDescription_${propertyId}');
+
+      driveWayImages = prefs.getStringList('driveWayImages_${propertyId}') ?? [];
+      outsideLightingImages = prefs.getStringList('outsideLightingImages_${propertyId}') ?? [];
+      additionalItemsImages = prefs.getStringList('additionalItemsImages_${propertyId}') ?? [];
+
+      //Garage
+      newdoor = prefs.getString('newdoor_${propertyId}');
+      garageDoorCondition = prefs.getString('doorCondition_${propertyId}');
+      garageDoorDescription = prefs.getString('doorDescription_${propertyId}');
+      garageDoorFrameCondition = prefs.getString('doorFrameCondition_${propertyId}');
+      garageDoorFrameDescription = prefs.getString('doorFrameDescription_${propertyId}');
+      garageceilingCondition = prefs.getString('ceilingCondition_${propertyId}');
+      garageceilingDescription = prefs.getString('ceilingDescription_${propertyId}');
+      garagelightingCondition = prefs.getString('lightingCondition_${propertyId}');
+      garagelightingDescription = prefs.getString('lightingDescription_${propertyId}');
+      garagewallsCondition = prefs.getString('wallsCondition_${propertyId}');
+      garagewallsDescription = prefs.getString('wallsDescription_${propertyId}');
+      garageskirtingCondition = prefs.getString('skirtingCondition_${propertyId}');
+      garageskirtingDescription = prefs.getString('skirtingDescription_${propertyId}');
+      garagewindowSillCondition = prefs.getString('windowSillCondition_${propertyId}');
+      garagewindowSillDescription = prefs.getString('windowSillDescription_${propertyId}');
+      garagecurtainsCondition = prefs.getString('curtainsCondition_${propertyId}');
+      garagecurtainsDescription = prefs.getString('curtainsDescription_${propertyId}');
+      garageblindsCondition = prefs.getString('blindsCondition_${propertyId}');
+      garageblindsDescription = prefs.getString('blindsDescription_${propertyId}');
+      garagelightSwitchesCondition = prefs.getString('lightSwitchesCondition_${propertyId}');
+      garagelightSwitchesDescription = prefs.getString('lightSwitchesDescription_${propertyId}');
+      garagesocketsCondition = prefs.getString('socketsCondition_${propertyId}');
+      garagesocketsDescription = prefs.getString('socketsDescription_${propertyId}');
+      garageflooringCondition = prefs.getString('flooringCondition_${propertyId}');
+      garageflooringDescription = prefs.getString('flooringDescription_${propertyId}');
+      garageadditionalItemsCondition = prefs.getString('additionalItemsCondition_${propertyId}');
+      garageadditionalItemsDescription =
+          prefs.getString('additionalItemsDescription_${propertyId}');
+
+      garagedoorFrameImages = prefs.getStringList('doorFrameImages_${propertyId}') ?? [];
+      garageceilingImages = prefs.getStringList('ceilingImages_${propertyId}') ?? [];
+      garagelightingImages = prefs.getStringList('lightingImages_${propertyId}') ?? [];
+      garagewallsImages = prefs.getStringList('wallsImages_${propertyId}') ?? [];
+      garageskirtingImages = prefs.getStringList('skirtingImages_${propertyId}') ?? [];
+      garagewindowSillImages = prefs.getStringList('windowSillImages_${propertyId}') ?? [];
+      garagecurtainsImages = prefs.getStringList('curtainsImages_${propertyId}') ?? [];
+      garageblindsImages = prefs.getStringList('blindsImages_${propertyId}') ?? [];
+      garagelightSwitchesImages = prefs.getStringList('lightSwitchesImages_${propertyId}') ?? [];
+      garagesocketsImages = prefs.getStringList('socketsImages_${propertyId}') ?? [];
+      garageflooringImages = prefs.getStringList('flooringImages_${propertyId}') ?? [];
+      garageadditionalItemsImages =
+          prefs.getStringList('additionalItemsImages_${propertyId}') ?? [];
+
+      //Exterior Front
+      ExteriorFrontDoorCondition = prefs.getString('doorCondition');
+      exteriorFrontDoorDescription = prefs.getString('doorDescription');
+      exteriorFrontDoorFrameCondition = prefs.getString('doorFrameCondition');
+      exteriorFrontDoorFrameDescription = prefs.getString('doorFrameDescription');
+      exteriorFrontPorchCondition = prefs.getString('porchCondition');
+      exteriorFrontPorchDescription = prefs.getString('porchDescription');
+      exteriorFrontAdditionalItemsCondition = prefs.getString('additionalItemsCondition');
+      exteriorFrontAdditionalItemsDescription = prefs.getString('additionalItemsDescription');
+
+      exteriorFrontDoorImages = prefs.getStringList('doorImages') ?? [];
+      exteriorFrontDoorFrameImages = prefs.getStringList('doorFrameImages') ?? [];
+      exteriorFrontPorchImages = prefs.getStringList('porchImages') ?? [];
+      exteriorFrontAdditionalItemsImages = prefs.getStringList('additionalItemsImages') ?? [];
+
+      //Entrance
+      entranceDoorCondition = prefs.getString('doorCondition_${propertyId}');
+      entranceDoorLocation = prefs.getString('doorLocation_${propertyId}');
+      entranceDoorFrameCondition = prefs.getString('doorFrameCondition_${propertyId}');
+      entranceDoorFrameLocation = prefs.getString('doorFrameLocation_${propertyId}');
+      entranceCeilingCondition = prefs.getString('ceilingCondition_${propertyId}');
+      entranceCeilingLocation = prefs.getString('ceilingLocation_${propertyId}');
+      entranceLightingCondition = prefs.getString('lightingCondition_${propertyId}');
+      entranceLightingLocation = prefs.getString('lightingLocation_${propertyId}');
+      entranceWallsCondition = prefs.getString('wallsCondition_${propertyId}');
+      entranceWallsLocation = prefs.getString('wallsLocation_${propertyId}');
+      entranceSkirtingCondition = prefs.getString('skirtingCondition_${propertyId}');
+      entranceSkirtingLocation = prefs.getString('skirtingLocation_${propertyId}');
+      entranceWindowSillCondition = prefs.getString('windowSillCondition_${propertyId}');
+      entranceWindowSillLocation = prefs.getString('windowSillLocation_${propertyId}');
+      entranceCurtainsCondition = prefs.getString('curtainsCondition_${propertyId}');
+      entranceCurtainsLocation = prefs.getString('curtainsLocation_${propertyId}');
+      entranceBlindsCondition = prefs.getString('blindsCondition_${propertyId}');
+      entranceBlindsLocation = prefs.getString('blindsLocation_${propertyId}');
+      entranceLightSwitchesCondition = prefs.getString('lightSwitchesCondition_${propertyId}');
+      entranceLightSwitchesLocation = prefs.getString('lightSwitchesLocation_${propertyId}');
+      entranceSocketsCondition = prefs.getString('socketsCondition_${propertyId}');
+      entranceSocketsLocation = prefs.getString('socketsLocation_${propertyId}');
+      entranceFlooringCondition = prefs.getString('flooringCondition_${propertyId}');
+      entranceFlooringLocation = prefs.getString('flooringLocation_${propertyId}');
+      entranceAdditionalItemsCondition = prefs.getString('additionalItemsCondition_${propertyId}');
+      entranceAdditionalItemsLocation = prefs.getString('additionalItemsLocation_${propertyId}');
+
+      entranceDoorImages = prefs.getStringList('doorImages_${propertyId}') ?? [];
+      entranceDoorFrameImages = prefs.getStringList('doorFrameImages_${propertyId}') ?? [];
+      entranceCeilingImages = prefs.getStringList('ceilingImages_${propertyId}') ?? [];
+      entranceLightingImages = prefs.getStringList('lightingImages_${propertyId}') ?? [];
+      entranceWallsImages = prefs.getStringList('wallsImages_${propertyId}') ?? [];
+      entranceSkirtingImages = prefs.getStringList('skirtingImages_${propertyId}') ?? [];
+      entranceWindowSillImages = prefs.getStringList('windowSillImages_${propertyId}') ?? [];
+      entranceCurtainsImages = prefs.getStringList('curtainsImages_${propertyId}') ?? [];
+      entranceBlindsImages = prefs.getStringList('blindsImages_${propertyId}') ?? [];
+      entranceLightSwitchesImages = prefs.getStringList('lightSwitchesImages_${propertyId}') ?? [];
+      entranceSocketsImages = prefs.getStringList('socketsImages_${propertyId}') ?? [];
+      entranceFlooringImages = prefs.getStringList('flooringImages_${propertyId}') ?? [];
+      entranceAdditionalItemsImages =
+          prefs.getStringList('additionalItemsImages_${propertyId}') ?? [];
     });
   }
+
+  // List<String> getOverviewImages(String propertyId) {
+  //   // Retrieve the image URLs from SharedPreferences
+  //   final prefs = SharedPreferences.getInstance();
+  //   final imageUrls = prefs.getStringList('overviewImages_${propertyId}') ?? [];
+  //
+  //   // Return the list of image URLs
+  //   return imageUrls;
+  // }
 
   late PropertyDto property = PropertyDto(
     id: 'property123',
@@ -159,85 +520,2288 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
       keyReference: '2024-09-01',
       internalNotes: '2024-09-01',
       inspectionReports: [
+        //1 SOC
         InspectionReportDto(
           reportId: 'report001',
           name: 'Schedule of Condition',
           subTypes: [
+            //1.1 Overview - Odours
             SubTypeDto(
               subTypeId: 'subType001',
               subTypeName: 'Overview - Odours',
-              images: ['https://www.loans.com.au/dA/9de8aa8d51/what-factors-affect-property-value.png'],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '', conditionImages: [],
+              images: [overviewImages.toString()],
+              comments: overview ?? 'N/A',
+              feedback: overview ?? 'N/A',
+              conditionImages: [],
             ),
 
-            // SubTypeDto(
-            //   subTypeId: 'subType001',
-            //   subTypeName: 'Overview - Odours',
-            //   images: ['https://www.loans.com.au/dA/9de8aa8d51/what-factors-affect-property-value.png'],
-            //   comments: 'Condition: Good, Additional Comments: Good',
-            //   feedback: '',
-            // ),
-            //
-            // SubTypeDto(
-            //   subTypeId: 'subType001',
-            //   subTypeName: 'Overview - Odours',
-            //   images: ['https://www.loans.com.au/dA/9de8aa8d51/what-factors-affect-property-value.png'],
-            //   comments: 'Condition: Good, Additional Comments: Good',
-            //   feedback: '',
-            // ),
-            //
-            // SubTypeDto(
-            //   subTypeId: 'subType001',
-            //   subTypeName: 'Overview - Odours',
-            //   images: ['https://www.loans.com.au/dA/9de8aa8d51/what-factors-affect-property-value.png'],
-            //   comments: 'Condition: Good, Additional Comments: Good',
-            //   feedback: '',
-            // ),
-            //
-            // SubTypeDto(
-            //   subTypeId: 'subType001',
-            //   subTypeName: 'Overview - Odours',
-            //   images: ['https://www.loans.com.au/dA/9de8aa8d51/what-factors-affect-property-value.png'],
-            //   comments: 'Condition: Good, Additional Comments: Good',
-            //   feedback: '',
-            // ),
-            //
-            // SubTypeDto(
-            //   subTypeId: 'subType001',
-            //   subTypeName: 'Overview - Odours',
-            //   images: ['https://www.loans.com.au/dA/9de8aa8d51/what-factors-affect-property-value.png'],
-            //   comments: 'Condition: Good, Additional Comments: Good',
-            //   feedback: '',
-            // ),
-            //
-            // SubTypeDto(
-            //   subTypeId: 'subType001',
-            //   subTypeName: 'Overview - Odours',
-            //   images: ['https://www.loans.com.au/dA/9de8aa8d51/what-factors-affect-property-value.png'],
-            //   comments: 'Condition: Good, Additional Comments: Good',
-            //   feedback: '',
-            // ),
-            //
-            // SubTypeDto(
-            //   subTypeId: 'subType001',
-            //   subTypeName: 'Overview - Odours',
-            //   images: ['https://www.loans.com.au/dA/9de8aa8d51/what-factors-affect-property-value.png'],
-            //   comments: 'Condition: Good, Additional Comments: Good',
-            //   feedback: '',
-            // ),
-            // SubTypeDto(
-            //   subTypeId: 'subType001',
-            //   subTypeName: 'Overview - Odours',
-            //   images: ['https://www.loans.com.au/dA/9de8aa8d51/what-factors-affect-property-value.png'],
-            //   comments: 'Condition: Good, Additional Comments: Good',
-            //   feedback: '',
-            // ),
+            //1.2 Accessory Cleanliness
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Accessory Cleanliness',
+              images: [accessoryCleanliness.toString()],
+              comments: accessoryCleanliness ?? 'N/A',
+              feedback: accessoryCleanliness ?? 'N/A',
+              conditionImages: [],
+            ),
 
-            // Add more SubTypeDto items as needed
+            //1.3 Window Sill
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Window Sill',
+              images: [windowSill.toString()],
+              comments: windowSill ?? 'N/A',
+              feedback: windowSill ?? 'N/A',
+              conditionImages: [],
+            ),
+
+            //1.4 Carpets
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Carpets',
+              images: [carpets.toString()],
+              comments: carpets ?? 'N/A',
+              feedback: carpets ?? 'N/A',
+              conditionImages: [],
+            ),
+
+            //1.5 Ceilings
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Ceilings',
+              images: [ceilings.toString()],
+              comments: ceilings ?? 'N/A',
+              feedback: ceilings ?? 'N/A',
+              conditionImages: [],
+            ),
+
+            //1.6 Curtains
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Curtains',
+              images: [curtains.toString()],
+              comments: curtains ?? 'N/A',
+              feedback: curtains ?? 'N/A',
+              conditionImages: [],
+            ),
+
+            //1.7 Hard Flooring
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Hard Flooring',
+              images: [hardFlooring.toString()],
+              comments:hardFlooring ?? 'N/A',
+              feedback: hardFlooring ?? 'N/A',
+              conditionImages: [],
+            ),
+
+            //1.8 Kitchen Area
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Kitchen Area',
+              images: [kitchenArea.toString()],
+              comments: kitchenArea ?? 'N/A',
+              feedback: kitchenArea ?? 'N/A',
+              conditionImages: [],
+            ),
+
+            //1.9 Oven
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Oven',
+              images: [oven.toString()],
+              comments: oven ?? 'N/A',
+              feedback: oven ?? 'N/A',
+              conditionImages: [],
+            ),
+
+            //1.10 Mattress
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Mattress',
+              images: [mattress.toString()],
+              comments: mattress ?? 'N/A',
+              feedback: mattress ?? 'N/A',
+              conditionImages: [],
+            ),
+
+            //1.11 Uholstrey
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Uholstrey',
+              images: [upholstrey.toString()],
+              comments: upholstrey ?? 'N/A',
+              feedback: upholstrey ?? 'N/A',
+              conditionImages: [],
+            ),
+
+            //1.12 Wall
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Wall',
+              images: [overviewImages.toString()],
+              comments: wall ?? 'N/A',
+              feedback: wall ?? 'N/A',
+              conditionImages: [],
+            ),
+
+            //1.13 Window
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Window',
+              images: [overviewImages.toString()],
+              comments: window ?? 'N/A',
+              feedback: window ?? 'N/A',
+              conditionImages: [],
+            ),
+
+            //1.14 Woodwork
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Woodwork',
+              images: [overviewImages.toString()],
+              comments: woodwork ?? 'N/A',
+              feedback: woodwork ?? 'N/A',
+              conditionImages: [],
+            ),
           ],
           additionalComments: 'All areas in good condition.',
         ),
+
+        //2 EV Charger
+        InspectionReportDto(
+          reportId: 'report002',
+          name: 'EV Charger',
+          subTypes: [
+            //2.1 EV Charger
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'EV Charger',
+              images: [evChargerDescription.toString()],
+              comments: evChargerDescription ?? 'N/A',
+              feedback: evChargerDescription ?? 'N/A',
+              conditionImages: [],
+            ),
+          ],
+          additionalComments: 'All areas in good condition.',
+        ),
+
+        //3 Meter Reading
+        InspectionReportDto(
+          reportId: 'report002',
+          name: 'Meter Reading',
+          subTypes: [
+            //1.1 Overview - Odours
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Overview - Odours',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //1.2 Accessory Cleanliness
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Accessory Cleanliness',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //1.3 Window Sill
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Window Sill',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //1.4 Carpets
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Carpets',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //1.5 Ceilings
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Ceilings',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //1.6 Curtains
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Curtains',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //1.7 Hard Flooring
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Hard Flooring',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //1.8 Kitchen Area
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Kitchen Area',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //1.9 Oven
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Oven',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //1.10 Mattress
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Mattress',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //1.11 Uholstrey
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Uholstrey',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //1.12 Wall
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Wall',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //1.13 Window
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Window',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //1.14 Woodwork
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Woodwork',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+          ],
+          additionalComments: 'All areas in good condition.',
+        ),
+
+        //Keys
+        InspectionReportDto(
+          reportId: 'report001',
+          name: 'Keys',
+          subTypes: [
+            //4.1 Yale
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Yale',
+              images: [overviewImages.toString()],
+              comments: evChargerDescription ?? 'N/A',
+              feedback: evChargerDescription ?? 'N/A',
+              conditionImages: [],
+            ),
+
+            //4.2 Mortice
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Mortice',
+              images: [overviewImages.toString()],
+              comments: evChargerDescription ?? 'N/A',
+              feedback: evChargerDescription ?? 'N/A',
+              conditionImages: [],
+            ),
+
+            //4.3 Window Lock
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Window Lock',
+              images: [overviewImages.toString()],
+              comments: evChargerDescription ?? 'N/A',
+              feedback: evChargerDescription ?? 'N/A',
+              conditionImages: [],
+            ),
+
+            //4.4 Gas Meter
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Gas Meter',
+              images: [overviewImages.toString()],
+              comments: evChargerDescription ?? 'N/A',
+              feedback: evChargerDescription ?? 'N/A',
+              conditionImages: [],
+            ),
+
+            //4.5 Car Pass
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Car Pass',
+              images: [overviewImages.toString()],
+              comments: evChargerDescription ?? 'N/A',
+              feedback: evChargerDescription ?? 'N/A',
+              conditionImages: [],
+            ),
+
+            //4.6 Remote
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Remote',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //4.7 Other
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Other',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+          ],
+          additionalComments: 'All areas in good condition.',
+        ),
+
+        //Keys Handed Over
+        InspectionReportDto(
+          reportId: 'report001',
+          name: 'Keys Handed Over',
+          subTypes: [
+            //5.1 Yale
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Yale',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //5.2 Mortice
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Mortice',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //5.3 Other
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Other',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+          ],
+          additionalComments: 'All areas in good condition.',
+        ),
+
+        //Health and Safety
+        InspectionReportDto(
+          reportId: 'report001',
+          name: 'Health and Safety',
+          subTypes: [
+            //6.1 Heat Sensor
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Heat Sensor',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //6.2 Smoke Alarm
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Smoke Alarm',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //6.3 Other
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Other',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+          ],
+          additionalComments: 'All areas in good condition.',
+        ),
+
+        // 7 - Front Garden
+        InspectionReportDto(
+          reportId: 'report001',
+          name: 'Front Garden',
+          subTypes: [
+            //7.1 Heat Sensor
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Drive Way',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //7.2 Outside Lighting
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Outside Lighting',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //7.3 Additional Items
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Additional Items',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+          ],
+          additionalComments: 'All areas in good condition.',
+        ),
+
+        // 8 Garage
+        InspectionReportDto(
+          reportId: 'report001',
+          name: 'Schedule of Condition',
+          subTypes: [
+            //8.1 Door
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Door',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //8.2 Door Frame
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Door Frame',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //8.3 Ceilings
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Ceilings',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //8.4 Lighting
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Lighting',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //8.5 Wall
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Wall',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //8.6 Skirting
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Skirting',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //8.7 Window Sill
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Window Sill',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //8.8 Curtains
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Curtains',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //8.9 Blinds
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Blinds',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //8.10 Light Switches
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Light Switches',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //8.11 Sockets
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Sockets',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //8.12 Flooring
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Flooring',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //8.13 Additional Items
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Additional Items',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+          ],
+          additionalComments: 'All areas in good condition.',
+        ),
+
+        // 9 Exterior Front
+        InspectionReportDto(
+          reportId: 'report001',
+          name: 'Exterior Front',
+          subTypes: [
+            //9.1 Door
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Door',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //9.2 Door Frame
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Door Frame',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //9.3 Porch
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Porch',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //9.4 Additional Items
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Additional Items',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+          ],
+          additionalComments: 'All areas in good condition.',
+        ),
+
+        // 10 Entrance Hallway
+        InspectionReportDto(
+          reportId: 'report001',
+          name: 'Entrance/Hallway',
+          subTypes: [
+            //8.1 Door
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Door',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //8.2 Door Frame
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Door Frame',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //8.3 Ceilings
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Ceilings',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //8.4 Lighting
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Lighting',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //8.5 Wall
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Wall',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //8.6 Skirting
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Skirting',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //8.7 Window Sill
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Window Sill',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //8.8 Curtains
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Curtains',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //8.9 Blinds
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Blinds',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //8.10 Light Switches
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Light Switches',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //8.11 Sockets
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Sockets',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //8.12 Flooring
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Flooring',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //8.13 Additional Items
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Additional Items',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+          ],
+          additionalComments: 'All areas in good condition.',
+        ),
+
+        // 11 Toilet
+        InspectionReportDto(
+          reportId: 'report001',
+          name: 'Entrance/Hallway',
+          subTypes: [
+
+            //11.1 Door Frame
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Door Frame',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //11.2 Ceilings
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Ceilings',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //11.3 Extractor Fan
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Extractor Fan',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //11.4 Lighting
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Lighting',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //11.5 Wall
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Wall',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //11.6 Skirting
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Skirting',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //11.7 Window Sill
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Window Sill',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //11.8 Curtains
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Curtains',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //11.9 Blinds
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Blinds',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //11.10 Toilet
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Toilet',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //11.11 Basin
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Basin',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //11.12 Shower Cubicle
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Shower Cubicle',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //11.13 Bath
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Bath',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //11.14 Switch Board
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Switch Board',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //8.15 Sockets
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Sockets',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //8.16 Heating
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Heating',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //8.17 Accessories
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Accessories',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //8.18 Flooring
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Flooring',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //8.19 Additional Items
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Additional Items',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+          ],
+          additionalComments: 'All areas in good condition.',
+        ),
+
+        // 12 Lounge
+        InspectionReportDto(
+          reportId: 'report001',
+          name: 'Lounge',
+          subTypes: [
+            //12.1 Door
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Door',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //12.2 Door Frame
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Door Frame',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //12.3 Ceilings
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Ceilings',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //12.4 Lighting
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Lighting',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //12.5 Wall
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Wall',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //12.6 Skirting
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Skirting',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //12.7 Window Sill
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Window Sill',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //12.8 Curtains
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Curtains',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //12.9 Blinds
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Blinds',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //12.10 Light Switches
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Light Switches',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //12.11 Sockets
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Sockets',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //12.12 Flooring
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Flooring',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //12.13 Additional Items
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Additional Items',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+          ],
+          additionalComments: 'All areas in good condition.',
+        ),
+
+        // 13 Kitchen
+        InspectionReportDto(
+          reportId: 'report001',
+          name: 'Kitchen',
+          subTypes: [
+            //13.1 Door
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Door',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //13.2 Door Frame
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Door Frame',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //13.3 Ceilings
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Ceilings',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //13.4 Lighting
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Lighting',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //13.5 Wall
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Wall',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //13.6 Skirting
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Skirting',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //13.7 Window Sill
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Window Sill',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //13.8 Curtains
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Curtains',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //13.9 Blinds
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Blinds',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //13.10 Light Switches
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Light Switches',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //13.11 Sockets
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Sockets',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //13.12 Flooring
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Flooring',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //13.13 Additional Items
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Additional Items',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+          ],
+          additionalComments: 'All areas in good condition.',
+        ),
+
+        // 14 Utility Area
+        InspectionReportDto(
+          reportId: 'report001',
+          name: 'Utility Area',
+          subTypes: [
+            //14.1 Door
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Door',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //14.2 Door Frame
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Door Frame',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //14.3 Ceilings
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Ceilings',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //14.4 Lighting
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Lighting',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //14.5 Wall
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Wall',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //14.6 Skirting
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Skirting',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //14.7 Window Sill
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Window Sill',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //14.8 Curtains
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Curtains',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //14.9 Blinds
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Blinds',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //14.10 Light Switches
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Light Switches',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //14.11 Sockets
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Sockets',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //14.12 Flooring
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Flooring',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //14.13 Additional Items
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Additional Items',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+          ],
+          additionalComments: 'All areas in good condition.',
+        ),
+
+        // 15 Stairs
+        InspectionReportDto(
+          reportId: 'report001',
+          name: 'Stairs',
+          subTypes: [
+            //15.1 Door
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Door',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //15.2 Door Frame
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Door Frame',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //15.3 Ceilings
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Ceilings',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //15.4 Lighting
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Lighting',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //15.5 Wall
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Wall',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //15.6 Skirting
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Skirting',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //15.7 Window Sill
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Window Sill',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //15.8 Curtains
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Curtains',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //15.9 Blinds
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Blinds',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //15.10 Light Switches
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Light Switches',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //15.11 Sockets
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Sockets',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //15.12 Flooring
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Flooring',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //15.13 Additional Items
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Additional Items',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+          ],
+          additionalComments: 'All areas in good condition.',
+        ),
+
+        // 16 Landing
+        InspectionReportDto(
+          reportId: 'report001',
+          name: 'Landing',
+          subTypes: [
+            //16.1 Door
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Door',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //16.2 Door Frame
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Door Frame',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //16.3 Ceilings
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Ceilings',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //16.4 Lighting
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Lighting',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //16.5 Wall
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Wall',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //16.6 Skirting
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Skirting',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //16.7 Window Sill
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Window Sill',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //16.8 Curtains
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Curtains',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //16.9 Blinds
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Blinds',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //16.10 Light Switches
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Light Switches',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //16.11 Sockets
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Sockets',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //16.12 Flooring
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Flooring',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //16.13 Additional Items
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Additional Items',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+          ],
+          additionalComments: 'All areas in good condition.',
+        ),
+
+        // 17 Bedroom
+        InspectionReportDto(
+          reportId: 'report001',
+          name: 'Bedroom',
+          subTypes: [
+            //17.1 Door
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Door',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //17.2 Door Frame
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Door Frame',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //17.3 Ceilings
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Ceilings',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //17.4 Lighting
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Lighting',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //17.5 Wall
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Wall',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //17.6 Skirting
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Skirting',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //17.7 Window Sill
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Window Sill',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //17.8 Curtains
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Curtains',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //17.9 Blinds
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Blinds',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //17.10 Light Switches
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Light Switches',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //17.11 Sockets
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Sockets',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //17.12 Flooring
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Flooring',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //17.13 Additional Items
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Additional Items',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+          ],
+          additionalComments: 'All areas in good condition.',
+        ),
+
+        // 18 Ensuite
+        InspectionReportDto(
+          reportId: 'report001',
+          name: 'Ensuite',
+          subTypes: [
+            //18.1 Door
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Door',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //18.2 Door Frame
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Door Frame',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //18.3 Ceilings
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Ceilings',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //18.4 Lighting
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Lighting',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //18.5 Wall
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Wall',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //18.6 Skirting
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Skirting',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //18.7 Window Sill
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Window Sill',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //18.8 Curtains
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Curtains',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //18.9 Blinds
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Blinds',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //18.10 Light Switches
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Light Switches',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //18.11 Sockets
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Sockets',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //18.12 Flooring
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Flooring',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //18.13 Additional Items
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Additional Items',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+          ],
+          additionalComments: 'All areas in good condition.',
+        ),
+
+        // 19 Bathroom
+        InspectionReportDto(
+          reportId: 'report001',
+          name: 'Bathroom',
+          subTypes: [
+            //19.1 Door
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Door',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //19.2 Door Frame
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Door Frame',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //19.3 Ceilings
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Ceilings',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //19.4 Lighting
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Lighting',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //19.5 Wall
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Wall',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //19.6 Skirting
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Skirting',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //19.7 Window Sill
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Window Sill',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //19.8 Curtains
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Curtains',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //19.9 Blinds
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Blinds',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //19.10 Light Switches
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Light Switches',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //19.11 Sockets
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Sockets',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //19.12 Flooring
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Flooring',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //19.13 Additional Items
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Additional Items',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+          ],
+          additionalComments: 'All areas in good condition.',
+        ),
+
+        // 20 Rear Garden
+        InspectionReportDto(
+          reportId: 'report001',
+          name: 'Rear Garden',
+          subTypes: [
+            //20.1 Garden Description
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Garden Description',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //20.2 Outside Lighting
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Outside Lightinge',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //20.3 Summer House
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Summer House',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //20.4 Shed
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Shed',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //20.5 Additional Information
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Additional Information',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+          ],
+          additionalComments: 'All areas in good condition.',
+        ),
+
+        // 21 Manuals
+        InspectionReportDto(
+          reportId: 'report001',
+          name: 'Manuals',
+          subTypes: [
+            //21.1 House Appliance Manual
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'House Appliance Manual',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //21.2 Kitchen Appliance Manual
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Kitchen Appliance Manual',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //21.3 Heating Manual
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Heating Manual',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //21.4 Landlord Gas Safety Certificate
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Landlord Gas Safety Certificate',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //21.5 Legionella Risk Assessment
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Legionella Risk Assessment',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //21.6 Electricity Safety Certificate
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Electricity Safety Certificate',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //21.7 Energy Performance Certificate
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Energy Performance Certificate',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+            //21.8 Move In Checklist
+            SubTypeDto(
+              subTypeId: 'subType001',
+              subTypeName: 'Move In Checklist',
+              images: [overviewImages.toString()],
+              comments: 'Condition: Good, Additional Comments: Good',
+              feedback: '',
+              conditionImages: [],
+            ),
+
+          ],
+          additionalComments: 'All areas in good condition.',
+        ),
+
+
+
         // Add more InspectionReportDto items as needed
       ],
     ),
@@ -257,7 +2821,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
   }
 
   Future<void> sendPropertyData(PropertyDto property) async {
-    final url = '$baseURL/summary/generateReport'; // Replace with your backend URL
+    final url =
+        '$baseURL/summary/generateReport'; // Replace with your backend URL
     final headers = {'Content-Type': 'application/json'};
     final body = jsonEncode(property.toJson());
 
@@ -309,7 +2874,6 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
       // Display error message
     }
   }
-
 
   Future<Map<String, dynamic>> getSharedPreferencesData() async {
     String propertyId = widget.propertyId;
@@ -2872,7 +5436,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           actions: [
             GestureDetector(
               onTap: () {
-                _saveData();// Link the save button to the function
+                _saveData(); // Link the save button to the function
                 // showDialog(
                 //   context: context,
                 //   builder: (BuildContext context) {

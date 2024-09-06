@@ -14,8 +14,8 @@ import '../../widgets/add_action.dart';
 
 class Exteriorfront extends StatefulWidget {
   final List<File>? capturedImages;
-
-  const Exteriorfront({super.key, this.capturedImages});
+  final String propertyId;
+  const Exteriorfront({super.key, this.capturedImages, required this.propertyId});
 
   @override
   State<Exteriorfront> createState() => _ExteriorfrontState();
@@ -23,62 +23,68 @@ class Exteriorfront extends StatefulWidget {
 
 class _ExteriorfrontState extends State<Exteriorfront> {
   String? newdoor;
-  String? doorCondition;
-  String? doorDescription;
-  String? doorFrameCondition;
-  String? doorFrameDescription;
-  String? porchCondition;
-  String? porchDescription;
-  String? additionalItemsCondition;
-  String? additionalItemsDescription;
-  List<String> doorImages = [];
-  List<String> doorFrameImages = [];
-  List<String> porchImages = [];
-  List<String> additionalItemsImages = [];
+  String? ExteriorFrontDoorCondition;
+  String? exteriorFrontDoorDescription;
+  String? exteriorFrontDoorFrameCondition;
+  String? exteriorFrontDoorFrameDescription;
+  String? exteriorFrontPorchCondition;
+  String? exteriorFrontPorchDescription;
+  String? exteriorFrontAdditionalItemsCondition;
+  String? exteriorFrontAdditionalItemsDescription;
+  List<String> exteriorFrontDoorImages = [];
+  List<String> exteriorFrontDoorFrameImages = [];
+  List<String> exteriorFrontPorchImages = [];
+  List<String> exteriorFrontAdditionalItemsImages = [];
   late List<File> capturedImages;
 
-  @override
+ @override
   void initState() {
     super.initState();
     capturedImages = widget.capturedImages ?? [];
-    _loadPreferences(); // Load the saved preferences when the state is initialized
+    print("Property Id - SOC${widget.propertyId}");
+    _loadPreferences(widget.propertyId);
+    // Load the saved preferences when the state is initialized
   }
 
   // Function to load preferences
-  Future<void> _loadPreferences() async {
+  Future<void> _loadPreferences(String propertyId) async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       newdoor = prefs.getString('newdoor');
-      doorCondition = prefs.getString('doorCondition');
-      doorDescription = prefs.getString('doorDescription');
-      doorFrameCondition = prefs.getString('doorFrameCondition');
-      doorFrameDescription = prefs.getString('doorFrameDescription');
-      porchCondition = prefs.getString('porchCondition');
-      porchDescription = prefs.getString('porchDescription');
-      additionalItemsCondition = prefs.getString('additionalItemsCondition');
-      additionalItemsDescription = prefs.getString('additionalItemsDescription');
+      ExteriorFrontDoorCondition = prefs.getString('doorCondition');
+      exteriorFrontDoorDescription = prefs.getString('doorDescription');
+      exteriorFrontDoorFrameCondition = prefs.getString('doorFrameCondition');
+      exteriorFrontDoorFrameDescription = prefs.getString('doorFrameDescription');
+      exteriorFrontPorchCondition = prefs.getString('porchCondition');
+      exteriorFrontPorchDescription = prefs.getString('porchDescription');
+      exteriorFrontAdditionalItemsCondition = prefs.getString('additionalItemsCondition');
+      exteriorFrontAdditionalItemsDescription = prefs.getString('additionalItemsDescription');
 
-      doorImages = prefs.getStringList('doorImages') ?? [];
-      doorFrameImages = prefs.getStringList('doorFrameImages') ?? [];
-      porchImages = prefs.getStringList('porchImages') ?? [];
-      additionalItemsImages = prefs.getStringList('additionalItemsImages') ?? [];
+      exteriorFrontDoorImages = prefs.getStringList('doorImages') ?? [];
+      exteriorFrontDoorFrameImages = prefs.getStringList('doorFrameImages') ?? [];
+      exteriorFrontPorchImages = prefs.getStringList('porchImages') ?? [];
+      exteriorFrontAdditionalItemsImages = prefs.getStringList('additionalItemsImages') ?? [];
     });
   }
 
   // Function to save a preference
-  Future<void> _savePreference(String key, String? value) async {
+  Future<void> _savePreference(String propertyId, String key, String value)
+  async {
     final prefs = await SharedPreferences.getInstance();
-    prefs.setString(key, value ?? '');
+    prefs.setString('${key}_$propertyId', value);
   }
 
-  Future<void> _savePreferenceList(String key, List<String> value) async {
+  Future<void> _savePreferenceList(String propertyId, String key, List<String> value) async {
     final prefs = await SharedPreferences.getInstance();
-    prefs.setStringList(key, value);
+    prefs.setStringList('${key}_$propertyId', value);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+     String propertyId = widget.propertyId;
+    return PopScope(
+      canPop: false,
+        child: Scaffold(
       appBar: AppBar(
         title: Text(
           'Exterior Front',
@@ -115,103 +121,103 @@ class _ExteriorfrontState extends State<Exteriorfront> {
               // Door
               ConditionItem(
                 name: "Door",
-                condition: doorCondition,
+                condition: ExteriorFrontDoorCondition,
                 description: newdoor,
-                images: doorImages,
+                images: exteriorFrontDoorImages,
                 onConditionSelected: (condition) {
                   setState(() {
-                    doorCondition = condition;
+                    ExteriorFrontDoorCondition = condition;
                   });
-                  _savePreference('doorCondition', condition);
+                  _savePreference(propertyId,'doorCondition', condition!);
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     newdoor = description;
                   });
-                  _savePreference('newdoor', description);
+                  _savePreference(propertyId,'newdoor', description!);
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
-                    doorImages.add(imagePath);
+                    exteriorFrontDoorImages.add(imagePath);
                   });
-                  _savePreferenceList('doorImages', doorImages);
+                  _savePreferenceList(propertyId,'doorImages', exteriorFrontDoorImages);
                 },
               ),
               // Door Frame
               ConditionItem(
                 name: "Door Frame",
-                condition: doorFrameCondition,
-                description: doorFrameDescription,
-                images: doorFrameImages,
+                condition: exteriorFrontDoorFrameCondition,
+                description: exteriorFrontDoorFrameDescription,
+                images: exteriorFrontDoorFrameImages,
                 onConditionSelected: (condition) {
                   setState(() {
-                    doorFrameCondition = condition;
+                    exteriorFrontDoorFrameCondition = condition;
                   });
-                  _savePreference('doorFrameCondition', condition); // Save preference
+                  _savePreference(propertyId,'doorFrameCondition', condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
-                    doorFrameDescription = description;
+                    exteriorFrontDoorFrameDescription = description;
                   });
-                  _savePreference('doorFrameDescription', description); // Save preference
+                  _savePreference(propertyId,'doorFrameDescription', description!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
-                    doorFrameImages.add(imagePath);
+                    exteriorFrontDoorFrameImages.add(imagePath);
                   });
-                  _savePreferenceList('doorFrameImages', doorFrameImages); // Save preference
+                  _savePreferenceList(propertyId,'doorFrameImages', exteriorFrontDoorFrameImages); // Save preference
                 },
               ),
 
               // Porch
               ConditionItem(
                 name: "Porch",
-                condition: porchCondition,
-                description: porchDescription,
-                images: porchImages,
+                condition: exteriorFrontPorchCondition,
+                description: exteriorFrontPorchDescription,
+                images: exteriorFrontPorchImages,
                 onConditionSelected: (condition) {
                   setState(() {
-                    porchCondition = condition;
+                    exteriorFrontPorchCondition = condition;
                   });
-                  _savePreference('porchCondition', condition); // Save preference
+                  _savePreference(propertyId,'porchCondition', condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
-                    porchDescription = description;
+                    exteriorFrontPorchDescription = description;
                   });
-                  _savePreference('porchDescription', description); // Save preference
+                  _savePreference(propertyId,'porchDescription', description!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
-                    porchImages.add(imagePath);
+                    exteriorFrontPorchImages.add(imagePath);
                   });
-                  _savePreferenceList('porchImages', porchImages); // Save preference
+                  _savePreferenceList(propertyId,'porchImages', exteriorFrontPorchImages); // Save preference
                 },
               ),
 
               // Additional Items
               ConditionItem(
                 name: "Additional Items",
-                condition: additionalItemsCondition,
-                description: additionalItemsDescription,
-                images: additionalItemsImages,
+                condition: exteriorFrontAdditionalItemsCondition,
+                description: exteriorFrontAdditionalItemsDescription,
+                images: exteriorFrontAdditionalItemsImages,
                 onConditionSelected: (condition) {
                   setState(() {
-                    additionalItemsCondition = condition;
+                    exteriorFrontAdditionalItemsCondition = condition;
                   });
-                  _savePreference('additionalItemsCondition', condition); // Save preference
+                  _savePreference(propertyId,'additionalItemsCondition', condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
-                    additionalItemsDescription = description;
+                    exteriorFrontAdditionalItemsDescription = description;
                   });
-                  _savePreference('additionalItemsDescription', description); // Save preference
+                  _savePreference(propertyId,'additionalItemsDescription', description!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
-                    additionalItemsImages.add(imagePath);
+                    exteriorFrontAdditionalItemsImages.add(imagePath);
                   });
-                  _savePreferenceList('additionalItemsImages', additionalItemsImages); // Save preference
+                  _savePreferenceList(propertyId,'additionalItemsImages', exteriorFrontAdditionalItemsImages); // Save preference
                 },
               ),
 
@@ -223,7 +229,7 @@ class _ExteriorfrontState extends State<Exteriorfront> {
           ),
         ),
       ),
-    );
+    ));
   }
 }
 
@@ -282,21 +288,21 @@ class ConditionItem extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  IconButton(
-                    icon: Icon(
-                      Icons.warning_amber,
-                      size: 24,
-                      color: kAccentColor,
-                    ),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => AddAction(),
-                        ),
-                      );
-                    },
-                  ),
+                  // IconButton(
+                  //   icon: Icon(
+                  //     Icons.warning_amber,
+                  //     size: 24,
+                  //     color: kAccentColor,
+                  //   ),
+                  //   onPressed: () {
+                  //     Navigator.push(
+                  //       context,
+                  //       MaterialPageRoute(
+                  //         builder: (context) => AddAction(),
+                  //       ),
+                  //     );
+                  //   },
+                  // ),
                   IconButton(
                     icon: Icon(
                       Icons.camera_alt_outlined,
@@ -353,35 +359,35 @@ class ConditionItem extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(
-            height: 12,
-          ),
-          GestureDetector(
-            onTap: () async {
-              final result = await Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ConditionDetails(
-                    initialCondition: description,
-                    type: name,
-                  ),
-                ),
-              );
-
-              if (result != null) {
-                onDescriptionSelected(result);
-              }
-            },
-            child: Text(
-              description?.isNotEmpty == true ? description! : "Description",
-              style: TextStyle(
-                fontSize: 12.0,
-                fontWeight: FontWeight.w700,
-                color: kPrimaryTextColourTwo,
-                fontStyle: FontStyle.italic,
-              ),
-            ),
-          ),
+          // SizedBox(
+          //   height: 12,
+          // ),
+          // GestureDetector(
+          //   onTap: () async {
+          //     final result = await Navigator.push(
+          //       context,
+          //       MaterialPageRoute(
+          //         builder: (context) => ConditionDetails(
+          //           initialCondition: description,
+          //           type: name,
+          //         ),
+          //       ),
+          //     );
+          //
+          //     if (result != null) {
+          //       onDescriptionSelected(result);
+          //     }
+          //   },
+          //   child: Text(
+          //     description?.isNotEmpty == true ? description! : "Description",
+          //     style: TextStyle(
+          //       fontSize: 12.0,
+          //       fontWeight: FontWeight.w700,
+          //       color: kPrimaryTextColourTwo,
+          //       fontStyle: FontStyle.italic,
+          //     ),
+          //   ),
+          // ),
           SizedBox(
             height: 12,
           ),

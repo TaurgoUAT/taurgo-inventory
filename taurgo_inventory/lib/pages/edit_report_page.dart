@@ -1,10 +1,8 @@
-import 'dart:io';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:taurgo_inventory/pages/home_page.dart';
 import 'package:taurgo_inventory/pages/inspection_confimation_page.dart';
+import 'package:taurgo_inventory/pages/property_details_view_page.dart';
 import 'package:taurgo_inventory/pages/reportPages/ExteriorFront.dart';
 import 'package:taurgo_inventory/pages/reportPages/bathroom.dart';
 import 'package:taurgo_inventory/pages/reportPages/bedroom.dart';
@@ -29,14 +27,8 @@ import 'package:taurgo_inventory/pages/reportPages/stairs.dart';
 import 'package:taurgo_inventory/pages/reportPages/toilet.dart';
 import 'package:taurgo_inventory/pages/reportPages/utility_room.dart';
 // Import other pages here
-import '../Dtos/AddressDto.dart';
-import '../Dtos/PropertyDto.dart';
-import '../Dtos/UserDto.dart';
 import '../constants/AppColors.dart';
 import 'landing_screen.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-import '../constants/UrlConstants.dart';
 
 class EditReportPage extends StatefulWidget {
   final String propertyId;
@@ -48,15 +40,6 @@ class EditReportPage extends StatefulWidget {
 
 class _EditReportPageState extends State<EditReportPage> {
   String? selectedType;
-  final Set<String> visitedPages = {}; // Track visited pages
-  bool isLoading = true;
-  List<Map<String, dynamic>> properties = [];
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
 
 
   @override
@@ -90,27 +73,28 @@ class _EditReportPageState extends State<EditReportPage> {
 
     final Map<String, Widget> typeToPageMap = {
       'Schedule of Condition': ScheduleOfCondition(propertyId: widget.propertyId),
-      'EV Charger': EvCharger(),
+      'EV Charger': EvCharger(propertyId: widget.propertyId,),
       'Meter Reading': MeterReading(propertyId: widget.propertyId,),
       'Keys': Keys(propertyId: widget.propertyId,),
-      "Keys Handed Over At Check In": KeyHandedOver(),
+      "Keys Handed Over At Check In": KeyHandedOver(propertyId: widget.propertyId,),
       'Health & Safety | Smoke & Carbon Monoxide': HealthAndSafety(),
-      'Front Garden': FrontGarden(),
-      'Garage': Garage(),
-      'Exterior Front': Exteriorfront(),
-      'Entrance / Hallway': EntranceHallway(),
-      'Toilet': Toilet(),
-      'Lounge': Lounge(),
-      'Dining Room': DiningRoom(),
-      'Kitchen': KitchenPage(),
-      'Utility Room / Area': UtilityRoom(),
-      'Stairs': Stairs(),
-      'Landing': Landing(),
-      'Bedroom 1': Bedroom(),
+      'Front Garden': FrontGarden(propertyId: widget.propertyId,),
+      'Garage': Garage(propertyId: widget.propertyId,),
+      'Exterior Front': Exteriorfront(propertyId: widget.propertyId,),
+      'Entrance / Hallway': EntranceHallway(propertyId: widget.propertyId,),
+      'Toilet': Toilet(propertyId: widget.propertyId,),
+      'Lounge': Lounge(propertyId: widget.propertyId,),
+      'Dining Room': DiningRoom(propertyId: widget.propertyId,),
+      'Kitchen': KitchenPage(propertyId: widget.propertyId,),
+      'Utility Room / Area': UtilityRoom(propertyId: widget.propertyId,),
+      'Stairs': Stairs(propertyId: widget.propertyId,),
+      'Landing': Landing(propertyId: widget.propertyId,),
+      'Bedroom 1': Bedroom(propertyId: widget.propertyId,),
       'En Suite': Ensuite(),
-      'Bathroom': Bathroom(),
-      'Rear Garden': RearGarden(),
-      'Manuals/ Certificates': Manuals(),
+      'Bathroom': Bathroom(propertyId: widget.propertyId,),
+      'Rear Garden': RearGarden(propertyId: widget.propertyId,),
+      'Manuals/ Certificates': Manuals(propertyId: widget.propertyId,),
+
     };
 
     final Map<String, IconData> typeToIconMap = {
@@ -237,7 +221,6 @@ class _EditReportPageState extends State<EditReportPage> {
           actions: [
             GestureDetector(
               onTap: (){
-
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -245,81 +228,99 @@ class _EditReportPageState extends State<EditReportPage> {
                       (propertyId: widget.propertyId,),
                   ),
                 );
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return AlertDialog(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      elevation: 10,
-                      backgroundColor: Colors.white,
-                      title: Row(
-                        children: [
-                          Icon(Icons.info_outline, color: kPrimaryColor),
-                          SizedBox(width: 10),
-                          Text(
-                            'Continue Saving',
-                            style: TextStyle(
-                              color: kPrimaryColor,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                      content: Text(
-                        'You Cannot make any changes after you save the Property',
-                        style: TextStyle(
-                          color: Colors.grey[800],
-                          fontSize: 14,
-                          fontWeight: FontWeight.w400,
-                          height: 1.5,
-                        ),
-                      ),
-                      actions: <Widget>[
-                        TextButton(
-                          child: Text('Cancel',
-                            style: TextStyle(
-                              color: kPrimaryColor,
-                              fontSize: 16,
-                            ),
-                          ),
-                          onPressed: () {
-                            Navigator.of(context).pop(); // Close the dialog
-                          },
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    InspectionConfimationPage(propertyId:
-                                    widget.propertyId,),
-                              ),
-                            );
-                          },
-                          style: TextButton.styleFrom(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 16, vertical: 8),
-                            backgroundColor: kPrimaryColor,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
-                          child: Text(
-                            'Continue',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                            ),
-                          ),
-                        ),
-                      ],
-                    );
-                  },
-                );
+                // showDialog(
+                //   context: context,
+                //   builder: (BuildContext context) {
+                //     return AlertDialog(
+                //       shape: RoundedRectangleBorder(
+                //         borderRadius: BorderRadius.circular(20),
+                //       ),
+                //       elevation: 10,
+                //       backgroundColor: Colors.white,
+                //       title: Row(
+                //         children: [
+                //           Icon(Icons.info_outline, color: kPrimaryColor),
+                //           SizedBox(width: 10),
+                //           Text(
+                //             'Continue Saving',
+                //             style: TextStyle(
+                //               color: kPrimaryColor,
+                //               fontSize: 18,
+                //               fontWeight: FontWeight.bold,
+                //             ),
+                //           ),
+                //         ],
+                //       ),
+                //       content: Text(
+                //         'You Cannot make any changes after you save the Property',
+                //         style: TextStyle(
+                //           color: Colors.grey[800],
+                //           fontSize: 14,
+                //           fontWeight: FontWeight.w400,
+                //           height: 1.5,
+                //         ),
+                //       ),
+                //       actions: <Widget>[
+                //         TextButton(
+                //           child: Text('Cancel',
+                //             style: TextStyle(
+                //               color: kPrimaryColor,
+                //               fontSize: 16,
+                //             ),
+                //           ),
+                //           onPressed: () {
+                //             Navigator.of(context).pop(); // Close the dialog
+                //           },
+                //         ),
+                //         TextButton(
+                //           onPressed: () {
+                //             Navigator.push(
+                //               context,
+                //               MaterialPageRoute(builder: (context) => DetailsConfirmationPage(
+                //                 lineOneAddress: widget.lineOneAddress,
+                //                 lineTwoAddress: widget.lineTwoAddress,
+                //                 city: widget.city,
+                //                 state: widget.state,
+                //                 country: widget.country,
+                //                 postalCode: widget.postalCode,
+                //                 reference: widget.reference,
+                //                 client: widget.client,
+                //                 type: widget.type,
+                //                 furnishing: widget.furnishing,
+                //                 noOfBeds: widget.noOfBeds,
+                //                 noOfBaths: widget.noOfBaths,
+                //                 garage: garageSelected,
+                //                 parking: parkingSelected,
+                //                 notes: widget.notes,
+                //                 selectedType: selectedType.toString(),
+                //                 date: selectedDate,
+                //                 time: selectedTime,
+                //                 keyLocation: keysIwth.toString(),
+                //                 referenceForKey: referenceController.text,
+                //                 internalNotes: internalNotesController.text,
+                //               )),
+                //             );
+                //           },
+                //           style: TextButton.styleFrom(
+                //             padding: EdgeInsets.symmetric(
+                //                 horizontal: 16, vertical: 8),
+                //             backgroundColor: kPrimaryColor,
+                //             shape: RoundedRectangleBorder(
+                //               borderRadius: BorderRadius.circular(10),
+                //             ),
+                //           ),
+                //           child: Text(
+                //             'Continue',
+                //             style: TextStyle(
+                //               color: Colors.white,
+                //               fontSize: 16,
+                //             ),
+                //           ),
+                //         ),
+                //       ],
+                //     );
+                //   },
+                // );
 
               },
               child: Container(
@@ -348,16 +349,24 @@ class _EditReportPageState extends State<EditReportPage> {
             final type = types[index];
             return GestureDetector(
               onTap: () {
-                if (!visitedPages.contains(type)) {
-                  visitedPages.add(type);
-                  Navigator.push(
+                setState(() {
+                  selectedType = type;
+                });
+
+                // Navigate to the corresponding page based on the type
+                if (typeToPageMap.containsKey(selectedType)) {
+                  Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => typeToPageMap[type]!,
+                        builder: (context) =>
+                        typeToPageMap[selectedType]!),
+                  );
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Page for $selectedType not yet implemented.'),
                     ),
-                  ).then((_) {
-                    setState(() {}); // Update the grid view after returning
-                  });
+                  );
                 }
               },
               child: Container(
