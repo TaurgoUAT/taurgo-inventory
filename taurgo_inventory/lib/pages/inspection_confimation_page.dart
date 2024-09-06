@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:taurgo_inventory/pages/home_page.dart';
 import 'package:taurgo_inventory/pages/landing_screen.dart';
 import '../../constants/AppColors.dart';
 import 'package:digital_signature_flutter/digital_signature_flutter.dart';
@@ -39,6 +40,42 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
   User? user;
   String? selectedType;
   final Set<String> visitedPages = {}; // Track visited pages
+
+  Future<void> fetchProperties() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    String propertyId = widget.propertyId;
+
+    try {
+      final response = await http.get(Uri.parse('$baseURL/property/$propertyId'))
+          .timeout(Duration(seconds: 60)); // Set the timeout duration
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = json.decode(response.body);
+        setState(() {
+          properties = data.map((item) => item as Map<String, dynamic>).toList();
+          isLoading = false;
+        });
+      } else {
+        // Handle server errors
+        setState(() {
+          properties = []; // Ensure properties is set to an empty list
+          isLoading = false;
+        });
+        // Display error message
+      }
+    } catch (e) {
+      // Handle network errors
+      setState(() {
+        properties = []; // Ensure properties is set to an empty list
+        isLoading = false;
+      });
+      // Display error message
+    }
+  }
+
 
   //SOC
   String? overview;
@@ -89,11 +126,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
 
   //Keys
   String? yaleLocation;
-  String? yaleReading;
   String? morticeLocation;
-  String? morticeReading;
   String? windowLockLocation;
-  String? windowLockReading;
   String? gasMeterLocation;
 
   // String? gasMeterReading;
@@ -818,6 +852,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
     getSharedPreferencesData();
     print(overview);
     _loadPreferences(widget.propertyId);
+    fetchProperties();
   }
 
   Future<void> _loadPreferences(String propertyId) async {
@@ -900,11 +935,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
 
       //Keys
       yaleLocation = prefs.getString('yaleLocation_${propertyId}');
-      yaleReading = prefs.getString('yaleReading_${propertyId}');
       morticeLocation = prefs.getString('morticeLocation_${propertyId}');
-      morticeReading = prefs.getString('morticeReading_${propertyId}');
       windowLockLocation = prefs.getString('windowLockLocation_${propertyId}');
-      windowLockReading = prefs.getString('windowLockReading_${propertyId}');
       gasMeterLocation = prefs.getString('gasMeterLocation_${propertyId}');
       gasMeterReading = prefs.getString('gasMeterReading_${propertyId}');
       carPassLocation = prefs.getString('carPassLocation_${propertyId}');
@@ -1878,32 +1910,32 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
   // }
 
   late PropertyDto property = PropertyDto(
-    id: 'property123',
+    id: widget.propertyId,
     addressDto: AddressDto(
-      addressLineOne: overview ?? 'N/A',
-      addressLineTwo: accessoryCleanliness ?? 'N/A',
-      city: 'Vavuniya',
-      state: 'Western',
-      country: 'Sri Lanka',
-      postalCode: '12345',
+      addressLineOne: properties[0]['addressLineOne'] ?? 'No address',
+      addressLineTwo: properties[0]['addressLineTwo'] ?? 'No address',
+      city: properties[0]['city'] ?? 'No address',
+      state: properties[0]['state'] ?? 'No address',
+      country: properties[0]['country'] ?? 'No address',
+      postalCode: properties[0]['postalCode'] ?? 'No address',
     ),
     userDto: UserDto(
       firebaseId: 'user001',
       firstName: 'Abishan',
       lastName: 'Ananthan',
-      userName: 'abishaan09',
-      email: 'abiabishan09@gmail.com',
+      userName: userDetails[0]['userName'] ?? 'Taurgo',
+      email: userDetails[0]['email'] ?? 'info@taurgo.co.uk',
       location: '+Vavuniya',
     ),
     inspectionDto: InspectionDto(
       inspectionId: 'insp001',
-      inspectorName: 'Jane Smith',
-      inspectionType: 'Check Out',
-      date: '2024-09-01',
-      time: '2024-09-01',
-      keyLocation: '2024-09-01',
-      keyReference: '2024-09-01',
-      internalNotes: '2024-09-01',
+      inspectorName: properties[0]['client'] ?? 'No address',
+      inspectionType: properties[0]['inspectionType'] ?? 'No address',
+      date: properties[0]['date'] ?? 'No address',
+      time: properties[0]['time'] ?? 'No address',
+      keyLocation: properties[0]['keyLocation'] ?? 'No address',
+      keyReference: properties[0]['keyLocation'] ?? 'No address',
+      internalNotes:properties[0]['keyLocation'] ?? 'No address',
       inspectionReports: [
         //1 SOC
         InspectionReportDto(
@@ -2140,8 +2172,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Yale',
               images: [overviewImages.toString()],
-              comments: evChargerDescription ?? 'N/A',
-              feedback: evChargerDescription ?? 'N/A',
+              comments:  yaleLocation?? 'N/A',
+              feedback: yaleLocation ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -2150,8 +2182,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Mortice',
               images: [overviewImages.toString()],
-              comments: evChargerDescription ?? 'N/A',
-              feedback: evChargerDescription ?? 'N/A',
+              comments: morticeLocation ?? 'N/A',
+              feedback: morticeLocation ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -2160,8 +2192,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Window Lock',
               images: [overviewImages.toString()],
-              comments: evChargerDescription ?? 'N/A',
-              feedback: evChargerDescription ?? 'N/A',
+              comments: windowLockLocation ?? 'N/A',
+              feedback:  windowLockLocation ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -2170,8 +2202,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Gas Meter',
               images: [overviewImages.toString()],
-              comments: evChargerDescription ?? 'N/A',
-              feedback: evChargerDescription ?? 'N/A',
+              comments:  gasMeterLocation ?? 'N/A',
+              feedback:  gasMeterLocation ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -2180,8 +2212,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Car Pass',
               images: [overviewImages.toString()],
-              comments: evChargerDescription ?? 'N/A',
-              feedback: evChargerDescription ?? 'N/A',
+              comments: carPassLocation ?? 'N/A',
+              feedback: carPassLocation ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -2190,8 +2222,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Remote',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: remoteLocation ?? 'N/A',
+              feedback: remoteLocation ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -2200,8 +2232,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Other',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: otherLocation ?? 'N/A',
+              feedback: otherLocation ?? 'N/A',
               conditionImages: [],
             ),
           ],
@@ -2218,8 +2250,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Yale',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: yale ?? 'N/A',
+              feedback: yale  ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -2228,8 +2260,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Mortice',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: mortice ?? 'N/A',
+              feedback: mortice ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -2238,8 +2270,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Other',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: other ?? 'N/A',
+              feedback: other ?? 'N/A',
               conditionImages: [],
             ),
           ],
@@ -2256,8 +2288,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Heat Sensor',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: heatSensorCondition ?? 'N/A',
+              feedback: heatSensorCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -2266,8 +2298,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Smoke Alarm',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: smokeAlarmCondition ?? 'N/A',
+              feedback: smokeAlarmCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -2276,8 +2308,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Other',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: smokeAlarmCondition ?? 'N/A',
+              feedback: smokeAlarmCondition ?? 'N/A',
               conditionImages: [],
             ),
           ],
@@ -2294,8 +2326,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Drive Way',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: driveWayCondition ?? 'N/A',
+              feedback: driveWayCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -2304,8 +2336,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Outside Lighting',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments:  outsideLightingCondition ?? 'N/A',
+              feedback:  outsideLightingCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -2314,8 +2346,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Additional Items',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: additionalItemsCondition ?? 'N/A',
+              feedback:  additionalItemsCondition?? 'N/A',
               conditionImages: [],
             ),
           ],
@@ -2325,15 +2357,15 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
         // 8 Garage
         InspectionReportDto(
           reportId: 'report001',
-          name: 'Schedule of Condition',
+          name: 'Garage',
           subTypes: [
             //8.1 Door
             SubTypeDto(
               subTypeId: 'subType001',
               subTypeName: 'Door',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: garageDoorCondition ?? 'N/A',
+              feedback: garageDoorCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -2342,8 +2374,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Door Frame',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: garageDoorFrameCondition ?? 'N/A',
+              feedback:  garageDoorFrameCondition?? 'N/A',
               conditionImages: [],
             ),
 
@@ -2352,8 +2384,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Ceilings',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: garageceilingCondition ?? 'N/A',
+              feedback: garageceilingCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -2362,8 +2394,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Lighting',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: garagelightingCondition ?? 'N/A',
+              feedback: garagelightingCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -2372,8 +2404,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Wall',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: garagewallsCondition ?? 'N/A',
+              feedback: garagewallsCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -2382,8 +2414,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Skirting',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: garageskirtingCondition ?? 'N/A',
+              feedback: garageskirtingCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -2392,8 +2424,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Window Sill',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: garagewindowSillCondition ?? 'N/A',
+              feedback: garagewindowSillCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -2402,8 +2434,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Curtains',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: garagecurtainsCondition ?? 'N/A',
+              feedback: garagecurtainsCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -2412,8 +2444,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Blinds',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: garageblindsCondition ?? 'N/A',
+              feedback: garageblindsCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -2422,8 +2454,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Light Switches',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: garagelightSwitchesCondition ?? 'N/A',
+              feedback: garagelightSwitchesCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -2432,8 +2464,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Sockets',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: garagesocketsCondition ?? 'N/A',
+              feedback: garagesocketsCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -2442,8 +2474,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Flooring',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: garageflooringCondition ?? 'N/A',
+              feedback: garageflooringCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -2452,8 +2484,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Additional Items',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: garageadditionalItemsCondition ?? 'N/A',
+              feedback: garageadditionalItemsCondition ?? 'N/A',
               conditionImages: [],
             ),
           ],
@@ -2470,8 +2502,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Door',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: ExteriorFrontDoorCondition ?? 'N/A',
+              feedback: ExteriorFrontDoorCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -2480,8 +2512,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Door Frame',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: exteriorFrontDoorFrameCondition ?? 'N/A',
+              feedback: exteriorFrontDoorFrameCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -2490,8 +2522,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Porch',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: exteriorFrontPorchCondition ?? 'N/A',
+              feedback: exteriorFrontPorchCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -2500,8 +2532,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Additional Items',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: exteriorFrontAdditionalItemsCondition  ?? 'N/A',
+              feedback: exteriorFrontAdditionalItemsCondition ?? 'N/A',
               conditionImages: [],
             ),
           ],
@@ -2518,8 +2550,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Door',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: entranceDoorCondition ?? 'N/A',
+              feedback: entranceDoorCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -2528,8 +2560,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Door Frame',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments:  entranceDoorFrameCondition ?? 'N/A',
+              feedback:  entranceDoorFrameCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -2538,8 +2570,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Ceilings',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: entranceCeilingCondition ?? 'N/A',
+              feedback: entranceCeilingCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -2548,8 +2580,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Lighting',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: entranceLightingCondition ?? 'N/A',
+              feedback: entranceLightingCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -2558,8 +2590,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Wall',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: entranceWallsCondition ?? 'N/A',
+              feedback: entranceWallsCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -2568,8 +2600,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Skirting',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: entranceSkirtingCondition ?? 'N/A',
+              feedback: entranceSkirtingCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -2578,8 +2610,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Window Sill',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: entranceWindowSillCondition ?? 'N/A',
+              feedback: entranceWindowSillCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -2588,8 +2620,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Curtains',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: entranceCurtainsCondition ?? 'N/A',
+              feedback: entranceCurtainsCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -2598,8 +2630,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Blinds',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: entranceBlindsCondition ?? 'N/A',
+              feedback: entranceBlindsCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -2608,8 +2640,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Light Switches',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: entranceLightSwitchesCondition ?? 'N/A',
+              feedback: entranceLightSwitchesCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -2618,8 +2650,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Sockets',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: entranceSocketsCondition ?? 'N/A',
+              feedback: entranceSocketsCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -2628,8 +2660,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Flooring',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments:entranceFlooringCondition  ?? 'N/A',
+              feedback: entranceFlooringCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -2638,8 +2670,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Additional Items',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: entranceAdditionalItemsCondition ?? 'N/A',
+              feedback: entranceAdditionalItemsCondition ?? 'N/A',
               conditionImages: [],
             ),
           ],
@@ -2649,7 +2681,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
         // 11 Toilet
         InspectionReportDto(
           reportId: 'report001',
-          name: 'Entrance/Hallway',
+          name: 'Toilet',
           subTypes: [
 
             //11.1 Door Frame
@@ -2657,8 +2689,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Door Frame',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: toiletDoorCondition ?? 'N/A',
+              feedback: toiletDoorCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -2667,8 +2699,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Ceilings',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: toiletDoorFrameCondition  ?? 'N/A',
+              feedback: toiletDoorFrameCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -2677,8 +2709,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Extractor Fan',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: toiletExtractorFanCondition ?? 'N/A',
+              feedback: toiletExtractorFanCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -2687,8 +2719,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Lighting',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: toiletLightingCondition ?? 'N/A',
+              feedback: toiletLightingCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -2697,8 +2729,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Wall',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: toiletWallsCondition ?? 'N/A',
+              feedback: toiletWallsCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -2707,8 +2739,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Skirting',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: toiletSkirtingCondition  ?? 'N/A',
+              feedback: toiletSkirtingCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -2717,8 +2749,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Window Sill',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: toiletWindowSillCondition ?? 'N/A',
+              feedback: toiletWindowSillCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -2727,8 +2759,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Curtains',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: toiletCurtainsCondition ?? 'N/A',
+              feedback: toiletCurtainsCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -2737,8 +2769,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Blinds',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: toiletBlindsCondition ?? 'N/A',
+              feedback: toiletBlindsCondition  ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -2747,8 +2779,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Toilet',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: toiletToiletCondition ?? 'N/A',
+              feedback: toiletToiletCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -2757,8 +2789,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Basin',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: toiletBasinCondition ?? 'N/A',
+              feedback: toiletBasinCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -2767,8 +2799,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Shower Cubicle',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: toiletShowerCubicleCondition ?? 'N/A',
+              feedback: toiletShowerCubicleCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -2777,8 +2809,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Bath',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: toiletBathCondition ?? 'N/A',
+              feedback:toiletBathCondition  ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -2787,8 +2819,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Switch Board',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: toiletSwitchBoardCondition ?? 'N/A',
+              feedback: toiletSwitchBoardCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -2797,8 +2829,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Sockets',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: toiletSocketCondition ?? 'N/A',
+              feedback: toiletSocketCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -2807,8 +2839,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Heating',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: toiletHeatingCondition ?? 'N/A',
+              feedback: toiletHeatingCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -2817,8 +2849,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Accessories',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: toiletAccessoriesCondition ?? 'N/A',
+              feedback: toiletAccessoriesCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -2827,8 +2859,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Flooring',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments:  toiletFlooringCondition ?? 'N/A',
+              feedback:  toiletFlooringCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -2837,8 +2869,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Additional Items',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: toiletAdditionalItemsCondition ?? 'N/A',
+              feedback: toiletAdditionalItemsCondition ?? 'N/A',
               conditionImages: [],
             ),
           ],
@@ -2855,8 +2887,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Door',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: lougeDoorCondition ?? 'N/A',
+              feedback: lougeDoorCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -2865,8 +2897,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Door Frame',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: loungedoorFrameCondition ?? 'N/A',
+              feedback: loungedoorFrameCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -2875,8 +2907,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Ceilings',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: loungeceilingCondition ?? 'N/A',
+              feedback: loungeceilingCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -2885,8 +2917,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Lighting',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: loungelightingCondition ?? 'N/A',
+              feedback: loungelightingCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -2895,8 +2927,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Wall',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: loungewallsCondition ?? 'N/A',
+              feedback: loungewallsCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -2905,8 +2937,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Skirting',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: loungeskirtingCondition ?? 'N/A',
+              feedback: loungeskirtingCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -2915,8 +2947,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Window Sill',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: loungewindowSillCondition ?? 'N/A',
+              feedback: loungewindowSillCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -2925,8 +2957,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Curtains',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: loungecurtainsCondition ?? 'N/A',
+              feedback: loungecurtainsCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -2935,8 +2967,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Blinds',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: loungeblindsCondition ?? 'N/A',
+              feedback: loungeblindsCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -2945,8 +2977,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Light Switches',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: loungelightSwitchesCondition ?? 'N/A',
+              feedback: loungelightSwitchesCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -2955,8 +2987,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Sockets',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: loungesocketsCondition ?? 'N/A',
+              feedback: loungesocketsCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -2965,8 +2997,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Flooring',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: loungeflooringCondition ?? 'N/A',
+              feedback: loungeflooringCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -2975,8 +3007,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Additional Items',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: loungeadditionalItemsCondition ?? 'N/A',
+              feedback: loungeadditionalItemsCondition ?? 'N/A',
               conditionImages: [],
             ),
           ],
@@ -2993,8 +3025,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Door',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: kitchenDoorCondition ?? 'N/A',
+              feedback:  kitchenDoorCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3003,8 +3035,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Door Frame',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: kitchenDoorFrameCondition ?? 'N/A',
+              feedback: kitchenDoorFrameCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3013,8 +3045,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Ceilings',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: kitchenCeilingCondition ?? 'N/A',
+              feedback: kitchenCeilingCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3023,8 +3055,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Lighting',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: kitchenLightingCondition ?? 'N/A',
+              feedback: kitchenLightingCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3033,8 +3065,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Wall',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: kitchenWallsCondition ?? 'N/A',
+              feedback: kitchenWallsCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3043,8 +3075,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Skirting',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: kitchenSkirtingCondition ?? 'N/A',
+              feedback: kitchenSkirtingCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3053,8 +3085,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Window Sill',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: kitchenWindowSillCondition ?? 'N/A',
+              feedback: kitchenWindowSillCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3063,8 +3095,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Curtains',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: kitchenCurtainsCondition ?? 'N/A',
+              feedback: kitchenCurtainsCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3073,8 +3105,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Blinds',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: kitchenBlindsCondition ?? 'N/A',
+              feedback: kitchenBlindsCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3083,8 +3115,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Light Switches',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: kitchenSwitchBoardCondition ?? 'N/A',
+              feedback:kitchenSwitchBoardCondition  ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3093,8 +3125,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Sockets',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: kitchenSocketCondition ?? 'N/A',
+              feedback: kitchenSocketCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3103,8 +3135,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Flooring',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: kitchenFlooringCondition ?? 'N/A',
+              feedback: kitchenFlooringCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3113,8 +3145,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Additional Items',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: kitchenAdditionItemsCondition ?? 'N/A',
+              feedback: kitchenAdditionItemsCondition ?? 'N/A',
               conditionImages: [],
             ),
           ],
@@ -3131,8 +3163,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Door',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: utilityDoorCondition ?? 'N/A',
+              feedback: utilityDoorCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3141,8 +3173,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Door Frame',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: utilityDoorFrameCondition ?? 'N/A',
+              feedback: utilityDoorFrameCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3151,8 +3183,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Ceilings',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: utilityCeilingCondition ?? 'N/A',
+              feedback: utilityCeilingCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3161,8 +3193,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Lighting',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: utilityLightingCondition ?? 'N/A',
+              feedback: utilityLightingCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3171,8 +3203,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Wall',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: utilitywallsCondition ?? 'N/A',
+              feedback: utilitywallsCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3181,8 +3213,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Skirting',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: utilityskirtingCondition ?? 'N/A',
+              feedback: utilityskirtingCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3191,8 +3223,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Window Sill',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: utilitywindowSillCondition ?? 'N/A',
+              feedback: utilitywindowSillCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3201,8 +3233,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Curtains',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: utilitycurtainsCondition ?? 'N/A',
+              feedback: utilitycurtainsCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3211,8 +3243,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Blinds',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: utilityblindsCondition ?? 'N/A',
+              feedback: utilityblindsCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3221,8 +3253,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Light Switches',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: utilitylightSwitchesCondition ?? 'N/A',
+              feedback: utilitylightSwitchesCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3231,8 +3263,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Sockets',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: utilitysocketsCondition ?? 'N/A',
+              feedback: utilitysocketsCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3241,8 +3273,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Flooring',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: utilityflooringCondition ?? 'N/A',
+              feedback: utilityflooringCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3251,8 +3283,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Additional Items',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: utilityadditionalItemsCondition ?? 'N/A',
+              feedback: utilityadditionalItemsCondition ?? 'N/A',
               conditionImages: [],
             ),
           ],
@@ -3269,8 +3301,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Door',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: stairsdoorCondition ?? 'N/A',
+              feedback: stairsdoorCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3279,8 +3311,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Door Frame',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: stairsdoorFrameCondition ?? 'N/A',
+              feedback: stairsdoorFrameCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3289,8 +3321,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Ceilings',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: stairsceilingCondition ?? 'N/A',
+              feedback: stairsceilingCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3299,8 +3331,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Lighting',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments:  stairslightingCondition ?? 'N/A',
+              feedback:  stairslightingCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3309,8 +3341,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Wall',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: stairswallsCondition ?? 'N/A',
+              feedback: stairswallsCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3319,8 +3351,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Skirting',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: stairsskirtingCondition ?? 'N/A',
+              feedback:stairsskirtingCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3329,8 +3361,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Window Sill',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: stairswindowSillCondition ?? 'N/A',
+              feedback: stairswindowSillCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3339,8 +3371,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Curtains',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: stairscurtainsCondition ?? 'N/A',
+              feedback: stairscurtainsCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3349,8 +3381,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Blinds',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: stairsblindsCondition ?? 'N/A',
+              feedback: stairsblindsCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3359,8 +3391,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Light Switches',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: stairslightSwitchesCondition ?? 'N/A',
+              feedback: stairslightSwitchesCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3369,8 +3401,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Sockets',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: stairssocketsCondition ?? 'N/A',
+              feedback: stairssocketsCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3379,8 +3411,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Flooring',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: stairsflooringCondition ?? 'N/A',
+              feedback: stairsflooringCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3389,8 +3421,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Additional Items',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: stairsadditionalItemsCondition ?? 'N/A',
+              feedback: stairsadditionalItemsCondition ?? 'N/A',
               conditionImages: [],
             ),
           ],
@@ -3407,8 +3439,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Door',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: landingdoorCondition ?? 'N/A',
+              feedback: landingdoorCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3417,8 +3449,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Door Frame',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: landingdoorFrameCondition  ?? 'N/A',
+              feedback: landingdoorFrameCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3427,8 +3459,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Ceilings',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: landingceilingCondition ?? 'N/A',
+              feedback: landingceilingCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3437,8 +3469,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Lighting',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: landinglightingCondition ?? 'N/A',
+              feedback: landinglightingCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3447,8 +3479,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Wall',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: landingwallsCondition ?? 'N/A',
+              feedback: landingwallsCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3457,8 +3489,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Skirting',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: landingskirtingCondition ?? 'N/A',
+              feedback: landingskirtingCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3467,8 +3499,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Window Sill',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: landingwindowSillCondition ?? 'N/A',
+              feedback: landingwindowSillCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3477,8 +3509,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Curtains',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: landingcurtainsCondition ?? 'N/A',
+              feedback: landingcurtainsCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3487,8 +3519,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Blinds',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: landingblindsCondition ?? 'N/A',
+              feedback: landingblindsCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3497,8 +3529,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Light Switches',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: landinglightSwitchesCondition ?? 'N/A',
+              feedback: landinglightSwitchesCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3507,8 +3539,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Sockets',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: landingsocketsCondition ?? 'N/A',
+              feedback: landingsocketsCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3517,8 +3549,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Flooring',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: landingflooringCondition ?? 'N/A',
+              feedback: landingflooringCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3527,8 +3559,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Additional Items',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: landingadditionalItemsCondition ?? 'N/A',
+              feedback: landingadditionalItemsCondition ?? 'N/A',
               conditionImages: [],
             ),
           ],
@@ -3545,8 +3577,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Door',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: bedRoomDoorCondition ?? 'N/A',
+              feedback: bedRoomDoorCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3555,8 +3587,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Door Frame',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: bedRoomDoorFrameCondition ?? 'N/A',
+              feedback: bedRoomDoorFrameCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3565,8 +3597,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Ceilings',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: bedRoomCeilingCondition ?? 'N/A',
+              feedback: bedRoomCeilingCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3575,8 +3607,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Lighting',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: bedRoomLightingCondition ?? 'N/A',
+              feedback: bedRoomLightingCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3585,8 +3617,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Wall',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: bedRoomWallsCondition ?? 'N/A',
+              feedback: bedRoomWallsCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3595,8 +3627,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Skirting',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: bedRoomsSkirtingCondition ?? 'N/A',
+              feedback: bedRoomsSkirtingCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3605,8 +3637,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Window Sill',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: bedRoomWindowSillCondition ?? 'N/A',
+              feedback: bedRoomWindowSillCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3615,8 +3647,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Curtains',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: bedRoomCurtainsCondition ?? 'N/A',
+              feedback: bedRoomCurtainsCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3625,8 +3657,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Blinds',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: bedRoomBlindsCondition ?? 'N/A',
+              feedback: bedRoomBlindsCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3635,8 +3667,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Light Switches',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: bedRoomLightSwitchesCondition ?? 'N/A',
+              feedback: bedRoomLightSwitchesCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3645,8 +3677,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Sockets',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: bedRoomSocketsCondition?? 'N/A',
+              feedback: bedRoomSocketsCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3655,8 +3687,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Flooring',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments:  bedRoomFlooringCondition ?? 'N/A',
+              feedback:  bedRoomFlooringCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3665,8 +3697,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Additional Items',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: bedRoomAdditionalItemsCondition ?? 'N/A',
+              feedback: bedRoomAdditionalItemsCondition ?? 'N/A',
               conditionImages: [],
             ),
           ],
@@ -3683,8 +3715,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Door',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: ensuitdoorCondition ?? 'N/A',
+              feedback: ensuitdoorCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3693,8 +3725,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Door Frame',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: ensuitdoorFrameCondition?? 'N/A',
+              feedback: ensuitdoorFrameCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3703,8 +3735,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Ceilings',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: ensuiteceilingCondition ?? 'N/A',
+              feedback: ensuiteceilingCondition?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3713,8 +3745,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Lighting',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: ensuitlightingCondition ?? 'N/A',
+              feedback: ensuitlightingCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3723,8 +3755,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Wall',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: ensuitewallsCondition ?? 'N/A',
+              feedback: ensuitewallsCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3733,8 +3765,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Skirting',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: ensuiteskirtingCondition ?? 'N/A',
+              feedback: ensuiteskirtingCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3743,8 +3775,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Window Sill',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: ensuitewindowSillCondition ?? 'N/A',
+              feedback: ensuitewindowSillCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3753,8 +3785,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Curtains',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: ensuitecurtainsCondition ?? 'N/A',
+              feedback:ensuitecurtainsCondition?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3763,8 +3795,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Blinds',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: ensuiteblindsCondition ?? 'N/A',
+              feedback: ensuiteblindsCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3773,8 +3805,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Light Switches',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: ensuitelightSwitchesCondition ?? 'N/A',
+              feedback: ensuitelightSwitchesCondition?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3783,8 +3815,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Sockets',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: ensuitesocketsCondition ?? 'N/A',
+              feedback: ensuitesocketsCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3793,8 +3825,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Flooring',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: ensuiteflooringCondition ?? 'N/A',
+              feedback: ensuiteflooringCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3803,8 +3835,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Additional Items',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: ensuiteadditionalItemsCondition ?? 'N/A',
+              feedback: ensuiteadditionalItemsCondition ?? 'N/A',
               conditionImages: [],
             ),
           ],
@@ -3821,8 +3853,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Door',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: bathroomdoorCondition ?? 'N/A',
+              feedback: bathroomdoorCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3831,8 +3863,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Door Frame',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: bathroomdoorFrameCondition ?? 'N/A',
+              feedback: bathroomdoorFrameCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3841,8 +3873,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Ceilings',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: bathroomceilingCondition ?? 'N/A',
+              feedback: bathroomceilingCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3851,8 +3883,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Lighting',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: bathroomlightingCondition ?? 'N/A',
+              feedback: bathroomlightingCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3861,8 +3893,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Wall',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: bathroomwallsCondition ?? 'N/A',
+              feedback: bathroomwallsCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3871,8 +3903,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Skirting',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: bathroomskirtingCondition ?? 'N/A',
+              feedback: bathroomskirtingCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3881,8 +3913,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Window Sill',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: bathroomwindowSillCondition ?? 'N/A',
+              feedback: bathroomwindowSillCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3891,8 +3923,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Curtains',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: bathroomcurtainsCondition ?? 'N/A',
+              feedback: bathroomcurtainsCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3901,8 +3933,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Blinds',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: bathroomblindsCondition ?? 'N/A',
+              feedback: bathroomblindsCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3911,8 +3943,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Light Switches',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: bathroomswitchBoardCondition ?? 'N/A',
+              feedback: bathroomswitchBoardCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3921,8 +3953,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Sockets',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: bathroomsocketCondition?? 'N/A',
+              feedback: bathroomsocketCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3931,8 +3963,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Flooring',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: bathroomflooringCondition ?? 'N/A',
+              feedback: bathroomflooringCondition ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3941,8 +3973,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Additional Items',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: bathroomadditionItemsCondition ?? 'N/A',
+              feedback: bathroomadditionItemsCondition ?? 'N/A',
               conditionImages: [],
             ),
           ],
@@ -3959,8 +3991,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Garden Description',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: reargardenDescription ?? 'N/A',
+              feedback: reargardenDescription ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3969,8 +4001,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Outside Lightinge',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: rearGardenOutsideLighting ?? 'N/A',
+              feedback: rearGardenOutsideLighting ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3979,8 +4011,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Summer House',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: rearGardensummerHouse ?? 'N/A',
+              feedback: rearGardensummerHouse ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3989,8 +4021,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Shed',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: rearGardenshed ?? 'N/A',
+              feedback: rearGardenshed ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -3999,8 +4031,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Additional Information',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: rearGardenadditionalInformation ?? 'N/A',
+              feedback: rearGardenadditionalInformation ?? 'N/A',
               conditionImages: [],
             ),
           ],
@@ -4017,8 +4049,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'House Appliance Manual',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: houseApplinceManual ?? 'N/A',
+              feedback: houseApplinceManual ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -4027,8 +4059,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Kitchen Appliance Manual',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: kitchenApplinceManual ?? 'N/A',
+              feedback: kitchenApplinceManual ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -4037,8 +4069,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Heating Manual',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: heatingManual ?? 'N/A',
+              feedback: heatingManual ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -4047,8 +4079,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Landlord Gas Safety Certificate',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: landlordGasSafetyCertificate ?? 'N/A',
+              feedback: landlordGasSafetyCertificate ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -4057,8 +4089,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Legionella Risk Assessment',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: legionellaRiskAssessment ?? 'N/A',
+              feedback: legionellaRiskAssessment ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -4067,8 +4099,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Electricity Safety Certificate',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: electricalSafetyCertificate ?? 'N/A',
+              feedback: electricalSafetyCertificate ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -4077,8 +4109,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Energy Performance Certificate',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: energyPerformanceCertificate ?? 'N/A',
+              feedback: energyPerformanceCertificate ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -4087,8 +4119,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               subTypeId: 'subType001',
               subTypeName: 'Move In Checklist',
               images: [overviewImages.toString()],
-              comments: 'Condition: Good, Additional Comments: Good',
-              feedback: '',
+              comments: moveInChecklist ?? 'N/A',
+              feedback: moveInChecklist ?? 'N/A',
               conditionImages: [],
             ),
 
@@ -4103,73 +4135,147 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
     ),
   );
 
-  Future<void> _saveData() async {
-    try {
-      await sendPropertyData(property);
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Data saved successfully!'),
-      ));
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Failed to save data: $e'),
-      ));
-    }
-  }
+  // Future<void> _saveData() async {
+  //   try {
+  //     await sendPropertyData(property);
+  //     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+  //       content: Text('Data saved successfully!'),
+  //     ));
+  //   } catch (e) {
+  //     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+  //       content: Text('Failed to save data: $e'),
+  //     ));
+  //   }
+  // }
+  
+  Future<void> sendPropertyData(BuildContext context, PropertyDto property) async {
+    // Show loading indicator
+    showDialog(
+      context: context,
+      barrierDismissible: false, // Prevent dismissing the dialog by tapping outside
+      builder: (BuildContext context) {
+        return Center(
+          child: SizedBox(
+            width: 60.0,
+            height: 60.0,
+            child: CircularProgressIndicator(
+              color: kPrimaryColor,
+              strokeWidth: 3.0,
+            ),
+          ),
+        );
+      },
+    );
 
-  Future<void> sendPropertyData(PropertyDto property) async {
-    final url =
-        '$baseURL/summary/generateReport'; // Replace with your backend URL
+    final url = '$baseURL/summary/generateReport'; // Replace with your backend URL
     final headers = {'Content-Type': 'application/json'};
     final body = jsonEncode(property.toJson());
 
-    final response = await http.post(
-      Uri.parse(url),
-      headers: headers,
-      body: body,
-    );
-
-    if (response.statusCode != 200) {
-      throw Exception('Failed to save data: ${response.reasonPhrase}');
-    }
-  }
-
-  Future<void> fetchProperties() async {
-    setState(() {
-      isLoading = true;
-    });
-
-    String propertyId = widget.propertyId;
-
     try {
-      final response = await http
-          .get(Uri.parse('$baseURL/property/$propertyId'))
-          .timeout(Duration(seconds: 60)); // Set the timeout duration
+      // Make the HTTP POST request
+      final response = await http.post(
+        Uri.parse(url),
+        headers: headers,
+        body: body,
+      );
+
+      // Close the loading dialog after receiving a response
+      Navigator.of(context, rootNavigator: true).pop();
 
       if (response.statusCode == 200) {
-        print("Edit Page - $propertyId");
-        final List<dynamic> data = json.decode(response.body);
-        setState(() {
-          properties =
-              data.map((item) => item as Map<String, dynamic>).toList();
-          isLoading = false;
+        // Parse response and perform success actions
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Report Has been Sent to your Email',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+              fontFamily: "Inter",
+            ),)),
+        );
+        // Hide the loading indicator
+        Navigator.of(context).pop();
+
+        // Navigate to the confirmation page
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) =>HomePage(),
+            ),
+          );
         });
       } else {
-        // Handle server errors
-        setState(() {
-          properties = []; // Ensure properties is set to an empty list
-          isLoading = false;
-        });
-        // Display error message
+        // Handle non-200 status codes
+        _showErrorDialog(context, 'Failed to save data: ${response.reasonPhrase}');
       }
     } catch (e) {
-      // Handle network errors
-      setState(() {
-        properties = []; // Ensure properties is set to an empty list
-        isLoading = false;
-      });
-      // Display error message
+      // Close the loading dialog if an exception occurs
+      Navigator.of(context, rootNavigator: true).pop();
+
+      // Handle connection issues or other errors
+      _showErrorDialog(context, 'An error occurred: $e');
     }
   }
+
+// Function to show error dialogs
+  void _showErrorDialog(BuildContext context, String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Error'),
+          content: Text(message),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // Future<void> fetchProperties() async {
+  //   setState(() {
+  //     isLoading = true;
+  //   });
+  //
+  //   String propertyId = widget.propertyId;
+  //
+  //   try {
+  //     final response = await http
+  //         .get(Uri.parse('$baseURL/property/$propertyId'))
+  //         .timeout(Duration(seconds: 60)); // Set the timeout duration
+  //
+  //     if (response.statusCode == 200) {
+  //       print("Edit Page - $propertyId");
+  //       final List<dynamic> data = json.decode(response.body);
+  //       setState(() {
+  //         properties =
+  //             data.map((item) => item as Map<String, dynamic>).toList();
+  //         isLoading = false;
+  //       });
+  //     } else {
+  //       // Handle server errors
+  //       setState(() {
+  //         properties = []; // Ensure properties is set to an empty list
+  //         isLoading = false;
+  //       });
+  //       // Display error message
+  //     }
+  //   } catch (e) {
+  //     // Handle network errors
+  //     setState(() {
+  //       properties = []; // Ensure properties is set to an empty list
+  //       isLoading = false;
+  //     });
+  //     // Display error message
+  //   }
+  // }
 
   Future<Map<String, dynamic>> getSharedPreferencesData() async {
     String propertyId = widget.propertyId;
@@ -4360,7 +4466,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
   Future<void> fetchUserDetails() async {
     try {
       final response =
-          await http.get(Uri.parse('$baseURL/user/firebaseId/$firebaseId'));
+      await http.get(Uri.parse('$baseURL/user/firebaseId/$firebaseId'));
 
       if (response.statusCode == 200) {
         print(response.statusCode);
@@ -4506,8 +4612,10 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '1.1 Overview - Odours',
             'details': [
-              {'label': 'Condition', 'value': overview ?? 'N/A',},
-              {'label': 'Additional Comments', 'value': overview ?? 'N/A',},
+              {
+                'label': 'Condition',
+                'value': overview ?? 'N/A',
+              },
             ],
             'images': ['path_to_image1', 'path_to_image2']
             // Use image paths or URLs
@@ -4515,9 +4623,10 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '1.2 Genral Cleanliness',
             'details': [
-              {'label': 'Condition', 'value': accessoryCleanliness ?? 'N/A',},
-              {'label': 'Additional Comments', 'value': accessoryCleanliness ?? 'N/A',},
-
+              {
+                'label': 'Condition',
+                'value': accessoryCleanliness ?? 'N/A',
+              },
             ],
             'images': ['path_to_image3', 'path_to_image4']
             // Use image paths or URLs
@@ -4525,7 +4634,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '1.3 Bathroom/En Suite/ Toilet(s)',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {'label': 'Condition', 'value': carpets ?? 'N/A',},
+
             ],
             'images': ['path_to_image1', 'path_to_image2']
             // Use image paths or URLs
@@ -4533,7 +4643,10 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '1.4 Carpets',
             'details': [
-              {'label': 'Condition', 'value': 'Clean'},
+              {
+                'label': 'Condition',
+                'value': carpets ?? 'N/A',
+              },
             ],
             'images': ['path_to_image3', 'path_to_image4']
             // Use image paths or URLs
@@ -4541,7 +4654,10 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '1.5 Ceiling(s)',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': ceilings ?? 'N/A',
+              },
             ],
             'images': ['path_to_image1', 'path_to_image2']
             // Use image paths or URLs
@@ -4549,7 +4665,10 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '1.6 Curtains/Blinds',
             'details': [
-              {'label': 'Condition', 'value': 'Clean'},
+              {
+                'label': 'Condition',
+                'value': curtains ?? 'N/A',
+              },
             ],
             'images': ['path_to_image3', 'path_to_image4']
             // Use image paths or URLs
@@ -4557,7 +4676,10 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '1.7 Hard Flooring',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': hardFlooring ?? 'N/A',
+              },
             ],
             'images': ['path_to_image1', 'path_to_image2']
             // Use image paths or URLs
@@ -4565,7 +4687,10 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '1.8 Kitchen Area',
             'details': [
-              {'label': 'Condition', 'value': 'Clean'},
+              {
+                'label': 'Condition',
+                'value': kitchenArea ?? 'N/A',
+              },
             ],
             'images': ['path_to_image3', 'path_to_image4']
             // Use image paths or URLs
@@ -4573,7 +4698,10 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '1.9 Kitchen - White Goods',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': oven ?? 'N/A',
+              },
             ],
             'images': ['path_to_image1', 'path_to_image2']
             // Use image paths or URLs
@@ -4581,7 +4709,10 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '1.10 Oven/Hob/Extractor Hood/Cooker',
             'details': [
-              {'label': 'Condition', 'value': 'Clean'},
+              {
+                'label': 'Condition',
+                'value': oven ?? 'N/A',
+              },
             ],
             'images': ['path_to_image3', 'path_to_image4']
             // Use image paths or URLs
@@ -4589,7 +4720,10 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '1.11 Mattress(s)',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': mattress ?? 'N/A',
+              },
             ],
             'images': ['path_to_image1', 'path_to_image2']
             // Use image paths or URLs
@@ -4597,7 +4731,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '1.12 Upholstery',
             'details': [
-              {'label': 'Condition', 'value': 'Clean'},
+              {'label': 'Condition', 'value': upholstrey?? 'N/A',},
             ],
             'images': ['path_to_image3', 'path_to_image4']
             // Use image paths or URLs
@@ -4605,7 +4739,10 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '1.13 Wall(s)',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': wall ?? 'N/A',
+              },
             ],
             'images': ['path_to_image1', 'path_to_image2']
             // Use image paths or URLs
@@ -4613,7 +4750,10 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '1.14 Window(s)',
             'details': [
-              {'label': 'Condition', 'value': 'Clean'},
+              {
+                'label': 'Condition',
+                'value': window ?? 'N/A',
+              },
             ],
             'images': ['path_to_image3', 'path_to_image4']
             // Use image paths or URLs
@@ -4621,7 +4761,10 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '1.15 Woodwork',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': woodwork ?? 'N/A',
+              },
             ],
             'images': ['path_to_image1', 'path_to_image2']
             // Use image paths or URLs
@@ -4643,7 +4786,10 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '2.1 Overview',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': evChargerDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -4657,7 +4803,10 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '3.1 Gas Meter ',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': gasMeterReading ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -4665,7 +4814,10 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '3.2 Electric Meter ',
             'details': [
-              {'label': 'Condition', 'value': 'Clean'},
+              {
+                'label': 'Condition',
+                'value': electricMeterReading ?? 'N/A',
+              },
             ],
             'images': ['path_to_image7', 'path_to_image8']
             // Use image paths or URLs
@@ -4673,7 +4825,10 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '3.3 Water Meter ',
             'details': [
-              {'label': 'Condition', 'value': 'Clean'},
+              {
+                'label': 'Condition',
+                'value': waterMeterReading ?? 'N/A',
+              },
             ],
             'images': ['path_to_image7', 'path_to_image8']
             // Use image paths or URLs
@@ -4681,7 +4836,10 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '3.4 Oil Meter ',
             'details': [
-              {'label': 'Condition', 'value': 'Clean'},
+              {
+                'label': 'Condition',
+                'value': oilMeterReading ?? 'N/A',
+              },
             ],
             'images': ['path_to_image7', 'path_to_image8']
             // Use image paths or URLs
@@ -4689,7 +4847,10 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '3.5 Other ',
             'details': [
-              {'label': 'Condition', 'value': 'Clean'},
+              {
+                'label': 'Condition',
+                'value': otherMeterReading ?? 'N/A',
+              },
             ],
             'images': ['path_to_image7', 'path_to_image8']
             // Use image paths or URLs
@@ -4703,7 +4864,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '4.1 Yale ',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': yaleLocation ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': yaleLocation ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -4711,7 +4879,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '4.2 Mortice',
             'details': [
-              {'label': 'Condition', 'value': 'Clean'},
+              {
+                'label': 'Condition',
+                'value': morticeLocation ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': morticeLocation ?? 'N/A',
+              },
             ],
             'images': ['path_to_image7', 'path_to_image8']
             // Use image paths or URLs
@@ -4719,7 +4894,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '4.3 Window Lock',
             'details': [
-              {'label': 'Condition', 'value': 'Clean'},
+              {
+                'label': 'Condition',
+                'value': windowLockLocation ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': windowLockLocation ?? 'N/A',
+              },
             ],
             'images': ['path_to_image7', 'path_to_image8']
             // Use image paths or URLs
@@ -4727,7 +4909,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '4.4 Gas/Electric Meter ',
             'details': [
-              {'label': 'Condition', 'value': 'Clean'},
+              {
+                'label': 'Condition',
+                'value': gasMeterLocation ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': gasMeterLocation ?? 'N/A',
+              },
             ],
             'images': ['path_to_image7', 'path_to_image8']
             // Use image paths or URLs
@@ -4735,7 +4924,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '4.5 Car Pass/Permit ',
             'details': [
-              {'label': 'Condition', 'value': 'Clean'},
+              {
+                'label': 'Condition',
+                'value': carPassLocation ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': carPassReading ?? 'N/A',
+              },
             ],
             'images': ['path_to_image7', 'path_to_image8']
             // Use image paths or URLs
@@ -4743,7 +4939,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '4.6 Remote/Security Fob ',
             'details': [
-              {'label': 'Condition', 'value': 'Clean'},
+              {
+                'label': 'Condition',
+                'value': remoteLocation ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': remoteReading ?? 'N/A',
+              },
             ],
             'images': ['path_to_image7', 'path_to_image8']
             // Use image paths or URLs
@@ -4751,7 +4954,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '4.7 Other ',
             'details': [
-              {'label': 'Condition', 'value': 'Clean'},
+              {
+                'label': 'Condition',
+                'value': otherLocation ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': otherReading ?? 'N/A',
+              },
             ],
             'images': ['path_to_image7', 'path_to_image8']
             // Use image paths or URLs
@@ -4765,7 +4975,10 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '5.1 Yale',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': yale ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -4773,7 +4986,10 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '5.2 Mortice',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': mortice ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -4781,7 +4997,10 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '5.3 Other',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': other ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -4795,7 +5014,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '6.1 Smoke Alarm(s)',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': smokeAlarmCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': smokeAlarmDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -4803,7 +5029,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '6.2 Heat Sensor Alarm(s)',
             'details': [
-              {'label': 'Condition', 'value': 'Clean'},
+              {
+                'label': 'Condition',
+                'value': heatSensorCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': heatSensorDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image7', 'path_to_image8']
             // Use image paths or URLs
@@ -4811,7 +5044,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '6.3 Carbon Monoxide Alarm(s)',
             'details': [
-              {'label': 'Condition', 'value': 'Clean'},
+              {
+                'label': 'Condition',
+                'value': carbonMonoxideCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': carbonMonoxideDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image7', 'path_to_image8']
             // Use image paths or URLs
@@ -4833,7 +5073,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '7.2 Door',
             'details': [
-              {'label': 'Condition', 'value': 'Clean'},
+              {
+                'label': 'Condition',
+                'value': newdoor ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': newdoor ?? 'N/A',
+              },
             ],
             'images': ['path_to_image7', 'path_to_image8']
             // Use image paths or URLs
@@ -4841,7 +5088,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '7.3 Door Frame',
             'details': [
-              {'label': 'Condition', 'value': 'Clean'},
+              {
+                'label': 'Condition',
+                'value': garageDoorFrameCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': garageDoorDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image7', 'path_to_image8']
             // Use image paths or URLs
@@ -4849,7 +5103,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '7.4 Ceiling',
             'details': [
-              {'label': 'Condition', 'value': 'Clean'},
+              {
+                'label': 'Condition',
+                'value': garageceilingCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': garageceilingDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image7', 'path_to_image8']
             // Use image paths or URLs
@@ -4857,7 +5118,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '7.5 Lighting',
             'details': [
-              {'label': 'Condition', 'value': 'Clean'},
+              {
+                'label': 'Condition',
+                'value': garagelightingCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': garagelightingDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image7', 'path_to_image8']
             // Use image paths or URLs
@@ -4865,7 +5133,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '7.6 Walls',
             'details': [
-              {'label': 'Condition', 'value': 'Clean'},
+              {
+                'label': 'Condition',
+                'value': garagewallsCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': garagewallsDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image7', 'path_to_image8']
             // Use image paths or URLs
@@ -4873,7 +5148,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '7.7 Window(s)/Sill',
             'details': [
-              {'label': 'Condition', 'value': 'Clean'},
+              {
+                'label': 'Condition',
+                'value': garagewindowSillCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': garagewindowSillDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image7', 'path_to_image8']
             // Use image paths or URLs
@@ -4881,7 +5163,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '7.8 Switch',
             'details': [
-              {'label': 'Condition', 'value': 'Clean'},
+              {
+                'label': 'Condition',
+                'value': garagelightSwitchesCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': garagelightSwitchesDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image7', 'path_to_image8']
             // Use image paths or URLs
@@ -4889,7 +5178,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '7.9 Sockets',
             'details': [
-              {'label': 'Condition', 'value': 'Clean'},
+              {
+                'label': 'Condition',
+                'value': garagesocketsCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': garagesocketsDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image7', 'path_to_image8']
             // Use image paths or URLs
@@ -4897,7 +5193,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '7.10 Flooring',
             'details': [
-              {'label': 'Condition', 'value': 'Clean'},
+              {
+                'label': 'Condition',
+                'value': garageflooringCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': garageflooringDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image7', 'path_to_image8']
             // Use image paths or URLs
@@ -4905,7 +5208,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '7.11 Additional Items/ Information',
             'details': [
-              {'label': 'Condition', 'value': 'Clean'},
+              {
+                'label': 'Condition',
+                'value': additionItemsImagePath ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': additionItemsImagePath ?? 'N/A',
+              },
             ],
             'images': ['path_to_image7', 'path_to_image8']
             // Use image paths or URLs
@@ -4919,7 +5229,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '8.1 Garden Discritpion',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {'label': 'Condition', 'value': 'Goods'},
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -4927,7 +5237,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '8.2 DriveWay',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': driveWayCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': driveWayDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -4935,7 +5252,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '8.3 Outside Lighting',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': outsideLightingCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': outsideLightingDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -4943,7 +5267,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '8.4 Additional Items/ Information',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': additionalItemsCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': additionalItemsDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -4957,7 +5288,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '9.1 Overview',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {'label': 'Condition', 'value': 'Goods'},
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -4965,7 +5296,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '9.2 Door',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': exteriorFrontDoorDescription ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': exteriorFrontDoorDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -4973,7 +5311,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '9.3 Door Frame',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': exteriorFrontDoorFrameCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': exteriorFrontDoorFrameDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -4981,7 +5326,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '9.4 Porch',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': exteriorFrontPorchCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': exteriorFrontPorchDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -4989,7 +5341,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '9.5 Additional Items/ Information',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': exteriorFrontAdditionalItemsCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': exteriorFrontAdditionalItemsDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5145,7 +5504,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '11.2 Door',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': toiletDoorCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': toiletDoorDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5153,7 +5519,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '11.3 Door Frame',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': toiletDoorFrameCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': toiletDoorFrameDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5161,7 +5534,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '11.4 Ceiling',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': toiletCeilingCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': toiletCeilingDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5169,7 +5549,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '11.5 Extractor Fan',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': toiletExtractorFanCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': toiletExtractorFanDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5177,7 +5564,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '11.6 Lighting',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': toiletLightingCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': toiletLightingDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5185,7 +5579,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '11.7 Walls',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': toiletWallsCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': toiletWallsCondition ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5193,7 +5594,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '11.8 Skirting',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': toiletSkirtingCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': toiletSkirtingDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5201,7 +5609,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '11.9 Window(s)/Sill',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': toiletWindowSillCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': toiletwWindowSillDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5209,7 +5624,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '11.10 Blinds',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': toiletBlindsCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': toiletBlindsDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5217,7 +5639,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '11.11 Toilet',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': toiletToiletCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': toiletToiletDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5225,7 +5654,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '11.12 Basin',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': toiletBasinCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': toiletBasinDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5233,7 +5669,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '11.13 Switch',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': toiletSwitchBoardCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': toiletSwitchBoardDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5241,7 +5684,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '11.14 Sockets',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': toiletSocketCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': toiletSocketDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5249,7 +5699,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '11.15 Heating',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': toiletHeatingCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': toiletHeatingDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5257,7 +5714,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '11.16 Accessories',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': toiletAccessoriesCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': toiletAccessoriesDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5265,7 +5729,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '11.17 Flooring',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': toiletFlooringCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': toiletFlooringDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5273,7 +5744,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '11.18 Additional Items/ Information',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': toiletAdditionalItemsCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': toiletAdditionalItemsDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5295,7 +5773,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '12.2 Door',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': lougeDoorCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': loungedoorDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5303,7 +5788,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '12.3 Door Frame',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': loungedoorFrameCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': loungedoorFrameDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5311,7 +5803,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '12.4 Ceiling',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': loungeceilingCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': loungeceilingDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5319,7 +5818,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '12.5 Lighting',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': loungelightingCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': loungelightingDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5327,7 +5833,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '12.6 Walls',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': loungewallsCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': loungewallsDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5335,7 +5848,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '12.7 Skirting',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': loungeskirtingCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': loungeskirtingDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5343,7 +5863,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '12.8 Window(s)/Sill',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': loungewindowSillCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': loungewindowSillDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5351,7 +5878,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '12.9 Curtain',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': loungecurtainsCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': loungecurtainsDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5359,7 +5893,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '12.10 Blinds',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': loungeblindsCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': loungeblindsDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5367,7 +5908,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '12.11 Switch',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': loungelightSwitchesCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': loungelightSwitchesDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5375,7 +5923,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '12.12 Sockets',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': loungesocketsCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': loungesocketsDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5383,7 +5938,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '12.13 Heating',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {'label': 'Condition', 'value': 'Goods'},
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5391,7 +5946,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '12.14 Fireplace',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {'label': 'Condition', 'value': 'Goods'},
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5399,7 +5954,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '12.15 Flooring',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': loungeflooringCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': loungeflooringDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5407,7 +5969,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '12.16 Additional Items/ Information',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': loungeadditionalItemsCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': loungeadditionalItemsDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5429,7 +5998,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '13.2 Door',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': kitchenNewDoor ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': kitchenDoorDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5437,7 +6013,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '13.3 Door Frame',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': kitchenDoorFrameCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': kitchenDoorFrameDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5445,7 +6028,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '13.4 Ceiling',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': kitchenCeilingCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': kitchenCeilingDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5453,7 +6043,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '13.5 Extractor Fan',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': kitchenExtractorFanCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': kitchenExtractorFanDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5461,7 +6058,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '13.6 Lighting',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': kitchenLightingCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': kitchenLightingDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5469,7 +6073,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '13.7 Walls',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': kitchenWallsCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': kitchenWallsDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5477,7 +6088,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '13.8 Skirting',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': kitchenSkirtingCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': kitchenSkirtingDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5485,7 +6103,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '13.9 Window(s)/Sill',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': kitchenWindowSillCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': kitchenWindowSillDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5493,7 +6118,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '13.10 Curtain',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': kitchenCurtainsCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': kitchenCurtainsDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5501,7 +6133,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '13.11 Blinds',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': kitchenBlindsCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': kitchenBlindsDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5509,7 +6148,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '13.12 Switch',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': kitchenSwitchBoardCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': kitchenSwitchBoardDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5517,7 +6163,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '13.13 Sockets',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': kitchenSocketCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': kitchenSocketDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5525,7 +6178,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '13.14 Heating',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': kitchenHeatingCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': kitchenHeatingDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5533,7 +6193,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '13.15 Kitchen Units',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {'label': 'Condition', 'value': 'Goods'},
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5541,7 +6201,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '13.16 Extractor Hood',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {'label': 'Condition', 'value': 'Goods'},
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5549,7 +6209,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '13.17 Cooker',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {'label': 'Condition', 'value': 'Goods'},
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5557,7 +6217,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '13.18 Hod',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {'label': 'Condition', 'value': 'Goods'},
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5565,7 +6225,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '13.19 Oven',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {'label': 'Condition', 'value': 'Goods'},
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5573,7 +6233,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '13.20 Worktop(s)',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {'label': 'Condition', 'value': 'Goods'},
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5581,7 +6241,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '13.21 Sink',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {'label': 'Condition', 'value': 'Goods'},
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5589,7 +6249,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '13.22 Fridge/Freezer',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {'label': 'Condition', 'value': 'Goods'},
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5597,7 +6257,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '13.24 Dishwasher',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {'label': 'Condition', 'value': 'Goods'},
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5605,7 +6265,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '13.25 Flooring',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': kitchenFlooringCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': kitchenFlooringDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5613,7 +6280,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '13.26 Additional Items/ Information',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {'label': 'Condition', 'value': 'Goods'},
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5635,7 +6302,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '14.2 Door',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': utilityNewdoor ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': utilityDoorDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5643,7 +6317,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '14.3 Door Frame',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': utilityDoorFrameCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': utilityDoorFrameDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5651,7 +6332,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '14.4 Ceiling',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': utilityCeilingCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': utilityCeilingDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5659,7 +6347,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '14.5 Extractor Fan',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {'label': 'Condition', 'value': 'Goods'},
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5667,7 +6355,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '14.6 Lighting',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': utilityLightingCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': utilitylightingDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5675,7 +6370,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '14.7 Walls',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': utilitywallsCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': utilitywallsDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5683,7 +6385,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '14.8 Skirting',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': kitchenSwitchBoardDescription ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': kitchenSwitchBoardDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5691,7 +6400,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '14.9 Window(s)/Sill',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': utilitywindowSillCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': utilitywindowSillDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5699,7 +6415,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '14.10 Curtain',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': utilitycurtainsCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': utilitycurtainsDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5707,7 +6430,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '14.11 Blinds',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': utilityblindsCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': utilityblindsDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5715,7 +6445,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '14.12 Switch',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': utilitylightSwitchesCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': utilitylightSwitchesDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5723,7 +6460,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '14.13 Sockets',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': utilitysocketsCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': utilitysocketsDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5731,7 +6475,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '14.14 Heating',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {'label': 'Condition', 'value': 'Goods'},
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5739,7 +6483,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '14.15 Kitchen Units',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {'label': 'Condition', 'value': 'Goods'},
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5747,7 +6491,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '14.16 Worktop(s)',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {'label': 'Condition', 'value': 'Goods'},
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5755,7 +6499,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '14.17 Sink',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {'label': 'Condition', 'value': 'Goods'},
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5763,7 +6507,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '14.18 Fridge/Freezer',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {'label': 'Condition', 'value': 'Goods'},
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5771,7 +6515,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '14.19 Washing Machine',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {'label': 'Condition', 'value': 'Goods'},
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5779,7 +6523,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '14.20 Dishwasher',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {'label': 'Condition', 'value': 'Goods'},
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5787,7 +6531,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '13.21 Flooring',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': utilityflooringCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': utilityflooringDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5795,7 +6546,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '13.22 Additional Items/ Information',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': utilityadditionalItemsCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': utilityadditionalItemsDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5817,7 +6575,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '15.2 Ceiling',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': stairsceilingCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': stairsceilingDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5825,7 +6590,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '15.3 Lighting',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': stairslightingCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': stairslightingDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5833,7 +6605,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '15.4 Walls',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': stairswallsCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': stairswallsDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5841,7 +6620,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '15.5 Skirting',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': stairsskirtingCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': stairsskirtingDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5849,7 +6635,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '15.6 Window(s)/Sill',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': stairswindowSillCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': stairswindowSillDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5857,7 +6650,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '15.7 Curtains',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': stairscurtainsCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': stairscurtainsDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5865,7 +6665,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '15.8 Blinds',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': stairsblindsCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': stairsblindsDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5873,7 +6680,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '15.9 Switch',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': stairslightSwitchesCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': stairslightSwitchesDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5881,7 +6695,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '15.10 Sockets',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': stairssocketsCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': stairssocketsDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5889,7 +6710,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '15.11 Heating',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {'label': 'Condition', 'value': 'Goods'},
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5905,7 +6726,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '15.13 Flooring',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': stairsflooringCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': stairsflooringDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5913,7 +6741,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '15.14 Additional Items/ Information',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': stairsadditionalItemsCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': stairsadditionalItemsDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5935,7 +6770,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '16.2 Ceiling',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': landingceilingCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': landingceilingDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5943,7 +6785,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '16.3 Lighting',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': landinglightingCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': landinglightingDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5951,7 +6800,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '16.4 Walls',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': landingwallsCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': landingwallsDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5959,7 +6815,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '16.5 Skirting',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': landingskirtingCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': landingskirtingDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5967,7 +6830,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '16.6 Window(s)/Sill',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': landingwindowSillCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': landingwindowSillDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5975,7 +6845,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '16.7 Curtains',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': landingcurtainsCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': landingcurtainsDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5983,7 +6860,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '16.8 Blinds',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': landingblindsCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': landingblindsDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5991,7 +6875,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '16.9 Switch',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': landinglightSwitchesCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': landinglightSwitchesDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -5999,7 +6890,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '16.10 Sockets',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': landingsocketsCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': landingsocketsDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -6015,7 +6913,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '16.12 Flooring',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': landingflooringCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': landingflooringDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -6023,7 +6928,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '16.13 Additional Items/ Information',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': landingadditionalItemsCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': landingadditionalItemsDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -6045,7 +6957,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '17.2 Door',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': bedRoomDoorCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': bedRoomDoorLocation ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -6053,7 +6972,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '17.3 Door Frame',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': bedRoomDoorFrameCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': bedRoomDoorFrameLocation ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -6061,7 +6987,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '17.4 Ceiling',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': bedRoomCeilingCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': bedRoomCeilingLocation ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -6069,7 +7002,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '17.5 Lighting',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': bedRoomLightingCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': bedRoomLightingLocation ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -6077,7 +7017,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '17.6 Walls',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': bedRoomWallsCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': bedRoomWallsLocation ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -6085,7 +7032,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '17.7 Skirting',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': bedRoomsSkirtingCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': bedRoomSkirtingLocation ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -6093,7 +7047,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '17.8 Window(s)/Sill',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': bedRoomWindowSillCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': bedRoomWindowSillLocation ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -6101,7 +7062,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '17.9 Curtain',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': bedRoomCurtainsCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': bedRoomCurtainsLocation ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -6109,7 +7077,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '17.10 Blinds',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': bedRoomBlindsCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': bedRoomBlindsLocation ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -6117,7 +7092,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '17.11 Switch',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': bedRoomLightSwitchesCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': bedRoomLightSwitchesLocation ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -6125,7 +7107,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '17.12 Sockets',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': bedRoomSocketsCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': bedRoomSocketsLocation ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -6141,7 +7130,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '17.14 Flooring',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': bedRoomFlooringCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': bedRoomFlooringLocation ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -6149,7 +7145,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '17.15 Additional Items/ Information',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': bedRoomAdditionalItemsCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': bedRoomAdditionalItemsLocation ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -6171,7 +7174,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '18.2 Door',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': ensuitdoorCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': ensuitdoorLocation ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -6179,7 +7189,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '18.3 Door Frame',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': ensuitdoorFrameCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': ensuitedoorFrameLocation ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -6187,7 +7204,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '18.4 Ceiling',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': ensuiteceilingCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': ensuitceilingLocation ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -6203,7 +7227,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '18.6 Lighting',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': ensuitlightingCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': ensuitelightingLocation ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -6211,7 +7242,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '18.7 Walls',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': ensuitewallsCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': ensuitewallsLocation ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -6219,7 +7257,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '18.8 Skirting',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': ensuiteskirtingCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': ensuiteskirtingLocation ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -6227,7 +7272,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '18.9 Window(s)/Sill',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': ensuitewindowSillCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': ensuitewindowSillLocation ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -6235,7 +7287,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '18.10 Curtain',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': ensuitecurtainsCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': ensuitecurtainsLocation ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -6243,7 +7302,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '18.11 Blinds',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {'label': 'Condition', 'value': 'Goods'},
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -6275,7 +7334,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '18.15 Switch',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': ensuitelightSwitchesCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': ensuitelightSwitchesLocation ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -6283,7 +7349,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '18.16 Sockets',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': ensuitesocketsCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': ensuitesocketsLocation ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -6307,7 +7380,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '18.19 Flooring',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': ensuiteflooringCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': ensuiteflooringLocation ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -6315,7 +7395,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '18.20 Additional Items/ Information',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': ensuiteadditionalItemsCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': ensuiteadditionalItemsLocation ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -6337,7 +7424,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '19.2 Door',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': bedRoomDoorCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': bedRoomDoorLocation ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -6345,7 +7439,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '19.3 Door Frame',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': bedRoomDoorFrameCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': bedRoomDoorFrameLocation ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -6353,7 +7454,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '19.4 Ceiling',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': bedRoomCeilingCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': bedRoomCeilingLocation ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -6369,7 +7477,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '19.6 Lighting',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': bedRoomLightingCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': bedRoomLightingLocation ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -6377,7 +7492,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '19.7 Walls',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': bedRoomWallsCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': bedRoomWallsLocation ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -6385,7 +7507,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '19.8 Skirting',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': bedRoomsSkirtingCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': bedRoomSkirtingLocation ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -6393,7 +7522,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '19.9 Window(s)/Sill',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': bedRoomWallsCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': bedRoomWallsLocation ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -6401,7 +7537,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '19.10 Curtain',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': bedRoomCurtainsCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': bedRoomCurtainsLocation ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -6409,7 +7552,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '19.11 Blinds',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': bedRoomBlindsCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': bedRoomBlindsLocation ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -6449,7 +7599,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '19.16 Switch',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': bedRoomLightSwitchesCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': bedRoomLightSwitchesLocation ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -6457,7 +7614,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '19.17 Sockets',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': bedRoomSocketsCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': bedRoomSocketsLocation ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -6481,7 +7645,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '19.20 Flooring',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': bedRoomFlooringCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': bedRoomFlooringLocation ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -6489,7 +7660,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '19.21 Additional Items/ Information',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': bedRoomAdditionalItemsCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': bedRoomAdditionalItemsLocation ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -6503,7 +7681,10 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '20.1 Garden Description',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': reargardenDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -6511,7 +7692,10 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '20.2 Outside Lighting',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': rearGardenOutsideLighting ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -6519,7 +7703,10 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '20.3 Summer House',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': rearGardensummerHouse ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -6527,7 +7714,10 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '20.4 Shed(s)',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': rearGardenshed ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -6535,7 +7725,10 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '20.5 Additional Items/ Information',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': rearGardenadditionalInformation ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -6549,7 +7742,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '21.1 House Application Manual',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': houseApplinceManual ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': houseApplinceManualDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -6557,7 +7757,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '21.2 Kitchen Appliances Manuals',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': kitchenApplinceManual ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': houseApplinceManualDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -6565,7 +7772,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '21.3 Heating System Manual',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': heatingManual ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': heatingManualDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -6573,7 +7787,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '21.4 Landlord Gas Safety Certificate',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': landlordGasSafetyCertificate ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': landlordGasSafetyCertificateDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -6581,7 +7802,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '21.5 Legionella Risk Assessment',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': legionellaRiskAssessment ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': legionellaRiskAssessmentDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -6589,7 +7817,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '21.6 Electrical Safety Certificate',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': electricalSafetyCertificate ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': electricalSafetyCertificateDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -6597,7 +7832,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '21.7 Energy Performance Certificate',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': energyPerformanceCertificate ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': energyPerformanceCertificateDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -6605,7 +7847,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '21.8 Move In Checklist',
             'details': [
-              {'label': 'Condition', 'value': 'Good'},
+              {
+                'label': 'Condition',
+                'value': moveInChecklist ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': moveInChecklistDescription ?? 'N/A',
+              },
             ],
             'images': ['path_to_image5', 'path_to_image6']
             // Use image paths or URLs
@@ -6629,7 +7878,6 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
 
       // Add more headings here
     ];
-
     return PopScope(
       canPop: false,
       child: Scaffold(
@@ -6734,7 +7982,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           actions: [
             GestureDetector(
               onTap: () {
-                _saveData(); // Link the save button to the function
+               sendPropertyData(context, property); // Link the save button to the function
                 // showDialog(
                 //   context: context,
                 //   builder: (BuildContext context) {
@@ -6869,7 +8117,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
                           children: [
                             Column(
                               children:
-                                  subItem['details'].map<Widget>((detail) {
+                              subItem['details'].map<Widget>((detail) {
                                 return ListTile(
                                   title: Text(detail['label']),
                                   subtitle: Text(detail['value']),
@@ -6887,7 +8135,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
                                     margin: EdgeInsets.symmetric(horizontal: 8),
                                     width: 100,
                                     child: Image.asset(subItem['images'][
-                                        imgIndex]), // Use Image.network() for URLs
+                                    imgIndex]), // Use Image.network() for URLs
                                   );
                                 },
                               ),
@@ -6908,10 +8156,10 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
                 const SizedBox(height: 15),
                 const Text(
                     'I/We the undersigned, affirm  that if I/we do not'
-                    ' comment on the inventory in writing within seven days '
-                    'of receipt of this inventory I/We accept the inventory '
-                    'as being an accurate record of the contents and '
-                    'conditions of the property',
+                        ' comment on the inventory in writing within seven days '
+                        'of receipt of this inventory I/We accept the inventory '
+                        'as being an accurate record of the contents and '
+                        'conditions of the property',
                     textAlign: TextAlign.justify,
                     style: TextStyle(
                       color: kPrimaryTextColourTwo,
@@ -6940,21 +8188,21 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
                 const SizedBox(height: 30),
                 signature != null
                     ? Column(
-                        children: [
-                          Center(child: Image.memory(signature!)),
-                          const SizedBox(height: 10),
-                          MaterialButton(
-                            color: Colors.green,
-                            onPressed: () {},
-                            child: const Text(
-                              "Submit",
-                              style: TextStyle(
-                                fontSize: 12,
-                              ),
-                            ),
-                          ),
-                        ],
-                      )
+                  children: [
+                    Center(child: Image.memory(signature!)),
+                    const SizedBox(height: 10),
+                    MaterialButton(
+                      color: Colors.green,
+                      onPressed: () {},
+                      child: const Text(
+                        "Submit",
+                        style: TextStyle(
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
+                  ],
+                )
                     : Container(),
                 const SizedBox(height: 30),
               ],

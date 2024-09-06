@@ -743,33 +743,33 @@ class _PropertyDetailsViewPageState extends State<PropertyDetailsViewPage> {
                       child:
                       Divider(thickness: 1, color: Color(0xFFC2C2C2)),
                     ),
-                    Spacer(),
-
-                    Center(
-                      child: GestureDetector(
-                        child: Container(
-                          height: 50,
-                          width: double.infinity,
-                          margin: EdgeInsets.only(bottom: 0.0, top: 0),
-                          decoration: BoxDecoration(
-                            color: kPrimaryColor,
-                            borderRadius: BorderRadius.circular(30.0),
-                          ),
-                          child: Center(
-                            child: Text(
-                              "Update",
-                              // The text you want to display
-                              style: TextStyle(
-                                color: Colors.white, // Text color
-                                fontSize: 16.0, // Font size
-                                fontWeight:
-                                FontWeight.bold, // Font weight
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    )
+                    // Spacer(),
+                    //
+                    // Center(
+                    //   child: GestureDetector(
+                    //     child: Container(
+                    //       height: 50,
+                    //       width: double.infinity,
+                    //       margin: EdgeInsets.only(bottom: 0.0, top: 0),
+                    //       decoration: BoxDecoration(
+                    //         color: kPrimaryColor,
+                    //         borderRadius: BorderRadius.circular(30.0),
+                    //       ),
+                    //       child: Center(
+                    //         child: Text(
+                    //           "Update",
+                    //           // The text you want to display
+                    //           style: TextStyle(
+                    //             color: Colors.white, // Text color
+                    //             fontSize: 16.0, // Font size
+                    //             fontWeight:
+                    //             FontWeight.bold, // Font weight
+                    //           ),
+                    //         ),
+                    //       ),
+                    //     ),
+                    //   ),
+                    // )
                   ],
                 ),
               ),
