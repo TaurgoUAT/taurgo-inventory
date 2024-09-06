@@ -9,33 +9,33 @@ import 'package:taurgo_inventory/pages/edit_report_page.dart';
 import 'package:taurgo_inventory/pages/reportPages/camera_preview_page.dart';
 
 import '../../constants/AppColors.dart';
-import '../../widgets/add_action.dart';
 
 class FrontGarden extends StatefulWidget {
-  final List<File>? capturedImages;
+  final List<File>? frontGardencapturedImages;
   final String propertyId;
-  const FrontGarden({super.key, this.capturedImages, required this.propertyId});
+  const FrontGarden(
+      {super.key, this.frontGardencapturedImages, required this.propertyId});
 
   @override
   State<FrontGarden> createState() => _FrontGardenState();
 }
 
 class _FrontGardenState extends State<FrontGarden> {
-  String? driveWayCondition;
-  String? driveWayDescription;
-  String? outsideLightingCondition;
-  String? outsideLightingDescription;
-  String? additionalItemsCondition;
-  String? additionalItemsDescription;
-  List<String> driveWayImages = [];
-  List<String> outsideLightingImages = [];
-  List<String> additionalItemsImages = [];
-  late List<File> capturedImages;
+  String? frontGardendriveWayCondition;
+  String? frontGardendriveWayDescription;
+  String? frontGardenoutsideLightingCondition;
+  String? frontGardenoutsideLightingDescription;
+  String? frontGardenadditionalItemsCondition;
+  String? frontGardenadditionalItemsDescription;
+  List<String> frontGardendriveWayImages = [];
+  List<String> frontGardenoutsideLightingImages = [];
+  List<String> frontGardenadditionalItemsImages = [];
+  late List<File> frontGardencapturedImages;
 
-   @override
+  @override
   void initState() {
     super.initState();
-    capturedImages = widget.capturedImages ?? [];
+    frontGardencapturedImages = widget.frontGardencapturedImages ?? [];
     print("Property Id - SOC${widget.propertyId}");
     _loadPreferences(widget.propertyId);
     // Load the saved preferences when the state is initialized
@@ -45,154 +45,195 @@ class _FrontGardenState extends State<FrontGarden> {
   Future<void> _loadPreferences(String propertyId) async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      driveWayCondition = prefs.getString('driveWayCondition_${propertyId}');
-      driveWayDescription = prefs.getString('driveWayDescription_${propertyId}');
-      outsideLightingCondition = prefs.getString('outsideLightingCondition_${propertyId}');
-      outsideLightingDescription = prefs.getString('outsideLightingDescription_${propertyId}');
-      additionalItemsCondition = prefs.getString('additionalItemsCondition_${propertyId}');
-      additionalItemsDescription = prefs.getString('additionalItemsDescription_${propertyId}');
+      frontGardendriveWayCondition =
+          prefs.getString('frontGardendriveWayCondition_${propertyId}');
+      frontGardendriveWayDescription =
+          prefs.getString('frontGardendriveWayDescription_${propertyId}');
+      frontGardenoutsideLightingCondition =
+          prefs.getString('frontGardenoutsideLightingCondition_${propertyId}');
+      frontGardenoutsideLightingDescription = prefs
+          .getString('frontGardenoutsideLightingDescription_${propertyId}');
+      frontGardenadditionalItemsCondition =
+          prefs.getString('frontGardenadditionalItemsCondition_${propertyId}');
+      frontGardenadditionalItemsDescription = prefs
+          .getString('frontGardenadditionalItemsDescription_${propertyId}');
 
-      driveWayImages = prefs.getStringList('driveWayImages_${propertyId}') ?? [];
-      outsideLightingImages = prefs.getStringList('outsideLightingImages_${propertyId}') ?? [];
-      additionalItemsImages = prefs.getStringList('additionalItemsImages_${propertyId}') ?? [];
+      frontGardendriveWayImages =
+          prefs.getStringList('frontGardendriveWayImages_${propertyId}') ?? [];
+      frontGardenoutsideLightingImages = prefs.getStringList(
+              'frontGardenoutsideLightingImages_${propertyId}') ??
+          [];
+      frontGardenadditionalItemsImages = prefs.getStringList(
+              'frontGardenadditionalItemsImages_${propertyId}') ??
+          [];
     });
   }
 
   // Function to save a preference
-  Future<void> _savePreference(String propertyId, String key, String value)
-  async {
+  Future<void> _savePreference(
+      String propertyId, String key, String value) async {
     final prefs = await SharedPreferences.getInstance();
     prefs.setString('${key}_$propertyId', value);
   }
 
-  Future<void> _savePreferenceList(String propertyId, String key, List<String> value) async {
+  Future<void> _savePreferenceList(
+      String propertyId, String key, List<String> value) async {
     final prefs = await SharedPreferences.getInstance();
     prefs.setStringList('${key}_$propertyId', value);
   }
 
   @override
   Widget build(BuildContext context) {
-     String propertyId = widget.propertyId;
+    String propertyId = widget.propertyId;
     return PopScope(
-      canPop: false,
+        canPop: false,
         child: Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Front Garden',
-          style: TextStyle(
-            color: kPrimaryColor,
-            fontSize: 14,
-            fontFamily: "Inter",
+          appBar: AppBar(
+            title: Text(
+              'Front Garden',
+              style: TextStyle(
+                color: kPrimaryColor,
+                fontSize: 14,
+                fontFamily: "Inter",
+              ),
+            ),
+            centerTitle: true,
+            backgroundColor: bWhite,
+            leading: GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => EditReportPage(
+                      propertyId: '',
+                    ),
+                  ),
+                );
+              },
+              child: Icon(
+                Icons.arrow_back_ios_new,
+                color: kPrimaryColor,
+                size: 24,
+              ),
+            ),
           ),
-        ),
-        centerTitle: true,
-        backgroundColor: bWhite,
-        leading: GestureDetector(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => EditReportPage(propertyId: '',),
+          body: SingleChildScrollView(
+            child: Padding(
+              padding: EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Drive Way
+                  ConditionItem(
+                    name: "Drive Way",
+                    condition: frontGardendriveWayCondition,
+                    description: frontGardendriveWayDescription,
+                    images: frontGardendriveWayImages,
+                    onConditionSelected: (condition) {
+                      setState(() {
+                        frontGardendriveWayCondition = condition;
+                      });
+                      _savePreference(
+                          propertyId,
+                          'frontGardendriveWayCondition',
+                          condition!); // Save preference
+                    },
+                    onDescriptionSelected: (description) {
+                      setState(() {
+                        frontGardendriveWayDescription = description;
+                      });
+                      _savePreference(
+                          propertyId,
+                          'frontGardendriveWayDescription',
+                          description!); // Save preference
+                    },
+                    onImageAdded: (imagePath) {
+                      setState(() {
+                        frontGardendriveWayImages.add(imagePath);
+                      });
+                      _savePreferenceList(
+                          propertyId,
+                          'frontGardendriveWayImages',
+                          frontGardendriveWayImages);
+                    },
+                  ),
+
+                  // Outside Lighting
+                  ConditionItem(
+                    name: "Outside Lighting",
+                    condition: frontGardenoutsideLightingCondition,
+                    description: frontGardenoutsideLightingDescription,
+                    images: frontGardenoutsideLightingImages,
+                    onConditionSelected: (condition) {
+                      setState(() {
+                        frontGardenoutsideLightingCondition = condition;
+                      });
+                      _savePreference(
+                          propertyId,
+                          'frontGardenoutsideLightingCondition',
+                          condition!); // Save preference
+                    },
+                    onDescriptionSelected: (description) {
+                      setState(() {
+                        frontGardenoutsideLightingDescription = description;
+                      });
+                      _savePreference(
+                          propertyId,
+                          'frontGardenoutsideLightingDescription',
+                          description!); // Save preference
+                    },
+                    onImageAdded: (imagePath) {
+                      setState(() {
+                        frontGardenoutsideLightingImages.add(imagePath);
+                      });
+                      _savePreferenceList(
+                          propertyId,
+                          'frontGardenoutsideLightingImages',
+                          frontGardenoutsideLightingImages);
+                    },
+                  ),
+
+                  // Additional Items
+                  ConditionItem(
+                    name: "Additional Items",
+                    condition: frontGardenadditionalItemsCondition,
+                    description: frontGardenadditionalItemsDescription,
+                    images: frontGardenadditionalItemsImages,
+                    onConditionSelected: (condition) {
+                      setState(() {
+                        frontGardenadditionalItemsCondition = condition;
+                      });
+                      _savePreference(
+                          propertyId,
+                          'frontGardenadditionalItemsCondition',
+                          condition!); // Save preference
+                    },
+                    onDescriptionSelected: (description) {
+                      setState(() {
+                        frontGardenadditionalItemsDescription = description;
+                      });
+                      _savePreference(
+                          propertyId,
+                          'frontGardenadditionalItemsDescription',
+                          description!); // Save preference
+                    },
+                    onImageAdded: (imagePath) {
+                      setState(() {
+                        frontGardenadditionalItemsImages.add(imagePath);
+                      });
+                      _savePreferenceList(
+                          propertyId,
+                          'frontGardenadditionalItemsImages',
+                          frontGardenadditionalItemsImages);
+                    },
+                  ),
+
+                  // Add more ConditionItem widgets as needed
+                ],
               ),
-            );
-          },
-          child: Icon(
-            Icons.arrow_back_ios_new,
-            color: kPrimaryColor,
-            size: 24,
+            ),
           ),
-        ),
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Drive Way
-              ConditionItem(
-                name: "Drive Way",
-                condition: driveWayCondition,
-                description: driveWayDescription,
-                images: driveWayImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    driveWayCondition = condition;
-                  });
-                  _savePreference(propertyId,'driveWayCondition', condition!); // Save preference
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    driveWayDescription = description;
-                  });
-                  _savePreference(propertyId,'driveWayDescription', description!); // Save preference
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    driveWayImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId,'driveWayImages', driveWayImages);
-                },
-              ),
-
-              // Outside Lighting
-              ConditionItem(
-                name: "Outside Lighting",
-                condition: outsideLightingCondition,
-                description: outsideLightingDescription,
-                images: outsideLightingImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    outsideLightingCondition = condition;
-                  });
-                  _savePreference(propertyId,'outsideLightingCondition', condition!); // Save preference
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    outsideLightingDescription = description;
-                  });
-                  _savePreference(propertyId,'outsideLightingDescription', description!); // Save preference
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    outsideLightingImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId,'outsideLightingImages', outsideLightingImages);
-                },
-              ),
-
-              // Additional Items
-              ConditionItem(
-                name: "Additional Items",
-                condition: additionalItemsCondition,
-                description: additionalItemsDescription,
-                images: additionalItemsImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    additionalItemsCondition = condition;
-                  });
-                  _savePreference(propertyId,'additionalItemsCondition', condition!); // Save preference
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    additionalItemsDescription = description;
-                  });
-                  _savePreference(propertyId,'additionalItemsDescription', description!); // Save preference
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    additionalItemsImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId,'additionalItemsImages', additionalItemsImages);
-                },
-              ),
-
-              // Add more ConditionItem widgets as needed
-            ],
-          ),
-        ),
-      ),
-    ));
+        ));
   }
 }
 
