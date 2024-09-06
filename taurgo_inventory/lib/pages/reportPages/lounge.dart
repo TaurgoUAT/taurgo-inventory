@@ -22,7 +22,7 @@ class Lounge extends StatefulWidget {
 }
 
 class _LoungeState extends State<Lounge> {
-  String? doorCondition;
+  String? lougeDoorCondition;
   String? doorDescription;
   String? doorFrameCondition;
   String? doorFrameDescription;
@@ -76,7 +76,7 @@ class _LoungeState extends State<Lounge> {
   Future<void> _loadPreferences(String propertyId) async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      doorCondition = prefs.getString('doorCondition_${propertyId}');
+      lougeDoorCondition = prefs.getString('doorCondition_${propertyId}');
       doorDescription = prefs.getString('doorDescription_${propertyId}');
       doorFrameCondition = prefs.getString('doorFrameCondition_${propertyId}');
       doorFrameDescription = prefs.getString('doorFrameDescription_${propertyId}');
@@ -171,12 +171,12 @@ Future<void> _savePreference(String propertyId, String key, String value)
               // Door
               ConditionItem(
                 name: "Door",
-                condition: doorCondition,
+                condition: lougeDoorCondition,
                 description: doorDescription,
                 images: doorImages,
                 onConditionSelected: (condition) {
                   setState(() {
-                    doorCondition = condition;
+                    lougeDoorCondition = condition;
                   });
                   _savePreference(propertyId,'doorCondition', condition!); // Save preference
                 },
