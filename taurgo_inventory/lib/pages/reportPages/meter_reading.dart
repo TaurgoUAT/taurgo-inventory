@@ -22,38 +22,18 @@ class MeterReading extends StatefulWidget {
 }
 
 class _MeterReadingState extends State<MeterReading> {
-  String? houseApplinceManualLocation;
-  String? houseApplinceManualReading;
-  String? houseApplinceManualSerialNumber;
-  String? kitchenApplinceManualLocation;
-  String? kitchenApplinceManualReading;
-  String? kitchenApplinceManualSerialNumber;
-  String? heatingManualLocation;
-  String? heatingManualReading;
-  String? heatingManualSerialNumber;
-  String? landlordGasSafetyCertificateLocation;
-  String? landlordGasSafetyCertificateReading;
-  String? landlordGasSafetyCertificateSerialNumber;
-  String? legionellaRiskAssessmentLocation;
-  String? legionellaRiskAssessmentReading;
-  String? legionellaRiskAssessmentSerialNumber;
-  String? electricalSafetyCertificateLocation;
-  String? electricalSafetyCertificateReading;
-  String? electricalSafetyCertificateSerialNumber;
-  String? energyPerformanceCertificateLocation;
-  String? energyPerformanceCertificateReading;
-  String? energyPerformanceCertificateSerialNumber;
-  String? moveInChecklistLocation;
-  String? moveInChecklistReading;
-  String? moveInChecklistSerialNumber;
-  List<String> houseApplinceManualImages = [];
-  List<String> kitchenApplinceManualImages = [];
-  List<String> heatingManualImages = [];
-  List<String> landlordGasSafetyCertificateImages = [];
-  List<String> legionellaRiskAssessmentImages = [];
-  List<String> electricalSafetyCertificateImages = [];
-  List<String> energyPerformanceCertificateImages = [];
-  List<String> moveInChecklistImages = [];
+  String? gasMeterReading;
+  String? electricMeterReading;
+  String? waterMeterReading;
+  String? oilMeterReading;
+  String? otherMeterReading;
+
+  List<String> gasMeterImages = [];
+  List<String> electricMeterImages = [];
+  List<String> waterMeterImages = [];
+  List<String> oilMeterImages = [];
+  List<String> otherMeterImages = [];
+
   late List<File> capturedImages;
 
   @override
@@ -69,65 +49,28 @@ class _MeterReadingState extends State<MeterReading> {
   Future<void> _loadPreferences(String propertyId) async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      houseApplinceManualLocation =
-          prefs.getString('houseApplinceManualLocation_${propertyId}');
-      houseApplinceManualReading =
-          prefs.getString('houseApplinceManualReading_${propertyId}');
-      houseApplinceManualSerialNumber =
-          prefs.getString('houseApplinceManualSerialNumber_${propertyId}');
-      kitchenApplinceManualLocation =
-          prefs.getString('kitchenApplinceManualLocation_${propertyId}');
-      kitchenApplinceManualReading =
-          prefs.getString('kitchenApplinceManualReading_${propertyId}');
-      kitchenApplinceManualSerialNumber =
-          prefs.getString('kitchenApplinceManualSerialNumber_${propertyId}');
-      heatingManualLocation = prefs.getString('heatingManualLocation_${propertyId}');
-      heatingManualReading = prefs.getString('heatingManualReading_${propertyId}');
-      heatingManualSerialNumber = prefs.getString('heatingManualSerialNumber_${propertyId}');
-      landlordGasSafetyCertificateLocation =
-          prefs.getString('landlordGasSafetyCertificateLocation_${propertyId}');
-      landlordGasSafetyCertificateReading =
-          prefs.getString('landlordGasSafetyCertificateReading_${propertyId}');
-      landlordGasSafetyCertificateSerialNumber =
-          prefs.getString('landlordGasSafetyCertificateSerialNumber_${propertyId}');
-      legionellaRiskAssessmentLocation =
-          prefs.getString('legionellaRiskAssessmentLocation_${propertyId}');
-      legionellaRiskAssessmentReading =
-          prefs.getString('legionellaRiskAssessmentReading_${propertyId}');
-      legionellaRiskAssessmentSerialNumber =
-          prefs.getString('legionellaRiskAssessmentSerialNumber_${propertyId}');
-      electricalSafetyCertificateLocation =
-          prefs.getString('electricalSafetyCertificateLocation_${propertyId}');
-      electricalSafetyCertificateReading =
-          prefs.getString('electricalSafetyCertificateReading_${propertyId}');
-      electricalSafetyCertificateSerialNumber =
-          prefs.getString('electricalSafetyCertificateSerialNumber_${propertyId}');
-      energyPerformanceCertificateLocation =
-          prefs.getString('energyPerformanceCertificateLocation_${propertyId}');
-      energyPerformanceCertificateReading =
-          prefs.getString('energyPerformanceCertificateReading_${propertyId}');
-      energyPerformanceCertificateSerialNumber =
-          prefs.getString('energyPerformanceCertificateSerialNumber_${propertyId}');
-      moveInChecklistLocation = prefs.getString('moveInChecklistLocation_${propertyId}');
-      moveInChecklistReading = prefs.getString('moveInChecklistReading_${propertyId}');
-      moveInChecklistSerialNumber =
-          prefs.getString('moveInChecklistSerialNumber_${propertyId}');
 
-      houseApplinceManualImages =
-          prefs.getStringList('houseApplinceManualImages_${propertyId}') ?? [];
-      kitchenApplinceManualImages =
-          prefs.getStringList('kitchenApplinceManualImages_${propertyId}') ?? [];
-      heatingManualImages = prefs.getStringList('heatingManualImages_${propertyId}') ?? [];
-      landlordGasSafetyCertificateImages =
-          prefs.getStringList('landlordGasSafetyCertificateImages_${propertyId}') ?? [];
-      legionellaRiskAssessmentImages =
-          prefs.getStringList('legionellaRiskAssessmentImages_${propertyId}') ?? [];
-      electricalSafetyCertificateImages =
-          prefs.getStringList('electricalSafetyCertificateImages_${propertyId}') ?? [];
-      energyPerformanceCertificateImages =
-          prefs.getStringList('energyPerformanceCertificateImages_${propertyId}') ?? [];
-      moveInChecklistImages =
-          prefs.getStringList('moveInChecklistImages_${propertyId}') ?? [];
+
+      gasMeterReading =
+          prefs.getString('gasMeterReading${propertyId}');
+      electricMeterReading =
+          prefs.getString('electricMeterReading${propertyId}');
+      waterMeterReading =
+          prefs.getString('waterMeterReading${propertyId}');
+      oilMeterReading =
+          prefs.getString('oilMeterReading${propertyId}');
+      otherMeterReading =
+          prefs.getString('otherMeterReading${propertyId}');
+
+      waterMeterImages =
+          prefs.getStringList('waterMeterImages${propertyId}') ?? [];
+      electricMeterImages =
+          prefs.getStringList('electricMeterImages${propertyId}') ?? [];
+      waterMeterImages = prefs.getStringList('waterMeterImages${propertyId}') ?? [];
+      oilMeterImages =
+          prefs.getStringList('oilMeterImages${propertyId}') ?? [];
+      otherMeterImages =
+          prefs.getStringList('otherMeterImages${propertyId}') ?? [];
     });
   }
 
@@ -159,12 +102,83 @@ class _MeterReadingState extends State<MeterReading> {
         centerTitle: true,
         backgroundColor: bWhite,
         leading: GestureDetector(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => EditReportPage(propertyId: '',),
-              ),
+          onTap: (){
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  elevation: 10,
+                  backgroundColor: Colors.white,
+                  title: Row(
+                    children: [
+                      Icon(Icons.info_outline, color: kPrimaryColor),
+                      SizedBox(width: 10),
+                      Text(
+                        'Exit',
+                        style: TextStyle(
+                          color: kPrimaryColor,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                  content: Text(
+                    'You may lost your data if you exit the process '
+                        'without saving',
+                    style: TextStyle(
+                      color: Colors.grey[800],
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                      height: 1.5,
+                    ),
+                  ),
+                  actions: <Widget>[
+                    TextButton(
+                      child: Text('Cancel',
+                        style: TextStyle(
+                          color: kPrimaryColor,
+                          fontSize: 16,
+                        ),
+                      ),
+                      onPressed: () {
+                        Navigator.of(context).pop(); // Close the dialog
+                      },
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        print("SOC -> EP ${widget.propertyId}");
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  EditReportPage(propertyId: widget.propertyId)), // Replace HomePage with your
+                          // home page
+                          // widget
+                        );
+                      },
+                      style: TextButton.styleFrom(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 8),
+                        backgroundColor: kPrimaryColor,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      child: Text(
+                        'Exit',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              },
             );
           },
           child: Icon(
@@ -173,6 +187,100 @@ class _MeterReadingState extends State<MeterReading> {
             size: 24,
           ),
         ),
+        actions: [
+          GestureDetector(
+            onTap: (){
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    elevation: 10,
+                    backgroundColor: Colors.white,
+                    title: Row(
+                      children: [
+                        Icon(Icons.info_outline, color: kPrimaryColor),
+                        SizedBox(width: 10),
+                        Text(
+                          'Continue Saving',
+                          style: TextStyle(
+                            color: kPrimaryColor,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                    content: Text(
+                      'Please Make Sure You Have Added All the Necessary '
+                          'Information',
+                      style: TextStyle(
+                        color: Colors.grey[800],
+                        fontSize: 14,
+                        fontWeight: FontWeight.w400,
+                        height: 1.5,
+                      ),
+                    ),
+                    actions: <Widget>[
+                      TextButton(
+                        child: Text('Cancel',
+                          style: TextStyle(
+                            color: kPrimaryColor,
+                            fontSize: 16,
+                          ),
+                        ),
+                        onPressed: () {
+                          Navigator.of(context).pop(); // Close the dialog
+                        },
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          print("SOC -> EP ${widget.propertyId}");
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    EditReportPage(propertyId: widget.propertyId)), // Replace HomePage with your
+                            // home page
+                            // widget
+                          );
+                        },
+                        style: TextButton.styleFrom(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 8),
+                          backgroundColor: kPrimaryColor,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        child: Text(
+                          'Save',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              );
+            },
+            child: Container(
+              margin: EdgeInsets.all(16),
+              child: Text(
+                'Save', // Replace with the actual location
+                style: TextStyle(
+                  color: kPrimaryColor,
+                  fontSize: 14, // Adjust the font size
+                  fontFamily: "Inter",
+                ),
+              ),
+            ),
+          )
+        ],
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -180,298 +288,113 @@ class _MeterReadingState extends State<MeterReading> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // House Appliance Manual
+              // Gas Meter
               ConditionItem(
-                name: "House Appliance Manual",
-                location: houseApplinceManualLocation,
-                reading: houseApplinceManualReading,
-                serialNumber: houseApplinceManualSerialNumber,
-                images: houseApplinceManualImages,
-                onLocationSelected: (location) {
+                name: "Gas Meter Reading",
+                reading: gasMeterReading,
+                images: otherMeterImages,
+                onReadingSelected: (gasMeterReading) {
                   setState(() {
-                    houseApplinceManualLocation = location;
-                  });
-                  _savePreference(propertyId,'houseApplinceManualLocation',
-                      location!); // Save preference
-                },
-                onReadingSelected: (reading) {
-                  setState(() {
-                    houseApplinceManualReading = reading;
+                    gasMeterReading = gasMeterReading;
                   });
                   _savePreference(propertyId,
-                      'houseApplinceManualReading', reading!); // Save preference
+                      'gasMeterReading', gasMeterReading!); // Save preference
                 },
-                onSerialNumberSelected: (serialNumber) {
-                  setState(() {
-                    houseApplinceManualSerialNumber = serialNumber;
-                  });
-                  _savePreference(propertyId,'houseApplinceManualSerialNumber',
-                      serialNumber!); // Save preference
-                },
+
                 onImageAdded: (imagePath) {
                   setState(() {
-                    houseApplinceManualImages.add(imagePath);
+                    gasMeterImages.add(imagePath);
                   });
                   _savePreferenceList(propertyId,
-                      'houseApplinceManualImages', houseApplinceManualImages);
+                      'gasMeterImages', gasMeterImages);
                 },
               ),
 
-              // Kitchen Appliance Manual
+              // Electric Meter
               ConditionItem(
-                name: "Kitchen Appliance Manual",
-                location: kitchenApplinceManualLocation,
-                reading: kitchenApplinceManualReading,
-                serialNumber: kitchenApplinceManualSerialNumber,
-                images: kitchenApplinceManualImages,
-                onLocationSelected: (location) {
+                name: "Electric Reading",
+                reading: electricMeterReading,
+                images: electricMeterImages,
+                onReadingSelected: (electricMeterReading) {
                   setState(() {
-                    kitchenApplinceManualLocation = location;
+                    electricMeterReading = electricMeterReading;
                   });
-                  _savePreference(propertyId,'kitchenApplinceManualLocation',
-                      location!); // Save preference
+                  _savePreference(propertyId,
+                      'electricMeterReading', electricMeterReading!); // Save preference
                 },
-                onReadingSelected: (reading) {
-                  setState(() {
-                    kitchenApplinceManualReading = reading;
-                  });
-                  _savePreference(propertyId,'kitchenApplinceManualReading',
-                      reading!); // Save preference
-                },
-                onSerialNumberSelected: (serialNumber) {
-                  setState(() {
-                    kitchenApplinceManualSerialNumber = serialNumber;
-                  });
-                  _savePreference(propertyId,'kitchenApplinceManualSerialNumber',
-                      serialNumber!); // Save preference
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    kitchenApplinceManualImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId,'kitchenApplinceManualImages',
-                      kitchenApplinceManualImages);
-                },
-              ),
 
-              // Heating Manual
-              ConditionItem(
-                name: "Heating Manual",
-                location: heatingManualLocation,
-                reading: heatingManualReading,
-                serialNumber: heatingManualSerialNumber,
-                images: heatingManualImages,
-                onLocationSelected: (location) {
-                  setState(() {
-                    heatingManualLocation = location;
-                  });
-                  _savePreference(propertyId,
-                      'heatingManualLocation', location!); // Save preference
-                },
-                onReadingSelected: (reading) {
-                  setState(() {
-                    heatingManualReading = reading;
-                  });
-                  _savePreference(propertyId,
-                      'heatingManualReading', reading!); // Save preference
-                },
-                onSerialNumberSelected: (serialNumber) {
-                  setState(() {
-                    heatingManualSerialNumber = serialNumber;
-                  });
-                  _savePreference(propertyId,'heatingManualSerialNumber',
-                      serialNumber!); // Save preference
-                },
                 onImageAdded: (imagePath) {
                   setState(() {
-                    heatingManualImages.add(imagePath);
+                    electricMeterImages.add(imagePath);
                   });
                   _savePreferenceList(propertyId,
-                      'heatingManualImages', heatingManualImages);
+                      'electricMeterImages', electricMeterImages);
                 },
               ),
 
-              // Landlord Gas Safety Certificate
+              // Water Meter
               ConditionItem(
-                name: "Landlord Gas Safety Certificate",
-                location: landlordGasSafetyCertificateLocation,
-                reading: landlordGasSafetyCertificateReading,
-                serialNumber: landlordGasSafetyCertificateSerialNumber,
-                images: landlordGasSafetyCertificateImages,
-                onLocationSelected: (location) {
+                name: "Water Meter Reading",
+                reading: waterMeterReading,
+                images: otherMeterImages,
+                onReadingSelected: (waterMeterReading) {
                   setState(() {
-                    landlordGasSafetyCertificateLocation = location;
-                  });
-                  _savePreference(propertyId,'landlordGasSafetyCertificateLocation',
-                      location!); // Save preference
-                },
-                onReadingSelected: (reading) {
-                  setState(() {
-                    landlordGasSafetyCertificateReading = reading;
-                  });
-                  _savePreference(propertyId,'landlordGasSafetyCertificateReading',
-                      reading!); // Save preference
-                },
-                onSerialNumberSelected: (serialNumber) {
-                  setState(() {
-                    landlordGasSafetyCertificateSerialNumber = serialNumber;
-                  });
-                  _savePreference(propertyId,'landlordGasSafetyCertificateSerialNumber',
-                      serialNumber!); // Save preference
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    landlordGasSafetyCertificateImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId,'landlordGasSafetyCertificateImages',
-                      landlordGasSafetyCertificateImages);
-                },
-              ),
-
-              // Legionella Risk Assessment
-              ConditionItem(
-                name: "Legionella Risk Assessment",
-                location: legionellaRiskAssessmentLocation,
-                reading: legionellaRiskAssessmentReading,
-                serialNumber: legionellaRiskAssessmentSerialNumber,
-                images: legionellaRiskAssessmentImages,
-                onLocationSelected: (location) {
-                  setState(() {
-                    legionellaRiskAssessmentLocation = location;
-                  });
-                  _savePreference(propertyId,'legionellaRiskAssessmentLocation',
-                      location!); // Save preference
-                },
-                onReadingSelected: (reading) {
-                  setState(() {
-                    legionellaRiskAssessmentReading = reading;
-                  });
-                  _savePreference(propertyId,'legionellaRiskAssessmentReading',
-                      reading!); // Save preference
-                },
-                onSerialNumberSelected: (serialNumber) {
-                  setState(() {
-                    legionellaRiskAssessmentSerialNumber = serialNumber;
-                  });
-                  _savePreference(propertyId,'legionellaRiskAssessmentSerialNumber',
-                      serialNumber!); // Save preference
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    legionellaRiskAssessmentImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId,'legionellaRiskAssessmentImages',
-                      legionellaRiskAssessmentImages);
-                },
-              ),
-
-              // Electrical Safety Certificate
-              ConditionItem(
-                name: "Electrical Safety Certificate",
-                location: electricalSafetyCertificateLocation,
-                reading: electricalSafetyCertificateReading,
-                serialNumber: electricalSafetyCertificateSerialNumber,
-                images: electricalSafetyCertificateImages,
-                onLocationSelected: (location) {
-                  setState(() {
-                    electricalSafetyCertificateLocation = location;
-                  });
-                  _savePreference(propertyId,'electricalSafetyCertificateLocation',
-                      location!); // Save preference
-                },
-                onReadingSelected: (reading) {
-                  setState(() {
-                    electricalSafetyCertificateReading = reading;
-                  });
-                  _savePreference(propertyId,'electricalSafetyCertificateReading',
-                      reading!); // Save preference
-                },
-                onSerialNumberSelected: (serialNumber) {
-                  setState(() {
-                    electricalSafetyCertificateSerialNumber = serialNumber;
-                  });
-                  _savePreference(propertyId,'electricalSafetyCertificateSerialNumber',
-                      serialNumber!); // Save preference
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    electricalSafetyCertificateImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId,'electricalSafetyCertificateImages',
-                      electricalSafetyCertificateImages);
-                },
-              ),
-              // Energy Performance Certificate
-              ConditionItem(
-                name: "Energy Performance Certificate",
-                location: energyPerformanceCertificateLocation,
-                reading: energyPerformanceCertificateReading,
-                serialNumber: energyPerformanceCertificateSerialNumber,
-                images: energyPerformanceCertificateImages,
-                onLocationSelected: (location) {
-                  setState(() {
-                    energyPerformanceCertificateLocation = location;
-                  });
-                  _savePreference(propertyId,'energyPerformanceCertificateLocation',
-                      location!); // Save preference
-                },
-                onReadingSelected: (reading) {
-                  setState(() {
-                    energyPerformanceCertificateReading = reading;
-                  });
-                  _savePreference(propertyId,'energyPerformanceCertificateReading',
-                      reading!); // Save preference
-                },
-                onSerialNumberSelected: (serialNumber) {
-                  setState(() {
-                    energyPerformanceCertificateSerialNumber = serialNumber;
-                  });
-                  _savePreference(propertyId,'energyPerformanceCertificateSerialNumber',
-                      serialNumber!); // Save preference
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    energyPerformanceCertificateImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId,'energyPerformanceCertificateImages',
-                      energyPerformanceCertificateImages);
-                },
-              ),
-
-              // Move In Checklist
-              ConditionItem(
-                name: "Move In Checklist",
-                location: moveInChecklistLocation,
-                reading: moveInChecklistReading,
-                serialNumber: moveInChecklistSerialNumber,
-                images: moveInChecklistImages,
-                onLocationSelected: (location) {
-                  setState(() {
-                    moveInChecklistLocation = location;
+                    waterMeterReading = waterMeterReading;
                   });
                   _savePreference(propertyId,
-                      'moveInChecklistLocation', location!); // Save preference
+                      'waterMeterReading', waterMeterReading!); // Save preference
                 },
-                onReadingSelected: (reading) {
-                  setState(() {
-                    moveInChecklistReading = reading;
-                  });
-                  _savePreference(propertyId,
-                      'moveInChecklistReading', reading!); // Save preference
-                },
-                onSerialNumberSelected: (serialNumber) {
-                  setState(() {
-                    moveInChecklistSerialNumber = serialNumber;
-                  });
-                  _savePreference(propertyId,'moveInChecklistSerialNumber',
-                      serialNumber!); // Save preference
-                },
+
                 onImageAdded: (imagePath) {
                   setState(() {
-                    moveInChecklistImages.add(imagePath);
+                    otherMeterImages.add(imagePath);
                   });
                   _savePreferenceList(propertyId,
-                      'moveInChecklistImages', moveInChecklistImages);
+                      'otherMeterImages', otherMeterImages);
+                },
+              ),
+
+              // Oil Meter
+              ConditionItem(
+                name: "Oil Meter Reading",
+                reading: oilMeterReading,
+                images: otherMeterImages,
+                onReadingSelected: (oilMeterReading) {
+                  setState(() {
+                    oilMeterReading = oilMeterReading;
+                  });
+                  _savePreference(propertyId,
+                      'oilMeterReading', oilMeterReading!); // Save preference
+                },
+
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    otherMeterImages.add(imagePath);
+                  });
+                  _savePreferenceList(propertyId,
+                      'otherMeterImages', otherMeterImages);
+                },
+              ),
+
+              // Other Meter
+              ConditionItem(
+                name: "Other Meter Reading",
+                reading: otherMeterReading,
+                images: otherMeterImages,
+                onReadingSelected: (otherMeterReading) {
+                  setState(() {
+                    otherMeterReading = otherMeterReading;
+                  });
+                  _savePreference(propertyId,
+                      'otherMeterReading', otherMeterReading!); // Save preference
+                },
+
+                onImageAdded: (imagePath) {
+                  setState(() {
+                    otherMeterImages.add(imagePath);
+                  });
+                  _savePreferenceList(propertyId,
+                      'otherMeterImages', otherMeterImages);
                 },
               ),
 
@@ -486,25 +409,17 @@ class _MeterReadingState extends State<MeterReading> {
 
 class ConditionItem extends StatelessWidget {
   final String name;
-  final String? location;
   final String? reading;
-  final String? serialNumber;
   final List<String> images;
-  final Function(String?) onLocationSelected;
   final Function(String?) onReadingSelected;
-  final Function(String?) onSerialNumberSelected;
   final Function(String) onImageAdded;
 
   const ConditionItem({
     Key? key,
     required this.name,
-    this.location,
     this.reading,
-    this.serialNumber,
     required this.images,
-    required this.onLocationSelected,
     required this.onReadingSelected,
-    required this.onSerialNumberSelected,
     required this.onImageAdded,
   }) : super(key: key);
 
@@ -588,35 +503,35 @@ class ConditionItem extends StatelessWidget {
           SizedBox(
             height: 12,
           ),
-          GestureDetector(
-            onTap: () async {
-              final result = await Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ConditionDetails(
-                    initialCondition: location,
-                    type: name,
-                  ),
-                ),
-              );
-
-              if (result != null) {
-                onLocationSelected(result);
-              }
-            },
-            child: Text(
-              location?.isNotEmpty == true ? location! : "Location",
-              style: TextStyle(
-                fontSize: 12.0,
-                fontWeight: FontWeight.w700,
-                color: kPrimaryTextColourTwo,
-                fontStyle: FontStyle.italic,
-              ),
-            ),
-          ),
-          SizedBox(
-            height: 12,
-          ),
+          // GestureDetector(
+          //   onTap: () async {
+          //     final result = await Navigator.push(
+          //       context,
+          //       MaterialPageRoute(
+          //         builder: (context) => ConditionDetails(
+          //           initialCondition: location,
+          //           type: name,
+          //         ),
+          //       ),
+          //     );
+          //
+          //     if (result != null) {
+          //       onLocationSelected(result);
+          //     }
+          //   },
+          //   child: Text(
+          //     location?.isNotEmpty == true ? location! : "Location",
+          //     style: TextStyle(
+          //       fontSize: 12.0,
+          //       fontWeight: FontWeight.w700,
+          //       color: kPrimaryTextColourTwo,
+          //       fontStyle: FontStyle.italic,
+          //     ),
+          //   ),
+          // ),
+          // SizedBox(
+          //   height: 12,
+          // ),
           GestureDetector(
             onTap: () async {
               final result = await Navigator.push(
@@ -646,37 +561,37 @@ class ConditionItem extends StatelessWidget {
           SizedBox(
             height: 12,
           ),
-          GestureDetector(
-            onTap: () async {
-              final result = await Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ConditionDetails(
-                    initialCondition: serialNumber,
-                    type: name,
-                  ),
-                ),
-              );
-
-              if (result != null) {
-                onSerialNumberSelected(result);
-              }
-            },
-            child: Text(
-              serialNumber?.isNotEmpty == true
-                  ? serialNumber!
-                  : "Serial Number",
-              style: TextStyle(
-                fontSize: 12.0,
-                fontWeight: FontWeight.w700,
-                color: kPrimaryTextColourTwo,
-                fontStyle: FontStyle.italic,
-              ),
-            ),
-          ),
-          SizedBox(
-            height: 12,
-          ),
+          // GestureDetector(
+          //   onTap: () async {
+          //     final result = await Navigator.push(
+          //       context,
+          //       MaterialPageRoute(
+          //         builder: (context) => ConditionDetails(
+          //           initialCondition: serialNumber,
+          //           type: name,
+          //         ),
+          //       ),
+          //     );
+          //
+          //     if (result != null) {
+          //       onSerialNumberSelected(result);
+          //     }
+          //   },
+          //   child: Text(
+          //     serialNumber?.isNotEmpty == true
+          //         ? serialNumber!
+          //         : "Serial Number",
+          //     style: TextStyle(
+          //       fontSize: 12.0,
+          //       fontWeight: FontWeight.w700,
+          //       color: kPrimaryTextColourTwo,
+          //       fontStyle: FontStyle.italic,
+          //     ),
+          //   ),
+          // ),
+          // SizedBox(
+          //   height: 12,
+          // ),
           images.isNotEmpty
               ? Wrap(
                   spacing: 8.0,

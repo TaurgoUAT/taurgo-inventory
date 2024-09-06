@@ -77,7 +77,7 @@ class _EditReportPageState extends State<EditReportPage> {
       'Meter Reading': MeterReading(propertyId: widget.propertyId,),
       'Keys': Keys(propertyId: widget.propertyId,),
       "Keys Handed Over At Check In": KeyHandedOver(propertyId: widget.propertyId,),
-      'Health & Safety | Smoke & Carbon Monoxide': HealthAndSafety(),
+      'Health & Safety | Smoke & Carbon Monoxide': HealthAndSafety(propertyId: widget.propertyId,),
       'Front Garden': FrontGarden(propertyId: widget.propertyId,),
       'Garage': Garage(propertyId: widget.propertyId,),
       'Exterior Front': Exteriorfront(propertyId: widget.propertyId,),

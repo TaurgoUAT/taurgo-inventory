@@ -13,9 +13,10 @@ import '../../widgets/add_action.dart';
 import '../camera_preview_page.dart';
 
 class HealthAndSafety extends StatefulWidget {
+  final String propertyId;
   final List<File>? capturedImages;
 
-  const HealthAndSafety({super.key, this.capturedImages});
+  const HealthAndSafety({super.key, this.capturedImages, required this.propertyId});
 
   @override
   _HealthAndSafetyState createState() => _HealthAndSafetyState();
@@ -41,39 +42,44 @@ class _HealthAndSafetyState extends State<HealthAndSafety> {
   void initState() {
     super.initState();
     capturedImages = widget.capturedImages ?? [];
-    _loadPreferences(); // Load the saved preferences when the state is initialized
+    print("Property Id - SOC${widget.propertyId}");
+    _loadPreferences(widget.propertyId);
+    // Load the saved preferences when the state is initialized
   }
 
   // Function to load preferences
-  Future<void> _loadPreferences() async {
+  Future<void> _loadPreferences(String propertyId) async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      heatSensorCondition = prefs.getString('heatSensorCondition');
-      heatSensorDescription = prefs.getString('heatSensorDescription');
-      smokeAlarmCondition = prefs.getString('smokeAlarmCondition');
-      smokeAlarmDescription = prefs.getString('smokeAlarmDescription');
-      carbonMonoxideCondition = prefs.getString('carbonMonoxideCondition');
-      carbonMonoxideDescription = prefs.getString('carbonMonoxideDescription');
-      smokeAlarmImages = prefs.getStringList('smokeAlarmImages') ?? [];
-      heatSensorImages = prefs.getStringList('heatSensorImages') ?? [];
-      carbonMonxideImages = prefs.getStringList('carbonMonxideImages') ?? [];
+      heatSensorCondition = prefs.getString('heatSensorCondition_${propertyId}');
+      heatSensorDescription = prefs.getString('heatSensorDescription_${propertyId}');
+      smokeAlarmCondition = prefs.getString('smokeAlarmCondition_${propertyId}');
+      smokeAlarmDescription = prefs.getString('smokeAlarmDescription_${propertyId}');
+      carbonMonoxideCondition = prefs.getString('carbonMonoxideCondition_${propertyId}');
+      carbonMonoxideDescription = prefs.getString('carbonMonoxideDescription_${propertyId}');
+      smokeAlarmImages = prefs.getStringList('smokeAlarmImages_${propertyId}') ?? [];
+      heatSensorImages = prefs.getStringList('heatSensorImages_${propertyId}') ?? [];
+      carbonMonxideImages = prefs.getStringList('carbonMonxideImages_${propertyId}') ?? [];
     });
   }
 
   // Function to save a preference
-  Future<void> _savePreference(String key, String? value) async {
+  Future<void> _savePreference(
+      String propertyId, String key, String value) async {
     final prefs = await SharedPreferences.getInstance();
-    prefs.setString(key, value ?? '');
+    prefs.setString('${key}_$propertyId', value);
   }
 
-  // Function to save a list preference
-  Future<void> _savePreferenceList(String key, List<String> value) async {
+  Future<void> _savePreferenceList(
+      String propertyId, String key, List<String> value) async {
     final prefs = await SharedPreferences.getInstance();
-    prefs.setStringList(key, value);
+    prefs.setStringList('${key}_$propertyId', value);
   }
 
   @override
   Widget build(BuildContext context) {
+    String propertyId = widget.propertyId;
+
     return PopScope(
       canPop: false,
         child: Scaffold(
@@ -89,12 +95,83 @@ class _HealthAndSafetyState extends State<HealthAndSafety> {
         centerTitle: true,
         backgroundColor: bWhite,
         leading: GestureDetector(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => EditReportPage(propertyId: '',),
-              ),
+          onTap: (){
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  elevation: 10,
+                  backgroundColor: Colors.white,
+                  title: Row(
+                    children: [
+                      Icon(Icons.info_outline, color: kPrimaryColor),
+                      SizedBox(width: 10),
+                      Text(
+                        'Exit',
+                        style: TextStyle(
+                          color: kPrimaryColor,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                  content: Text(
+                    'You may lost your data if you exit the process '
+                        'without saving',
+                    style: TextStyle(
+                      color: Colors.grey[800],
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                      height: 1.5,
+                    ),
+                  ),
+                  actions: <Widget>[
+                    TextButton(
+                      child: Text('Cancel',
+                        style: TextStyle(
+                          color: kPrimaryColor,
+                          fontSize: 16,
+                        ),
+                      ),
+                      onPressed: () {
+                        Navigator.of(context).pop(); // Close the dialog
+                      },
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        print("SOC -> EP ${widget.propertyId}");
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  EditReportPage(propertyId: widget.propertyId)), // Replace HomePage with your
+                          // home page
+                          // widget
+                        );
+                      },
+                      style: TextButton.styleFrom(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 8),
+                        backgroundColor: kPrimaryColor,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      child: Text(
+                        'Exit',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              },
             );
           },
           child: Icon(
@@ -103,6 +180,100 @@ class _HealthAndSafetyState extends State<HealthAndSafety> {
             size: 24,
           ),
         ),
+        actions: [
+          GestureDetector(
+            onTap: (){
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    elevation: 10,
+                    backgroundColor: Colors.white,
+                    title: Row(
+                      children: [
+                        Icon(Icons.info_outline, color: kPrimaryColor),
+                        SizedBox(width: 10),
+                        Text(
+                          'Continue Saving',
+                          style: TextStyle(
+                            color: kPrimaryColor,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                    content: Text(
+                      'Please Make Sure You Have Added All the Necessary '
+                          'Information',
+                      style: TextStyle(
+                        color: Colors.grey[800],
+                        fontSize: 14,
+                        fontWeight: FontWeight.w400,
+                        height: 1.5,
+                      ),
+                    ),
+                    actions: <Widget>[
+                      TextButton(
+                        child: Text('Cancel',
+                          style: TextStyle(
+                            color: kPrimaryColor,
+                            fontSize: 16,
+                          ),
+                        ),
+                        onPressed: () {
+                          Navigator.of(context).pop(); // Close the dialog
+                        },
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          print("SOC -> EP ${widget.propertyId}");
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    EditReportPage(propertyId: widget.propertyId)), // Replace HomePage with your
+                            // home page
+                            // widget
+                          );
+                        },
+                        style: TextButton.styleFrom(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 8),
+                          backgroundColor: kPrimaryColor,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        child: Text(
+                          'Save',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              );
+            },
+            child: Container(
+              margin: EdgeInsets.all(16),
+              child: Text(
+                'Save', // Replace with the actual location
+                style: TextStyle(
+                  color: kPrimaryColor,
+                  fontSize: 14, // Adjust the font size
+                  fontFamily: "Inter",
+                ),
+              ),
+            ),
+          )
+        ],
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -120,21 +291,21 @@ class _HealthAndSafetyState extends State<HealthAndSafety> {
                   setState(() {
                     heatSensorCondition = condition;
                   });
-                  _savePreference(
-                      'heatSensorCondition', condition); // Save preference
+                  _savePreference(propertyId,
+                      'heatSensorCondition', condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     heatSensorDescription = description;
                   });
-                  _savePreference('heatSensorDescription',
-                      description); // Save preference
+                  _savePreference(propertyId,'heatSensorDescription',
+                      description!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     heatSensorImages.add(imagePath);
                   });
-                  _savePreferenceList('heatSensorImages',
+                  _savePreferenceList(propertyId,'heatSensorImages',
                       heatSensorImages); // Save preference
                 },
               ),
@@ -149,21 +320,21 @@ class _HealthAndSafetyState extends State<HealthAndSafety> {
                   setState(() {
                     smokeAlarmCondition = condition;
                   });
-                  _savePreference(
-                      'smokeAlarmCondition', condition); // Save preference
+                  _savePreference(propertyId,
+                      'smokeAlarmCondition', condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     smokeAlarmDescription = description;
                   });
-                  _savePreference('smokeAlarmDescription',
-                      description); // Save preference
+                  _savePreference(propertyId,'smokeAlarmDescription',
+                      description!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     smokeAlarmImages.add(imagePath);
                   });
-                  _savePreferenceList('smokeAlarmImages',
+                  _savePreferenceList(propertyId,'smokeAlarmImages',
                       smokeAlarmImages); // Save preference
                 },
               ),
@@ -178,21 +349,21 @@ class _HealthAndSafetyState extends State<HealthAndSafety> {
                   setState(() {
                     carbonMonoxideCondition = condition;
                   });
-                  _savePreference('carbonMonoxideCondition',
-                      condition); // Save preference
+                  _savePreference(propertyId,'carbonMonoxideCondition',
+                      condition!); // Save preference
                 },
                 onDescriptionSelected: (description) {
                   setState(() {
                     carbonMonoxideDescription = description;
                   });
-                  _savePreference('carbonMonoxideDescription',
-                      description); // Save preference
+                  _savePreference(propertyId,'carbonMonoxideDescription',
+                      description!); // Save preference
                 },
                 onImageAdded: (imagePath) {
                   setState(() {
                     carbonMonxideImages.add(imagePath);
                   });
-                  _savePreferenceList('carbonMonxideImages',
+                  _savePreferenceList(propertyId,'carbonMonxideImages',
                       carbonMonxideImages); // Save preference
                 },
               ),

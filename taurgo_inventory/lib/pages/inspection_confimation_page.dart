@@ -74,6 +74,19 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
   String? evChargerDescription;
   List<String> evChargerImages = [];
 
+  //Meter Reading
+  String? gasMeterReading;
+  String? electricMeterReading;
+  String? waterMeterReading;
+  String? oilMeterReading;
+  String? otherMeterReading;
+
+  List<String> gasMeterImages = [];
+  List<String> electricMeterImages = [];
+  List<String> waterMeterImages = [];
+  List<String> oilMeterImages = [];
+  List<String> otherMeterImages = [];
+
   //Keys
   String? yaleLocation;
   String? yaleReading;
@@ -82,7 +95,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
   String? windowLockLocation;
   String? windowLockReading;
   String? gasMeterLocation;
-  String? gasMeterReading;
+  // String? gasMeterReading;
   String? carPassLocation;
   String? carPassReading;
   String? remoteLocation;
@@ -92,7 +105,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
   List<String> yaleImages = [];
   List<String> morticeImages = [];
   List<String> windowLockImages = [];
-  List<String> gasMeterImages = [];
+  // List<String> gasMeterImages = [];
   List<String> carPassImages = [];
   List<String> remoteImages = [];
   List<String> otherImages = [];
@@ -486,6 +499,29 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
       evChargerImages = prefs.getStringList('evChargerImages_${propertyId}')
           ?? [];
 
+      //Metr Reading
+      gasMeterReading =
+          prefs.getString('gasMeterReading${propertyId}');
+      electricMeterReading =
+          prefs.getString('electricMeterReading${propertyId}');
+      waterMeterReading =
+          prefs.getString('waterMeterReading${propertyId}');
+      oilMeterReading =
+          prefs.getString('oilMeterReading${propertyId}');
+      otherMeterReading =
+          prefs.getString('otherMeterReading${propertyId}');
+
+      waterMeterImages =
+          prefs.getStringList('waterMeterImages${propertyId}') ?? [];
+      electricMeterImages =
+          prefs.getStringList('electricMeterImages${propertyId}') ?? [];
+      waterMeterImages = prefs.getStringList('waterMeterImages${propertyId}') ?? [];
+      oilMeterImages =
+          prefs.getStringList('oilMeterImages${propertyId}') ?? [];
+      otherMeterImages =
+          prefs.getStringList('otherMeterImages${propertyId}') ?? [];
+
+
       //Keys
       yaleLocation = prefs.getString('yaleLocation_${propertyId}');
       yaleReading = prefs.getString('yaleReading_${propertyId}');
@@ -523,16 +559,15 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
         ('otherImages_${propertyId}') ?? [];
 
       //Health and Safety
-      heatSensorCondition = prefs.getString('heatSensorCondition');
-      heatSensorDescription = prefs.getString('heatSensorDescription');
-      smokeAlarmCondition = prefs.getString('smokeAlarmCondition');
-      smokeAlarmDescription = prefs.getString('smokeAlarmDescription');
-      carbonMonoxideCondition = prefs.getString('carbonMonoxideCondition');
-      carbonMonoxideDescription = prefs.getString('carbonMonoxideDescription');
-      smokeAlarmImages = prefs.getStringList('smokeAlarmImages') ?? [];
-      heatSensorImages = prefs.getStringList('heatSensorImages') ?? [];
-      carbonMonxideImages = prefs.getStringList('carbonMonxideImages') ?? [];
-
+      heatSensorCondition = prefs.getString('heatSensorCondition_${propertyId}');
+      heatSensorDescription = prefs.getString('heatSensorDescription_${propertyId}');
+      smokeAlarmCondition = prefs.getString('smokeAlarmCondition_${propertyId}');
+      smokeAlarmDescription = prefs.getString('smokeAlarmDescription_${propertyId}');
+      carbonMonoxideCondition = prefs.getString('carbonMonoxideCondition_${propertyId}');
+      carbonMonoxideDescription = prefs.getString('carbonMonoxideDescription_${propertyId}');
+      smokeAlarmImages = prefs.getStringList('smokeAlarmImages_${propertyId}') ?? [];
+      heatSensorImages = prefs.getStringList('heatSensorImages_${propertyId}') ?? [];
+      carbonMonxideImages = prefs.getStringList('carbonMonxideImages_${propertyId}') ?? [];
       //Front Garden
       driveWayCondition = prefs.getString('driveWayCondition_${propertyId}');
       driveWayDescription = prefs.getString('driveWayDescription_${propertyId}');
