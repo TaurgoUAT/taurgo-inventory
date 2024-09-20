@@ -7,7 +7,8 @@ import 'package:shared_preferences/shared_preferences.dart'; // Import shared_pr
 import 'package:taurgo_inventory/pages/conditions/condition_details.dart';
 import 'package:taurgo_inventory/pages/edit_report_page.dart';
 import 'package:taurgo_inventory/pages/reportPages/camera_preview_page.dart';
-
+import 'package:cloud_firestore/cloud_firestore.dart'; // Firestore
+import 'package:firebase_storage/firebase_storage.dart';
 import '../../constants/AppColors.dart';
 import '../../widgets/add_action.dart';
 
@@ -21,8 +22,40 @@ class MeterReading extends StatefulWidget {
   State<MeterReading> createState() => _MeterReadingState();
 }
 
+Future<String?> uploadImageToFirebase(File imageFile, String propertyId, String collectionName, String documentId) async {
+  try {
+    // Step 1: Upload the image to Firebase Storage
+    String fileName = '${documentId}_${DateTime.now().millisecondsSinceEpoch}.jpg';
+    Reference storageReference = FirebaseStorage.instance
+        .ref()
+        .child('$propertyId/$collectionName/$documentId/$fileName');
+
+    UploadTask uploadTask = storageReference.putFile(imageFile);
+    TaskSnapshot snapshot = await uploadTask.whenComplete(() => null);
+
+    // Step 2: Get the download URL of the uploaded image
+    String downloadURL = await snapshot.ref.getDownloadURL();
+    print("Uploaded to Firebase: $downloadURL");
+
+    // Step 3: Save the download URL to Firestore
+    await FirebaseFirestore.instance
+        .collection('properties')
+        .doc(propertyId)
+        .collection(collectionName)
+        .doc(documentId)
+        .set({
+          'images': FieldValue.arrayUnion([downloadURL])
+        }, SetOptions(merge: true));
+
+    return downloadURL;
+  } catch (e) {
+    print("Error uploading image: $e");
+    return null;
+  }
+}
+
 class _MeterReadingState extends State<MeterReading> {
-  String? gasMeterReading;
+  String? GasMeterReading;
   String? electricMeterReading;
   String? waterMeterReading;
   String? oilMeterReading;
@@ -39,40 +72,26 @@ class _MeterReadingState extends State<MeterReading> {
   @override
   void initState() {
     super.initState();
-    capturedImages = widget.capturedImages ?? [];
     print("Property Id - SOC${widget.propertyId}");
-    _loadPreferences(widget.propertyId);
     // Load the saved preferences when the state is initialized
   }
 
-  // Function to load preferences
-  Future<void> _loadPreferences(String propertyId) async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-
-
-      gasMeterReading =
-          prefs.getString('gasMeterReading${propertyId}');
-      electricMeterReading =
-          prefs.getString('electricMeterReading${propertyId}');
-      waterMeterReading =
-          prefs.getString('waterMeterReading${propertyId}');
-      oilMeterReading =
-          prefs.getString('oilMeterReading${propertyId}');
-      otherMeterReading =
-          prefs.getString('otherMeterReading${propertyId}');
-
-      waterMeterImages =
-          prefs.getStringList('waterMeterImages${propertyId}') ?? [];
-      electricMeterImages =
-          prefs.getStringList('electricMeterImages${propertyId}') ?? [];
-      waterMeterImages = prefs.getStringList('waterMeterImages${propertyId}') ?? [];
-      oilMeterImages =
-          prefs.getStringList('oilMeterImages${propertyId}') ?? [];
-      otherMeterImages =
-          prefs.getStringList('otherMeterImages${propertyId}') ?? [];
+ Stream<List<String>> _getImagesFromFirestore(String propertyId, String imageType) {
+    return FirebaseFirestore.instance
+        .collection('properties')
+        .doc(propertyId)
+        .collection('meter_reading')
+        .doc(imageType)
+        .snapshots()
+        .map((snapshot) {
+      print("Firestore snapshot data for $imageType: ${snapshot.data()}");
+      if (snapshot.exists && snapshot.data() != null) {
+        return List<String>.from(snapshot.data()!['images'] ?? []);
+      }
+      return [];
     });
   }
+
 
   // Function to save a preference
   Future<void> _savePreference(String propertyId, String key, String value)
@@ -81,10 +100,6 @@ class _MeterReadingState extends State<MeterReading> {
     prefs.setString('${key}_$propertyId', value);
   }
 
-  Future<void> _savePreferenceList(String propertyId, String key, List<String> value) async {
-    final prefs = await SharedPreferences.getInstance();
-    prefs.setStringList('${key}_$propertyId', value);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -289,114 +304,254 @@ class _MeterReadingState extends State<MeterReading> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Gas Meter
-              ConditionItem(
-                name: "Gas Meter Reading",
-                reading: gasMeterReading,
-                images: otherMeterImages,
-                onReadingSelected: (gasMeterReading) {
-                  setState(() {
-                    gasMeterReading = gasMeterReading;
-                  });
-                  _savePreference(propertyId,
-                      'gasMeterReading', gasMeterReading!); // Save preference
-                },
+              StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'gasMeterImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Yale images');
+                    }
+                    final gasMeterImages = snapshot.data ?? [];
+                    return ConditionItem(
+                        name: "Gas Meter",
+                        condition: GasMeterReading,
+                        description: GasMeterReading,
+                        images: gasMeterImages,
+                        onConditionSelected: (condition) {
+                        setState(() {
+                          GasMeterReading = condition;
+                        });
+                        _savePreference(propertyId, 'GasMeterReading', condition!);
+                      },
+                        onDescriptionSelected: (description) {
+                        setState(() {
+                          GasMeterReading = description;
+                        });
+                        _savePreference(propertyId, 'GasMeterReading', description!);
+                      },
+                        onImageAdded: (imagePath) async {
+                          File imageFile = File(imagePath);
+                          String? downloadUrl = await uploadImageToFirebase(
+                              imageFile, propertyId,'meter_reading', 'gasMeterImages');
 
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    gasMeterImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId,
-                      'gasMeterImages', gasMeterImages);
-                },
-              ),
+                          if (downloadUrl != null) {
+                            print(
+                                "Adding image URL to Firestore: $downloadUrl");
+                            FirebaseFirestore.instance
+                                .collection('properties')
+                                .doc(propertyId)
+                                .collection('meter_reading')
+                                .doc('gasMeterImages')
+                                .update({
+                              'images': FieldValue.arrayUnion([downloadUrl]),
+                            });
+                          }
+                        });
+                  },
+                ),
+
 
               // Electric Meter
-              ConditionItem(
-                name: "Electric Reading",
-                reading: electricMeterReading,
-                images: electricMeterImages,
-                onReadingSelected: (electricMeterReading) {
-                  setState(() {
-                    electricMeterReading = electricMeterReading;
-                  });
-                  _savePreference(propertyId,
-                      'electricMeterReading', electricMeterReading!); // Save preference
-                },
+              StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'electricMeterImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Yale images');
+                    }
+                    final electricMeterImages= snapshot.data ?? [];
+                    return ConditionItem(
+                        name: "Electric Meter",
+                        condition: electricMeterReading,
+                        description:  electricMeterReading,
+                        images: electricMeterImages,
+                        onConditionSelected: (condition) {
+                        setState(() {
+                          electricMeterReading = condition;
+                        });
+                        _savePreference(propertyId, 'electricMeterReading', condition!);
+                      },
+                        onDescriptionSelected: (description) {
+                        setState(() {
+                            electricMeterReading = description;
+                        });
+                        _savePreference(propertyId, 'electricMeterReading', description!);
+                      },
+                        onImageAdded: (imagePath) async {
+                          File imageFile = File(imagePath);
+                          String? downloadUrl = await uploadImageToFirebase(
+                              imageFile, propertyId,'meter_reading', 'electricMeterImages');
 
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    electricMeterImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId,
-                      'electricMeterImages', electricMeterImages);
-                },
-              ),
+                          if (downloadUrl != null) {
+                            print(
+                                "Adding image URL to Firestore: $downloadUrl");
+                            FirebaseFirestore.instance
+                                .collection('properties')
+                                .doc(propertyId)
+                                .collection('meter_reading')
+                                .doc('electricMeterImages')
+                                .update({
+                              'images': FieldValue.arrayUnion([downloadUrl]),
+                            });
+                          }
+                        });
+                  },
+                ),
+
 
               // Water Meter
-              ConditionItem(
-                name: "Water Meter Reading",
-                reading: waterMeterReading,
-                images: otherMeterImages,
-                onReadingSelected: (waterMeterReading) {
-                  setState(() {
-                    waterMeterReading = waterMeterReading;
-                  });
-                  _savePreference(propertyId,
-                      'waterMeterReading', waterMeterReading!); // Save preference
-                },
+              StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'waterMeterImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Yale images');
+                    }
+                    final waterMeterImages = snapshot.data ?? [];
+                    return ConditionItem(
+                        name: "Water Meter",
+                        condition: waterMeterReading,
+                        description:  waterMeterReading,
+                        images: waterMeterImages,
+                        onConditionSelected: (condition) {
+                        setState(() {
+                          waterMeterReading = condition;
+                        });
+                        _savePreference(propertyId, 'waterMeterReading', condition!);
+                      },
+                        onDescriptionSelected: (description) {
+                        setState(() {
+                            waterMeterReading = description;
+                        });
+                        _savePreference(propertyId, 'waterMeterReading', description!);
+                      },
+                        onImageAdded: (imagePath) async {
+                          File imageFile = File(imagePath);
+                          String? downloadUrl = await uploadImageToFirebase(
+                              imageFile, propertyId,'meter_reading', 'waterMeterImages');
 
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    otherMeterImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId,
-                      'otherMeterImages', otherMeterImages);
-                },
-              ),
+                          if (downloadUrl != null) {
+                            print(
+                                "Adding image URL to Firestore: $downloadUrl");
+                            FirebaseFirestore.instance
+                                .collection('properties')
+                                .doc(propertyId)
+                                .collection('meter_reading')
+                                .doc('waterMeterImages')
+                                .update({
+                              'images': FieldValue.arrayUnion([downloadUrl]),
+                            });
+                          }
+                        });
+                  },
+                ),
+
 
               // Oil Meter
-              ConditionItem(
-                name: "Oil Meter Reading",
-                reading: oilMeterReading,
-                images: otherMeterImages,
-                onReadingSelected: (oilMeterReading) {
-                  setState(() {
-                    oilMeterReading = oilMeterReading;
-                  });
-                  _savePreference(propertyId,
-                      'oilMeterReading', oilMeterReading!); // Save preference
-                },
+              StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'oilMeterImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Yale images');
+                    }
+                    final oilMeterImages = snapshot.data ?? [];
+                    return ConditionItem(
+                        name: "Oil Meter",
+                        condition: oilMeterReading,
+                        description: oilMeterReading,
+                        images: oilMeterImages,
+                        onConditionSelected: (condition) {
+                        setState(() {
+                          oilMeterReading = condition;
+                        });
+                        _savePreference(propertyId, 'oilMeterReading', condition!);
+                      },
+                        onDescriptionSelected: (description) {
+                        setState(() {
+                          oilMeterReading = description;
+                        });
+                        _savePreference(propertyId, 'oilMeterReading', description!);
+                      },
+                        onImageAdded: (imagePath) async {
+                          File imageFile = File(imagePath);
+                          String? downloadUrl = await uploadImageToFirebase(
+                              imageFile, propertyId,'meter_reading', 'oilMeterImages');
 
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    otherMeterImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId,
-                      'otherMeterImages', otherMeterImages);
-                },
-              ),
+                          if (downloadUrl != null) {
+                            print(
+                                "Adding image URL to Firestore: $downloadUrl");
+                            FirebaseFirestore.instance
+                                .collection('properties')
+                                .doc(propertyId)
+                                .collection('meter_reading')
+                                .doc('oilMeterImages')
+                                .update({
+                              'images': FieldValue.arrayUnion([downloadUrl]),
+                            });
+                          }
+                        });
+                  },
+                ),
+
 
               // Other Meter
-              ConditionItem(
-                name: "Other Meter Reading",
-                reading: otherMeterReading,
-                images: otherMeterImages,
-                onReadingSelected: (otherMeterReading) {
-                  setState(() {
-                    otherMeterReading = otherMeterReading;
-                  });
-                  _savePreference(propertyId,
-                      'otherMeterReading', otherMeterReading!); // Save preference
-                },
+              StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'otherMeterImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Yale images');
+                    }
+                    final otherMeterImages = snapshot.data ?? [];
+                    return ConditionItem(
+                        name: "Other Meter",
+                        condition: otherMeterReading,
+                        description:  otherMeterReading,
+                        images: otherMeterImages,
+                        onConditionSelected: (condition) {
+                        setState(() {
+                          otherMeterReading = condition;
+                        });
+                        _savePreference(propertyId, 'otherMeterReading', condition!);
+                      },
+                        onDescriptionSelected: (description) {
+                        setState(() {
+                            otherMeterReading = description;
+                        });
+                        _savePreference(propertyId, 'otherMeterReading', description!);
+                      },
+                        onImageAdded: (imagePath) async {
+                          File imageFile = File(imagePath);
+                          String? downloadUrl = await uploadImageToFirebase(
+                              imageFile, propertyId,'meter_reading', 'otherMeterImages');
 
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    otherMeterImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId,
-                      'otherMeterImages', otherMeterImages);
-                },
-              ),
+                          if (downloadUrl != null) {
+                            print(
+                                "Adding image URL to Firestore: $downloadUrl");
+                            FirebaseFirestore.instance
+                                .collection('properties')
+                                .doc(propertyId)
+                                .collection('meter_reading')
+                                .doc('otherMeterImages')
+                                .update({
+                              'images': FieldValue.arrayUnion([downloadUrl]),
+                            });
+                          }
+                        });
+                  },
+                ),
+
 
               // Add more ConditionItem widgets as needed
             ],
@@ -409,17 +564,21 @@ class _MeterReadingState extends State<MeterReading> {
 
 class ConditionItem extends StatelessWidget {
   final String name;
-  final String? reading;
+  final String? condition;
+  final String? description;
   final List<String> images;
-  final Function(String?) onReadingSelected;
+  final Function(String?) onConditionSelected;
+  final Function(String?) onDescriptionSelected;
   final Function(String) onImageAdded;
 
   const ConditionItem({
     Key? key,
     required this.name,
-    this.reading,
+    this.condition,
+    this.description,
     required this.images,
-    required this.onReadingSelected,
+    required this.onConditionSelected,
+    required this.onDescriptionSelected,
     required this.onImageAdded,
   }) : super(key: key);
 
@@ -458,21 +617,6 @@ class ConditionItem extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // IconButton(
-                  //   icon: Icon(
-                  //     Icons.warning_amber,
-                  //     size: 24,
-                  //     color: kAccentColor,
-                  //   ),
-                  //   onPressed: () {
-                  //     Navigator.push(
-                  //       context,
-                  //       MaterialPageRoute(
-                  //         builder: (context) => AddAction(),
-                  //       ),
-                  //     );
-                  //   },
-                  // ),
                   IconButton(
                     icon: Icon(
                       Icons.camera_alt_outlined,
@@ -538,18 +682,18 @@ class ConditionItem extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) => ConditionDetails(
-                    initialCondition: reading,
+                    initialCondition: description,
                     type: name,
                   ),
                 ),
               );
 
               if (result != null) {
-                onReadingSelected(result);
+                onDescriptionSelected(result);
               }
             },
             child: Text(
-              reading?.isNotEmpty == true ? reading! : "Reading",
+              description?.isNotEmpty == true ? description! : "Description",
               style: TextStyle(
                 fontSize: 12.0,
                 fontWeight: FontWeight.w700,
@@ -596,9 +740,9 @@ class ConditionItem extends StatelessWidget {
               ? Wrap(
                   spacing: 8.0,
                   runSpacing: 8.0,
-                  children: images.map((imagePath) {
-                    return Image.file(
-                      File(imagePath),
+                  children: images.map((imageUrl) {
+                    return Image.network(
+                      imageUrl,
                       width: 100,
                       height: 100,
                       fit: BoxFit.cover,

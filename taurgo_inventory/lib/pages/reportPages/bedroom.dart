@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:camera/camera.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart'; // Import shared_preferences
 import 'package:taurgo_inventory/pages/conditions/condition_details.dart';
@@ -20,7 +22,37 @@ class Bedroom extends StatefulWidget {
   @override
   State<Bedroom> createState() => _BedroomState();
 }
+Future<String?> uploadImageToFirebase(File imageFile, String propertyId, String collectionName, String documentId) async {
+  try {
+    // Step 1: Upload the image to Firebase Storage
+    String fileName = '${documentId}_${DateTime.now().millisecondsSinceEpoch}.jpg';
+    Reference storageReference = FirebaseStorage.instance
+        .ref()
+        .child('$propertyId/$collectionName/$documentId/$fileName');
 
+    UploadTask uploadTask = storageReference.putFile(imageFile);
+    TaskSnapshot snapshot = await uploadTask.whenComplete(() => null);
+
+    // Step 2: Get the download URL of the uploaded image
+    String downloadURL = await snapshot.ref.getDownloadURL();
+    print("Uploaded to Firebase: $downloadURL");
+
+    // Step 3: Save the download URL to Firestore
+    await FirebaseFirestore.instance
+        .collection('properties')
+        .doc(propertyId)
+        .collection(collectionName)
+        .doc(documentId)
+        .set({
+          'images': FieldValue.arrayUnion([downloadURL])
+        }, SetOptions(merge: true));
+
+    return downloadURL;
+  } catch (e) {
+    print("Error uploading image: $e");
+    return null;
+  }
+}
 class _BedroomState extends State<Bedroom> {
   String? bedRoomDoorLocation;
   String? bedRoomDoorCondition;
@@ -82,85 +114,25 @@ class _BedroomState extends State<Bedroom> {
     super.initState();
     capturedImages = widget.capturedImages ?? [];
     print("Property Id - SOC${widget.propertyId}");
-    _loadPreferences(widget.propertyId);
     // Load the saved preferences when the state is initialized
   }
 
-  // Function to load preferences
-  Future<void> _loadPreferences(String propertyId) async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      bedRoomDoorLocation = prefs.getString('doorLocation_${propertyId}');
-      bedRoomDoorCondition = prefs.getString('doorCondition_${propertyId}');
-      bedRoomDoorFrameLocation =
-          prefs.getString('doorFrameLocation_${propertyId}');
-      bedRoomDoorFrameCondition =
-          prefs.getString('doorFrameCondition_${propertyId}');
-      bedRoomCeilingLocation = prefs.getString('ceilingLocation_${propertyId}');
-      bedRoomCeilingCondition =
-          prefs.getString('ceilingCondition_${propertyId}');
-      bedRoomLightingLocation =
-          prefs.getString('lightingLocation_${propertyId}');
-      bedRoomLightingCondition =
-          prefs.getString('lightingCondition_${propertyId}');
-      bedRoomWallsLocation = prefs.getString('wallsLocation_${propertyId}');
-      bedRoomWallsCondition = prefs.getString('wallsCondition_${propertyId}');
-      bedRoomSkirtingLocation =
-          prefs.getString('skirtingLocation_${propertyId}');
-      bedRoomsSkirtingCondition =
-          prefs.getString('skirtingCondition_${propertyId}');
-      bedRoomWindowSillLocation =
-          prefs.getString('windowSillLocation_${propertyId}');
-      bedRoomWindowSillCondition =
-          prefs.getString('windowSillCondition_${propertyId}');
-      bedRoomCurtainsLocation =
-          prefs.getString('curtainsLocation_${propertyId}');
-      bedRoomCurtainsCondition =
-          prefs.getString('curtainsCondition_${propertyId}');
-      bedRoomBlindsLocation = prefs.getString('blindsLocation_${propertyId}');
-      bedRoomBlindsCondition = prefs.getString('blindsCondition_${propertyId}');
-      bedRoomLightSwitchesLocation =
-          prefs.getString('lightSwitchesLocation_${propertyId}');
-      bedRoomLightSwitchesCondition =
-          prefs.getString('lightSwitchesCondition_${propertyId}');
-      bedRoomSocketsLocation = prefs.getString('socketsLocation_${propertyId}');
-      bedRoomSocketsCondition =
-          prefs.getString('socketsCondition_${propertyId}');
-      bedRoomFlooringLocation =
-          prefs.getString('flooringLocation_${propertyId}');
-      bedRoomFlooringCondition =
-          prefs.getString('flooringCondition_${propertyId}');
-      bedRoomAdditionalItemsLocation =
-          prefs.getString('additionalItemsLocation_${propertyId}');
-      bedRoomAdditionalItemsCondition =
-          prefs.getString('additionalItemsCondition_${propertyId}');
-      bedRoomDoorImages = prefs.getStringList('doorImages_${propertyId}') ?? [];
-      bedRoomDoorFrameImages =
-          prefs.getStringList('doorFrameImages_${propertyId}') ?? [];
-      bedRoomCeilingImages =
-          prefs.getStringList('ceilingImages_${propertyId}') ?? [];
-      bedRoomlLightingImages =
-          prefs.getStringList('lightingImages_${propertyId}') ?? [];
-      bedRoomwWallsImages =
-          prefs.getStringList('wallsImages_${propertyId}') ?? [];
-      bedRoomSkirtingImages =
-          prefs.getStringList('skirtingImages_${propertyId}') ?? [];
-      bedRoomWindowSillImages =
-          prefs.getStringList('windowSillImages_${propertyId}') ?? [];
-      bedRoomCurtainsImages =
-          prefs.getStringList('curtainsImages_${propertyId}') ?? [];
-      bedRoomBlindsImages =
-          prefs.getStringList('blindsImages_${propertyId}') ?? [];
-      bedRoomLightSwitchesImages =
-          prefs.getStringList('lightSwitchesImages_${propertyId}') ?? [];
-      bedRoomSocketsImages =
-          prefs.getStringList('socketsImages_${propertyId}') ?? [];
-      bedRoomFlooringImages =
-          prefs.getStringList('flooringImages_${propertyId}') ?? [];
-      bedRoomAdditionalItemsImages =
-          prefs.getStringList('additionalItemsImages_${propertyId}') ?? [];
+  Stream<List<String>> _getImagesFromFirestore(String propertyId, String imageType) {
+    return FirebaseFirestore.instance
+        .collection('properties')
+        .doc(propertyId)
+        .collection('bedroom')
+        .doc(imageType)
+        .snapshots()
+        .map((snapshot) {
+      print("Firestore snapshot data for $imageType: ${snapshot.data()}");
+      if (snapshot.exists && snapshot.data() != null) {
+        return List<String>.from(snapshot.data()!['images'] ?? []);
+      }
+      return [];
     });
   }
+  
 
   // Function to save a preference
   Future<void> _savePreference(
@@ -169,16 +141,13 @@ class _BedroomState extends State<Bedroom> {
     prefs.setString('${key}_$propertyId', value);
   }
 
-  Future<void> _savePreferenceList(
-      String propertyId, String key, List<String> value) async {
-    final prefs = await SharedPreferences.getInstance();
-    prefs.setStringList('${key}_$propertyId', value);
-  }
+
 
   @override
   Widget build(BuildContext context) {
     String propertyId = widget.propertyId;
     return PopScope(
+        canPop: false,
       child: Scaffold(
         appBar: AppBar(
           title: Text(
@@ -379,381 +348,440 @@ class _BedroomState extends State<Bedroom> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Door
-                ConditionItem(
-                  name: "Door",
-                  location: bedRoomDoorLocation,
-                  condition: bedRoomDoorCondition,
-                  images: bedRoomDoorImages,
-                  onlocationSelected: (location) {
-                    setState(() {
-                      bedRoomDoorLocation = location;
-                    });
-                    _savePreference(propertyId, 'doorLocation',
-                        location!); // Save preference
-                  },
-                  onConditionSelected: (condition) {
-                    setState(() {
-                      bedRoomDoorCondition = condition;
-                    });
-                    _savePreference(propertyId, 'doorCondition',
-                        condition!); // Save preference
-                  },
-                  onImageAdded: (imagePath) {
-                    setState(() {
-                      bedRoomDoorImages.add(imagePath);
-                    });
-                    _savePreferenceList(propertyId, 'doorImages',
-                        bedRoomDoorImages); // Save preference
+                StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'bedRoomDoorImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Mortice images');
+                    }
+                    final bedRoomDoorImages = snapshot.data ?? [];
+                    return ConditionItem(
+                      name: "Mortice",
+                      condition: bedRoomDoorCondition,
+                      description: bedRoomDoorLocation,
+                      images: bedRoomDoorImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          bedRoomDoorCondition = condition;
+                        });
+                        _savePreference(propertyId, 'bedRoomDoorCondition', condition!);
+                      },
+                      onDescriptionSelected: (description) {
+                        setState(() {
+                          bedRoomDoorLocation = description;
+                        });
+                        _savePreference(propertyId, 'bedRoomDoorLocation', description!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile, propertyId,'bedroom', 'bedRoomDoorImages');
+
+                        if (downloadUrl != null) {
+                          print("Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('bedroom')
+                              .doc('bedRoomDoorImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      },
+                    );
                   },
                 ),
 
                 // Door Frame
-                ConditionItem(
-                  name: "Door Frame",
-                  location: bedRoomDoorFrameLocation,
-                  condition: bedRoomDoorFrameCondition,
-                  images: bedRoomDoorFrameImages,
-                  onlocationSelected: (location) {
-                    setState(() {
-                      bedRoomDoorFrameLocation = location;
-                    });
-                    _savePreference(propertyId, 'doorFrameLocation',
-                        location!); // Save preference
+                StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'bedRoomDoorFrameImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Mortice images');
+                    }
+                    final bedRoomDoorFrameImages = snapshot.data ?? [];
+                    return ConditionItem(
+                      name: "Door Frame",
+                      condition: bedRoomDoorCondition,
+                      description: bedRoomDoorLocation,
+                      images: bedRoomDoorFrameImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          bedRoomDoorCondition = condition;
+                        });
+                        _savePreference(propertyId, 'bedRoomDoorCondition', condition!);
+                      },
+                      onDescriptionSelected: (description) {
+                        setState(() {
+                          bedRoomDoorLocation = description;
+                        });
+                        _savePreference(propertyId, 'bedRoomDoorLocation', description!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile, propertyId,'bedroom', 'bedRoomDoorFrameImages');
+
+                        if (downloadUrl != null) {
+                          print("Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('bedroom')
+                              .doc('bedRoomDoorFrameImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      },
+                    );
                   },
-                  onConditionSelected: (condition) {
-                    setState(() {
-                      bedRoomDoorFrameCondition = condition;
-                    });
-                    _savePreference(propertyId, 'doorFrameCondition',
-                        condition!); // Save preference
-                  },
-                  onImageAdded: (imagePath) {
-                    setState(() {
-                      bedRoomDoorFrameImages.add(imagePath);
-                    });
-                    _savePreferenceList(propertyId, 'doorFrameImages',
-                        bedRoomDoorFrameImages); // Save preference
+                ),
+                // // Ceiling
+                StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'bedRoomDoorImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Mortice images');
+                    }
+                    final bedRoomDoorImages = snapshot.data ?? [];
+                    return ConditionItem(
+                      name: "Mortice",
+                      condition: bedRoomDoorCondition,
+                      description: bedRoomDoorLocation,
+                      images: bedRoomDoorImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          bedRoomDoorCondition = condition;
+                        });
+                        _savePreference(propertyId, 'bedRoomDoorCondition', condition!);
+                      },
+                      onDescriptionSelected: (description) {
+                        setState(() {
+                          bedRoomDoorLocation = description;
+                        });
+                        _savePreference(propertyId, 'bedRoomDoorLocation', description!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile, propertyId,'bedroom', 'bedRoomDoorImages');
+
+                        if (downloadUrl != null) {
+                          print("Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('bedroom')
+                              .doc('bedRoomDoorImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      },
+                    );
                   },
                 ),
 
-                // Ceiling
-                ConditionItem(
-                  name: "Ceiling",
-                  location: bedRoomCeilingLocation,
-                  condition: bedRoomCeilingCondition,
-                  images: bedRoomCeilingImages,
-                  onlocationSelected: (location) {
-                    setState(() {
-                      bedRoomCeilingLocation = location;
-                    });
-                    _savePreference(propertyId, 'ceilingLocation',
-                        location!); // Save preference
-                  },
-                  onConditionSelected: (condition) {
-                    setState(() {
-                      bedRoomCeilingCondition = condition;
-                    });
-                    _savePreference(propertyId, 'ceilingCondition',
-                        condition!); // Save preference
-                  },
-                  onImageAdded: (imagePath) {
-                    setState(() {
-                      bedRoomCeilingImages.add(imagePath);
-                    });
-                    _savePreferenceList(propertyId, 'ceilingImages',
-                        bedRoomCeilingImages); // Save preference
-                  },
-                ),
+                // // Lighting
+                // ConditionItem(
+                //   name: "Lighting",
+                //   location: bedRoomLightingLocation,
+                //   condition: bedRoomLightingCondition,
+                //   images: bedRoomlLightingImages,
+                //   onlocationSelected: (location) {
+                //     setState(() {
+                //       bedRoomLightingLocation = location;
+                //     });
+                //     _savePreference(propertyId, 'lightingLocation',
+                //         location!); // Save preference
+                //   },
+                //   onConditionSelected: (condition) {
+                //     setState(() {
+                //       bedRoomLightingCondition = condition;
+                //     });
+                //     _savePreference(propertyId, 'lightingCondition',
+                //         condition!); // Save preference
+                //   },
+                //   onImageAdded: (imagePath) {
+                //     setState(() {
+                //       bedRoomlLightingImages.add(imagePath);
+                //     });
+                //     _savePreferenceList(propertyId, 'lightingImages',
+                //         bedRoomlLightingImages); // Save preference
+                //   },
+                // ),
 
-                // Lighting
-                ConditionItem(
-                  name: "Lighting",
-                  location: bedRoomLightingLocation,
-                  condition: bedRoomLightingCondition,
-                  images: bedRoomlLightingImages,
-                  onlocationSelected: (location) {
-                    setState(() {
-                      bedRoomLightingLocation = location;
-                    });
-                    _savePreference(propertyId, 'lightingLocation',
-                        location!); // Save preference
-                  },
-                  onConditionSelected: (condition) {
-                    setState(() {
-                      bedRoomLightingCondition = condition;
-                    });
-                    _savePreference(propertyId, 'lightingCondition',
-                        condition!); // Save preference
-                  },
-                  onImageAdded: (imagePath) {
-                    setState(() {
-                      bedRoomlLightingImages.add(imagePath);
-                    });
-                    _savePreferenceList(propertyId, 'lightingImages',
-                        bedRoomlLightingImages); // Save preference
-                  },
-                ),
+                // // Walls
+                // ConditionItem(
+                //   name: "Walls",
+                //   location: bedRoomWallsLocation,
+                //   condition: bedRoomWallsCondition,
+                //   images: bedRoomwWallsImages,
+                //   onlocationSelected: (location) {
+                //     setState(() {
+                //       bedRoomWallsLocation = location;
+                //     });
+                //     _savePreference(propertyId, 'wallsLocation',
+                //         location!); // Save preference
+                //   },
+                //   onConditionSelected: (condition) {
+                //     setState(() {
+                //       bedRoomWallsCondition = condition;
+                //     });
+                //     _savePreference(propertyId, 'wallsCondition',
+                //         condition!); // Save preference
+                //   },
+                //   onImageAdded: (imagePath) {
+                //     setState(() {
+                //       bedRoomwWallsImages.add(imagePath);
+                //     });
+                //     _savePreferenceList(propertyId, 'wallsImages',
+                //         bedRoomwWallsImages); // Save preference
+                //   },
+                // ),
 
-                // Walls
-                ConditionItem(
-                  name: "Walls",
-                  location: bedRoomWallsLocation,
-                  condition: bedRoomWallsCondition,
-                  images: bedRoomwWallsImages,
-                  onlocationSelected: (location) {
-                    setState(() {
-                      bedRoomWallsLocation = location;
-                    });
-                    _savePreference(propertyId, 'wallsLocation',
-                        location!); // Save preference
-                  },
-                  onConditionSelected: (condition) {
-                    setState(() {
-                      bedRoomWallsCondition = condition;
-                    });
-                    _savePreference(propertyId, 'wallsCondition',
-                        condition!); // Save preference
-                  },
-                  onImageAdded: (imagePath) {
-                    setState(() {
-                      bedRoomwWallsImages.add(imagePath);
-                    });
-                    _savePreferenceList(propertyId, 'wallsImages',
-                        bedRoomwWallsImages); // Save preference
-                  },
-                ),
+                // // Skirting
+                // ConditionItem(
+                //   name: "Skirting",
+                //   location: bedRoomSkirtingLocation,
+                //   condition: bedRoomsSkirtingCondition,
+                //   images: bedRoomSkirtingImages,
+                //   onlocationSelected: (location) {
+                //     setState(() {
+                //       bedRoomSkirtingLocation = location;
+                //     });
+                //     _savePreference(propertyId, 'skirtingLocation',
+                //         location!); // Save preference
+                //   },
+                //   onConditionSelected: (condition) {
+                //     setState(() {
+                //       bedRoomsSkirtingCondition = condition;
+                //     });
+                //     _savePreference(propertyId, 'skirtingCondition',
+                //         condition!); // Save preference
+                //   },
+                //   onImageAdded: (imagePath) {
+                //     setState(() {
+                //       bedRoomSkirtingImages.add(imagePath);
+                //     });
+                //     _savePreferenceList(propertyId, 'skirtingImages',
+                //         bedRoomSkirtingImages); // Save preference
+                //   },
+                // ),
 
-                // Skirting
-                ConditionItem(
-                  name: "Skirting",
-                  location: bedRoomSkirtingLocation,
-                  condition: bedRoomsSkirtingCondition,
-                  images: bedRoomSkirtingImages,
-                  onlocationSelected: (location) {
-                    setState(() {
-                      bedRoomSkirtingLocation = location;
-                    });
-                    _savePreference(propertyId, 'skirtingLocation',
-                        location!); // Save preference
-                  },
-                  onConditionSelected: (condition) {
-                    setState(() {
-                      bedRoomsSkirtingCondition = condition;
-                    });
-                    _savePreference(propertyId, 'skirtingCondition',
-                        condition!); // Save preference
-                  },
-                  onImageAdded: (imagePath) {
-                    setState(() {
-                      bedRoomSkirtingImages.add(imagePath);
-                    });
-                    _savePreferenceList(propertyId, 'skirtingImages',
-                        bedRoomSkirtingImages); // Save preference
-                  },
-                ),
+                // // Window Sill
+                // ConditionItem(
+                //   name: "Window Sill",
+                //   location: bedRoomWindowSillLocation,
+                //   condition: bedRoomWindowSillCondition,
+                //   images: bedRoomWindowSillImages,
+                //   onlocationSelected: (location) {
+                //     setState(() {
+                //       bedRoomWindowSillLocation = location;
+                //     });
+                //     _savePreference(propertyId, 'windowSillLocation',
+                //         location!); // Save preference
+                //   },
+                //   onConditionSelected: (condition) {
+                //     setState(() {
+                //       bedRoomWindowSillCondition = condition;
+                //     });
+                //     _savePreference(propertyId, 'windowSillCondition',
+                //         condition!); // Save preference
+                //   },
+                //   onImageAdded: (imagePath) {
+                //     setState(() {
+                //       bedRoomWindowSillImages.add(imagePath);
+                //     });
+                //     _savePreferenceList(propertyId, 'windowSillImages',
+                //         bedRoomWindowSillImages); // Save preference
+                //   },
+                // ),
 
-                // Window Sill
-                ConditionItem(
-                  name: "Window Sill",
-                  location: bedRoomWindowSillLocation,
-                  condition: bedRoomWindowSillCondition,
-                  images: bedRoomWindowSillImages,
-                  onlocationSelected: (location) {
-                    setState(() {
-                      bedRoomWindowSillLocation = location;
-                    });
-                    _savePreference(propertyId, 'windowSillLocation',
-                        location!); // Save preference
-                  },
-                  onConditionSelected: (condition) {
-                    setState(() {
-                      bedRoomWindowSillCondition = condition;
-                    });
-                    _savePreference(propertyId, 'windowSillCondition',
-                        condition!); // Save preference
-                  },
-                  onImageAdded: (imagePath) {
-                    setState(() {
-                      bedRoomWindowSillImages.add(imagePath);
-                    });
-                    _savePreferenceList(propertyId, 'windowSillImages',
-                        bedRoomWindowSillImages); // Save preference
-                  },
-                ),
+                // // Curtains
+                // ConditionItem(
+                //   name: "Curtains",
+                //   location: bedRoomCurtainsLocation,
+                //   condition: bedRoomCurtainsCondition,
+                //   images: bedRoomCurtainsImages,
+                //   onlocationSelected: (location) {
+                //     setState(() {
+                //       bedRoomCurtainsLocation = location;
+                //     });
+                //     _savePreference(propertyId, 'curtainsLocation',
+                //         location!); // Save preference
+                //   },
+                //   onConditionSelected: (condition) {
+                //     setState(() {
+                //       bedRoomCurtainsCondition = condition;
+                //     });
+                //     _savePreference(propertyId, 'curtainsCondition',
+                //         condition!); // Save preference
+                //   },
+                //   onImageAdded: (imagePath) {
+                //     setState(() {
+                //       bedRoomCurtainsImages.add(imagePath);
+                //     });
+                //     _savePreferenceList(propertyId, 'curtainsImages',
+                //         bedRoomCurtainsImages); // Save preference
+                //   },
+                // ),
 
-                // Curtains
-                ConditionItem(
-                  name: "Curtains",
-                  location: bedRoomCurtainsLocation,
-                  condition: bedRoomCurtainsCondition,
-                  images: bedRoomCurtainsImages,
-                  onlocationSelected: (location) {
-                    setState(() {
-                      bedRoomCurtainsLocation = location;
-                    });
-                    _savePreference(propertyId, 'curtainsLocation',
-                        location!); // Save preference
-                  },
-                  onConditionSelected: (condition) {
-                    setState(() {
-                      bedRoomCurtainsCondition = condition;
-                    });
-                    _savePreference(propertyId, 'curtainsCondition',
-                        condition!); // Save preference
-                  },
-                  onImageAdded: (imagePath) {
-                    setState(() {
-                      bedRoomCurtainsImages.add(imagePath);
-                    });
-                    _savePreferenceList(propertyId, 'curtainsImages',
-                        bedRoomCurtainsImages); // Save preference
-                  },
-                ),
+                // // Blinds
+                // ConditionItem(
+                //   name: "Blinds",
+                //   location: bedRoomBlindsLocation,
+                //   condition: bedRoomBlindsCondition,
+                //   images: bedRoomBlindsImages,
+                //   onlocationSelected: (location) {
+                //     setState(() {
+                //       bedRoomBlindsLocation = location;
+                //     });
+                //     _savePreference(propertyId, 'blindsLocation',
+                //         location!); // Save preference
+                //   },
+                //   onConditionSelected: (condition) {
+                //     setState(() {
+                //       bedRoomBlindsCondition = condition;
+                //     });
+                //     _savePreference(propertyId, 'blindsCondition',
+                //         condition!); // Save preference
+                //   },
+                //   onImageAdded: (imagePath) {
+                //     setState(() {
+                //       bedRoomBlindsImages.add(imagePath);
+                //     });
+                //     _savePreferenceList(propertyId, 'blindsImages',
+                //         bedRoomBlindsImages); // Save preference
+                //   },
+                // ),
 
-                // Blinds
-                ConditionItem(
-                  name: "Blinds",
-                  location: bedRoomBlindsLocation,
-                  condition: bedRoomBlindsCondition,
-                  images: bedRoomBlindsImages,
-                  onlocationSelected: (location) {
-                    setState(() {
-                      bedRoomBlindsLocation = location;
-                    });
-                    _savePreference(propertyId, 'blindsLocation',
-                        location!); // Save preference
-                  },
-                  onConditionSelected: (condition) {
-                    setState(() {
-                      bedRoomBlindsCondition = condition;
-                    });
-                    _savePreference(propertyId, 'blindsCondition',
-                        condition!); // Save preference
-                  },
-                  onImageAdded: (imagePath) {
-                    setState(() {
-                      bedRoomBlindsImages.add(imagePath);
-                    });
-                    _savePreferenceList(propertyId, 'blindsImages',
-                        bedRoomBlindsImages); // Save preference
-                  },
-                ),
+                // // Light Switches
+                // ConditionItem(
+                //   name: "Light Switches",
+                //   location: bedRoomLightSwitchesLocation,
+                //   condition: bedRoomLightSwitchesCondition,
+                //   images: bedRoomLightSwitchesImages,
+                //   onlocationSelected: (location) {
+                //     setState(() {
+                //       bedRoomLightSwitchesLocation = location;
+                //     });
+                //     _savePreference(propertyId, 'lightSwitchesLocation',
+                //         location!); // Save preference
+                //   },
+                //   onConditionSelected: (condition) {
+                //     setState(() {
+                //       bedRoomLightSwitchesCondition = condition;
+                //     });
+                //     _savePreference(propertyId, 'lightSwitchesCondition',
+                //         condition!); // Save preference
+                //   },
+                //   onImageAdded: (imagePath) {
+                //     setState(() {
+                //       bedRoomLightSwitchesImages.add(imagePath);
+                //     });
+                //     _savePreferenceList(propertyId, 'lightSwitchesImages',
+                //         bedRoomLightSwitchesImages); // Save preference
+                //   },
+                // ),
 
-                // Light Switches
-                ConditionItem(
-                  name: "Light Switches",
-                  location: bedRoomLightSwitchesLocation,
-                  condition: bedRoomLightSwitchesCondition,
-                  images: bedRoomLightSwitchesImages,
-                  onlocationSelected: (location) {
-                    setState(() {
-                      bedRoomLightSwitchesLocation = location;
-                    });
-                    _savePreference(propertyId, 'lightSwitchesLocation',
-                        location!); // Save preference
-                  },
-                  onConditionSelected: (condition) {
-                    setState(() {
-                      bedRoomLightSwitchesCondition = condition;
-                    });
-                    _savePreference(propertyId, 'lightSwitchesCondition',
-                        condition!); // Save preference
-                  },
-                  onImageAdded: (imagePath) {
-                    setState(() {
-                      bedRoomLightSwitchesImages.add(imagePath);
-                    });
-                    _savePreferenceList(propertyId, 'lightSwitchesImages',
-                        bedRoomLightSwitchesImages); // Save preference
-                  },
-                ),
+                // // Sockets
+                // ConditionItem(
+                //   name: "Sockets",
+                //   location: bedRoomSocketsLocation,
+                //   condition: bedRoomSocketsCondition,
+                //   images: bedRoomSocketsImages,
+                //   onlocationSelected: (location) {
+                //     setState(() {
+                //       bedRoomSocketsLocation = location;
+                //     });
+                //     _savePreference(propertyId, 'socketsLocation',
+                //         location!); // Save preference
+                //   },
+                //   onConditionSelected: (condition) {
+                //     setState(() {
+                //       bedRoomSocketsCondition = condition;
+                //     });
+                //     _savePreference(propertyId, 'socketsCondition',
+                //         condition!); // Save preference
+                //   },
+                //   onImageAdded: (imagePath) {
+                //     setState(() {
+                //       bedRoomSocketsImages.add(imagePath);
+                //     });
+                //     _savePreferenceList(propertyId, 'socketsImages',
+                //         bedRoomSocketsImages); // Save preference
+                //   },
+                // ),
 
-                // Sockets
-                ConditionItem(
-                  name: "Sockets",
-                  location: bedRoomSocketsLocation,
-                  condition: bedRoomSocketsCondition,
-                  images: bedRoomSocketsImages,
-                  onlocationSelected: (location) {
-                    setState(() {
-                      bedRoomSocketsLocation = location;
-                    });
-                    _savePreference(propertyId, 'socketsLocation',
-                        location!); // Save preference
-                  },
-                  onConditionSelected: (condition) {
-                    setState(() {
-                      bedRoomSocketsCondition = condition;
-                    });
-                    _savePreference(propertyId, 'socketsCondition',
-                        condition!); // Save preference
-                  },
-                  onImageAdded: (imagePath) {
-                    setState(() {
-                      bedRoomSocketsImages.add(imagePath);
-                    });
-                    _savePreferenceList(propertyId, 'socketsImages',
-                        bedRoomSocketsImages); // Save preference
-                  },
-                ),
+                // // Flooring
+                // ConditionItem(
+                //   name: "Flooring",
+                //   location: bedRoomFlooringLocation,
+                //   condition: bedRoomFlooringCondition,
+                //   images: bedRoomFlooringImages,
+                //   onlocationSelected: (location) {
+                //     setState(() {
+                //       bedRoomFlooringLocation = location;
+                //     });
+                //     _savePreference(propertyId, 'flooringLocation',
+                //         location!); // Save preference
+                //   },
+                //   onConditionSelected: (condition) {
+                //     setState(() {
+                //       bedRoomFlooringCondition = condition;
+                //     });
+                //     _savePreference(propertyId, 'flooringCondition',
+                //         condition!); // Save preference
+                //   },
+                //   onImageAdded: (imagePath) {
+                //     setState(() {
+                //       bedRoomFlooringImages.add(imagePath);
+                //     });
+                //     _savePreferenceList(propertyId, 'flooringImages',
+                //         bedRoomFlooringImages); // Save preference
+                //   },
+                // ),
 
-                // Flooring
-                ConditionItem(
-                  name: "Flooring",
-                  location: bedRoomFlooringLocation,
-                  condition: bedRoomFlooringCondition,
-                  images: bedRoomFlooringImages,
-                  onlocationSelected: (location) {
-                    setState(() {
-                      bedRoomFlooringLocation = location;
-                    });
-                    _savePreference(propertyId, 'flooringLocation',
-                        location!); // Save preference
-                  },
-                  onConditionSelected: (condition) {
-                    setState(() {
-                      bedRoomFlooringCondition = condition;
-                    });
-                    _savePreference(propertyId, 'flooringCondition',
-                        condition!); // Save preference
-                  },
-                  onImageAdded: (imagePath) {
-                    setState(() {
-                      bedRoomFlooringImages.add(imagePath);
-                    });
-                    _savePreferenceList(propertyId, 'flooringImages',
-                        bedRoomFlooringImages); // Save preference
-                  },
-                ),
-
-                // Additional Items
-                ConditionItem(
-                  name: "Additional Items",
-                  location: bedRoomAdditionalItemsLocation,
-                  condition: bedRoomAdditionalItemsCondition,
-                  images: bedRoomAdditionalItemsImages,
-                  onlocationSelected: (location) {
-                    setState(() {
-                      bedRoomAdditionalItemsLocation = location;
-                    });
-                    _savePreference(propertyId, 'additionalItemsLocation',
-                        location!); // Save preference
-                  },
-                  onConditionSelected: (condition) {
-                    setState(() {
-                      bedRoomAdditionalItemsCondition = condition;
-                    });
-                    _savePreference(propertyId, 'additionalItemsCondition',
-                        condition!); // Save preference
-                  },
-                  onImageAdded: (imagePath) {
-                    setState(() {
-                      bedRoomAdditionalItemsImages.add(imagePath);
-                    });
-                    _savePreferenceList(propertyId, 'additionalItemsImages',
-                        bedRoomAdditionalItemsImages); // Save preference
-                  },
-                ),
+                // // Additional Items
+                // ConditionItem(
+                //   name: "Additional Items",
+                //   location: bedRoomAdditionalItemsLocation,
+                //   condition: bedRoomAdditionalItemsCondition,
+                //   images: bedRoomAdditionalItemsImages,
+                //   onlocationSelected: (location) {
+                //     setState(() {
+                //       bedRoomAdditionalItemsLocation = location;
+                //     });
+                //     _savePreference(propertyId, 'additionalItemsLocation',
+                //         location!); // Save preference
+                //   },
+                //   onConditionSelected: (condition) {
+                //     setState(() {
+                //       bedRoomAdditionalItemsCondition = condition;
+                //     });
+                //     _savePreference(propertyId, 'additionalItemsCondition',
+                //         condition!); // Save preference
+                //   },
+                //   onImageAdded: (imagePath) {
+                //     setState(() {
+                //       bedRoomAdditionalItemsImages.add(imagePath);
+                //     });
+                //     _savePreferenceList(propertyId, 'additionalItemsImages',
+                //         bedRoomAdditionalItemsImages); // Save preference
+                //   },
+                // ),
 
                 // Add more ConditionItem widgets as needed
               ],
@@ -761,7 +789,7 @@ class _BedroomState extends State<Bedroom> {
           ),
         ),
       ),
-      canPop: false,
+    
     );
   }
 }
@@ -770,9 +798,11 @@ class ConditionItem extends StatelessWidget {
   final String name;
   final String? location;
   final String? condition;
+  final String? description;
   final List<String> images;
-  final Function(String?) onlocationSelected;
+ 
   final Function(String?) onConditionSelected;
+  final Function(String?) onDescriptionSelected;
   final Function(String) onImageAdded;
 
   const ConditionItem({
@@ -780,9 +810,11 @@ class ConditionItem extends StatelessWidget {
     required this.name,
     this.location,
     this.condition,
+    this.description,
     required this.images,
-    required this.onlocationSelected,
+   
     required this.onConditionSelected,
+    required this.onDescriptionSelected,
     required this.onImageAdded,
   }) : super(key: key);
 
@@ -928,9 +960,9 @@ class ConditionItem extends StatelessWidget {
               ? Wrap(
                   spacing: 8.0,
                   runSpacing: 8.0,
-                  children: images.map((imagePath) {
-                    return Image.file(
-                      File(imagePath),
+                  children: images.map((imageUrl) {
+                    return Image.network(
+                      imageUrl,
                       width: 100,
                       height: 100,
                       fit: BoxFit.cover,

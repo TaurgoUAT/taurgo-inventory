@@ -279,7 +279,8 @@ class _AddPropertyDetailsPageState extends State<AddPropertyDetailsPage> {
                   ),
                 ),
               )
-            ]),
+            ]
+        ),
 
         body: SingleChildScrollView(
           child: Padding(

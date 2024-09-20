@@ -3,9 +3,13 @@ import 'dart:io';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:mailer/mailer.dart';
 import 'package:shared_preferences/shared_preferences.dart'; // Import shared_preferences
 import 'package:taurgo_inventory/pages/conditions/condition_details.dart';
 import 'package:taurgo_inventory/pages/edit_report_page.dart';
+import 'package:cloud_firestore/cloud_firestore.dart'; // Firestore
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:taurgo_inventory/pages/reportPages/camera_preview_page.dart'; 
 
 import '../../constants/AppColors.dart';
 import '../../widgets/add_action.dart';
@@ -20,8 +24,41 @@ class Ensuite extends StatefulWidget {
   State<Ensuite> createState() => _EnsuiteState();
 }
 
+Future<String?> uploadImageToFirebase(File imageFile, String propertyId, String collectionName, String documentId) async {
+  try {
+    // Step 1: Upload the image to Firebase Storage
+    String fileName = '${documentId}_${DateTime.now().millisecondsSinceEpoch}.jpg';
+    Reference storageReference = FirebaseStorage.instance
+        .ref()
+        .child('$propertyId/$collectionName/$documentId/$fileName');
+
+    UploadTask uploadTask = storageReference.putFile(imageFile);
+    TaskSnapshot snapshot = await uploadTask.whenComplete(() => null);
+
+    // Step 2: Get the download URL of the uploaded image
+    String downloadURL = await snapshot.ref.getDownloadURL();
+    print("Uploaded to Firebase: $downloadURL");
+
+    // Step 3: Save the download URL to Firestore
+    await FirebaseFirestore.instance
+        .collection('properties')
+        .doc(propertyId)
+        .collection(collectionName)
+        .doc(documentId)
+        .set({
+          'images': FieldValue.arrayUnion([downloadURL])
+        }, SetOptions(merge: true));
+
+    return downloadURL;
+  } catch (e) {
+    print("Error uploading image: $e");
+    return null;
+  }
+}
+
+
 class _EnsuiteState extends State<Ensuite> {
-  String? ensuitdoorCondition;
+String? ensuitdoorCondition;
   String? ensuitdoorLocation;
   String? ensuitdoorFrameCondition;
   String? ensuitedoorFrameLocation;
@@ -41,12 +78,26 @@ class _EnsuiteState extends State<Ensuite> {
   String? ensuiteblindsLocation;
   String? ensuitelightSwitchesCondition;
   String? ensuitelightSwitchesLocation;
-  String? ensuitesocketsCondition;
-  String? ensuitesocketsLocation;
-  String? ensuiteflooringCondition;
-  String? ensuiteflooringLocation;
-  String? ensuiteadditionalItemsCondition;
-  String? ensuiteadditionalItemsLocation;
+  String? ensuiteToiletCondition;
+  String? ensuiteToiletLocation;
+  String? ensuiteBasinCondition;
+  String? ensuiteBasinLocation;
+  String? ensuiteShowerCubicleCondition;
+  String? ensuiteShowerCubicleLocation;
+  String? ensuiteSwitchCondition;
+  String? ensuiteSwitchLocation;
+  String? ensuiteSocketCondition;
+  String? ensuiteSocketLocation;
+  String? ensuiteHeatingCondition;
+  String? ensuiteHeatingLocation;
+  String? ensuiteAccessoriesCondition;
+  String? ensuiteAccessoriesLocation;
+  String? ensuiteFlooringCondition;
+  String? ensuiteFlooringLocation;
+  String? ensuiteAdditionItemsCondition;
+  String? ensuiteAdditionItemsLocation;
+  String? ensuiteShowerCondition;
+  String? ensuiteShowerLocation;
   List<String> ensuitedoorImages = [];
   List<String> ensuitedoorFrameImages = [];
   List<String> ensuiteceilingImages = [];
@@ -55,9 +106,16 @@ class _EnsuiteState extends State<Ensuite> {
   List<String> ensuiteskirtingImages = [];
   List<String> ensuitewindowSillImages = [];
   List<String> ensuitecurtainsImages = [];
+  List<String> ensuiteToiletImages = [];
+  List<String> ensuiteBasinImages = [];
+  List<String> ensuiteShowerCubicleImages = [];
+  List<String> ensuiteShowerImages = [];
+  List<String> ensuiteSwitchImages = [];
+  List<String> ensuiteSocketImages = [];
+  List<String> ensuiteHeatingImages = [];
+  List<String> ensuiteAccessoriesImages = [];
   List<String> ensuiteblindsImages = [];
   List<String> ensuitelightSwitchesImages = [];
-  List<String> ensuitesocketsImages = [];
   List<String> ensuiteflooringImages = [];
   List<String> ensuiteadditionalItemsImages = [];
   late List<File> ensuitecapturedImages;
@@ -66,79 +124,34 @@ class _EnsuiteState extends State<Ensuite> {
   void initState() {
     super.initState();
     ensuitecapturedImages = widget.ensuitecapturedImages ?? [];
-    _loadPreferences(); // Load the saved preferences when the state is initialized
+    
   }
 
-  // Function to load preferences
-  Future<void> _loadPreferences() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      ensuitdoorCondition = prefs.getString('ensuitdoorCondition');
-      ensuitdoorLocation = prefs.getString('ensuitdoorLocation');
-      ensuitdoorFrameCondition = prefs.getString('ensuitdoorFrameCondition');
-      ensuitedoorFrameLocation = prefs.getString('ensuitedoorFrameLocation');
-      ensuiteceilingCondition = prefs.getString('ensuiteceilingCondition');
-      ensuitceilingLocation = prefs.getString('ensuitceilingLocation');
-      ensuitlightingCondition = prefs.getString('ensuitlightingCondition');
-      ensuitelightingLocation = prefs.getString('ensuitelightingLocation');
-      ensuitewallsCondition = prefs.getString('ensuitewallsCondition');
-      ensuitewallsLocation = prefs.getString('ensuitewallsLocation');
-      ensuiteskirtingCondition = prefs.getString('ensuiteskirtingCondition');
-      ensuiteskirtingLocation = prefs.getString('ensuiteskirtingLocation');
-      ensuitewindowSillCondition =
-          prefs.getString('ensuitewindowSillCondition');
-      ensuitewindowSillLocation = prefs.getString('ensuitewindowSillLocation');
-      ensuitecurtainsCondition = prefs.getString('ensuitecurtainsCondition');
-      ensuitecurtainsLocation = prefs.getString('ensuitecurtainsLocation');
-      ensuiteblindsCondition = prefs.getString('ensuiteblindsCondition');
-      ensuiteblindsLocation = prefs.getString('ensuiteblindsLocation');
-      ensuitelightSwitchesCondition =
-          prefs.getString('ensuitelightSwitchesCondition');
-      ensuitelightSwitchesLocation =
-          prefs.getString('ensuitelightSwitchesLocation');
-      ensuitesocketsCondition = prefs.getString('ensuitesocketsCondition');
-      ensuitesocketsLocation = prefs.getString('ensuitesocketsLocation');
-      ensuiteflooringCondition = prefs.getString('ensuiteflooringCondition');
-      ensuiteflooringLocation = prefs.getString('ensuiteflooringLocation');
-      ensuiteadditionalItemsCondition =
-          prefs.getString('ensuiteadditionalItemsCondition');
-      ensuiteadditionalItemsLocation =
-          prefs.getString('ensuiteadditionalItemsLocation');
-
-      ensuitedoorImages = prefs.getStringList('ensuitedoorImages') ?? [];
-      ensuitedoorFrameImages =
-          prefs.getStringList('ensuitedoorFrameImages') ?? [];
-      ensuiteceilingImages = prefs.getStringList('ensuiteceilingImages') ?? [];
-      ensuitelightingImages =
-          prefs.getStringList('ensuitelightingImages') ?? [];
-      ensuitewallsImages = prefs.getStringList('ensuitewallsImages') ?? [];
-      ensuiteskirtingImages =
-          prefs.getStringList('ensuiteskirtingImages') ?? [];
-      ensuitewindowSillImages =
-          prefs.getStringList('ensuitewindowSillImages') ?? [];
-      ensuitecurtainsImages =
-          prefs.getStringList('ensuitecurtainsImages') ?? [];
-      ensuiteblindsImages = prefs.getStringList('ensuiteblindsImages') ?? [];
-      ensuitelightSwitchesImages =
-          prefs.getStringList('ensuitelightSwitchesImages') ?? [];
-      ensuitesocketsImages = prefs.getStringList('ensuitesocketsImages') ?? [];
-      ensuiteflooringImages =
-          prefs.getStringList('ensuiteflooringImages') ?? [];
-      ensuiteadditionalItemsImages =
-          prefs.getStringList('ensuiteadditionalItemsImages') ?? [];
+ // Fetch images from Firestore
+  Stream<List<String>> _getImagesFromFirestore(
+      String propertyId, String imageType) {
+    return FirebaseFirestore.instance
+        .collection('properties')
+        .doc(propertyId)
+        .collection('ensuite')
+        .doc(imageType)
+        .snapshots()
+        .map((snapshot) {
+      print("Firestore snapshot data for $imageType: ${snapshot.data()}");
+      if (snapshot.exists && snapshot.data() != null) {
+        return List<String>.from(snapshot.data()!['images'] ?? []);
+      }
+      return [];
     });
   }
 
   // Function to save a preference
-  Future<void> _savePreference(String key, String value) async {
+  Future<void> _savePreference(
+      String propertyId, String key, String value) async {
     final prefs = await SharedPreferences.getInstance();
-    prefs.setString(key, value);
+    prefs.setString('${key}_$propertyId', value);
   }
 
-  Future<void> _savePreferenceList(String key, List<String> value) async {
-    final prefs = await SharedPreferences.getInstance();
-    prefs.setStringList(key, value);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -343,354 +356,1031 @@ class _EnsuiteState extends State<Ensuite> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Door
-              ConditionItem(
-                name: "Door",
-                condition: ensuitdoorCondition,
-                location: ensuitdoorLocation,
-                images: ensuitedoorImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    ensuitdoorCondition = condition;
-                  });
-                  _savePreference('ensuitdoorCondition', condition!);
-                },
-                onLocationSelected: (location) {
-                  setState(() {
-                    ensuitdoorLocation = location;
-                  });
-                  _savePreference('ensuitdoorLocation', location!);
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    ensuitedoorImages.add(imagePath);
-                  });
-                  _savePreferenceList('ensuitedoorImages', ensuitedoorImages);
+              StreamBuilder<List<String>>(
+                stream:
+                    _getImagesFromFirestore(propertyId, 'ensuitedoorImages'),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  }
+                  if (snapshot.hasError) {
+                    return Text('Error loading Door images');
+                  }
+                  final ensuitedoorImages = snapshot.data ?? [];
+                  return ConditionItem(
+                      name: "Door",
+                      condition: ensuitdoorCondition,
+                      location: ensuitdoorLocation,
+                      images: ensuitedoorImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          ensuitdoorCondition = condition;
+                        });
+                        _savePreference(
+                            propertyId, 'ensuitdoorCondition', condition!);
+                      },
+                      onLocationSelected: (location) {
+                        setState(() {
+                          ensuitdoorLocation = location;
+                        });
+                        _savePreference(
+                            propertyId, 'ensuitdoorLocation', location!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile,
+                            propertyId,
+                            'ensuite',
+                            'ensuitedoorImages');
+
+                        if (downloadUrl != null) {
+                          print("Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('ensuite')
+                              .doc('ensuitedoorImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      });
                 },
               ),
-
               // Door Frame
-              ConditionItem(
-                name: "Door Frame",
-                condition: ensuitdoorFrameCondition,
-                location: ensuitedoorFrameLocation,
-                images: ensuitedoorFrameImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    ensuitdoorFrameCondition = condition;
-                  });
-                  _savePreference('ensuitdoorFrameCondition', condition!);
-                },
-                onLocationSelected: (location) {
-                  setState(() {
-                    ensuitedoorFrameLocation = location;
-                  });
-                  _savePreference('ensuitedoorFrameLocation', location!);
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    ensuitedoorFrameImages.add(imagePath);
-                  });
-                  _savePreferenceList(
-                      'ensuitedoorFrameImages', ensuitedoorFrameImages);
+              StreamBuilder<List<String>>(
+                stream: _getImagesFromFirestore(
+                    propertyId, 'ensuitedoorFrameImages'),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  }
+                  if (snapshot.hasError) {
+                    return Text('Error loading Door Frame images');
+                  }
+                  final ensuitedoorFrameImages = snapshot.data ?? [];
+                  return ConditionItem(
+                      name: "Door Frame",
+                      condition: ensuitdoorFrameCondition,
+                      location: ensuitedoorFrameLocation,
+                      images: ensuitedoorFrameImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          ensuitdoorFrameCondition = condition;
+                        });
+                        _savePreference(propertyId, 'ensuitdoorFrameCondition',
+                            condition!);
+                      },
+                      onLocationSelected: (location) {
+                        setState(() {
+                          ensuitedoorFrameLocation = location;
+                        });
+                        _savePreference(propertyId, 'ensuitedoorFrameLocation',
+                            location!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile,
+                            propertyId,
+                            'ensuite',
+                            'ensuitedoorFrameImages');
+
+                        if (downloadUrl != null) {
+                          print(
+                              "Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('ensuite')
+                              .doc('ensuitedoorFrameImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      });
                 },
               ),
-
               // Ceiling
-              ConditionItem(
-                name: "Ceiling",
-                condition: ensuiteceilingCondition,
-                location: ensuitceilingLocation,
-                images: ensuiteceilingImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    ensuiteceilingCondition = condition;
-                  });
-                  _savePreference('ensuiteceilingCondition', condition!);
-                },
-                onLocationSelected: (location) {
-                  setState(() {
-                    ensuitceilingLocation = location;
-                  });
-                  _savePreference('ensuitceilingLocation', location!);
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    ensuiteceilingImages.add(imagePath);
-                  });
-                  _savePreferenceList(
-                      'ensuiteceilingImages', ensuiteceilingImages);
+              StreamBuilder<List<String>>(
+                stream: _getImagesFromFirestore(
+                    propertyId, 'ensuiteceilingImages'),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  }
+                  if (snapshot.hasError) {
+                    return Text('Error loading Ceiling images');
+                  }
+                  final ensuiteceilingImages = snapshot.data ?? [];
+                  return ConditionItem(
+                      name: "Ceiling",
+                      condition: ensuiteceilingCondition,
+                      location: ensuitceilingLocation,
+                      images: ensuiteceilingImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          ensuiteceilingCondition = condition;
+                        });
+                        _savePreference(propertyId, 'ensuiteceilingCondition',
+                            condition!);
+                      },
+                      onLocationSelected: (location) {
+                        setState(() {
+                          ensuitceilingLocation = location;
+                        });
+                        _savePreference(propertyId, 'ensuitceilingLocation',
+                            location!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile,
+                            propertyId,
+                            'ensuite',
+                            'ensuiteceilingImages');
+
+                        if (downloadUrl != null) {
+                          print(
+                              "Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('ensuite')
+                              .doc('ensuiteceilingImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      });
                 },
               ),
-
               // Lighting
-              ConditionItem(
-                name: "Lighting",
-                condition: ensuitlightingCondition,
-                location: ensuitelightingLocation,
-                images: ensuitelightingImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    ensuitlightingCondition = condition;
-                  });
-                  _savePreference('ensuitlightingCondition', condition!);
-                },
-                onLocationSelected: (location) {
-                  setState(() {
-                    ensuitelightingLocation = location;
-                  });
-                  _savePreference('ensuitelightingLocation', location!);
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    ensuitelightingImages.add(imagePath);
-                  });
-                  _savePreferenceList(
-                      'ensuitelightingImages', ensuitelightingImages);
+              StreamBuilder<List<String>>(
+                stream: _getImagesFromFirestore(
+                    propertyId, 'ensuitelightingImages'),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  }
+                  if (snapshot.hasError) {
+                    return Text('Error loading Lighting images');
+                  }
+                  final ensuitelightingImages = snapshot.data ?? [];
+                  return ConditionItem(
+                      name: "Lighting",
+                      condition: ensuitlightingCondition,
+                      location: ensuitelightingLocation,
+                      images: ensuitelightingImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          ensuitlightingCondition = condition;
+                        });
+                        _savePreference(
+                            propertyId, 'ensuitlightingCondition', condition!);
+                      },
+                      onLocationSelected: (location) {
+                        setState(() {
+                          ensuitelightingLocation = location;
+                        });
+                        _savePreference(
+                            propertyId, 'ensuitelightingLocation', location!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile,
+                            propertyId,
+                            'ensuite',
+                            'ensuitelightingImages');
+
+                        if (downloadUrl != null) {
+                          print(
+                              "Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('ensuite')
+                              .doc('ensuitelightingImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      });
                 },
               ),
-
               // Walls
-              ConditionItem(
-                name: "Walls",
-                condition: ensuitewallsCondition,
-                location: ensuitewallsLocation,
-                images: ensuitewallsImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    ensuitewallsCondition = condition;
-                  });
-                  _savePreference('ensuitewallsCondition', condition!);
-                },
-                onLocationSelected: (location) {
-                  setState(() {
-                    ensuitewallsLocation = location;
-                  });
-                  _savePreference('ensuitewallsLocation', location!);
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    ensuitewallsImages.add(imagePath);
-                  });
-                  _savePreferenceList('ensuitewallsImages', ensuitewallsImages);
+              StreamBuilder<List<String>>(
+                stream: _getImagesFromFirestore(
+                    propertyId, 'ensuitewallsImages'),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  }
+                  if (snapshot.hasError) {
+                    return Text('Error loading Walls images');
+                  }
+                  final ensuitewallsImages = snapshot.data ?? [];
+                  return ConditionItem(
+                      name: "Walls",
+                      condition: ensuitewallsCondition,
+                      location: ensuitewallsLocation,
+                      images: ensuitewallsImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          ensuitewallsCondition = condition;
+                        });
+                        _savePreference(propertyId, 'ensuitewallsCondition',
+                            condition!);
+                      },
+                      onLocationSelected: (location) {
+                        setState(() {
+                          ensuitewallsLocation = location;
+                        });
+                        _savePreference(propertyId, 'ensuitewallsLocation',
+                            location!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile,
+                            propertyId,
+                            'ensuite',
+                            'ensuitewallsImages');
+
+                        if (downloadUrl != null) {
+                          print(
+                              "Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('ensuite')
+                              .doc('ensuitewallsImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      });
                 },
               ),
-
               // Skirting
-              ConditionItem(
-                name: "Skirting",
-                condition: ensuiteskirtingCondition,
-                location: ensuiteskirtingLocation,
-                images: ensuiteskirtingImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    ensuiteskirtingCondition = condition;
-                  });
-                  _savePreference('ensuiteskirtingCondition', condition!);
-                },
-                onLocationSelected: (location) {
-                  setState(() {
-                    ensuiteskirtingLocation = location;
-                  });
-                  _savePreference('ensuiteskirtingLocation', location!);
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    ensuiteskirtingImages.add(imagePath);
-                  });
-                  _savePreferenceList(
-                      'ensuiteskirtingImages', ensuiteskirtingImages);
+              StreamBuilder<List<String>>(
+                stream: _getImagesFromFirestore(
+                    propertyId, 'ensuiteskirtingImages'),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  }
+                  if (snapshot.hasError) {
+                    return Text('Error loading Skirting images');
+                  }
+                  final ensuiteskirtingImages = snapshot.data ?? [];
+                  return ConditionItem(
+                      name: "Skirting",
+                      condition: ensuiteskirtingCondition,
+                      location: ensuiteskirtingLocation,
+                      images: ensuiteskirtingImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          ensuiteskirtingCondition = condition;
+                        });
+                        _savePreference(propertyId, 'ensuiteskirtingCondition',
+                            condition!);
+                      },
+                      onLocationSelected: (location) {
+                        setState(() {
+                          ensuiteskirtingLocation = location;
+                        });
+                        _savePreference(propertyId, 'ensuiteskirtingLocation',
+                            location!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile,
+                            propertyId,
+                            'ensuite',
+                            'ensuiteskirtingImages');
+
+                        if (downloadUrl != null) {
+                          print(
+                              "Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('ensuite')
+                              .doc('ensuiteskirtingImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      });
                 },
               ),
-
               // Window Sill
-              ConditionItem(
-                name: "Window Sill",
-                condition: ensuitewindowSillCondition,
-                location: ensuitewindowSillLocation,
-                images: ensuitewindowSillImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    ensuitewindowSillCondition = condition;
-                  });
-                  _savePreference('ensuitewindowSillCondition', condition!);
-                },
-                onLocationSelected: (location) {
-                  setState(() {
-                    ensuitewindowSillLocation = location;
-                  });
-                  _savePreference('ensuitewindowSillLocation', location!);
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    ensuitewindowSillImages.add(imagePath);
-                  });
-                  _savePreferenceList(
-                      'ensuitewindowSillImages', ensuitewindowSillImages);
+              StreamBuilder<List<String>>(
+                stream: _getImagesFromFirestore(
+                    propertyId, 'ensuitewindowSillImages'),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  }
+                  if (snapshot.hasError) {
+                    return Text('Error loading Window Sill images');
+                  }
+                  final ensuitewindowSillImages = snapshot.data ?? [];
+                  return ConditionItem(
+                      name: "Window Sill",
+                      condition: ensuitewindowSillCondition,
+                      location: ensuitewindowSillLocation,
+                      images: ensuitewindowSillImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          ensuitewindowSillCondition = condition;
+                        });
+                        _savePreference(propertyId, 'ensuitewindowSillCondition',
+                            condition!);
+                      },
+                      onLocationSelected: (location) {
+                        setState(() {
+                          ensuitewindowSillLocation = location;
+                        });
+                        _savePreference(propertyId, 'ensuitewindowSillLocation',
+                            location!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile,
+                            propertyId,
+                            'ensuite',
+                            'ensuitewindowSillImages');
+
+                        if (downloadUrl != null) {
+                          print(
+                              "Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('ensuite')
+                              .doc('ensuitewindowSillImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      });
                 },
               ),
-
               // Curtains
-              ConditionItem(
-                name: "Curtains",
-                condition: ensuitecurtainsCondition,
-                location: ensuitecurtainsLocation,
-                images: ensuitecurtainsImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    ensuitecurtainsCondition = condition;
-                  });
-                  _savePreference('ensuitecurtainsCondition', condition!);
-                },
-                onLocationSelected: (location) {
-                  setState(() {
-                    ensuitecurtainsLocation = location;
-                  });
-                  _savePreference('ensuitecurtainsLocation', location!);
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    ensuitecurtainsImages.add(imagePath);
-                  });
-                  _savePreferenceList(
-                      'ensuitecurtainsImages', ensuitecurtainsImages);
+              StreamBuilder<List<String>>(
+                stream: _getImagesFromFirestore(
+                    propertyId, 'ensuitecurtainsImages'),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  }
+                  if (snapshot.hasError) {
+                    return Text('Error loading Curtains images');
+                  }
+                  final ensuitecurtainsImages = snapshot.data ?? [];
+                  return ConditionItem(
+                      name: "Curtains",
+                      condition: ensuitecurtainsCondition,
+                      location: ensuitecurtainsLocation,
+                      images: ensuitecurtainsImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          ensuitecurtainsCondition = condition;
+                        });
+                        _savePreference(propertyId, 'ensuitecurtainsCondition',
+                            condition!);
+                      },
+                      onLocationSelected: (location) {
+                        setState(() {
+                          ensuitecurtainsLocation = location;
+                        });
+                        _savePreference(propertyId, 'ensuitecurtainsLocation',
+                            location!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile,
+                            propertyId,
+                            'ensuite',
+                            'ensuitecurtainsImages');
+
+                        if (downloadUrl != null) {
+                          print(
+                              "Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('ensuite')
+                              .doc('ensuitecurtainsImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      });
                 },
               ),
-
               // Blinds
-              ConditionItem(
-                name: "Blinds",
-                condition: ensuiteblindsCondition,
-                location: ensuiteblindsLocation,
-                images: ensuiteblindsImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    ensuiteblindsCondition = condition;
-                  });
-                  _savePreference('ensuiteblindsCondition', condition!);
-                },
-                onLocationSelected: (location) {
-                  setState(() {
-                    ensuiteblindsLocation = location;
-                  });
-                  _savePreference('ensuiteblindsLocation', location!);
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    ensuiteblindsImages.add(imagePath);
-                  });
-                  _savePreferenceList(
-                      'ensuiteblindsImages', ensuiteblindsImages);
+              StreamBuilder<List<String>>(
+                stream: _getImagesFromFirestore(
+                    propertyId, 'ensuiteblindsImages'),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  }
+                  if (snapshot.hasError) {
+                    return Text('Error loading Blinds images');
+                  }
+                  final ensuiteblindsImages = snapshot.data ?? [];
+                  return ConditionItem(
+                      name: "Blinds",
+                      condition: ensuiteblindsCondition,
+                      location: ensuiteblindsLocation,
+                      images: ensuiteblindsImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          ensuiteblindsCondition = condition;
+                        });
+                        _savePreference(propertyId, 'ensuiteblindsCondition',
+                            condition!);
+                      },
+                      onLocationSelected: (location) {
+                        setState(() {
+                          ensuiteblindsLocation = location;
+                        });
+                        _savePreference(propertyId, 'ensuiteblindsLocation',
+                            location!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile,
+                            propertyId,
+                            'ensuite',
+                            'ensuiteblindsImages');
+
+                        if (downloadUrl != null) {
+                          print(
+                              "Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('ensuite')
+                              .doc('ensuiteblindsImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      });
                 },
               ),
-
               // Light Switches
-              ConditionItem(
-                name: "Light Switches",
-                condition: ensuitelightSwitchesCondition,
-                location: ensuitelightSwitchesLocation,
-                images: ensuitelightSwitchesImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    ensuitelightSwitchesCondition = condition;
-                  });
-                  _savePreference('ensuitelightSwitchesCondition', condition!);
-                },
-                onLocationSelected: (location) {
-                  setState(() {
-                    ensuitelightSwitchesLocation = location;
-                  });
-                  _savePreference('ensuitelightSwitchesLocation', location!);
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    ensuitelightSwitchesImages.add(imagePath);
-                  });
-                  _savePreferenceList(
-                      'ensuitelightSwitchesImages', ensuitelightSwitchesImages);
+              StreamBuilder<List<String>>(
+                stream: _getImagesFromFirestore(
+                    propertyId, 'ensuitelightSwitchesImages'),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  }
+                  if (snapshot.hasError) {
+                    return Text('Error loading Light Switches images');
+                  }
+                  final ensuitelightSwitchesImages = snapshot.data ?? [];
+                  return ConditionItem(
+                      name: "Light Switches",
+                      condition: ensuitelightSwitchesCondition,
+                      location: ensuitelightSwitchesLocation,
+                      images: ensuitelightSwitchesImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          ensuitelightSwitchesCondition = condition;
+                        });
+                        _savePreference(
+                            propertyId, 'ensuitelightSwitchesCondition', condition!);
+                      },
+                      onLocationSelected: (location) {
+                        setState(() {
+                          ensuitelightSwitchesLocation = location;
+                        });
+                        _savePreference(
+                            propertyId, 'ensuitelightSwitchesLocation', location!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile,
+                            propertyId,
+                            'ensuite',
+                            'ensuitelightSwitchesImages');
+
+                        if (downloadUrl != null) {
+                          print(
+                              "Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('ensuite')
+                              .doc('ensuitelightSwitchesImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      });
                 },
               ),
+              // Toilet
+              StreamBuilder<List<String>>(
+                stream: _getImagesFromFirestore(
+                    propertyId, 'ensuiteToiletImages'),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  }
+                  if (snapshot.hasError) {
+                    return Text('Error loading Toilet images');
+                  }
+                  final ensuiteToiletImages = snapshot.data ?? [];
+                  return ConditionItem(
+                      name: "Toilet",
+                      condition: ensuiteToiletCondition,
+                      location: ensuiteToiletLocation,
+                      images: ensuiteToiletImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          ensuiteToiletCondition = condition;
+                        });
+                        _savePreference(propertyId, 'ensuiteToiletCondition',
+                            condition!);
+                      },
+                      onLocationSelected: (location) {
+                        setState(() {
+                          ensuiteToiletLocation = location;
+                        });
+                        _savePreference(propertyId, 'ensuiteToiletLocation',
+                            location!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile,
+                            propertyId,
+                            'ensuite',
+                            'ensuiteToiletImages');
 
-              // Sockets
-              ConditionItem(
-                name: "Sockets",
-                condition: ensuitesocketsCondition,
-                location: ensuitesocketsLocation,
-                images: ensuitesocketsImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    ensuitesocketsCondition = condition;
-                  });
-                  _savePreference('ensuitesocketsCondition', condition!);
-                },
-                onLocationSelected: (location) {
-                  setState(() {
-                    ensuitesocketsLocation = location;
-                  });
-                  _savePreference('ensuitesocketsLocation', location!);
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    ensuitesocketsImages.add(imagePath);
-                  });
-                  _savePreferenceList(
-                      'ensuitesocketsImages', ensuitesocketsImages);
+                        if (downloadUrl != null) {
+                          print(
+                              "Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('ensuite')
+                              .doc('ensuiteToiletImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      });
                 },
               ),
+              // Basin
+              StreamBuilder<List<String>>(
+                stream: _getImagesFromFirestore(
+                    propertyId, 'ensuiteBasinImages'),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  }
+                  if (snapshot.hasError) {
+                    return Text('Error loading Basin images');
+                  }
+                  final ensuiteBasinImages = snapshot.data ?? [];
+                  return ConditionItem(
+                      name: "Basin",
+                      condition: ensuiteBasinCondition,
+                      location: ensuiteBasinLocation,
+                      images: ensuiteBasinImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          ensuiteBasinCondition = condition;
+                        });
+                        _savePreference(propertyId, 'ensuiteBasinCondition',
+                            condition!);
+                      },
+                      onLocationSelected: (location) {
+                        setState(() {
+                          ensuiteBasinLocation = location;
+                        });
+                        _savePreference(propertyId, 'ensuiteBasinLocation',
+                            location!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile,
+                            propertyId,
+                            'ensuite',
+                            'ensuiteBasinImages');
 
-              // Flooring
-              ConditionItem(
-                name: "Flooring",
-                condition: ensuiteflooringCondition,
-                location: ensuiteflooringLocation,
-                images: ensuiteflooringImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    ensuiteflooringCondition = condition;
-                  });
-                  _savePreference('ensuiteflooringCondition', condition!);
-                },
-                onLocationSelected: (location) {
-                  setState(() {
-                    ensuiteflooringLocation = location;
-                  });
-                  _savePreference('ensuiteflooringLocation', location!);
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    ensuiteflooringImages.add(imagePath);
-                  });
-                  _savePreferenceList(
-                      'ensuiteflooringImages', ensuiteflooringImages);
+                        if (downloadUrl != null) {
+                          print(
+                              "Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('ensuite')
+                              .doc('ensuiteBasinImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      });
                 },
               ),
+              // Shower Cubicle
+              StreamBuilder<List<String>>(
+                stream: _getImagesFromFirestore(
+                    propertyId, 'ensuiteShowerImages'),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  }
+                  if (snapshot.hasError) {
+                    return Text('Error loading Shower Cubicle images');
+                  }
+                  final ensuiteShowerImages = snapshot.data ?? [];
+                  return ConditionItem(
+                      name: "Shower Cubicle",
+                      condition: ensuiteShowerCondition,
+                      location: ensuiteShowerLocation,
+                      images: ensuiteShowerImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          ensuiteShowerCondition = condition;
+                        });
+                        _savePreference(propertyId, 'ensuiteShowerCondition',
+                            condition!);
+                      },
+                      onLocationSelected: (location) {
+                        setState(() {
+                          ensuiteShowerLocation = location;
+                        });
+                        _savePreference(propertyId, 'ensuiteShowerLocation',
+                            location!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile,
+                            propertyId,
+                            'ensuite',
+                            'ensuiteShowerImages');
 
+                        if (downloadUrl != null) {
+                          print(
+                              "Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('ensuite')
+                              .doc('ensuiteShowerImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      });
+                },
+              ),
+              // Switch
+              StreamBuilder<List<String>>(
+                stream: _getImagesFromFirestore(
+                    propertyId, 'ensuiteSwitchImages'),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  }
+                  if (snapshot.hasError) {
+                    return Text('Error loading Switch images');
+                  }
+                  final ensuiteSwitchImages = snapshot.data ?? [];
+                  return ConditionItem(
+                      name: "Switch",
+                      condition: ensuiteSwitchCondition,
+                      location: ensuiteSwitchLocation,
+                      images: ensuiteSwitchImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          ensuiteSwitchCondition = condition;
+                        });
+                        _savePreference(propertyId, 'ensuiteSwitchCondition',
+                            condition!);
+                      },
+                      onLocationSelected: (location) {
+                        setState(() {
+                          ensuiteSwitchLocation = location;
+                        });
+                        _savePreference(propertyId, 'ensuiteSwitchLocation',
+                            location!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile,
+                            propertyId,
+                            'ensuite',
+                            'ensuiteSwitchImages');
+
+                        if (downloadUrl != null) {
+                          print(
+                              "Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('ensuite')
+                              .doc('ensuiteSwitchImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      });
+                },
+              ),
+              // Socket
+              StreamBuilder<List<String>>(
+                stream: _getImagesFromFirestore(
+                    propertyId, 'ensuiteSocketImages'),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  }
+                  if (snapshot.hasError) {
+                    return Text('Error loading Socket images');
+                  }
+                  final ensuiteSocketImages = snapshot.data ?? [];
+                  return ConditionItem(
+                      name: "Socket",
+                      condition: ensuiteSocketCondition,
+                      location: ensuiteSocketLocation,
+                      images: ensuiteSocketImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          ensuiteSocketCondition = condition;
+                        });
+                        _savePreference(propertyId, 'ensuiteSocketCondition',
+                            condition!);
+                      },
+                      onLocationSelected: (location) {
+                        setState(() {
+                          ensuiteSocketLocation = location;
+                        });
+                        _savePreference(propertyId, 'ensuiteSocketLocation',
+                            location!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile,
+                            propertyId,
+                            'ensuite',
+                            'ensuiteSocketImages');
+
+                        if (downloadUrl != null) {
+                          print(
+                              "Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('ensuite')
+                              .doc('ensuiteSocketImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      });
+                },
+              ),
+              // Heating
+              StreamBuilder<List<String>>(
+                stream: _getImagesFromFirestore(
+                    propertyId, 'ensuiteHeatingImages'),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  }
+                  if (snapshot.hasError) {
+                    return Text('Error loading Heating images');
+                  }
+                  final ensuiteHeatingImages = snapshot.data ?? [];
+                  return ConditionItem(
+                      name: "Heating",
+                      condition: ensuiteHeatingCondition,
+                      location: ensuiteHeatingLocation,
+                      images: ensuiteHeatingImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          ensuiteHeatingCondition = condition;
+                        });
+                        _savePreference(propertyId, 'ensuiteHeatingCondition',
+                            condition!);
+                      },
+                      onLocationSelected: (location) {
+                        setState(() {
+                          ensuiteHeatingLocation = location;
+                        });
+                        _savePreference(propertyId, 'ensuiteHeatingLocation',
+                            location!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile,
+                            propertyId,
+                            'ensuite',
+                            'ensuiteHeatingImages');
+
+                        if (downloadUrl != null) {
+                          print(
+                              "Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('ensuite')
+                              .doc('ensuiteHeatingImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      });
+                },
+              ),
+              // Accessories
+              StreamBuilder<List<String>>(
+                stream: _getImagesFromFirestore(
+                    propertyId, 'ensuiteAccessoriesImages'),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  }
+                  if (snapshot.hasError) {
+                    return Text('Error loading Accessories images');
+                  }
+                  final ensuiteAccessoriesImages = snapshot.data ?? [];
+                  return ConditionItem(
+                      name: "Accessories",
+                      condition: ensuiteAccessoriesCondition,
+                      location: ensuiteAccessoriesLocation,
+                      images: ensuiteAccessoriesImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          ensuiteAccessoriesCondition = condition;
+                        });
+                        _savePreference(propertyId, 'ensuiteAccessoriesCondition',
+                            condition!);
+                      },
+                      onLocationSelected: (location) {
+                        setState(() {
+                          ensuiteAccessoriesLocation = location;
+                        });
+                        _savePreference(propertyId, 'ensuiteAccessoriesLocation',
+                            location!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile,
+                            propertyId,
+                            'ensuite',
+                            'ensuiteAccessoriesImages');
+
+                        if (downloadUrl != null) {
+                          print(
+                              "Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('ensuite')
+                              .doc('ensuiteAccessoriesImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      });
+                },
+              ),
+              //Flooring
+              StreamBuilder<List<String>>(
+                stream: _getImagesFromFirestore(
+                    propertyId, 'ensuiteflooringImages'),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  }
+                  if (snapshot.hasError) {
+                    return Text('Error loading Flooring images');
+                  }
+                  final ensuiteflooringImages = snapshot.data ?? [];
+                  return ConditionItem(
+                      name: "Flooring",
+                      condition: ensuiteFlooringCondition,
+                      location: ensuiteFlooringLocation,
+                      images: ensuiteflooringImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          ensuiteFlooringCondition = condition;
+                        });
+                        _savePreference(propertyId, 'ensuiteFlooringCondition',
+                            condition!);
+                      },
+                      onLocationSelected: (location) {
+                        setState(() {
+                          ensuiteFlooringLocation = location;
+                        });
+                        _savePreference(propertyId, 'ensuiteFlooringLocation',
+                            location!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile,
+                            propertyId,
+                            'ensuite',
+                            'ensuiteflooringImages');
+
+                        if (downloadUrl != null) {
+                          print(
+                              "Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('ensuite')
+                              .doc('ensuiteflooringImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      });
+                },
+              ),
               // Additional Items
-              ConditionItem(
-                name: "Additional Items",
-                condition: ensuiteadditionalItemsCondition,
-                location: ensuiteadditionalItemsLocation,
-                images: ensuiteadditionalItemsImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    ensuiteadditionalItemsCondition = condition;
-                  });
-                  _savePreference(
-                      'ensuiteadditionalItemsCondition', condition!);
-                },
-                onLocationSelected: (location) {
-                  setState(() {
-                    ensuiteadditionalItemsLocation = location;
-                  });
-                  _savePreference('ensuiteadditionalItemsLocation', location!);
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    ensuiteadditionalItemsImages.add(imagePath);
-                  });
-                  _savePreferenceList('ensuiteadditionalItemsImages',
-                      ensuiteadditionalItemsImages);
+              StreamBuilder<List<String>>(
+                stream: _getImagesFromFirestore(
+                    propertyId, 'ensuiteadditionalItemsImages'),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  }
+                  if (snapshot.hasError) {
+                    return Text('Error loading Additional Items images');
+                  }
+                  final ensuiteadditionalItemsImages = snapshot.data ?? [];
+                  return ConditionItem(
+                      name: "Additional Items",
+                      condition: ensuiteAdditionItemsCondition,
+                      location: ensuiteAdditionItemsLocation,
+                      images: ensuiteadditionalItemsImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          ensuiteAdditionItemsCondition = condition;
+                        });
+                        _savePreference(
+                            propertyId, 'ensuiteAdditionItemsCondition', condition!);
+                      },
+                      onLocationSelected: (location) {
+                        setState(() {
+                          ensuiteAdditionItemsLocation = location;
+                        });
+                        _savePreference(
+                            propertyId, 'ensuiteAdditionItemsLocation', location!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile,
+                            propertyId,
+                            'ensuite',
+                            'ensuiteadditionalItemsImages');
+
+                        if (downloadUrl != null) {
+                          print(
+                              "Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('ensuite')
+                              .doc('ensuiteadditionalItemsImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      });
                 },
               ),
+             
             ],
           ),
         ),
@@ -779,16 +1469,17 @@ class ConditionItem extends StatelessWidget {
                       // Initialize the camera when the button is pressed
                       final cameras = await availableCameras();
                       if (cameras.isNotEmpty) {
-                        final cameraController = CameraController(
-                          cameras.first,
-                          ResolutionPreset.high,
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => CameraPreviewPage(
+                              camera: cameras.first,
+                              onPictureTaken: (imagePath) {
+                                onImageAdded(imagePath);
+                              },
+                            ),
+                          ),
                         );
-                        await cameraController.initialize();
-                        final image = await cameraController.takePicture();
-                        final imagePath = image.path;
-
-                        // Save the image path using the provided callback
-                        onImageAdded(imagePath);
                       }
                     },
                   ),
@@ -853,14 +1544,14 @@ class ConditionItem extends StatelessWidget {
               ? Wrap(
             spacing: 8.0,
             runSpacing: 8.0,
-            children: images.map((imagePath) {
-              return Image.file(
-                File(imagePath),
-                width: 100,
-                height: 100,
-                fit: BoxFit.cover,
-              );
-            }).toList(),
+            children: images.map((imageUrl) {
+                    return Image.network(
+                      imageUrl,
+                      width: 100,
+                      height: 100,
+                      fit: BoxFit.cover,
+                    );
+                  }).toList(),
           )
               : Text(
             "No images selected",

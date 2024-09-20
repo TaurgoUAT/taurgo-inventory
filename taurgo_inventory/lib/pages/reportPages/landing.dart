@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:camera/camera.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart'; // Import shared_preferences
 import 'package:taurgo_inventory/pages/conditions/condition_details.dart';
@@ -20,7 +22,37 @@ class Landing extends StatefulWidget {
   @override
   State<Landing> createState() => _LandingState();
 }
+Future<String?> uploadImageToFirebase(File imageFile, String propertyId, String collectionName, String documentId) async {
+  try {
+    // Step 1: Upload the image to Firebase Storage
+    String fileName = '${documentId}_${DateTime.now().millisecondsSinceEpoch}.jpg';
+    Reference storageReference = FirebaseStorage.instance
+        .ref()
+        .child('$propertyId/$collectionName/$documentId/$fileName');
 
+    UploadTask uploadTask = storageReference.putFile(imageFile);
+    TaskSnapshot snapshot = await uploadTask.whenComplete(() => null);
+
+    // Step 2: Get the download URL of the uploaded image
+    String downloadURL = await snapshot.ref.getDownloadURL();
+    print("Uploaded to Firebase: $downloadURL");
+
+    // Step 3: Save the download URL to Firestore
+    await FirebaseFirestore.instance
+        .collection('properties')
+        .doc(propertyId)
+        .collection(collectionName)
+        .doc(documentId)
+        .set({
+          'images': FieldValue.arrayUnion([downloadURL])
+        }, SetOptions(merge: true));
+
+    return downloadURL;
+  } catch (e) {
+    print("Error uploading image: $e");
+    return null;
+  }
+}
 class _LandingState extends State<Landing> {
   String? landingnewdoor;
   String? landingdoorCondition;
@@ -69,94 +101,23 @@ class _LandingState extends State<Landing> {
     super.initState();
     landingcapturedImages = widget.landingcapturedImages ?? [];
     print("Property Id - SOC${widget.propertyId}");
-    _loadPreferences(widget.propertyId);
     // Load the saved preferences when the state is initialized
   }
 
-  // Function to load preferences
-  Future<void> _loadPreferences(String propertyId) async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      landingnewdoor = prefs.getString('landingnewdoor_${propertyId}');
-      landingdoorCondition =
-          prefs.getString('landingdoorCondition_${propertyId}');
-      landingdoorDescription =
-          prefs.getString('landingdoorDescription_${propertyId}');
-      landingdoorFrameCondition =
-          prefs.getString('landingdoorFrameCondition_${propertyId}');
-      landingdoorFrameDescription =
-          prefs.getString('landingdoorFrameDescription_${propertyId}');
-      landingceilingCondition =
-          prefs.getString('landingceilingCondition_${propertyId}');
-      landingceilingDescription =
-          prefs.getString('landingceilingDescription_${propertyId}');
-      landinglightingCondition =
-          prefs.getString('landinglightingCondition_${propertyId}');
-      landinglightingDescription =
-          prefs.getString('landinglightingDescription_${propertyId}');
-      landingwallsCondition =
-          prefs.getString('landingwallsCondition_${propertyId}');
-      landingwallsDescription =
-          prefs.getString('landingwallsDescription_${propertyId}');
-      landingskirtingCondition =
-          prefs.getString('landingskirtingCondition_${propertyId}');
-      landingskirtingDescription =
-          prefs.getString('landingskirtingDescription_${propertyId}');
-      landingwindowSillCondition =
-          prefs.getString('landingwindowSillCondition_${propertyId}');
-      landingwindowSillDescription =
-          prefs.getString('landingwindowSillDescription_${propertyId}');
-      landingcurtainsCondition =
-          prefs.getString('landingcurtainsCondition_${propertyId}');
-      landingcurtainsDescription =
-          prefs.getString('landingcurtainsDescription_${propertyId}');
-      landingblindsCondition =
-          prefs.getString('landingblindsCondition_${propertyId}');
-      landingblindsDescription =
-          prefs.getString('landingblindsDescription_${propertyId}');
-      landinglightSwitchesCondition =
-          prefs.getString('landinglightSwitchesCondition_${propertyId}');
-      landinglightSwitchesDescription =
-          prefs.getString('landinglightSwitchesDescription_${propertyId}');
-      landingsocketsCondition =
-          prefs.getString('landingsocketsCondition_${propertyId}');
-      landingsocketsDescription =
-          prefs.getString('landingsocketsDescription_${propertyId}');
-      landingflooringCondition =
-          prefs.getString('landingflooringCondition_${propertyId}');
-      landingflooringDescription =
-          prefs.getString('landingflooringDescription_${propertyId}');
-      landingadditionalItemsCondition =
-          prefs.getString('landingadditionalItemsCondition_${propertyId}');
-      landingadditionalItemsDescription =
-          prefs.getString('landingadditionalItemsDescription_${propertyId}');
-      landingdoorImages =
-          prefs.getStringList('landingdoorImages_${propertyId}') ?? [];
-      landingdoorFrameImages =
-          prefs.getStringList('landingdoorFrameImages_${propertyId}') ?? [];
-      landingceilingImages =
-          prefs.getStringList('landingceilingImages_${propertyId}') ?? [];
-      landinglightingImages =
-          prefs.getStringList('landinglightingImages_${propertyId}') ?? [];
-      ladingwallsImages =
-          prefs.getStringList('ladingwallsImages_${propertyId}') ?? [];
-      landingskirtingImages =
-          prefs.getStringList('landingskirtingImages_${propertyId}') ?? [];
-      landingwindowSillImages =
-          prefs.getStringList('landingwindowSillImages_${propertyId}') ?? [];
-      landingcurtainsImages =
-          prefs.getStringList('landingcurtainsImages_${propertyId}') ?? [];
-      landingblindsImages =
-          prefs.getStringList('landingblindsImages_${propertyId}') ?? [];
-      landinglightSwitchesImages =
-          prefs.getStringList('landinglightSwitchesImages_${propertyId}') ?? [];
-      landingsocketsImages =
-          prefs.getStringList('landingsocketsImages_${propertyId}') ?? [];
-      landingflooringImages =
-          prefs.getStringList('landingflooringImages_${propertyId}') ?? [];
-      landingadditionalItemsImages =
-          prefs.getStringList('landingadditionalItemsImages_${propertyId}') ??
-              [];
+ 
+   Stream<List<String>> _getImagesFromFirestore(String propertyId, String imageType) {
+    return FirebaseFirestore.instance
+        .collection('properties')
+        .doc(propertyId)
+        .collection('landing')
+        .doc(imageType)
+        .snapshots()
+        .map((snapshot) {
+      print("Firestore snapshot data for $imageType: ${snapshot.data()}");
+      if (snapshot.exists && snapshot.data() != null) {
+        return List<String>.from(snapshot.data()!['images'] ?? []);
+      }
+      return [];
     });
   }
 
@@ -167,11 +128,7 @@ class _LandingState extends State<Landing> {
     prefs.setString('${key}_$propertyId', value);
   }
 
-  Future<void> _savePreferenceList(
-      String propertyId, String key, List<String> value) async {
-    final prefs = await SharedPreferences.getInstance();
-    prefs.setStringList('${key}_$propertyId', value);
-  }
+ 
 
   @override
   Widget build(BuildContext context) {
@@ -376,383 +333,546 @@ class _LandingState extends State<Landing> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Door
-              ConditionItem(
-                name: "Door",
-                condition: landingdoorCondition,
-                description: landingnewdoor,
-                images: landingdoorImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    landingdoorCondition = condition;
-                  });
-                  _savePreference(
-                      propertyId, 'landingdoorCondition', condition!);
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    landingnewdoor = description;
-                  });
-                  _savePreference(propertyId, 'landingnewdoor', description!);
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    landingdoorImages.add(imagePath);
-                  });
-                  _savePreferenceList(
-                      propertyId, 'landingdoorImages', landingdoorImages);
-                },
-              ),
-              // Door Frame
-              ConditionItem(
-                name: "Door Frame",
-                condition: landingdoorFrameCondition,
-                description: landingdoorFrameDescription,
-                images: landingdoorFrameImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    landingdoorFrameCondition = condition;
-                  });
-                  _savePreference(propertyId, 'landingdoorFrameCondition',
-                      condition!); // Save preference
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    landingdoorFrameDescription = description;
-                  });
-                  _savePreference(propertyId, 'landingdoorFrameDescription',
-                      description!); // Save preference
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    landingdoorFrameImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId, 'landingdoorFrameImages',
-                      landingdoorFrameImages);
-                },
-              ),
+              // 
+              // // Door Frame
+              
 
               // Ceiling
-              ConditionItem(
-                name: "Ceiling",
-                condition: landingceilingCondition,
-                description: landingceilingDescription,
-                images: landingceilingImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    landingceilingCondition = condition;
-                  });
-                  _savePreference(propertyId, 'landingceilingCondition',
-                      condition!); // Save preference
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    landingceilingDescription = description;
-                  });
-                  _savePreference(propertyId, 'landingceilingDescription',
-                      description!); // Save preference
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    landingceilingImages.add(imagePath);
-                  });
-                  _savePreferenceList(
-                      propertyId, 'landingceilingImages', landingceilingImages);
-                },
-              ),
+              StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'landingceilingImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Yale images');
+                    }
+                    final landingceilingImages = snapshot.data ?? [];
+                    return ConditionItem(
+                        name: "Ceiling",
+                        condition: landingceilingCondition,
+                        description: landingceilingDescription,
+                        images: landingceilingImages,
+                        onConditionSelected: (condition) {
+                        setState(() {
+                          landingceilingCondition = condition;
+                        });
+                        _savePreference(propertyId, 'landingceilingCondition', condition!);
+                      },
+                        onDescriptionSelected: (description) {
+                        setState(() {
+                          landingceilingDescription = description;
+                        });
+                        _savePreference(propertyId, 'landingceilingDescription', description!);
+                      },
+                        onImageAdded: (imagePath) async {
+                          File imageFile = File(imagePath);
+                          String? downloadUrl = await uploadImageToFirebase(
+                              imageFile, propertyId,'landing', 'landingceilingImages');
+
+                          if (downloadUrl != null) {
+                            print(
+                                "Adding image URL to Firestore: $downloadUrl");
+                            FirebaseFirestore.instance
+                                .collection('properties')
+                                .doc(propertyId)
+                                .collection('landing')
+                                .doc('landingceilingImages')
+                                .update({
+                              'images': FieldValue.arrayUnion([downloadUrl]),
+                            });
+                          }
+                        });
+                  },
+                ),
 
               // Lighting
-              ConditionItem(
-                name: "Lighting",
-                condition: landinglightingCondition,
-                description: landinglightingDescription,
-                images: landinglightingImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    landinglightingCondition = condition;
-                  });
-                  _savePreference(propertyId, 'landinglightingCondition',
-                      condition!); // Save preference
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    landinglightingDescription = description;
-                  });
-                  _savePreference(propertyId, 'landinglightingDescription',
-                      description!); // Save preference
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    landinglightingImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId, 'landinglightingImages',
-                      landinglightingImages);
-                },
-              ),
+              StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'landinglightingImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Yale images');
+                    }
+                    final landinglightingImages = snapshot.data ?? [];
+                    return ConditionItem(
+                        name: "Lighting",
+                        condition: landinglightingCondition,
+                        description: landinglightingDescription,
+                        images: landinglightingImages,
+                        onConditionSelected: (condition) {
+                        setState(() {
+                          landinglightingCondition = condition;
+                        });
+                        _savePreference(propertyId, 'landinglightingCondition', condition!);
+                      },
+                        onDescriptionSelected: (description) {
+                        setState(() {
+                          landinglightingDescription = description;
+                        });
+                        _savePreference(propertyId, 'landinglightingDescription', description!);
+                      },
+                        onImageAdded: (imagePath) async {
+                          File imageFile = File(imagePath);
+                          String? downloadUrl = await uploadImageToFirebase(
+                              imageFile, propertyId,'landing', 'landinglightingImages');
 
+                          if (downloadUrl != null) {
+                            print(
+                                "Adding image URL to Firestore: $downloadUrl");
+                            FirebaseFirestore.instance
+                                .collection('properties')
+                                .doc(propertyId)
+                                .collection('landing')
+                                .doc('landinglightingImages')
+                                .update({
+                              'images': FieldValue.arrayUnion([downloadUrl]),
+                            });
+                          }
+                        });
+                  },
+                ),
               // Walls
-              ConditionItem(
-                name: "Walls",
-                condition: landingwallsCondition,
-                description: landingwallsDescription,
-                images: ladingwallsImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    landingwallsCondition = condition;
-                  });
-                  _savePreference(propertyId, 'landingwallsCondition',
-                      condition!); // Save preference
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    landingwallsDescription = description;
-                  });
-                  _savePreference(propertyId, 'landingwallsDescription',
-                      description!); // Save preference
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    ladingwallsImages.add(imagePath);
-                  });
-                  _savePreferenceList(
-                      propertyId, 'ladingwallsImages', ladingwallsImages);
-                },
-              ),
+              StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'ladingwallsImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Yale images');
+                    }
+                    final ladingwallsImages = snapshot.data ?? [];
+                    return ConditionItem(
+                        name: "Walls",
+                        condition: landingwallsCondition,
+                        description: landingwallsDescription,
+                        images: ladingwallsImages,
+                        onConditionSelected: (condition) {
+                        setState(() {
+                          landingwallsCondition = condition;
+                        });
+                        _savePreference(propertyId, 'landingwallsCondition', condition!);
+                      },
+                        onDescriptionSelected: (description) {
+                        setState(() {
+                          landingwallsDescription = description;
+                        });
+                        _savePreference(propertyId, 'landingwallsDescription', description!);
+                      },
+                        onImageAdded: (imagePath) async {
+                          File imageFile = File(imagePath);
+                          String? downloadUrl = await uploadImageToFirebase(
+                              imageFile, propertyId,'landing', 'ladingwallsImages');
+
+                          if (downloadUrl != null) {
+                            print(
+                                "Adding image URL to Firestore: $downloadUrl");
+                            FirebaseFirestore.instance
+                                .collection('properties')
+                                .doc(propertyId)
+                                .collection('landing')
+                                .doc('ladingwallsImages')
+                                .update({
+                              'images': FieldValue.arrayUnion([downloadUrl]),
+                            });
+                          }
+                        });
+                  },
+                ),
 
               // Skirting
-              ConditionItem(
-                name: "Skirting",
-                condition: landingskirtingCondition,
-                description: landingskirtingDescription,
-                images: landingskirtingImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    landingskirtingCondition = condition;
-                  });
-                  _savePreference(propertyId, 'landingskirtingCondition',
-                      condition!); // Save preference
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    landingskirtingDescription = description;
-                  });
-                  _savePreference(propertyId, 'landingskirtingDescription',
-                      description!); // Save preference
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    landingskirtingImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId, 'landingskirtingImages',
-                      landingskirtingImages);
-                },
-              ),
+              StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'landingskirtingImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Yale images');
+                    }
+                    final landingskirtingImages = snapshot.data ?? [];
+                    return ConditionItem(
+                        name: "Skirting",
+                        condition: landingskirtingCondition,
+                        description: landingskirtingDescription,
+                        images: landingskirtingImages,
+                        onConditionSelected: (condition) {
+                        setState(() {
+                          landingskirtingCondition = condition;
+                        });
+                        _savePreference(propertyId, 'landingskirtingCondition', condition!);
+                      },
+                        onDescriptionSelected: (description) {
+                        setState(() {
+                          landingskirtingDescription = description;
+                        });
+                        _savePreference(propertyId, 'landingskirtingDescription', description!);
+                      },
+                        onImageAdded: (imagePath) async {
+                          File imageFile = File(imagePath);
+                          String? downloadUrl = await uploadImageToFirebase(
+                              imageFile, propertyId,'landing', 'landingskirtingImages');
+
+                          if (downloadUrl != null) {
+                            print(
+                                "Adding image URL to Firestore: $downloadUrl");
+                            FirebaseFirestore.instance
+                                .collection('properties')
+                                .doc(propertyId)
+                                .collection('landing')
+                                .doc('landingskirtingImages')
+                                .update({
+                              'images': FieldValue.arrayUnion([downloadUrl]),
+                            });
+                          }
+                        });
+                  },
+                ),
 
               // Window Sill
-              ConditionItem(
-                name: "Window Sill",
-                condition: landingwindowSillCondition,
-                description: landingwindowSillDescription,
-                images: landingwindowSillImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    landingwindowSillCondition = condition;
-                  });
-                  _savePreference(propertyId, 'landingwindowSillCondition',
-                      condition!); // Save preference
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    landingwindowSillDescription = description;
-                  });
-                  _savePreference(propertyId, 'landingwindowSillDescription',
-                      description!); // Save preference
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    landingwindowSillImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId, 'landingwindowSillImages',
-                      landingwindowSillImages);
-                },
-              ),
+              StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'landingwindowSillImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Yale images');
+                    }
+                    final landingwindowSillImages = snapshot.data ?? [];
+                    return ConditionItem(
+                        name: "Window Sill",
+                        condition: landingwindowSillCondition,
+                        description: landingwindowSillDescription,
+                        images: landingwindowSillImages,
+                        onConditionSelected: (condition) {
+                        setState(() {
+                          landingwindowSillCondition = condition;
+                        });
+                        _savePreference(propertyId, 'landingwindowSillCondition', condition!);
+                      },
+                        onDescriptionSelected: (description) {
+                        setState(() {
+                          landingwindowSillDescription = description;
+                        });
+                        _savePreference(propertyId, 'landingwindowSillDescription', description!);
+                      },
+                        onImageAdded: (imagePath) async {
+                          File imageFile = File(imagePath);
+                          String? downloadUrl = await uploadImageToFirebase(
+                              imageFile, propertyId,'landing', 'landingwindowSillImages');
+
+                          if (downloadUrl != null) {
+                            print(
+                                "Adding image URL to Firestore: $downloadUrl");
+                            FirebaseFirestore.instance
+                                .collection('properties')
+                                .doc(propertyId)
+                                .collection('landing')
+                                .doc('landingwindowSillImages')
+                                .update({
+                              'images': FieldValue.arrayUnion([downloadUrl]),
+                            });
+                          }
+                        });
+                  },
+                ),
 
               // Curtains
-              ConditionItem(
-                name: "Curtains",
-                condition: landingcurtainsCondition,
-                description: landingcurtainsDescription,
-                images: landingcurtainsImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    landingcurtainsCondition = condition;
-                  });
-                  _savePreference(propertyId, 'landingcurtainsCondition',
-                      condition!); // Save preference
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    landingcurtainsDescription = description;
-                  });
-                  _savePreference(propertyId, 'landingcurtainsDescription',
-                      description!); // Save preference
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    landingcurtainsImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId, 'landingcurtainsImages',
-                      landingcurtainsImages);
-                },
-              ),
+              StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'landingcurtainsImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Yale images');
+                    }
+                    final landingcurtainsImages = snapshot.data ?? [];
+                    return ConditionItem(
+                        name: " Curtains",
+                        condition: landingcurtainsCondition,
+                        description: landingcurtainsDescription,
+                        images: landingcurtainsImages,
+                        onConditionSelected: (condition) {
+                        setState(() {
+                          landingcurtainsCondition = condition;
+                        });
+                        _savePreference(propertyId, 'landingcurtainsCondition', condition!);
+                      },
+                        onDescriptionSelected: (description) {
+                        setState(() {
+                          landingcurtainsDescription = description;
+                        });
+                        _savePreference(propertyId, 'landingcurtainsDescription', description!);
+                      },
+                        onImageAdded: (imagePath) async {
+                          File imageFile = File(imagePath);
+                          String? downloadUrl = await uploadImageToFirebase(
+                              imageFile, propertyId,'landing', 'landingcurtainsImages');
+
+                          if (downloadUrl != null) {
+                            print(
+                                "Adding image URL to Firestore: $downloadUrl");
+                            FirebaseFirestore.instance
+                                .collection('properties')
+                                .doc(propertyId)
+                                .collection('landing')
+                                .doc('landingcurtainsImages')
+                                .update({
+                              'images': FieldValue.arrayUnion([downloadUrl]),
+                            });
+                          }
+                        });
+                  },
+                ),
 
               // Blinds
-              ConditionItem(
-                name: "Blinds",
-                condition: landingblindsCondition,
-                description: landingblindsDescription,
-                images: landingblindsImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    landingblindsCondition = condition;
-                  });
-                  _savePreference(propertyId, 'landingblindsCondition',
-                      condition!); // Save preference
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    landingblindsDescription = description;
-                  });
-                  _savePreference(propertyId, 'landingblindsDescription',
-                      description!); // Save preference
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    landingblindsImages.add(imagePath);
-                  });
-                  _savePreferenceList(
-                      propertyId, 'landingblindsImages', landingblindsImages);
-                },
-              ),
+              StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'landingblindsImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Yale images');
+                    }
+                    final landingblindsImages = snapshot.data ?? [];
+                    return ConditionItem(
+                        name: " Blinds",
+                        condition: landingblindsCondition,
+                        description: landingblindsDescription,
+                        images: landingblindsImages,
+                        onConditionSelected: (condition) {
+                        setState(() {
+                          landingblindsCondition = condition;
+                        });
+                        _savePreference(propertyId, 'landingblindsCondition', condition!);
+                      },
+                        onDescriptionSelected: (description) {
+                        setState(() {
+                          landingblindsDescription = description;
+                        });
+                        _savePreference(propertyId, 'landingblindsDescription', description!);
+                      },
+                        onImageAdded: (imagePath) async {
+                          File imageFile = File(imagePath);
+                          String? downloadUrl = await uploadImageToFirebase(
+                              imageFile, propertyId,'landing', 'landingblindsImages');
 
+                          if (downloadUrl != null) {
+                            print(
+                                "Adding image URL to Firestore: $downloadUrl");
+                            FirebaseFirestore.instance
+                                .collection('properties')
+                                .doc(propertyId)
+                                .collection('landing')
+                                .doc('landingblindsImages')
+                                .update({
+                              'images': FieldValue.arrayUnion([downloadUrl]),
+                            });
+                          }
+                        });
+                  },
+                ),
               // Light Switches
-              ConditionItem(
-                name: "Light Switches",
-                condition: landinglightSwitchesCondition,
-                description: landinglightSwitchesDescription,
-                images: landinglightSwitchesImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    landinglightSwitchesCondition = condition;
-                  });
-                  _savePreference(propertyId, 'landinglightSwitchesCondition',
-                      condition!); // Save preference
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    landinglightSwitchesDescription = description;
-                  });
-                  _savePreference(propertyId, 'landinglightSwitchesDescription',
-                      description!); // Save preference
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    landinglightSwitchesImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId, 'landinglightSwitchesImages',
-                      landinglightSwitchesImages);
-                },
-              ),
+              StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'landinglightSwitchesImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Yale images');
+                    }
+                    final landinglightSwitchesImages = snapshot.data ?? [];
+                    return ConditionItem(
+                        name: " Light Switches",
+                        condition: landinglightSwitchesCondition,
+                        description: landinglightSwitchesDescription,
+                        images: landinglightSwitchesImages,
+                        onConditionSelected: (condition) {
+                        setState(() {
+                          landinglightSwitchesCondition = condition;
+                        });
+                        _savePreference(propertyId, 'landinglightSwitchesCondition', condition!);
+                      },
+                        onDescriptionSelected: (description) {
+                        setState(() {
+                          landinglightSwitchesDescription = description;
+                        });
+                        _savePreference(propertyId, 'landinglightSwitchesDescription', description!);
+                      },
+                        onImageAdded: (imagePath) async {
+                          File imageFile = File(imagePath);
+                          String? downloadUrl = await uploadImageToFirebase(
+                              imageFile, propertyId,'landing', 'landinglightSwitchesImages');
+
+                          if (downloadUrl != null) {
+                            print(
+                                "Adding image URL to Firestore: $downloadUrl");
+                            FirebaseFirestore.instance
+                                .collection('properties')
+                                .doc(propertyId)
+                                .collection('landing')
+                                .doc('landinglightSwitchesImages')
+                                .update({
+                              'images': FieldValue.arrayUnion([downloadUrl]),
+                            });
+                          }
+                        });
+                  },
+                ),
 
               // Sockets
-              ConditionItem(
-                name: "Sockets",
-                condition: landingsocketsCondition,
-                description: landingsocketsDescription,
-                images: landingsocketsImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    landingsocketsCondition = condition;
-                  });
-                  _savePreference(propertyId, 'landingsocketsCondition',
-                      condition!); // Save preference
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    landingsocketsDescription = description;
-                  });
-                  _savePreference(propertyId, 'landingsocketsDescription',
-                      description!); // Save preference
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    landingsocketsImages.add(imagePath);
-                  });
-                  _savePreferenceList(
-                      propertyId, 'landingsocketsImages', landingsocketsImages);
-                },
-              ),
+              StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'landingsocketsImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Yale images');
+                    }
+                    final landingsocketsImages = snapshot.data ?? [];
+                    return ConditionItem(
+                        name: " Sockets",
+                        condition: landingsocketsCondition,
+                        description: landingsocketsDescription,
+                        images: landingsocketsImages,
+                        onConditionSelected: (condition) {
+                        setState(() {
+                          landingsocketsCondition = condition;
+                        });
+                        _savePreference(propertyId, 'landingsocketsCondition', condition!);
+                      },
+                        onDescriptionSelected: (description) {
+                        setState(() {
+                          landingsocketsDescription = description;
+                        });
+                        _savePreference(propertyId, 'landingsocketsDescription', description!);
+                      },
+                        onImageAdded: (imagePath) async {
+                          File imageFile = File(imagePath);
+                          String? downloadUrl = await uploadImageToFirebase(
+                              imageFile, propertyId,'landing', 'landingsocketsImages');
+
+                          if (downloadUrl != null) {
+                            print(
+                                "Adding image URL to Firestore: $downloadUrl");
+                            FirebaseFirestore.instance
+                                .collection('properties')
+                                .doc(propertyId)
+                                .collection('landing')
+                                .doc('landingsocketsImages')
+                                .update({
+                              'images': FieldValue.arrayUnion([downloadUrl]),
+                            });
+                          }
+                        });
+                  },
+                ),
 
               // Flooring
-              ConditionItem(
-                name: "Flooring",
-                condition: landingflooringCondition,
-                description: landingflooringDescription,
-                images: landingflooringImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    landingflooringCondition = condition;
-                  });
-                  _savePreference(propertyId, 'landingflooringCondition',
-                      condition!); // Save preference
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    landingflooringDescription = description;
-                  });
-                  _savePreference(propertyId, 'landingflooringDescription',
-                      description!); // Save preference
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    landingflooringImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId, 'landingflooringImages',
-                      landingflooringImages);
-                },
-              ),
+              StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'landingflooringImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Yale images');
+                    }
+                    final landingflooringImages = snapshot.data ?? [];
+                    return ConditionItem(
+                        name: " Flooring",
+                        condition: landingflooringCondition,
+                        description: landingflooringDescription,
+                        images: landingflooringImages,
+                        onConditionSelected: (condition) {
+                        setState(() {
+                          landingflooringCondition = condition;
+                        });
+                        _savePreference(propertyId, 'landingflooringCondition', condition!);
+                      },
+                        onDescriptionSelected: (description) {
+                        setState(() {
+                          landingflooringDescription = description;
+                        });
+                        _savePreference(propertyId, 'landingflooringDescription', description!);
+                      },
+                        onImageAdded: (imagePath) async {
+                          File imageFile = File(imagePath);
+                          String? downloadUrl = await uploadImageToFirebase(
+                              imageFile, propertyId,'landing', 'landingflooringImages');
+
+                          if (downloadUrl != null) {
+                            print(
+                                "Adding image URL to Firestore: $downloadUrl");
+                            FirebaseFirestore.instance
+                                .collection('properties')
+                                .doc(propertyId)
+                                .collection('landing')
+                                .doc('landingflooringImages')
+                                .update({
+                              'images': FieldValue.arrayUnion([downloadUrl]),
+                            });
+                          }
+                        });
+                  },
+                ),
 
               // Additional Items
-              ConditionItem(
-                name: "Additional Items",
-                condition: landingadditionalItemsCondition,
-                description: landingadditionalItemsDescription,
-                images: landingadditionalItemsImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    landingadditionalItemsCondition = condition;
-                  });
-                  _savePreference(propertyId, 'landingadditionalItemsCondition',
-                      condition!); // Save preference
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    landingadditionalItemsDescription = description;
-                  });
-                  _savePreference(
-                      propertyId,
-                      'landingadditionalItemsDescription',
-                      description!); // Save preference
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    landingadditionalItemsImages.add(imagePath);
-                  });
-                  _savePreferenceList(
-                      propertyId,
-                      'landingadditionalItemsImages',
-                      landingadditionalItemsImages);
-                },
-              ),
+              StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'landingadditionalItemsImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Yale images');
+                    }
+                    final landingadditionalItemsImages = snapshot.data ?? [];
+                    return ConditionItem(
+                        name: " Additional Items",
+                        condition: landingadditionalItemsCondition,
+                        description: landingadditionalItemsDescription,
+                        images: landingadditionalItemsImages,
+                        onConditionSelected: (condition) {
+                        setState(() {
+                          landingadditionalItemsCondition = condition;
+                        });
+                        _savePreference(propertyId, 'landingadditionalItemsCondition', condition!);
+                      },
+                        onDescriptionSelected: (description) {
+                        setState(() {
+                          landingadditionalItemsDescription = description;
+                        });
+                        _savePreference(propertyId, 'landingadditionalItemsDescription', description!);
+                      },
+                        onImageAdded: (imagePath) async {
+                          File imageFile = File(imagePath);
+                          String? downloadUrl = await uploadImageToFirebase(
+                              imageFile, propertyId,'landing', 'landingadditionalItemsImages');
+
+                          if (downloadUrl != null) {
+                            print(
+                                "Adding image URL to Firestore: $downloadUrl");
+                            FirebaseFirestore.instance
+                                .collection('properties')
+                                .doc(propertyId)
+                                .collection('landing')
+                                .doc('landingadditionalItemsImages')
+                                .update({
+                              'images': FieldValue.arrayUnion([downloadUrl]),
+                            });
+                          }
+                        });
+                  },
+                ),
 
               // Add more ConditionItem widgets as needed
             ],
@@ -925,14 +1045,14 @@ class ConditionItem extends StatelessWidget {
               ? Wrap(
             spacing: 8.0,
             runSpacing: 8.0,
-            children: images.map((imagePath) {
-              return Image.file(
-                File(imagePath),
-                width: 100,
-                height: 100,
-                fit: BoxFit.cover,
-              );
-            }).toList(),
+            children: images.map((imageUrl) {
+                    return Image.network(
+                      imageUrl,
+                      width: 100,
+                      height: 100,
+                      fit: BoxFit.cover,
+                    );
+                  }).toList(),
           )
               : Text(
             "No images selected",

@@ -7,6 +7,7 @@ import 'package:taurgo_inventory/pages/property_details_view_page.dart';
 import '../constants/AppColors.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import '../widgets/DottedCirclepainter.dart';
 import 'authentication/controller/authController.dart';
 
 class LandingScreen extends StatefulWidget {
@@ -16,7 +17,7 @@ class LandingScreen extends StatefulWidget {
   State<LandingScreen> createState() => _LandingScreenState();
 }
 
-class _LandingScreenState extends State<LandingScreen> {
+class _LandingScreenState extends State<LandingScreen> with TickerProviderStateMixin{
   List<Map<String, dynamic>> completedProperties = [];
   List<Map<String, dynamic>> pendingProperties = [];
   bool isLoading = true;
@@ -25,12 +26,18 @@ class _LandingScreenState extends State<LandingScreen> {
   List<Map<String, dynamic>> properties = [];
   List<Map<String, dynamic>> userDetails= [];
   User? user;
+  late AnimationController _controller;
+
 
   @override
   void initState() {
     super.initState();
     getFirebaseUserId();
     fetchProperties();
+    _controller = AnimationController(
+      vsync: this,
+      duration: Duration(seconds: 2),
+    )..repeat();
   }
 
   Future<void> fetchProperties() async {
@@ -220,6 +227,11 @@ class _LandingScreenState extends State<LandingScreen> {
       _selectedIndex = index;
     });
   }
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -336,184 +348,78 @@ class _LandingScreenState extends State<LandingScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    SizedBox(
-                      height: 20,
+                    SizedBox(height: 60),
+                    Center(
+                      child: Image.asset(
+                          "assets/images/onboarding3.png",
+                          height: 300),
                     ),
-
-                    //Search bar
-                    Padding(
-                      padding: const EdgeInsets.all(0.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            width: double.maxFinite,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              color: bWhite,
-                              border: Border.all(
-                                color: kSecondaryButtonBorderColor,
-                                // Replace with your desired
-                                // border color
-                                width: 2.0, // Adjust the border width as needed
-                              ), // Background color of the search bar
-                              borderRadius: BorderRadius.circular(30.0),
-
-                              // boxShadow: [
-                              //   BoxShadow(
-                              //     color: Colors.grey.withOpacity(0.5),
-                              //     spreadRadius: 2,
-                              //     blurRadius: 5,
-                              //     offset: Offset(0, 3),
-                              //   ),
-                              // ],
-                            ),
-                            child: Row(
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Icon(Icons.search,
-                                      color:
-                                      kSecondaryButtonBorderColor), // Search icon
-                                ),
-                                Expanded(
-                                  child: TextField(
-                                    cursorColor: kPrimaryColor,
-                                    decoration: InputDecoration(
-                                      hintText: 'Search',
-                                      hintStyle: TextStyle(
-                                          color: kSecondaryButtonBorderColor),
-                                      border: InputBorder.none,
-                                    ),
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Icon(Icons.mic,
-                                      color: kSecondaryButtonBorderColor), // Mic icon
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    SizedBox(
-                      height: 20,
-                    ),
-
-                    //Filter Options
-                    Padding(
-                      padding: EdgeInsets.all(0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: <Widget>[
-                          Text(
-                            "Your Properties",
-                            style: TextStyle(
-                              fontSize: 20.0,
-                              fontWeight: FontWeight.w700,
-                              color: kPrimaryColor,
-                            ),
-                          ),
-                          Row(
-                            children: [
-                              GestureDetector(
-                                onTap: () {
-                                  _showFilterOptions(context);
-                                },
-                                child: Text(
-                                  "Filter",
-                                  style: TextStyle(
-                                    fontSize: 12.0,
-                                    fontWeight: FontWeight.w700,
-                                    color: kSecondaryTextColourTwo,
-                                  ),
-                                ),
-                              ),
-                              IconButton(
-                                icon: Icon(
-                                  Icons.filter_alt_outlined,
-                                  size: 24,
-                                  color: kSecondaryTextColourTwo,
-                                ),
-                                onPressed: () {
-                                  _showFilterOptions(context);
-                                },
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(
-                      height: 20,),
+                    // Image
                     Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         SizedBox(
-                        height: 20,),
-                          Center(
-                            child: Text(
-                              'Welcome to Taurgo inventory',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                                fontFamily: "Inter",
-                                color: kPrimaryColor,
-                              ),
-                            ),
-                          ),
-                          SizedBox(
-                            height: 20,
-                          ),
-                          Text(
-                            'No properties available',
+                          height: 20,
+                        ),
+                        Center(
+                          child: Text(
+                            'Welcome to Taurgo Inventory',
                             style: TextStyle(
-                              fontSize: 12,
+                              fontSize: 16,
                               fontWeight: FontWeight.w500,
                               fontFamily: "Inter",
-                              color: Colors.grey,
+                              color: kPrimaryColor,
                             ),
                           ),
-                          SizedBox(
-                            height: 150,
+                        ),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        Text(
+                          'Simplifying Property Management',
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w500,
+                            fontFamily: "Inter",
+                            color: Colors.grey,
                           ),
-                          Center(
-                            child: GestureDetector(
-                              onTap:(){
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(builder: (context) => AddPropertyDetailsPage()), //
-                                  // Replace with your page or function to add properties
-                                );
-                              },
-                              child: Container(
-                                height: 50,
-                                width: double.infinity,
-                                margin: EdgeInsets.only(bottom: 0.0, top: 0),
-                                decoration: BoxDecoration(
-                                  color: kPrimaryColor,
-                                  borderRadius: BorderRadius.circular(30.0),
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    "Start Report",
-                                    // The text you want to display
-                                    style: TextStyle(
-                                      color: Colors.white, // Text color
-                                      fontSize: 16.0, // Font size
-                                      fontWeight: FontWeight.bold, // Font weight
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          )
+                        ),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        // Center(
+                        //   child: GestureDetector(
+                        //     onTap:(){
+                        //       // Navigator.push(
+                        //       //   context,
+                        //       //   MaterialPageRoute(builder: (context) => AddPropertyDetailsPage()), //
+                        //       //   // Replace with your page or function to add properties
+                        //       // );
+                        //     },
+                        //     child: Container(
+                        //       height: 50,
+                        //       width: double.infinity,
+                        //       margin: EdgeInsets.only(bottom: 0.0, top: 0),
+                        //       decoration: BoxDecoration(
+                        //         color: kPrimaryColor,
+                        //         borderRadius: BorderRadius.circular(30.0),
+                        //       ),
+                        //       child: Center(
+                        //         child: Text(
+                        //           "Get Start",
+                        //           // The text you want to display
+                        //           style: TextStyle(
+                        //             color: Colors.white, // Text color
+                        //             fontSize: 16.0, // Font size
+                        //             fontWeight: FontWeight.bold, // Font weight
+                        //           ),
+                        //         ),
+                        //       ),
+                        //     ),
+                        //   ),
+                        // )
                       ],
                     )
-
                   ],
                 ),
               ),

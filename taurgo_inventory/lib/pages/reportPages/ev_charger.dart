@@ -9,6 +9,8 @@ import '../../constants/AppColors.dart';
 import '../../widgets/DottedBorderPainter.dart';
 import '../conditions/condition_details.dart';
 import '../edit_report_page.dart';
+import 'package:cloud_firestore/cloud_firestore.dart'; // Firestore
+import 'package:firebase_storage/firebase_storage.dart';
 
 class EvCharger extends StatefulWidget {
   final List<File>? capturedImages;
@@ -19,36 +21,82 @@ class EvCharger extends StatefulWidget {
   State<EvCharger> createState() => _EvChargerState();
 }
 
+
+Future<String?> uploadImageToFirebase(File imageFile, String propertyId, String collectionName, String documentId) async {
+  try {
+    // Step 1: Upload the image to Firebase Storage
+    String fileName = '${documentId}_${DateTime.now().millisecondsSinceEpoch}.jpg';
+    Reference storageReference = FirebaseStorage.instance
+        .ref()
+        .child('$propertyId/$collectionName/$documentId/$fileName');
+
+    UploadTask uploadTask = storageReference.putFile(imageFile);
+    TaskSnapshot snapshot = await uploadTask.whenComplete(() => null);
+
+    // Step 2: Get the download URL of the uploaded image
+    String downloadURL = await snapshot.ref.getDownloadURL();
+    print("Uploaded to Firebase: $downloadURL");
+
+    // Step 3: Save the download URL to Firestore
+    await FirebaseFirestore.instance
+        .collection('properties')
+        .doc(propertyId)
+        .collection(collectionName)
+        .doc(documentId)
+        .set({
+          'images': FieldValue.arrayUnion([downloadURL])
+        }, SetOptions(merge: true));
+
+    return downloadURL;
+  } catch (e) {
+    print("Error uploading image: $e");
+    return null;
+  }
+}
+
+
+
+
+
+
 class _EvChargerState extends State<EvCharger> {
+  
+ String? evChargerDescription;
   List<File> images = []; // List to store selected images
   List<String> imageNames = []; // List to hold image names
 
-  late CameraController _cameraController;
-  late Future<void> _initializeControllerFuture;
   List<File> capturedImages = [];
 
-  String? evChargerDescription;
-  List<String> evChargerImages = [];
+ 
+  
 
   @override
   void initState() {
     super.initState();
     capturedImages = widget.capturedImages ?? [];
     print("Property Id - SOC${widget.propertyId}");
-    _loadPreferences(widget.propertyId);
+    // _loadPreferences(widget.propertyId);
 
   }
 
-  Future<void> _loadPreferences(String propertyId) async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      evChargerDescription = prefs.getString
-        ('evChargerDescription_${propertyId}');
-
-      evChargerImages = prefs.getStringList('evChargerImages_${propertyId}')
-          ?? [];
+  
+   Stream<List<String>> _getImagesFromFirestore(
+      String propertyId, String imageType) {
+    return FirebaseFirestore.instance
+        .collection('properties')
+        .doc(propertyId)
+        .collection('EvCharger')
+        .doc(imageType)
+        .snapshots()
+        .map((snapshot) {
+      print("Firestore snapshot data for $imageType: ${snapshot.data()}");
+      if (snapshot.exists && snapshot.data() != null) {
+        return List<String>.from(snapshot.data()!['images'] ?? []);
+      }
+      return [];
     });
   }
+
 
   // Function to save a preference
   Future<void> _savePreference(String propertyId, String key, String value)
@@ -57,10 +105,7 @@ class _EvChargerState extends State<EvCharger> {
     prefs.setString('${key}_$propertyId', value);
   }
 
-  Future<void> _savePreferenceList(String propertyId, String key, List<String> value) async {
-    final prefs = await SharedPreferences.getInstance();
-    prefs.setStringList('${key}_$propertyId', value);
-  }
+ 
   @override
   Widget build(BuildContext context) {
     String propertyId = widget.propertyId;
@@ -265,30 +310,53 @@ class _EvChargerState extends State<EvCharger> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // EV Charger
-              ConditionItem(
-                name: "EV Charger",
-                // condition: evChargerDescription,
-                description: evChargerDescription,
-                images: evChargerImages,
-                // onConditionSelected: (condition) {
-                //   setState(() {
-                //     evChargerDescription = condition;
-                //   });
-                //   _savePreference(propertyId,'evChargerDescription', condition!); // Save preference
-                // },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    evChargerDescription = description;
-                  });
-                  _savePreference(propertyId,'evChargerDescription', description!); // Save preference
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    evChargerImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId,'evChargerImages', evChargerImages);
-                },
-              ),
+              StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'EvCharger'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Yale images');
+                    }
+                    final EvChargerImages = snapshot.data ?? [];
+                    return ConditionItem(
+                        name: "Ev Charger",
+                        condition: evChargerDescription ,
+                        description: evChargerDescription,
+                        images: EvChargerImages,
+                        onConditionSelected: (condition) {
+                        setState(() {
+                          evChargerDescription = condition;
+                        });
+                        _savePreference(propertyId, 'evChargerDescription', condition!);
+                      },
+                        onDescriptionSelected: (description) {
+                        setState(() {
+                          evChargerDescription = description;
+                        });
+                        _savePreference(propertyId, 'evChargerDescription', description!);
+                      },
+                        onImageAdded: (imagePath) async {
+                          File imageFile = File(imagePath);
+                          String? downloadUrl = await uploadImageToFirebase(
+                              imageFile, propertyId, 'EvCharger','EvCharger');
+
+                          if (downloadUrl != null) {
+                            print(
+                                "Adding image URL to Firestore: $downloadUrl");
+                            FirebaseFirestore.instance
+                                .collection('properties')
+                                .doc(propertyId)
+                                .collection('EvCharger')
+                                .doc('EvCharger')
+                                .update({
+                              'images': FieldValue.arrayUnion([downloadUrl]),
+                            });
+                          }
+                        });
+                  },
+                ),
 
               // Add more ConditionItem widgets as needed
             ],
@@ -301,20 +369,20 @@ class _EvChargerState extends State<EvCharger> {
 }
 class ConditionItem extends StatelessWidget {
   final String name;
-  // final String? condition;
+  final String? condition;
   final String? description;
   final List<String> images;
-  // final Function(String?) onConditionSelected;
+  final Function(String?) onConditionSelected;
   final Function(String?) onDescriptionSelected;
   final Function(String) onImageAdded;
 
   const ConditionItem({
     Key? key,
     required this.name,
-    // this.condition,
+    this.condition,
     this.description,
     required this.images,
-    // required this.onConditionSelected,
+    required this.onConditionSelected,
     required this.onDescriptionSelected,
     required this.onImageAdded,
   }) : super(key: key);
@@ -459,17 +527,17 @@ class ConditionItem extends StatelessWidget {
           ),
           images.isNotEmpty
               ? Wrap(
-            spacing: 8.0,
-            runSpacing: 8.0,
-            children: images.map((imagePath) {
-              return Image.file(
-                File(imagePath),
-                width: 100,
-                height: 100,
-                fit: BoxFit.cover,
-              );
-            }).toList(),
-          )
+                  spacing: 8.0,
+                  runSpacing: 8.0,
+                  children: images.map((imageUrl) {
+                    return Image.network(
+                      imageUrl,
+                      width: 100,
+                      height: 100,
+                      fit: BoxFit.cover,
+                    );
+                  }).toList(),
+                )
               : Text(
             "No images selected",
             style: TextStyle(

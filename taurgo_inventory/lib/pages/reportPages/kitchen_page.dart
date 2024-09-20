@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart'; // Add this import for SharedPreferences
 import 'package:taurgo_inventory/pages/conditions/condition_details.dart';
 import 'package:taurgo_inventory/pages/edit_report_page.dart';
+import 'package:cloud_firestore/cloud_firestore.dart'; // Firestore
+import 'package:firebase_storage/firebase_storage.dart'; // Firebase Storage
 import 'package:taurgo_inventory/pages/reportPages/camera_preview_page.dart';
 
 import '../../constants/AppColors.dart';
@@ -22,8 +24,40 @@ class KitchenPage extends StatefulWidget {
   State<KitchenPage> createState() => _KitchenPageState();
 }
 
+Future<String?> uploadImageToFirebase(File imageFile, String propertyId, String collectionName, String documentId) async {
+  try {
+    // Step 1: Upload the image to Firebase Storage
+    String fileName = '${documentId}_${DateTime.now().millisecondsSinceEpoch}.jpg';
+    Reference storageReference = FirebaseStorage.instance
+        .ref()
+        .child('$propertyId/$collectionName/$documentId/$fileName');
+
+    UploadTask uploadTask = storageReference.putFile(imageFile);
+    TaskSnapshot snapshot = await uploadTask.whenComplete(() => null);
+
+    // Step 2: Get the download URL of the uploaded image
+    String downloadURL = await snapshot.ref.getDownloadURL();
+    print("Uploaded to Firebase: $downloadURL");
+
+    // Step 3: Save the download URL to Firestore
+    await FirebaseFirestore.instance
+        .collection('properties')
+        .doc(propertyId)
+        .collection(collectionName)
+        .doc(documentId)
+        .set({
+          'images': FieldValue.arrayUnion([downloadURL])
+        }, SetOptions(merge: true));
+
+    return downloadURL;
+  } catch (e) {
+    print("Error uploading image: $e");
+    return null;
+  }
+}
+
 class _KitchenPageState extends State<KitchenPage> {
-  String? kitchenNewDoor;
+String? kitchenNewDoor;
   String? kitchenDoorCondition;
   String? kitchenDoorDescription;
   String? kitchenDoorFrameCondition;
@@ -34,6 +68,8 @@ class _KitchenPageState extends State<KitchenPage> {
   String? kitchenExtractorFanDescription;
   String? kitchenLightingCondition;
   String? kitchenLightingDescription;
+  String? kitchenLightSwitchesCondition;
+  String? kitchenLightSwitchesDescription;
   String? kitchenWallsCondition;
   String? kitchenWallsDescription;
   String? kitchenSkirtingCondition;
@@ -42,16 +78,14 @@ class _KitchenPageState extends State<KitchenPage> {
   String? kitchenWindowSillDescription;
   String? kitchenCurtainsCondition;
   String? kitchenCurtainsDescription;
+  String? kitchenCuboardsCondition;
+  String? kitchenCuboardsDescription;
+  String? kitchenHobCondition;
+  String? kitchenHobDescription;
+  String? kitchenTapCondition;
+  String? kitchenTapDescription;
   String? kitchenBlindsCondition;
   String? kitchenBlindsDescription;
-  String? kitchenToiletCondition;
-  String? kitchenToiletDescription;
-  String? kitchenBasinCondition;
-  String? kitchenBasinDescription;
-  String? kitchenShowerCubicleCondition;
-  String? kitchenShowerCubicleDescription;
-  String? kitchenBathCondition;
-  String? kitchenBathDescription;
   String? kitchenSwitchBoardCondition;
   String? kitchenSwitchBoardDescription;
   String? kitchenSocketCondition;
@@ -62,6 +96,38 @@ class _KitchenPageState extends State<KitchenPage> {
   String? kitchenAccessoriesDescription;
   String? kitchenFlooringCondition;
   String? kitchenFlooringDescription;
+  String? kichenKitchenUnitsCondition;
+  String? kitchenKitchenUnitsDescription;
+  String? kitchenExtractorHoodCondition;
+  String? kitchenExtractorHoodDescription;
+  String? kitchenCookerCondition;
+  String? kitchenCookerDescription;
+  String? kitchenFridgeFreezerCondition;
+  String? kitchenFridgeFreezerDescription;
+  String? kitchenWashingMachineCondition;
+  String? kitchenWashingMachineDescription;
+  String? kitchenDishwasherCondition;
+  String? kitchenDishwasherDescription;
+  String? kitchenTumbleDryerCondition;
+  String? kitchenTumbleDryerDescription;
+  String? kitchenMicrowaveCondition;
+  String? kitchenMicrowaveDescription;
+  String? kitchenKettleCondition;
+  String? kitchenKettleDescription;
+  String? kitchenToasterCondition;
+  String? kitchenToasterDescription;
+  String? kitchenVacuumCleanerCondition;
+  String? kitchenVacuumCleanerDescription;
+  String? kitchenBroomCondition;
+  String? kitchenBroomDescription;
+  String? kitchenMopBucketCondition;
+  String? kitchenMopBucketDescription;
+  String? kitchenSinkCondition;
+  String? kitchenSinkDescription;
+  String? kitchenWorktopCondition;
+  String? kitchenWorktopDescription;
+  String? kitchenOvenCondition;
+  String? kitchenOvenDescription;
   String? kitchenAdditionItemsCondition;
   String? kitchenAdditionItemsDescription;
   List<String> kitchenDoorImages = [];
@@ -69,20 +135,36 @@ class _KitchenPageState extends State<KitchenPage> {
   List<String> kitchenCeilingImages = [];
   List<String> kitchenExtractorFanImages = [];
   List<String> kitchenLightingImages = [];
+  List<String> kitchenLightSwitchesImages = [];
   List<String> kitchenWallsImages = [];
   List<String> kitchenSkirtingImages = [];
   List<String> kitchenWindowSillImages = [];
   List<String> ktichenCurtainsImages = [];
+  List<String> kitchenCuboardsImages = [];
+  List<String> kitchenHobImages = [];
+  List<String> kitchenTapImages = [];
   List<String> kitchenBlindsImages = [];
-  List<String> kitchenToiletImages = [];
-  List<String> kitchenBasinImages = [];
-  List<String> kitchenShowerCubicleImages = [];
   List<String> kitchenBathImages = [];
   List<String> kitchenSwitchBoardImages = [];
   List<String> kitchenSocketImages = [];
   List<String> kitchenHeatingImages = [];
   List<String> kitchenAccessoriesImages = [];
   List<String> kitchenFlooringImages = [];
+  List<String> kitchenKitchenUnitsImages = [];
+  List<String> kitchenExtractorHoodImages = [];
+  List<String> kitchenCookerImages = [];
+  List<String> kitchenFridgeFreezerImages = [];
+  List<String> kitchenWashingMachineImages = [];
+  List<String> kitchenDishwasherImages = [];
+  List<String> kitchenMicrowaveImages = [];
+  List<String> kitchenKettleImages = [];
+  List<String> kitchenToasterImages = [];
+  List<String> kitchenVacuumCleanerImages = [];
+  List<String> kitchenBroomImages = [];
+  List<String> kitchenMopBucketImages = [];
+  List<String> kitchenSinkImages = [];
+  List<String> kitchenWorktopImages = [];
+  List<String> kitchenOvenImages = [];
   List<String> kitchenAdditionItemsImages = [];
   late List<File> kitchenCapturedImages;
 
@@ -91,138 +173,28 @@ class _KitchenPageState extends State<KitchenPage> {
     super.initState();
     kitchenCapturedImages = widget.kitchenCapturedImages ?? [];
     print("Property Id - SOC${widget.propertyId}");
-    _loadPreferences(widget.propertyId);
+
     // Load the saved preferences when the state is initialized
   }
 
-  // Load saved preferences
-  Future<void> _loadPreferences(String propertyId) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      kitchenNewDoor = prefs.getString('kitchenNewDoor_${propertyId}');
-      kitchenDoorCondition =
-          prefs.getString('kitchenDoorCondition_${propertyId}');
-      kitchenDoorDescription =
-          prefs.getString('kitchenDoorDescription_${propertyId}');
-      kitchenDoorFrameCondition =
-          prefs.getString('kitchenDoorFrameCondition_${propertyId}');
-      kitchenDoorFrameDescription =
-          prefs.getString('kitchenDoorFrameDescription_${propertyId}');
-      kitchenCeilingCondition =
-          prefs.getString('kitchenCeilingCondition_${propertyId}');
-      kitchenCeilingDescription =
-          prefs.getString('kitchenCeilingDescription_${propertyId}');
-      kitchenExtractorFanCondition =
-          prefs.getString('kitchenExtractorFanCondition_${propertyId}');
-      kitchenExtractorFanDescription =
-          prefs.getString('kitchenExtractorFanDescription_${propertyId}');
-      kitchenLightingCondition =
-          prefs.getString('kitchenLightingCondition_${propertyId}');
-      kitchenLightingDescription =
-          prefs.getString('kitchenLightingDescription_${propertyId}');
-      kitchenWallsCondition =
-          prefs.getString('kitchenWallsCondition_${propertyId}');
-      kitchenWallsDescription =
-          prefs.getString('kitchenWallsDescription_${propertyId}');
-      kitchenSkirtingCondition =
-          prefs.getString('kitchenSkirtingCondition_${propertyId}');
-      kitchenSkirtingDescription =
-          prefs.getString('kitchenSkirtingDescription_${propertyId}');
-      kitchenWindowSillCondition =
-          prefs.getString('kitchenWindowSillCondition_${propertyId}');
-      kitchenWindowSillDescription =
-          prefs.getString('kitchenWindowSillDescription_${propertyId}');
-      kitchenCurtainsCondition =
-          prefs.getString('kitchenCurtainsCondition_${propertyId}');
-      kitchenCurtainsDescription =
-          prefs.getString('kitchenCurtainsDescription_${propertyId}');
-      kitchenBlindsCondition =
-          prefs.getString('kitchenBlindsCondition_${propertyId}');
-      kitchenBlindsDescription =
-          prefs.getString('kitchenBlindsDescription_${propertyId}');
-      kitchenToiletCondition =
-          prefs.getString('kitchenToiletCondition_${propertyId}');
-      kitchenToiletDescription =
-          prefs.getString('kitchenToiletDescription_${propertyId}');
-      kitchenBasinCondition =
-          prefs.getString('kitchenBasinCondition_${propertyId}');
-      kitchenBasinDescription =
-          prefs.getString('kitchenBasinDescription_${propertyId}');
-      kitchenShowerCubicleCondition =
-          prefs.getString('kitchenShowerCubicleCondition_${propertyId}');
-      kitchenShowerCubicleDescription =
-          prefs.getString('kitchenShowerCubicleDescription_${propertyId}');
-      kitchenBathCondition =
-          prefs.getString('kitchenBathCondition_${propertyId}');
-      kitchenBathDescription =
-          prefs.getString('kitchenBathDescription_${propertyId}');
-      kitchenSwitchBoardCondition =
-          prefs.getString('kitchenSwitchBoardCondition_${propertyId}');
-      kitchenSwitchBoardDescription =
-          prefs.getString('kitchenSwitchBoardDescription_${propertyId}');
-      kitchenSocketCondition =
-          prefs.getString('kitchenSocketCondition_${propertyId}');
-      kitchenSocketDescription =
-          prefs.getString('kitchenSocketDescription_${propertyId}');
-      kitchenHeatingCondition =
-          prefs.getString('kitchenHeatingCondition_${propertyId}');
-      kitchenHeatingDescription =
-          prefs.getString('kitchenHeatingDescription_${propertyId}');
-      kitchenAccessoriesCondition =
-          prefs.getString('kitchenAccessoriesCondition_${propertyId}');
-      kitchenAccessoriesDescription =
-          prefs.getString('kitchenAccessoriesDescription_${propertyId}');
-      kitchenFlooringCondition =
-          prefs.getString('kitchenFlooringCondition_${propertyId}');
-      kitchenFlooringDescription =
-          prefs.getString('kitchenFlooringDescription_${propertyId}');
-      kitchenAdditionItemsCondition =
-          prefs.getString('kitchenAdditionItemsCondition_${propertyId}');
-      kitchenAdditionItemsDescription =
-          prefs.getString('kitchenAdditionItemsDescription_${propertyId}');
-
-      kitchenDoorImages =
-          prefs.getStringList('kitchenDoorImages_${propertyId}') ?? [];
-      kitchenDoorFrameImages =
-          prefs.getStringList('kitchenDoorFrameImages_${propertyId}') ?? [];
-      kitchenCeilingImages =
-          prefs.getStringList('kitchenCeilingImages_${propertyId}') ?? [];
-      kitchenExtractorFanImages =
-          prefs.getStringList('kitchenExtractorFanImages_${propertyId}') ?? [];
-      kitchenLightingImages =
-          prefs.getStringList('kitchenLightingImages_${propertyId}') ?? [];
-      kitchenWallsImages =
-          prefs.getStringList('kitchenWallsImages_${propertyId}') ?? [];
-      kitchenSkirtingImages =
-          prefs.getStringList('kitchenSkirtingImages_${propertyId}') ?? [];
-      kitchenWindowSillImages =
-          prefs.getStringList('kitchenWindowSillImages_${propertyId}') ?? [];
-      ktichenCurtainsImages =
-          prefs.getStringList('ktichenCurtainsImages_${propertyId}') ?? [];
-      kitchenBlindsImages =
-          prefs.getStringList('blindsImages_${propertyId}') ?? [];
-      kitchenToiletImages =
-          prefs.getStringList('kitchenToiletImages_${propertyId}') ?? [];
-      kitchenBasinImages =
-          prefs.getStringList('kitchenBasinImages_${propertyId}') ?? [];
-      kitchenShowerCubicleImages =
-          prefs.getStringList('kitchenShowerCubicleImages_${propertyId}') ?? [];
-      kitchenBathImages =
-          prefs.getStringList('kitchenBathImages_${propertyId}') ?? [];
-      kitchenSwitchBoardImages =
-          prefs.getStringList('kitchenSwitchBoardImages_${propertyId}') ?? [];
-      kitchenSocketImages =
-          prefs.getStringList('kitchenSocketImages_${propertyId}') ?? [];
-      kitchenHeatingImages =
-          prefs.getStringList('kitchenHeatingImages_${propertyId}') ?? [];
-      kitchenAccessoriesImages =
-          prefs.getStringList('kitchenAccessoriesImages_${propertyId}') ?? [];
-      kitchenFlooringImages =
-          prefs.getStringList('kitchenFlooringImages_${propertyId}') ?? [];
-      kitchenAdditionItemsImages =
-          prefs.getStringList('kitchenAdditionItemsImages_${propertyId}') ?? [];
+  // Fetch images from Firestore
+  Stream<List<String>> _getImagesFromFirestore(
+      String propertyId, String imageType) {
+    return FirebaseFirestore.instance
+        .collection('properties')
+        .doc(propertyId)
+        .collection('kitchen')
+        .doc(imageType)
+        .snapshots()
+        .map((snapshot) {
+      print("Firestore snapshot data for $imageType: ${snapshot.data()}");
+      if (snapshot.exists && snapshot.data() != null) {
+        return List<String>.from(snapshot.data()!['images'] ?? []);
+      }
+      return [];
     });
   }
+
 
   // Save preferences when a condition is selected
   Future<void> _savePreference(
@@ -440,583 +412,1603 @@ class _KitchenPageState extends State<KitchenPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Door
-              ConditionItem(
-                name: "Door",
-                condition: kitchenDoorCondition,
-                description: kitchenNewDoor,
-                images: kitchenDoorImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    kitchenDoorCondition = condition;
-                  });
-                  _savePreference(
-                      propertyId, 'kitchenDoorCondition', condition!);
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    kitchenNewDoor = description;
-                  });
-                  _savePreference(propertyId, 'kitchenNewDoor', description!);
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    kitchenDoorImages.add(imagePath);
-                  });
-                  _savePreferenceList(
-                      propertyId, 'kitchenDoorImages', kitchenDoorImages);
+             StreamBuilder<List<String>>(
+                stream:
+                    _getImagesFromFirestore(propertyId, 'kitchenDoorImages'),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  }
+                  if (snapshot.hasError) {
+                    return Text('Error loading Door images');
+                  }
+                  final kitchenDoorImages = snapshot.data ?? [];
+                  return ConditionItem(
+                      name: "Door",
+                      condition: kitchenDoorCondition,
+                      description: kitchenDoorDescription,
+                      images: kitchenDoorImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          kitchenDoorCondition = condition;
+                        });
+                        _savePreference(
+                            propertyId, 'kitchenDoorCondition', condition!);
+                      },
+                      onDescriptionSelected: (description) {
+                        setState(() {
+                          kitchenDoorDescription = description;
+                        });
+                        _savePreference(
+                            propertyId, 'kitchenDoorDescription', description!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile,
+                            propertyId,
+                            'kitchen',
+                            'kitchenDoorImages');
+
+                        if (downloadUrl != null) {
+                          print("Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('kitchen')
+                              .doc('kitchenDoorImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      });
                 },
               ),
-
               // Door Frame
-              ConditionItem(
-                name: "Door Frame",
-                condition: kitchenDoorFrameCondition,
-                description: kitchenDoorFrameDescription,
-                images: kitchenDoorFrameImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    kitchenDoorFrameCondition = condition;
-                  });
-                  _savePreference(
-                      propertyId, 'kitchenDoorFrameCondition', condition!);
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    kitchenDoorFrameDescription = description;
-                  });
-                  _savePreference(
-                      propertyId, 'kitchenDoorFrameDescription', description!);
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    kitchenDoorFrameImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId, 'kitchenDoorFrameImages',
-                      kitchenDoorFrameImages);
+              StreamBuilder<List<String>>(
+                stream:
+                    _getImagesFromFirestore(propertyId, 'kitchenDoorFrameImages'),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  }
+                  if (snapshot.hasError) {
+                    return Text('Error loading Door Frame images');
+                  }
+                  final kitchenDoorFrameImages = snapshot.data ?? [];
+                  return ConditionItem(
+                      name: "Door Frame",
+                      condition: kitchenDoorFrameCondition,
+                      description: kitchenDoorFrameDescription,
+                      images: kitchenDoorFrameImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          kitchenDoorFrameCondition = condition;
+                        });
+                        _savePreference(
+                            propertyId, 'kitchenDoorFrameCondition', condition!);
+                      },
+                      onDescriptionSelected: (description) {
+                        setState(() {
+                          kitchenDoorFrameDescription = description;
+                        });
+                        _savePreference(
+                            propertyId, 'kitchenDoorFrameDescription', description!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile,
+                            propertyId,
+                            'kitchen',
+                            'kitchenDoorFrameImages');
+
+                        if (downloadUrl != null) {
+                          print("Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('kitchen')
+                              .doc('kitchenDoorFrameImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      });
                 },
               ),
-
               // Ceiling
-              ConditionItem(
-                name: "Ceiling",
-                condition: kitchenCeilingCondition,
-                description: kitchenCeilingDescription,
-                images: kitchenCeilingImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    kitchenCeilingCondition = condition;
-                  });
-                  _savePreference(
-                      propertyId, 'kitchenCeilingCondition', condition!);
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    kitchenCeilingDescription = description;
-                  });
-                  _savePreference(
-                      propertyId, 'kitchenCeilingDescription', description!);
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    kitchenCeilingImages.add(imagePath);
-                  });
-                  _savePreferenceList(
-                      propertyId, 'kitchenCeilingImages', kitchenCeilingImages);
+              StreamBuilder<List<String>>(
+                stream:
+                    _getImagesFromFirestore(propertyId, 'kitchenCeilingImages'),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  }
+                  if (snapshot.hasError) {
+                    return Text('Error loading Ceiling images');
+                  }
+                  final kitchenCeilingImages= snapshot.data ?? [];
+                  return ConditionItem(
+                      name: "Ceiling",
+                      condition: kitchenCeilingCondition,
+                      description: kitchenCeilingDescription,
+                      images: kitchenCeilingImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          kitchenCeilingCondition = condition;
+                        });
+                        _savePreference(
+                            propertyId, 'kitchenCeilingCondition', condition!);
+                      },
+                      onDescriptionSelected: (description) {
+                        setState(() {
+                          kitchenCeilingDescription = description;
+                        });
+                        _savePreference(
+                            propertyId, 'kitchenCeilingDescription', description!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile,
+                            propertyId,
+                            'kitchen',
+                            'kitchenCeilingImages');
+
+                        if (downloadUrl != null) {
+                          print("Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('kitchen')
+                              .doc('kitchenCeilingImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      });
                 },
               ),
-
-              // Extractor Fan
-              ConditionItem(
-                name: "Extractor Fan",
-                condition: kitchenExtractorFanCondition,
-                description: kitchenExtractorFanDescription,
-                images: kitchenExtractorFanImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    kitchenExtractorFanCondition = condition;
-                  });
-                  _savePreference(
-                      propertyId, 'kitchenExtractorFanCondition', condition!);
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    kitchenExtractorFanDescription = description;
-                  });
-                  _savePreference(propertyId, 'kitchenExtractorFanDescription',
-                      description!);
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    kitchenExtractorFanImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId, 'kitchenExtractorFanImages',
-                      kitchenExtractorFanImages);
-                },
-              ),
-
+         
               // Lighting
-              ConditionItem(
-                name: "Lighting",
-                condition: kitchenLightingCondition,
-                description: kitchenLightingDescription,
-                images: kitchenLightingImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    kitchenLightingCondition = condition;
-                  });
-                  _savePreference(
-                      propertyId, 'kitchenLightingCondition', condition!);
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    kitchenLightingDescription = description;
-                  });
-                  _savePreference(
-                      propertyId, 'kitchenLightingDescription', description!);
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    kitchenLightingImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId, 'kitchenLightingImages',
-                      kitchenLightingImages);
+              StreamBuilder<List<String>>(
+                stream:
+                    _getImagesFromFirestore(propertyId, 'kitchenLightingImages'),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  }
+                  if (snapshot.hasError) {
+                    return Text('Error loading Lighting images');
+                  }
+                  final kitchenLightingImages = snapshot.data ?? [];
+                  return ConditionItem(
+                      name: "Lighting",
+                      condition: kitchenLightingCondition,
+                      description: kitchenLightingDescription,
+                      images: kitchenLightingImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          kitchenLightingCondition = condition;
+                        });
+                        _savePreference(
+                            propertyId, 'kitchenLightingCondition', condition!);
+                      },
+                      onDescriptionSelected: (description) {
+                        setState(() {
+                          kitchenLightingDescription = description;
+                        });
+                        _savePreference(
+                            propertyId, 'kitchenLightingDescription', description!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile,
+                            propertyId,
+                            'kitchen',
+                            'kitchenLightingImages');
+
+                        if (downloadUrl != null) {
+                          print("Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('kitchen')
+                              .doc('kitchenLightingImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      });
                 },
               ),
+              // Light Switches
+              StreamBuilder<List<String>>(
+                stream:
+                    _getImagesFromFirestore(propertyId, 'kitchenLightSwitchesImages'),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  }
+                  if (snapshot.hasError) {
+                    return Text('Error loading Light Switches images');
+                  }
+                  final kitchenLightSwitchesImages = snapshot.data ?? [];
+                  return ConditionItem(
+                      name: "Light Switches",
+                      condition: kitchenLightSwitchesCondition,
+                      description: kitchenLightSwitchesDescription,
+                      images: kitchenLightSwitchesImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          kitchenLightSwitchesCondition = condition;
+                        });
+                        _savePreference(
+                            propertyId, 'kitchenLightSwitchesCondition', condition!);
+                      },
+                      onDescriptionSelected: (description) {
+                        setState(() {
+                          kitchenLightSwitchesDescription = description;
+                        });
+                        _savePreference(
+                            propertyId, 'kitchenLightSwitchesDescription', description!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile,
+                            propertyId,
+                            'kitchen',
+                            'kitchenLightSwitchesImages');
 
+                        if (downloadUrl != null) {
+                          print("Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('kitchen')
+                              .doc('kitchenLightSwitchesImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      });
+                },
+              ),
               // Walls
-              ConditionItem(
-                name: "Walls",
-                condition: kitchenWallsCondition,
-                description: kitchenWallsDescription,
-                images: kitchenWallsImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    kitchenWallsCondition = condition;
-                  });
-                  _savePreference(
-                      propertyId, 'kitchenWallsCondition', condition!);
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    kitchenWallsDescription = description;
-                  });
-                  _savePreference(
-                      propertyId, 'kitchenWallsDescription', description!);
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    kitchenWallsImages.add(imagePath);
-                  });
-                  _savePreferenceList(
-                      propertyId, 'kitchenWallsImages', kitchenWallsImages);
+              StreamBuilder<List<String>>(
+                stream:
+                    _getImagesFromFirestore(propertyId, 'kitchenWallsImages'),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  }
+                  if (snapshot.hasError) {
+                    return Text('Error loading Walls images');
+                  }
+                  final kitchenWallsImages = snapshot.data ?? [];
+                  return ConditionItem(
+                      name: "Walls",
+                      condition: kitchenWallsCondition,
+                      description: kitchenWallsDescription,
+                      images: kitchenWallsImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          kitchenWallsCondition = condition;
+                        });
+                        _savePreference(
+                            propertyId, 'kitchenWallsCondition', condition!);
+                      },
+                      onDescriptionSelected: (description) {
+                        setState(() {
+                          kitchenWallsDescription = description;
+                        });
+                        _savePreference(
+                            propertyId, 'kitchenWallsDescription', description!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile,
+                            propertyId,
+                            'kitchen',
+                            'kitchenWallsImages');
+
+                        if (downloadUrl != null) {
+                          print("Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('kitchen')
+                              .doc('kitchenWallsImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      });
                 },
               ),
-
               // Skirting
-              ConditionItem(
-                name: "Skirting",
-                condition: kitchenSkirtingCondition,
-                description: kitchenSkirtingDescription,
-                images: kitchenSkirtingImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    kitchenSkirtingCondition = condition;
-                  });
-                  _savePreference(
-                      propertyId, 'kitchenSkirtingCondition', condition!);
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    kitchenSkirtingDescription = description;
-                  });
-                  _savePreference(
-                      propertyId, 'kitchenSkirtingDescription', description!);
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    kitchenSkirtingImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId, 'kitchenSkirtingImages',
-                      kitchenSkirtingImages);
+              StreamBuilder<List<String>>(
+                stream:
+                    _getImagesFromFirestore(propertyId, 'kitchenSkirtingImages'),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  }
+                  if (snapshot.hasError) {
+                    return Text('Error loading Skirting images');
+                  }
+                  final kitchenSkirtingImages = snapshot.data ?? [];
+                  return ConditionItem(
+                      name: "Skirting",
+                      condition: kitchenSkirtingCondition,
+                      description: kitchenSkirtingDescription,
+                      images: kitchenSkirtingImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          kitchenSkirtingCondition = condition;
+                        });
+                        _savePreference(
+                            propertyId, 'kitchenSkirtingCondition', condition!);
+                      },
+                      onDescriptionSelected: (description) {
+                        setState(() {
+                          kitchenSkirtingDescription = description;
+                        });
+                        _savePreference(
+                            propertyId, 'kitchenSkirtingDescription', description!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile,
+                            propertyId,
+                            'kitchen',
+                            'kitchenSkirtingImages');
+
+                        if (downloadUrl != null) {
+                          print("Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('kitchen')
+                              .doc('kitchenSkirtingImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      });
                 },
               ),
-
               // Window Sill
-              ConditionItem(
-                name: "Window Sill",
-                condition: kitchenWindowSillCondition,
-                description: kitchenWindowSillDescription,
-                images: kitchenWindowSillImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    kitchenWindowSillCondition = condition;
-                  });
-                  _savePreference(
-                      propertyId, 'kitchenWindowSillCondition', condition!);
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    kitchenWindowSillDescription = description;
-                  });
-                  _savePreference(
-                      propertyId, 'kitchenWindowSillDescription', description!);
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    kitchenWindowSillImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId, 'kitchenWindowSillImages',
-                      kitchenWindowSillImages);
+              StreamBuilder<List<String>>(
+                stream:
+                    _getImagesFromFirestore(propertyId, 'kitchenWindowSillImages'),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  }
+                  if (snapshot.hasError) {
+                    return Text('Error loading Window Sill images');
+                  }
+                  final kitchenWindowSillImages = snapshot.data ?? [];
+                  return ConditionItem(
+                      name: "Window Sill",
+                      condition: kitchenWindowSillCondition,
+                      description: kitchenWindowSillDescription,
+                      images: kitchenWindowSillImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          kitchenWindowSillCondition = condition;
+                        });
+                        _savePreference(
+                            propertyId, 'kitchenWindowSillCondition', condition!);
+                      },
+                      onDescriptionSelected: (description) {
+                        setState(() {
+                          kitchenWindowSillDescription = description;
+                        });
+                        _savePreference(
+                            propertyId, 'kitchenWindowSillDescription', description!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile,
+                            propertyId,
+                            'kitchen',
+                            'kitchenWindowSillImages');
+
+                        if (downloadUrl != null) {
+                          print("Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('kitchen')
+                              .doc('kitchenWindowSillImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      });
                 },
               ),
-
               // Curtains
-              ConditionItem(
-                name: "Curtains",
-                condition: kitchenCurtainsCondition,
-                description: kitchenCurtainsDescription,
-                images: ktichenCurtainsImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    kitchenCurtainsCondition = condition;
-                  });
-                  _savePreference(
-                      propertyId, 'kitchenCurtainsCondition', condition!);
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    kitchenCurtainsDescription = description;
-                  });
-                  _savePreference(
-                      propertyId, 'kitchenCurtainsDescription', description!);
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    ktichenCurtainsImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId, 'ktichenCurtainsImages',
-                      ktichenCurtainsImages);
+              StreamBuilder<List<String>>(
+                stream:
+                    _getImagesFromFirestore(propertyId, 'kitchenCurtainsImages'),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  }
+                  if (snapshot.hasError) {
+                    return Text('Error loading Curtains images');
+                  }
+                  final kitchenCurtainsImages = snapshot.data ?? [];
+                  return ConditionItem(
+                      name: "Curtains",
+                      condition: kitchenCurtainsCondition,
+                      description: kitchenCurtainsDescription,
+                      images: kitchenCurtainsImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          kitchenCurtainsCondition = condition;
+                        });
+                        _savePreference(
+                            propertyId, 'kitchenCurtainsCondition', condition!);
+                      },
+                      onDescriptionSelected: (description) {
+                        setState(() {
+                          kitchenCurtainsDescription = description;
+                        });
+                        _savePreference(
+                            propertyId, 'kitchenCurtainsDescription', description!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile,
+                            propertyId,
+                            'kitchen',
+                            'kitchenCurtainsImages');
+
+                        if (downloadUrl != null) {
+                          print("Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('kitchen')
+                              .doc('kitchenCurtainsImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      });
                 },
               ),
+              // Cuboards
+              StreamBuilder<List<String>>(
+                stream:
+                    _getImagesFromFirestore(propertyId, 'kitchenCuboardsImages'),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  }
+                  if (snapshot.hasError) {
+                    return Text('Error loading Cuboards images');
+                  }
+                  final kitchenCuboardsImages= snapshot.data ?? [];
+                  return ConditionItem(
+                      name: "Cuboards",
+                      condition: kitchenCuboardsCondition,
+                      description: kitchenCuboardsDescription,
+                      images: kitchenCuboardsImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          kitchenCuboardsCondition = condition;
+                        });
+                        _savePreference(
+                            propertyId, 'kitchenCuboardsCondition', condition!);
+                      },
+                      onDescriptionSelected: (description) {
+                        setState(() {
+                          kitchenCuboardsDescription = description;
+                        });
+                        _savePreference(
+                            propertyId, 'kitchenCuboardsDescription', description!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile,
+                            propertyId,
+                            'kitchen',
+                            'kitchenCuboardsImages');
 
+                        if (downloadUrl != null) {
+                          print("Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('kitchen')
+                              .doc('kitchenCuboardsImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      });
+                },
+              ),
+              // Hob
+              StreamBuilder<List<String>>(
+                stream:
+                    _getImagesFromFirestore(propertyId, 'kitchenHobImages'),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  }
+                  if (snapshot.hasError) {
+                    return Text('Error loading Hob images');
+                  }
+                  final kitchenHobImages = snapshot.data ?? [];
+                  return ConditionItem(
+                      name: "Hob",
+                      condition: kitchenHobCondition,
+                      description: kitchenHobDescription,
+                      images: kitchenHobImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          kitchenHobCondition = condition;
+                        });
+                        _savePreference(
+                            propertyId, 'kitchenHobCondition', condition!);
+                      },
+                      onDescriptionSelected: (description) {
+                        setState(() {
+                          kitchenHobDescription = description;
+                        });
+                        _savePreference(
+                            propertyId, 'kitchenHobDescription', description!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile,
+                            propertyId,
+                            'kitchen',
+                            'kitchenHobImages');
+
+                        if (downloadUrl != null) {
+                          print("Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('kitchen')
+                              .doc('kitchenHobImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      });
+                },
+              ),
+             
+              
               // Blinds
-              ConditionItem(
-                name: "Blinds",
-                condition: kitchenBlindsCondition,
-                description: kitchenBlindsDescription,
-                images: kitchenBlindsImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    kitchenBlindsCondition = condition;
-                  });
-                  _savePreference(
-                      propertyId, 'kitchenBlindsCondition', condition!);
+              StreamBuilder<List<String>>(
+                stream:
+                    _getImagesFromFirestore(propertyId, 'kitchenBlindsImages'),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  }
+                  if (snapshot.hasError) {
+                    return Text('Error loading Blinds images');
+                  }
+                  final kitchenBlindsImages = snapshot.data ?? [];
+                  return ConditionItem(
+                      name: "Blinds",
+                      condition: kitchenBlindsCondition,
+                      description: kitchenBlindsDescription,
+                      images: kitchenBlindsImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          kitchenBlindsCondition = condition;
+                        });
+                        _savePreference(
+                            propertyId, 'kitchenBlindsCondition', condition!);
+                      },
+                      onDescriptionSelected: (description) {
+                        setState(() {
+                          kitchenBlindsDescription = description;
+                        });
+                        _savePreference(
+                            propertyId, 'kitchenBlindsDescription', description!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile,
+                            propertyId,
+                            'kitchen',
+                            'kitchenBlindsImages');
+
+                        if (downloadUrl != null) {
+                          print("Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('kitchen')
+                              .doc('kitchenBlindsImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      });
                 },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    kitchenBlindsDescription = description;
-                  });
-                  _savePreference(
-                      propertyId, 'kitchenBlindsDescription', description!);
+              ),
+             
+              // Sink
+              StreamBuilder<List<String>>(
+                stream:
+                    _getImagesFromFirestore(propertyId, 'kitchenSinkImages'),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  }
+                  if (snapshot.hasError) {
+                    return Text('Error loading Sink images');
+                  }
+                  final kitchenSinkImages = snapshot.data ?? [];
+                  return ConditionItem(
+                      name: "Sink",
+                      condition: kitchenSinkCondition,
+                      description: kitchenSinkDescription,
+                      images: kitchenSinkImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          kitchenSinkCondition = condition;
+                        });
+                        _savePreference(
+                            propertyId, 'kitchenSinkCondition', condition!);
+                      },
+                      onDescriptionSelected: (description) {
+                        setState(() {
+                          kitchenSinkDescription = description;
+                        });
+                        _savePreference(
+                            propertyId, 'kitchenSinkDescription', description!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile,
+                            propertyId,
+                            'kitchen',
+                            'kitchenSinkImages');
+
+                        if (downloadUrl != null) {
+                          print("Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('kitchen')
+                              .doc('kitchenSinkImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      });
                 },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    kitchenBlindsImages.add(imagePath);
-                  });
-                  _savePreferenceList(
-                      propertyId, 'blindsImages', kitchenBlindsImages);
+              ),
+             
+              //Tap
+              StreamBuilder<List<String>>(
+                stream:
+                    _getImagesFromFirestore(propertyId, 'kitchenTapImages'),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  }
+                  if (snapshot.hasError) {
+                    return Text('Error loading Tap images');
+                  }
+                  final kitchenTapImages = snapshot.data ?? [];
+                  return ConditionItem(
+                      name: "Tap",
+                      condition: kitchenTapCondition,
+                      description: kitchenTapDescription,
+                      images: kitchenTapImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          kitchenTapCondition = condition;
+                        });
+                        _savePreference(
+                            propertyId, 'kitchenTapCondition', condition!);
+                      },
+                      onDescriptionSelected: (description) {
+                        setState(() {
+                          kitchenTapDescription = description;
+                        });
+                        _savePreference(
+                            propertyId, 'kitchenTapDescription', description!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile,
+                            propertyId,
+                            'kitchen',
+                            'kitchenTapImages');
+
+                        if (downloadUrl != null) {
+                          print("Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('kitchen')
+                              .doc('kitchenTapImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      });
+                },
+              ),
+              //Kitchen Accessories
+              StreamBuilder<List<String>>(
+                stream:
+                    _getImagesFromFirestore(propertyId, 'kitchenAccessoriesImages'),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  }
+                  if (snapshot.hasError) {
+                    return Text('Error loading Kitchen Accessories images');
+                  }
+                  final kitchenAccessoriesImages = snapshot.data ?? [];
+                  return ConditionItem(
+                      name: "Kitchen Accessories",
+                      condition: kitchenAccessoriesCondition,
+                      description: kitchenAccessoriesDescription,
+                      images: kitchenAccessoriesImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          kitchenAccessoriesCondition = condition;
+                        });
+                        _savePreference(
+                            propertyId, 'kitchenAccessoriesCondition', condition!);
+                      },
+                      onDescriptionSelected: (description) {
+                        setState(() {
+                          kitchenAccessoriesDescription = description;
+                        });
+                        _savePreference(
+                            propertyId, 'kitchenAccessoriesDescription', description!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile,
+                            propertyId,
+                            'kitchen',
+                            'kitchenAccessoriesImages');
+
+                        if (downloadUrl != null) {
+                          print("Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('kitchen')
+                              .doc('kitchenAccessoriesImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      });
+                },
+              ),
+              //Kitchen Units
+              StreamBuilder<List<String>>(
+                stream:
+                    _getImagesFromFirestore(propertyId, 'kitchenKitchenUnits'),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  }
+                  if (snapshot.hasError) {
+                    return Text('Error loading Kitchen Units images');
+                  }
+                  final kitchenKitchenUnits = snapshot.data ?? [];
+                  return ConditionItem(
+                      name: "Kitchen Units",
+                      condition: kichenKitchenUnitsCondition,
+                      description: kitchenKitchenUnitsDescription,
+                      images: kitchenKitchenUnits,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          kichenKitchenUnitsCondition = condition;
+                        });
+                        _savePreference(
+                            propertyId, 'kichenKitchenUnitsCondition', condition!);
+                      },
+                      onDescriptionSelected: (description) {
+                        setState(() {
+                          kitchenKitchenUnitsDescription = description;
+                        });
+                        _savePreference(
+                            propertyId, 'kitchenKitchenUnitsDescription,', description!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile,
+                            propertyId,
+                            'kitchen',
+                            'kitchenKitchenUnits');
+
+                        if (downloadUrl != null) {
+                          print("Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('kitchen')
+                              .doc('kitchenKitchenUnits')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      });
+                },
+              ),
+                   // Extractor Fan
+              StreamBuilder<List<String>>(
+                stream:
+                    _getImagesFromFirestore(propertyId, 'kitchenExtractorFanImages'),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  }
+                  if (snapshot.hasError) {
+                    return Text('Error loading Extractor Fan images');
+                  }
+                  final kitchenExtractorFanImages = snapshot.data ?? [];
+                  return ConditionItem(
+                      name: "Extractor Fan",
+                      condition: kitchenExtractorFanCondition,
+                      description: kitchenExtractorFanDescription,
+                      images: kitchenExtractorFanImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          kitchenExtractorFanCondition = condition;
+                        });
+                        _savePreference(
+                            propertyId, 'kitchenExtractorFanCondition', condition!);
+                      },
+                      onDescriptionSelected: (description) {
+                        setState(() {
+                          kitchenExtractorFanDescription = description;
+                        });
+                        _savePreference(
+                            propertyId, 'kitchenExtractorFanDescription', description!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile,
+                            propertyId,
+                            'kitchen',
+                            'kitchenExtractorFanImages');
+
+                        if (downloadUrl != null) {
+                          print("Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('kitchen')
+                              .doc('kitchenExtractorFanImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      });
+                },
+              ),
+              // Extarctor Hood
+              StreamBuilder<List<String>>(
+                stream:
+                    _getImagesFromFirestore(propertyId, 'kitchenExtractorHoodImages'),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  }
+                  if (snapshot.hasError) {
+                    return Text('Error loading Extractor Hood images');
+                  }
+                  final kitchenExtractorHoodImages = snapshot.data ?? [];
+                  return ConditionItem(
+                      name: "Extractor Hood",
+                      condition: kitchenExtractorHoodCondition,
+                      description: kitchenExtractorHoodDescription,
+                      images: kitchenExtractorHoodImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          kitchenExtractorHoodCondition = condition;
+                        });
+                        _savePreference(
+                            propertyId, 'kitchenExtractorHoodCondition', condition!);
+                      },
+                      onDescriptionSelected: (description) {
+                        setState(() {
+                          kitchenExtractorHoodDescription = description;
+                        });
+                        _savePreference(
+                            propertyId, 'kitchenExtractorHoodDescription', description!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile,
+                            propertyId,
+                            'kitchen',
+                            'kitchenExtractorHoodImages');
+
+                        if (downloadUrl != null) {
+                          print("Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('kitchen')
+                              .doc('kitchenExtractorHoodImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      });
+                },
+              ),
+              // Cooker
+              StreamBuilder<List<String>>(
+                stream:
+                    _getImagesFromFirestore(propertyId, 'kitchenCookerImages'),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  }
+                  if (snapshot.hasError) {
+                    return Text('Error loading Cooker images');
+                  }
+                  final kitchenCookerImages = snapshot.data ?? [];
+                  return ConditionItem(
+                      name: "Cooker",
+                      condition: kitchenCookerCondition,
+                      description: kitchenCookerDescription,
+                      images: kitchenCookerImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          kitchenCookerCondition = condition;
+                        });
+                        _savePreference(
+                            propertyId, 'kitchenCookerCondition', condition!);
+                      },
+                      onDescriptionSelected: (description) {
+                        setState(() {
+                          kitchenCookerDescription = description;
+                        });
+                        _savePreference(
+                            propertyId, 'kitchenCookerDescription', description!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile,
+                            propertyId,
+                            'kitchen',
+                            'kitchenCookerImages');
+
+                        if (downloadUrl != null) {
+                          print("Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('kitchen')
+                              .doc('kitchenCookerImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      });
+                },
+              ),
+              // Fridge/Freezer
+              StreamBuilder<List<String>>(
+                stream:
+                    _getImagesFromFirestore(propertyId, 'kitchenFridgeFreezerImages'),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  }
+                  if (snapshot.hasError) {
+                    return Text('Error loading Fridge images');
+                  }
+                  final kitchenFridgeFreezerImages = snapshot.data ?? [];
+                  return ConditionItem(
+                      name: "Fridge",
+                      condition: kitchenFridgeFreezerCondition,
+                      description: kitchenFridgeFreezerDescription,
+                      images: kitchenFridgeFreezerImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          kitchenFridgeFreezerCondition = condition;
+                        });
+                        _savePreference(
+                            propertyId, 'kitchenFridgeFreezerCondition', condition!);
+                      },
+                      onDescriptionSelected: (description) {
+                        setState(() {
+                          kitchenFridgeFreezerDescription = description;
+                        });
+                        _savePreference(
+                            propertyId, 'kitchenFridgeFreezerDescription', description!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile,
+                            propertyId,
+                            'kitchen',
+                            'kitchenFridgeFreezerImages');
+
+                        if (downloadUrl != null) {
+                          print("Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('kitchen')
+                              .doc('kitchenFridgeFreezerImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      });
+                },
+              ),
+              // Microwave
+              StreamBuilder<List<String>>(
+                stream:
+                    _getImagesFromFirestore(propertyId, 'kitchenMicrowaveImages'),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  }
+                  if (snapshot.hasError) {
+                    return Text('Error loading Microwave images');
+                  }
+                  final kitchenMicrowaveImages = snapshot.data ?? [];
+                  return ConditionItem(
+                      name: "Microwave",
+                      condition: kitchenMicrowaveCondition,
+                      description: kitchenMicrowaveDescription,
+                      images: kitchenMicrowaveImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          kitchenMicrowaveCondition = condition;
+                        });
+                        _savePreference(
+                            propertyId, 'kitchenMicrowaveCondition', condition!);
+                      },
+                      onDescriptionSelected: (description) {
+                        setState(() {
+                          kitchenMicrowaveDescription = description;
+                        });
+                        _savePreference(
+                            propertyId, 'kitchenMicrowaveDescription', description!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile,
+                            propertyId,
+                            'kitchen',
+                            'kitchenMicrowaveImages');
+
+                        if (downloadUrl != null) {
+                          print("Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('kitchen')
+                              .doc('kitchenMicrowaveImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      });
+                },
+              ),
+              // Oven
+              StreamBuilder<List<String>>(
+                stream:
+                    _getImagesFromFirestore(propertyId, 'kitchenOvenImages'),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  }
+                  if (snapshot.hasError) {
+                    return Text('Error loading Oven images');
+                  }
+                  final kitchenOvenImages = snapshot.data ?? [];
+                  return ConditionItem(
+                      name: "Oven",
+                      condition: kitchenOvenCondition,
+                      description: kitchenOvenDescription,
+                      images: kitchenOvenImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          kitchenOvenCondition = condition;
+                        });
+                        _savePreference(
+                            propertyId, 'kitchenOvenCondition', condition!);
+                      },
+                      onDescriptionSelected: (description) {
+                        setState(() {
+                          kitchenOvenDescription = description;
+                        });
+                        _savePreference(
+                            propertyId, 'kitchenOvenDescription', description!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile,
+                            propertyId,
+                            'kitchen',
+                            'kitchenOvenImages');
+
+                        if (downloadUrl != null) {
+                          print("Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('kitchen')
+                              .doc('kitchenOvenImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      });
+                },
+              ),
+              // Dishwasher
+              StreamBuilder<List<String>>(
+                stream:
+                    _getImagesFromFirestore(propertyId, 'kitchenDishwasherImages'),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  }
+                  if (snapshot.hasError) {
+                    return Text('Error loading Dishwasher images');
+                  }
+                  final kitchenDishwasherImages = snapshot.data ?? [];
+                  return ConditionItem(
+                      name: "Dishwasher",
+                      condition: kitchenDishwasherCondition,
+                      description: kitchenDishwasherDescription,
+                      images: kitchenDishwasherImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          kitchenDishwasherCondition = condition;
+                        });
+                        _savePreference(
+                            propertyId, 'kitchenDishwasherCondition', condition!);
+                      },
+                      onDescriptionSelected: (description) {
+                        setState(() {
+                          kitchenDishwasherDescription = description;
+                        });
+                        _savePreference(
+                            propertyId, 'kitchenDishwasherDescription', description!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile,
+                            propertyId,
+                            'kitchen',
+                            'kitchenDishwasherImages');
+
+                        if (downloadUrl != null) {
+                          print("Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('kitchen')
+                              .doc('kitchenDishwasherImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      });
+                },
+              ),
+              //Kettle
+              StreamBuilder<List<String>>(
+                stream:
+                    _getImagesFromFirestore(propertyId, 'kitchenKettleImages'),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  }
+                  if (snapshot.hasError) {
+                    return Text('Error loading Kettle images');
+                  }
+                  final kitchenKettleImages = snapshot.data ?? [];
+                  return ConditionItem(
+                      name: "Kettle",
+                      condition: kitchenKettleCondition,
+                      description: kitchenKettleDescription,
+                      images: kitchenKettleImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          kitchenKettleCondition = condition;
+                        });
+                        _savePreference(
+                            propertyId, 'kitchenKettleCondition', condition!);
+                      },
+                      onDescriptionSelected: (description) {
+                        setState(() {
+                          kitchenKettleDescription = description;
+                        });
+                        _savePreference(
+                            propertyId, 'kitchenKettleDescription', description!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile,
+                            propertyId,
+                            'kitchen',
+                            'kitchenKettleImages');
+
+                        if (downloadUrl != null) {
+                          print("Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('kitchen')
+                              .doc('kitchenKettleImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      });
+                },
+              ),
+              //Toaster
+              StreamBuilder<List<String>>(
+                stream:
+                    _getImagesFromFirestore(propertyId, 'kitchenToasterImages'),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  }
+                  if (snapshot.hasError) {
+                    return Text('Error loading Toaster images');
+                  }
+                  final kitchenToasterImages = snapshot.data ?? [];
+                  return ConditionItem(
+                      name: "Toaster",
+                      condition: kitchenToasterCondition,
+                      description: kitchenToasterDescription,
+                      images: kitchenToasterImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          kitchenToasterCondition = condition;
+                        });
+                        _savePreference(
+                            propertyId, 'kitchenToasterCondition', condition!);
+                      },
+                      onDescriptionSelected: (description) {
+                        setState(() {
+                          kitchenToasterDescription = description;
+                        });
+                        _savePreference(
+                            propertyId, 'kitchenToasterDescription', description!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile,
+                            propertyId,
+                            'kitchen',
+                            'kitchenToasterImages');
+
+                        if (downloadUrl != null) {
+                          print("Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('kitchen')
+                              .doc('kitchenToasterImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      });
+                },
+              ),
+              //Vacuum Cleaner
+              StreamBuilder<List<String>>(
+                stream:
+                    _getImagesFromFirestore(propertyId, 'kitchenVacuumCleanerImages'),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  }
+                  if (snapshot.hasError) {
+                    return Text('Error loading Vacuum Cleaner images');
+                  }
+                  final kitchenVacuumCleanerImages = snapshot.data ?? [];
+                  return ConditionItem(
+                      name: "Vacuum Cleaner",
+                      condition: kitchenVacuumCleanerCondition,
+                      description: kitchenVacuumCleanerDescription,
+                      images: kitchenVacuumCleanerImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          kitchenVacuumCleanerCondition = condition;
+                        });
+                        _savePreference(
+                            propertyId, 'kitchenVacuumCleanerCondition', condition!);
+                      },
+                      onDescriptionSelected: (description) {
+                        setState(() {
+                          kitchenVacuumCleanerDescription = description;
+                        });
+                        _savePreference(
+                            propertyId, 'kitchenVacuumCleanerDescription', description!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile,
+                            propertyId,
+                            'kitchen',
+                            'kitchenVacuumCleanerImages');
+
+                        if (downloadUrl != null) {
+                          print("Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('kitchen')
+                              .doc('kitchenVacuumCleanerImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      });
+                },
+              ),
+              //Mop and Bucket
+              StreamBuilder<List<String>>(
+                stream:
+                    _getImagesFromFirestore(propertyId, 'kitchenMopAndBucketImages'),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  }
+                  if (snapshot.hasError) {
+                    return Text('Error loading Mop and Bucket images');
+                  }
+                  final kitchenMopAndBucketImages = snapshot.data ?? [];
+                  return ConditionItem(
+                      name: "Mop and Bucket",
+                      condition: kitchenMopBucketCondition,
+                      description: kitchenMopBucketDescription,
+                      images: kitchenMopAndBucketImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          kitchenMopBucketCondition = condition;
+                        });
+                        _savePreference(
+                            propertyId, 'kitchenMopBucketCondition', condition!);
+                      },
+                      onDescriptionSelected: (description) {
+                        setState(() {
+                          kitchenMopBucketDescription = description;
+                        });
+                        _savePreference(
+                            propertyId, 'kitchenMopBucketDescription', description!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile,
+                            propertyId,
+                            'kitchen',
+                            'kitchenMopAndBucketImages');
+
+                        if (downloadUrl != null) {
+                          print("Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('kitchen')
+                              .doc('kitchenMopAndBucketImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      });
+                },
+              ),
+              //Worktops
+              StreamBuilder<List<String>>(
+                stream:
+                    _getImagesFromFirestore(propertyId, 'kitchenWorktopsImages'),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  }
+                  if (snapshot.hasError) {
+                    return Text('Error loading Worktops images');
+                  }
+                  final kitchenWorktopsImages = snapshot.data ?? [];
+                  return ConditionItem(
+                      name: "Worktops",
+                      condition: kitchenWorktopCondition,
+                      description: kitchenWorktopDescription,
+                      images: kitchenWorktopsImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          kitchenWorktopCondition = condition;
+                        });
+                        _savePreference(
+                            propertyId, 'kitchenWorktopCondition', condition!);
+                      },
+                      onDescriptionSelected: (description) {
+                        setState(() {
+                          kitchenWorktopDescription = description;
+                        });
+                        _savePreference(
+                            propertyId, 'kitchenWorktopDescription', description!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile,
+                            propertyId,
+                            'kitchen',
+                            'kitchenWorktopsImages');
+
+                        if (downloadUrl != null) {
+                          print("Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('kitchen')
+                              .doc('kitchen_worktops_images')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      });
+                },
+              ),
+              //Floring
+              StreamBuilder<List<String>>(
+                stream:
+                    _getImagesFromFirestore(propertyId, 'kitchenFlooringImages'),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  }
+                  if (snapshot.hasError) {
+                    return Text('Error loading Flooring images');
+                  }
+                  final kitchenFlooringImages = snapshot.data ?? [];
+                  return ConditionItem(
+                      name: "Flooring",
+                      condition: kitchenFlooringCondition,
+                      description: kitchenFlooringDescription,
+                      images: kitchenFlooringImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          kitchenFlooringCondition = condition;
+                        });
+                        _savePreference(
+                            propertyId, 'kitchenFlooringCondition', condition!);
+                      },
+                      onDescriptionSelected: (description) {
+                        setState(() {
+                          kitchenFlooringDescription = description;
+                        });
+                        _savePreference(
+                            propertyId, 'kitchenFlooringDescription', description!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile,
+                            propertyId,
+                            'kitchen',
+                            'kitchenFlooringImages');
+
+                        if (downloadUrl != null) {
+                          print("Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('kitchen')
+                              .doc('kitchenFlooringImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      });
+                },
+              ),
+              //Addition Items
+              StreamBuilder<List<String>>(
+                stream:
+                    _getImagesFromFirestore(propertyId, 'kitchenAdditionalItemsImages'),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  }
+                  if (snapshot.hasError) {
+                    return Text('Error loading Additional Items images');
+                  }
+                  final kitchenAdditionalItemsImages = snapshot.data ?? [];
+                  return ConditionItem(
+                      name: "Additional Items",
+                      condition: kitchenAdditionItemsCondition,
+                      description: kitchenAdditionItemsDescription,
+                      images: kitchenAdditionalItemsImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          kitchenAdditionItemsCondition = condition;
+                        });
+                        _savePreference(
+                            propertyId, 'kitchenAdditionItemsCondition', condition!);
+                      },
+                      onDescriptionSelected: (description) {
+                        setState(() {
+                          kitchenAdditionItemsDescription = description;
+                        });
+                        _savePreference(
+                            propertyId, 'kitchenAdditionItemsDescription', description!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile,
+                            propertyId,
+                            'kitchen',
+                            'kitchenAdditionalItemsImages');
+
+                        if (downloadUrl != null) {
+                          print("Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('kitchen')
+                              .doc('kitchenAdditionalItemsImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      });
                 },
               ),
 
-              // Toilet
-              ConditionItem(
-                name: "Toilet",
-                condition: kitchenToiletCondition,
-                description: kitchenToiletDescription,
-                images: kitchenToiletImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    kitchenToiletCondition = condition;
-                  });
-                  _savePreference(
-                      propertyId, 'kitchenToiletCondition', condition!);
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    kitchenToiletDescription = description;
-                  });
-                  _savePreference(
-                      propertyId, 'kitchenToiletDescription', description!);
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    kitchenToiletImages.add(imagePath);
-                  });
-                  _savePreferenceList(
-                      propertyId, 'kitchenToiletImages', kitchenToiletImages);
-                },
-              ),
-
-              // Basin
-              ConditionItem(
-                name: "Basin",
-                condition: kitchenBasinCondition,
-                description: kitchenBasinDescription,
-                images: kitchenBasinImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    kitchenBasinCondition = condition;
-                  });
-                  _savePreference(
-                      propertyId, 'kitchenBasinCondition', condition!);
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    kitchenBasinDescription = description;
-                  });
-                  _savePreference(
-                      propertyId, 'kitchenBasinDescription', description!);
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    kitchenBasinImages.add(imagePath);
-                  });
-                  _savePreferenceList(
-                      propertyId, 'kitchenBasinImages', kitchenBasinImages);
-                },
-              ),
-
-              // Shower Cubicle
-              ConditionItem(
-                name: "Shower Cubicle",
-                condition: kitchenShowerCubicleCondition,
-                description: kitchenShowerCubicleDescription,
-                images: kitchenShowerCubicleImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    kitchenShowerCubicleCondition = condition;
-                  });
-                  _savePreference(
-                      propertyId, 'kitchenShowerCubicleCondition', condition!);
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    kitchenShowerCubicleDescription = description;
-                  });
-                  _savePreference(propertyId, 'kitchenShowerCubicleDescription',
-                      description!);
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    kitchenShowerCubicleImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId, 'kitchenShowerCubicleImages',
-                      kitchenShowerCubicleImages);
-                },
-              ),
-
-              // Bath
-              ConditionItem(
-                name: "Bath",
-                condition: kitchenBathCondition,
-                description: kitchenBathDescription,
-                images: kitchenBathImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    kitchenBathCondition = condition;
-                  });
-                  _savePreference(
-                      propertyId, 'kitchenBathCondition', condition!);
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    kitchenBathDescription = description;
-                  });
-                  _savePreference(
-                      propertyId, 'kitchenBathDescription', description!);
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    kitchenBathImages.add(imagePath);
-                  });
-                  _savePreferenceList(
-                      propertyId, 'kitchenBathImages', kitchenBathImages);
-                },
-              ),
-
-              // Switch Board
-              ConditionItem(
-                name: "Switch Board",
-                condition: kitchenSwitchBoardCondition,
-                description: kitchenSwitchBoardDescription,
-                images: kitchenSwitchBoardImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    kitchenSwitchBoardCondition = condition;
-                  });
-                  _savePreference(
-                      propertyId, 'kitchenSwitchBoardCondition', condition!);
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    kitchenSwitchBoardDescription = description;
-                  });
-                  _savePreference(propertyId, 'kitchenSwitchBoardDescription',
-                      description!);
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    kitchenSwitchBoardImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId, 'kitchenSwitchBoardImages',
-                      kitchenSwitchBoardImages);
-                },
-              ),
-
-              // Socket
-              ConditionItem(
-                name: "Socket",
-                condition: kitchenSocketCondition,
-                description: kitchenSocketDescription,
-                images: kitchenSocketImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    kitchenSocketCondition = condition;
-                  });
-                  _savePreference(
-                      propertyId, 'kitchenSocketCondition', condition!);
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    kitchenSocketDescription = description;
-                  });
-                  _savePreference(
-                      propertyId, 'kitchenSocketDescription', description!);
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    kitchenSocketImages.add(imagePath);
-                  });
-                  _savePreferenceList(
-                      propertyId, 'kitchenSocketImages', kitchenSocketImages);
-                },
-              ),
-
-              // Heating
-              ConditionItem(
-                name: "Heating",
-                condition: kitchenHeatingCondition,
-                description: kitchenHeatingDescription,
-                images: kitchenHeatingImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    kitchenHeatingCondition = condition;
-                  });
-                  _savePreference(
-                      propertyId, 'kitchenHeatingCondition', condition!);
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    kitchenHeatingDescription = description;
-                  });
-                  _savePreference(
-                      propertyId, 'kitchenHeatingDescription', description!);
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    kitchenHeatingImages.add(imagePath);
-                  });
-                  _savePreferenceList(
-                      propertyId, 'kitchenHeatingImages', kitchenHeatingImages);
-                },
-              ),
-
-              // Accessories
-              ConditionItem(
-                name: "Accessories",
-                condition: kitchenAccessoriesCondition,
-                description: kitchenAccessoriesDescription,
-                images: kitchenAccessoriesImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    kitchenAccessoriesCondition = condition;
-                  });
-                  _savePreference(
-                      propertyId, 'kitchenAccessoriesCondition', condition!);
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    kitchenAccessoriesDescription = description;
-                  });
-                  _savePreference(propertyId, 'kitchenAccessoriesDescription',
-                      description!);
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    kitchenAccessoriesImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId, 'kitchenAccessoriesImages',
-                      kitchenAccessoriesImages);
-                },
-              ),
-
-              // Flooring
-              ConditionItem(
-                name: "Flooring",
-                condition: kitchenFlooringCondition,
-                description: kitchenFlooringDescription,
-                images: kitchenFlooringImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    kitchenFlooringCondition = condition;
-                  });
-                  _savePreference(
-                      propertyId, 'kitchenFlooringCondition', condition!);
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    kitchenFlooringDescription = description;
-                  });
-                  _savePreference(
-                      propertyId, 'kitchenFlooringDescription', description!);
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    kitchenFlooringImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId, 'kitchenFlooringImages',
-                      kitchenFlooringImages);
-                },
-              ),
-
-              // Addition Items
-              ConditionItem(
-                name: "Addition Items",
-                condition: kitchenAdditionItemsCondition,
-                description: kitchenAdditionItemsDescription,
-                images: kitchenAdditionItemsImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    kitchenAdditionItemsCondition = condition;
-                  });
-                  _savePreference(
-                      propertyId, 'kitchenAdditionItemsCondition', condition!);
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    kitchenAdditionItemsDescription = description;
-                  });
-                  _savePreference(propertyId, 'kitchenAdditionItemsDescription',
-                      description!);
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    kitchenAdditionItemsImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId, 'kitchenAdditionItemsImages',
-                      kitchenAdditionItemsImages);
-                },
-              ),
+              
+              
 
               // Add more ConditionItem widgets as needed
             ],

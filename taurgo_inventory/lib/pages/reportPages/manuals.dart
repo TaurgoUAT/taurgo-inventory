@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:camera/camera.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart'; // Import shared_preferences
 import 'package:taurgo_inventory/pages/conditions/condition_details.dart';
@@ -18,6 +20,40 @@ class Manuals extends StatefulWidget {
 
   @override
   State<Manuals> createState() => _ManualsState();
+}
+
+Future<String?> uploadImageToFirebase(File imageFile, String propertyId,
+    String collectionName, String documentId) async {
+  try {
+    // Step 1: Upload the image to Firebase Storage
+    String fileName =
+        '${documentId}_${DateTime.now().millisecondsSinceEpoch}.jpg';
+    Reference storageReference = FirebaseStorage.instance
+        .ref()
+        .child('$propertyId/$collectionName/$documentId/$fileName');
+
+    UploadTask uploadTask = storageReference.putFile(imageFile);
+    TaskSnapshot snapshot = await uploadTask.whenComplete(() => null);
+
+    // Step 2: Get the download URL of the uploaded image
+    String downloadURL = await snapshot.ref.getDownloadURL();
+    print("Uploaded to Firebase: $downloadURL");
+
+    // Step 3: Save the download URL to Firestore
+    await FirebaseFirestore.instance
+        .collection('properties')
+        .doc(propertyId)
+        .collection(collectionName)
+        .doc(documentId)
+        .set({
+      'images': FieldValue.arrayUnion([downloadURL])
+    }, SetOptions(merge: true));
+
+    return downloadURL;
+  } catch (e) {
+    print("Error uploading image: $e");
+    return null;
+  }
 }
 
 class _ManualsState extends State<Manuals> {
@@ -47,162 +83,57 @@ class _ManualsState extends State<Manuals> {
   List<String> moveInChecklistImages = [];
   late List<File> capturedImages;
 
-   @override
+  @override
   void initState() {
     super.initState();
     capturedImages = widget.capturedImages ?? [];
     print("Property Id - SOC${widget.propertyId}");
-    _loadPreferences(widget.propertyId);
     // Load the saved preferences when the state is initialized
   }
 
-  // Function to load preferences
-  Future<void> _loadPreferences(String propertyId) async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      houseApplinceManual = prefs.getString('houseApplinceManual_${propertyId}');
-      houseApplinceManualDescription = prefs.getString('houseApplinceManualDescription_${propertyId}');
-      kitchenApplinceManual = prefs.getString('kitchenApplinceManual_${propertyId}');
-      kitchenApplinceManualDescription = prefs.getString('kitchenApplinceManualDescription_${propertyId}');
-      heatingManual = prefs.getString('heatingManual_${propertyId}');
-      heatingManualDescription = prefs.getString('heatingManualDescription_${propertyId}');
-      landlordGasSafetyCertificate = prefs.getString('landlordGasSafetyCertificate_${propertyId}');
-      landlordGasSafetyCertificateDescription = prefs.getString('landlordGasSafetyCertificateDescription_${propertyId}');
-      legionellaRiskAssessment = prefs.getString('legionellaRiskAssessment_${propertyId}');
-      legionellaRiskAssessmentDescription = prefs.getString('legionellaRiskAssessmentDescription_${propertyId}');
-      electricalSafetyCertificate = prefs.getString('electricalSafetyCertificate_${propertyId}');
-      electricalSafetyCertificateDescription = prefs.getString('electricalSafetyCertificateDescription_${propertyId}');
-      energyPerformanceCertificate = prefs.getString('energyPerformanceCertificate_${propertyId}');
-      energyPerformanceCertificateDescription = prefs.getString('energyPerformanceCertificateDescription_${propertyId}');
-      moveInChecklist = prefs.getString('moveInChecklist_${propertyId}');
-      moveInChecklistDescription = prefs.getString('moveInChecklistDescription_${propertyId}');
-
-      houseApplinceManualImages = prefs.getStringList('houseApplinceManualImages_${propertyId}') ?? [];
-      kitchenApplinceManualImages = prefs.getStringList('kitchenApplinceManualImages_${propertyId}') ?? [];
-      heatingManualImages = prefs.getStringList('heatingManualImages_${propertyId}') ?? [];
-      landlordGasSafetyCertificateImages = prefs.getStringList('landlordGasSafetyCertificateImages_${propertyId}') ?? [];
-      legionellaRiskAssessmentImages = prefs.getStringList('legionellaRiskAssessmentImages_${propertyId}') ?? [];
-      electricalSafetyCertificateImages = prefs.getStringList('electricalSafetyCertificateImages_${propertyId}') ?? [];
-      energyPerformanceCertificateImages = prefs.getStringList('energyPerformanceCertificateImages_${propertyId}') ?? [];
-      moveInChecklistImages = prefs.getStringList('moveInChecklistImages_${propertyId}') ?? [];
+  Stream<List<String>> _getImagesFromFirestore(
+      String propertyId, String imageType) {
+    return FirebaseFirestore.instance
+        .collection('properties')
+        .doc(propertyId)
+        .collection('manuals')
+        .doc(imageType)
+        .snapshots()
+        .map((snapshot) {
+      print("Firestore snapshot data for $imageType: ${snapshot.data()}");
+      if (snapshot.exists && snapshot.data() != null) {
+        return List<String>.from(snapshot.data()!['images'] ?? []);
+      }
+      return [];
     });
   }
 
   // Function to save a preference
-  Future<void> _savePreference(String propertyId, String key, String value)
-  async {
+  Future<void> _savePreference(
+      String propertyId, String key, String value) async {
     final prefs = await SharedPreferences.getInstance();
     prefs.setString('${key}_$propertyId', value);
   }
 
-  Future<void> _savePreferenceList(String propertyId, String key, List<String> value) async {
-    final prefs = await SharedPreferences.getInstance();
-    prefs.setStringList('${key}_$propertyId', value);
-  }
   @override
   Widget build(BuildContext context) {
-     String propertyId = widget.propertyId;
-    return PopScope(child: Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Manuals',
-          style: TextStyle(
-            color: kPrimaryColor,
-            fontSize: 14,
-            fontFamily: "Inter",
+    String propertyId = widget.propertyId;
+    return PopScope(
+      canPop: false,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(
+            'Manuals',
+            style: TextStyle(
+              color: kPrimaryColor,
+              fontSize: 14,
+              fontFamily: "Inter",
+            ),
           ),
-        ),
-        centerTitle: true,
-        backgroundColor: bWhite,
-        leading: GestureDetector(
-          onTap: (){
-            showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return AlertDialog(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  elevation: 10,
-                  backgroundColor: Colors.white,
-                  title: Row(
-                    children: [
-                      Icon(Icons.info_outline, color: kPrimaryColor),
-                      SizedBox(width: 10),
-                      Text(
-                        'Exit',
-                        style: TextStyle(
-                          color: kPrimaryColor,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                  content: Text(
-                    'You may lost your data if you exit the process '
-                        'without saving',
-                    style: TextStyle(
-                      color: Colors.grey[800],
-                      fontSize: 14,
-                      fontWeight: FontWeight.w400,
-                      height: 1.5,
-                    ),
-                  ),
-                  actions: <Widget>[
-                    TextButton(
-                      child: Text('Cancel',
-                        style: TextStyle(
-                          color: kPrimaryColor,
-                          fontSize: 16,
-                        ),
-                      ),
-                      onPressed: () {
-                        Navigator.of(context).pop(); // Close the dialog
-                      },
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        print("SOC -> EP ${widget.propertyId}");
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) =>
-                                  EditReportPage(propertyId: widget.propertyId)), // Replace HomePage with your
-                          // home page
-                          // widget
-                        );
-                      },
-                      style: TextButton.styleFrom(
-                        padding: EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 8),
-                        backgroundColor: kPrimaryColor,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                      child: Text(
-                        'Exit',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                        ),
-                      ),
-                    ),
-                  ],
-                );
-              },
-            );
-          },
-          child: Icon(
-            Icons.arrow_back_ios_new,
-            color: kPrimaryColor,
-            size: 24,
-          ),
-        ),
-        actions: [
-          GestureDetector(
-            onTap: (){
+          centerTitle: true,
+          backgroundColor: bWhite,
+          leading: GestureDetector(
+            onTap: () {
               showDialog(
                 context: context,
                 builder: (BuildContext context) {
@@ -217,7 +148,7 @@ class _ManualsState extends State<Manuals> {
                         Icon(Icons.info_outline, color: kPrimaryColor),
                         SizedBox(width: 10),
                         Text(
-                          'Continue Saving',
+                          'Exit',
                           style: TextStyle(
                             color: kPrimaryColor,
                             fontSize: 18,
@@ -227,8 +158,8 @@ class _ManualsState extends State<Manuals> {
                       ],
                     ),
                     content: Text(
-                      'Please Make Sure You Have Added All the Necessary '
-                          'Information',
+                      'You may lost your data if you exit the process '
+                      'without saving',
                       style: TextStyle(
                         color: Colors.grey[800],
                         fontSize: 14,
@@ -238,7 +169,8 @@ class _ManualsState extends State<Manuals> {
                     ),
                     actions: <Widget>[
                       TextButton(
-                        child: Text('Cancel',
+                        child: Text(
+                          'Cancel',
                           style: TextStyle(
                             color: kPrimaryColor,
                             fontSize: 16,
@@ -254,22 +186,23 @@ class _ManualsState extends State<Manuals> {
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
-                                builder: (context) =>
-                                    EditReportPage(propertyId: widget.propertyId)), // Replace HomePage with your
+                                builder: (context) => EditReportPage(
+                                    propertyId: widget
+                                        .propertyId)), // Replace HomePage with your
                             // home page
                             // widget
                           );
                         },
                         style: TextButton.styleFrom(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 8),
+                          padding:
+                              EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                           backgroundColor: kPrimaryColor,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
                         ),
                         child: Text(
-                          'Save',
+                          'Exit',
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 16,
@@ -281,242 +214,567 @@ class _ManualsState extends State<Manuals> {
                 },
               );
             },
-            child: Container(
-              margin: EdgeInsets.all(16),
-              child: Text(
-                'Save', // Replace with the actual location
-                style: TextStyle(
-                  color: kPrimaryColor,
-                  fontSize: 14, // Adjust the font size
-                  fontFamily: "Inter",
+            child: Icon(
+              Icons.arrow_back_ios_new,
+              color: kPrimaryColor,
+              size: 24,
+            ),
+          ),
+          actions: [
+            GestureDetector(
+              onTap: () {
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      elevation: 10,
+                      backgroundColor: Colors.white,
+                      title: Row(
+                        children: [
+                          Icon(Icons.info_outline, color: kPrimaryColor),
+                          SizedBox(width: 10),
+                          Text(
+                            'Continue Saving',
+                            style: TextStyle(
+                              color: kPrimaryColor,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                      content: Text(
+                        'Please Make Sure You Have Added All the Necessary '
+                        'Information',
+                        style: TextStyle(
+                          color: Colors.grey[800],
+                          fontSize: 14,
+                          fontWeight: FontWeight.w400,
+                          height: 1.5,
+                        ),
+                      ),
+                      actions: <Widget>[
+                        TextButton(
+                          child: Text(
+                            'Cancel',
+                            style: TextStyle(
+                              color: kPrimaryColor,
+                              fontSize: 16,
+                            ),
+                          ),
+                          onPressed: () {
+                            Navigator.of(context).pop(); // Close the dialog
+                          },
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            print("SOC -> EP ${widget.propertyId}");
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => EditReportPage(
+                                      propertyId: widget
+                                          .propertyId)), // Replace HomePage with your
+                              // home page
+                              // widget
+                            );
+                          },
+                          style: TextButton.styleFrom(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 8),
+                            backgroundColor: kPrimaryColor,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          child: Text(
+                            'Save',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
+              child: Container(
+                margin: EdgeInsets.all(16),
+                child: Text(
+                  'Save', // Replace with the actual location
+                  style: TextStyle(
+                    color: kPrimaryColor,
+                    fontSize: 14, // Adjust the font size
+                    fontFamily: "Inter",
+                  ),
                 ),
               ),
+            )
+          ],
+        ),
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // House Appliance Manual
+                StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(
+                      propertyId, ' houseApplinceManualImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Yale images');
+                    }
+                    final houseApplinceManualImages = snapshot.data ?? [];
+                    return ConditionItem(
+                        name: "House Appliance Manual",
+                        condition: houseApplinceManual,
+                        description: houseApplinceManual,
+                        images: houseApplinceManualImages,
+                        onConditionSelected: (condition) {
+                          setState(() {
+                            houseApplinceManual = condition;
+                          });
+                          _savePreference(
+                              propertyId, 'houseApplinceManual', condition!);
+                        },
+                        onDescriptionSelected: (description) {
+                          setState(() {
+                            houseApplinceManual = description;
+                          });
+                          _savePreference(
+                              propertyId, 'houseApplinceManual', description!);
+                        },
+                        onImageAdded: (imagePath) async {
+                          File imageFile = File(imagePath);
+                          String? downloadUrl = await uploadImageToFirebase(
+                              imageFile,
+                              propertyId,
+                              'manuals',
+                              ' houseApplinceManualImages');
+
+                          if (downloadUrl != null) {
+                            print(
+                                "Adding image URL to Firestore: $downloadUrl");
+                            FirebaseFirestore.instance
+                                .collection('properties')
+                                .doc(propertyId)
+                                .collection('manuals')
+                                .doc(' houseApplinceManualImages')
+                                .update({
+                              'images': FieldValue.arrayUnion([downloadUrl]),
+                            });
+                          }
+                        });
+                  },
+                ),
+
+                // Kitchen Appliance Manual
+                StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(
+                      propertyId, ' kitchenApplinceManualImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Yale images');
+                    }
+                    final kitchenApplinceManualImages = snapshot.data ?? [];
+                    return ConditionItem(
+                        name: "Kitchen Appliance Manual",
+                        condition: kitchenApplinceManual,
+                        description: kitchenApplinceManual,
+                        images: kitchenApplinceManualImages,
+                        onConditionSelected: (condition) {
+                          setState(() {
+                            kitchenApplinceManual = condition;
+                          });
+                          _savePreference(
+                              propertyId, 'kitchenApplinceManual', condition!);
+                        },
+                        onDescriptionSelected: (description) {
+                          setState(() {
+                            kitchenApplinceManual = description;
+                          });
+                          _savePreference(propertyId, 'kitchenApplinceManual',
+                              description!);
+                        },
+                        onImageAdded: (imagePath) async {
+                          File imageFile = File(imagePath);
+                          String? downloadUrl = await uploadImageToFirebase(
+                              imageFile,
+                              propertyId,
+                              'manuals',
+                              ' kitchenApplinceManualImages');
+
+                          if (downloadUrl != null) {
+                            print(
+                                "Adding image URL to Firestore: $downloadUrl");
+                            FirebaseFirestore.instance
+                                .collection('properties')
+                                .doc(propertyId)
+                                .collection('manuals')
+                                .doc(' kitchenApplinceManualImages')
+                                .update({
+                              'images': FieldValue.arrayUnion([downloadUrl]),
+                            });
+                          }
+                        });
+                  },
+                ),
+
+                // Heating Manual
+                StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(
+                      propertyId, ' heatingManualImages '),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Yale images');
+                    }
+                    final heatingManualImages = snapshot.data ?? [];
+                    return ConditionItem(
+                        name: "Heating Manual",
+                        condition: heatingManual,
+                        description: heatingManual,
+                        images: heatingManualImages,
+                        onConditionSelected: (condition) {
+                          setState(() {
+                            heatingManual = condition;
+                          });
+                          _savePreference(
+                              propertyId, 'heatingManual', condition!);
+                        },
+                        onDescriptionSelected: (description) {
+                          setState(() {
+                            heatingManual = description;
+                          });
+                          _savePreference(
+                              propertyId, 'heatingManual', description!);
+                        },
+                        onImageAdded: (imagePath) async {
+                          File imageFile = File(imagePath);
+                          String? downloadUrl = await uploadImageToFirebase(
+                              imageFile,
+                              propertyId,
+                              'manuals',
+                              ' heatingManualImages ');
+
+                          if (downloadUrl != null) {
+                            print(
+                                "Adding image URL to Firestore: $downloadUrl");
+                            FirebaseFirestore.instance
+                                .collection('properties')
+                                .doc(propertyId)
+                                .collection('manuals')
+                                .doc(' heatingManualImages ')
+                                .update({
+                              'images': FieldValue.arrayUnion([downloadUrl]),
+                            });
+                          }
+                        });
+                  },
+                ),
+
+                // Landlord Gas Safety Certificate
+                StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(
+                      propertyId, ' landlordGasSafetyCertificateImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Yale images');
+                    }
+                    final landlordGasSafetyCertificateImages =
+                        snapshot.data ?? [];
+                    return ConditionItem(
+                        name: " Landlord Gas Safety Certificate",
+                        condition: landlordGasSafetyCertificate,
+                        description: landlordGasSafetyCertificate,
+                        images: landlordGasSafetyCertificateImages,
+                        onConditionSelected: (condition) {
+                          setState(() {
+                            landlordGasSafetyCertificate = condition;
+                          });
+                          _savePreference(propertyId,
+                              'landlordGasSafetyCertificate', condition!);
+                        },
+                        onDescriptionSelected: (description) {
+                          setState(() {
+                            landlordGasSafetyCertificate = description;
+                          });
+                          _savePreference(propertyId,
+                              'landlordGasSafetyCertificate', description!);
+                        },
+                        onImageAdded: (imagePath) async {
+                          File imageFile = File(imagePath);
+                          String? downloadUrl = await uploadImageToFirebase(
+                              imageFile,
+                              propertyId,
+                              'manuals',
+                              ' landlordGasSafetyCertificateImages');
+
+                          if (downloadUrl != null) {
+                            print(
+                                "Adding image URL to Firestore: $downloadUrl");
+                            FirebaseFirestore.instance
+                                .collection('properties')
+                                .doc(propertyId)
+                                .collection('manuals')
+                                .doc(' landlordGasSafetyCertificateImages')
+                                .update({
+                              'images': FieldValue.arrayUnion([downloadUrl]),
+                            });
+                          }
+                        });
+                  },
+                ),
+
+                // Legionella Risk Assessment
+                StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(
+                      propertyId, ' legionellaRiskAssessmentImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Yale images');
+                    }
+                    final legionellaRiskAssessmentImages = snapshot.data ?? [];
+                    return ConditionItem(
+                        name: " Legionella Risk Assessment",
+                        condition: legionellaRiskAssessment,
+                        description: legionellaRiskAssessment,
+                        images: legionellaRiskAssessmentImages,
+                        onConditionSelected: (condition) {
+                          setState(() {
+                            legionellaRiskAssessment = condition;
+                          });
+                          _savePreference(propertyId,
+                              'legionellaRiskAssessment', condition!);
+                        },
+                        onDescriptionSelected: (description) {
+                          setState(() {
+                            legionellaRiskAssessment = description;
+                          });
+                          _savePreference(propertyId,
+                              'legionellaRiskAssessment', description!);
+                        },
+                        onImageAdded: (imagePath) async {
+                          File imageFile = File(imagePath);
+                          String? downloadUrl = await uploadImageToFirebase(
+                              imageFile,
+                              propertyId,
+                              'manuals',
+                              ' legionellaRiskAssessmentImages');
+
+                          if (downloadUrl != null) {
+                            print(
+                                "Adding image URL to Firestore: $downloadUrl");
+                            FirebaseFirestore.instance
+                                .collection('properties')
+                                .doc(propertyId)
+                                .collection('manuals')
+                                .doc(' legionellaRiskAssessmentImages')
+                                .update({
+                              'images': FieldValue.arrayUnion([downloadUrl]),
+                            });
+                          }
+                        });
+                  },
+                ),
+
+                // Electrical Safety Certificate
+                StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(
+                      propertyId, ' electricalSafetyCertificateImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Yale images');
+                    }
+                    final electricalSafetyCertificateImages =
+                        snapshot.data ?? [];
+                    return ConditionItem(
+                        name: "Electrical Safety Certificate",
+                        condition: electricalSafetyCertificate,
+                        description: electricalSafetyCertificate,
+                        images: electricalSafetyCertificateImages,
+                        onConditionSelected: (condition) {
+                          setState(() {
+                            electricalSafetyCertificate = condition;
+                          });
+                          _savePreference(propertyId,
+                              'electricalSafetyCertificate', condition!);
+                        },
+                        onDescriptionSelected: (description) {
+                          setState(() {
+                            electricalSafetyCertificate = description;
+                          });
+                          _savePreference(propertyId,
+                              'electricalSafetyCertificate', description!);
+                        },
+                        onImageAdded: (imagePath) async {
+                          File imageFile = File(imagePath);
+                          String? downloadUrl = await uploadImageToFirebase(
+                              imageFile,
+                              propertyId,
+                              'manuals',
+                              ' electricalSafetyCertificateImages');
+
+                          if (downloadUrl != null) {
+                            print(
+                                "Adding image URL to Firestore: $downloadUrl");
+                            FirebaseFirestore.instance
+                                .collection('properties')
+                                .doc(propertyId)
+                                .collection('manuals')
+                                .doc(' electricalSafetyCertificateImages')
+                                .update({
+                              'images': FieldValue.arrayUnion([downloadUrl]),
+                            });
+                          }
+                        });
+                  },
+                ),
+                // Energy Performance Certificate
+                StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(
+                      propertyId, ' energyPerformanceCertificateImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Yale images');
+                    }
+                    final energyPerformanceCertificateImages =
+                        snapshot.data ?? [];
+                    return ConditionItem(
+                        name: " Energy Performance Certificate",
+                        condition: energyPerformanceCertificate,
+                        description: energyPerformanceCertificate,
+                        images: energyPerformanceCertificateImages,
+                        onConditionSelected: (condition) {
+                          setState(() {
+                            energyPerformanceCertificate = condition;
+                          });
+                          _savePreference(propertyId,
+                              'energyPerformanceCertificate', condition!);
+                        },
+                        onDescriptionSelected: (description) {
+                          setState(() {
+                            energyPerformanceCertificate = description;
+                          });
+                          _savePreference(propertyId,
+                              'energyPerformanceCertificate', description!);
+                        },
+                        onImageAdded: (imagePath) async {
+                          File imageFile = File(imagePath);
+                          String? downloadUrl = await uploadImageToFirebase(
+                              imageFile,
+                              propertyId,
+                              'manuals',
+                              ' energyPerformanceCertificateImages');
+
+                          if (downloadUrl != null) {
+                            print(
+                                "Adding image URL to Firestore: $downloadUrl");
+                            FirebaseFirestore.instance
+                                .collection('properties')
+                                .doc(propertyId)
+                                .collection('manuals')
+                                .doc(' energyPerformanceCertificateImages')
+                                .update({
+                              'images': FieldValue.arrayUnion([downloadUrl]),
+                            });
+                          }
+                        });
+                  },
+                ),
+
+                // Move In Checklist
+                StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(
+                      propertyId, ' moveInChecklistImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Yale images');
+                    }
+                    final moveInChecklistImages = snapshot.data ?? [];
+                    return ConditionItem(
+                        name: " Move In Checklist",
+                        condition: moveInChecklist,
+                        description: moveInChecklist,
+                        images: moveInChecklistImages,
+                        onConditionSelected: (condition) {
+                          setState(() {
+                            moveInChecklist = condition;
+                          });
+                          _savePreference(
+                              propertyId, 'moveInChecklist', condition!);
+                        },
+                        onDescriptionSelected: (description) {
+                          setState(() {
+                            moveInChecklist = description;
+                          });
+                          _savePreference(
+                              propertyId, 'moveInChecklist', description!);
+                        },
+                        onImageAdded: (imagePath) async {
+                          File imageFile = File(imagePath);
+                          String? downloadUrl = await uploadImageToFirebase(
+                              imageFile,
+                              propertyId,
+                              'manuals',
+                              ' moveInChecklistImages'); 
+
+                          if (downloadUrl != null) {
+                            print(
+                                "Adding image URL to Firestore: $downloadUrl");
+                            FirebaseFirestore.instance
+                                .collection('properties')
+                                .doc(propertyId)
+                                .collection('manuals')
+                                .doc(' moveInChecklistImages')
+                                .update({
+                              'images': FieldValue.arrayUnion([downloadUrl]),
+                            });
+                          }
+                        });
+                  },
+                ),
+
+                // Add more ConditionItem widgets as needed
+              ],
             ),
-          )
-        ],
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // House Appliance Manual
-              ConditionItem(
-                name: "House Appliance Manual",
-                condition: houseApplinceManual,
-                description: houseApplinceManualDescription,
-                images: houseApplinceManualImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    houseApplinceManual = condition;
-                  });
-                  _savePreference(propertyId,'houseApplinceManual', condition!); // Save preference
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    houseApplinceManualDescription = description;
-                  });
-                  _savePreference(propertyId,'houseApplinceManualDescription', description!); // Save preference
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    houseApplinceManualImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId,'houseApplinceManualImages', houseApplinceManualImages);
-                },
-              ),
-
-              // Kitchen Appliance Manual
-              ConditionItem(
-                name: "Kitchen Appliance Manual",
-                condition: kitchenApplinceManual,
-                description: kitchenApplinceManualDescription,
-                images: kitchenApplinceManualImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    kitchenApplinceManual = condition;
-                  });
-                  _savePreference(propertyId,'kitchenApplinceManual', condition!); // Save preference
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    kitchenApplinceManualDescription = description;
-                  });
-                  _savePreference(propertyId,'kitchenApplinceManualDescription', description!); // Save preference
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    kitchenApplinceManualImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId,'kitchenApplinceManualImages', kitchenApplinceManualImages);
-                },
-              ),
-
-              // Heating Manual
-              ConditionItem(
-                name: "Heating Manual",
-                condition: heatingManual,
-                description: heatingManualDescription,
-                images: heatingManualImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    heatingManual = condition;
-                  });
-                  _savePreference(propertyId,'heatingManual', condition!); // Save preference
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    heatingManualDescription = description;
-                  });
-                  _savePreference(propertyId,'heatingManualDescription', description!); // Save preference
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    heatingManualImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId,'heatingManualImages', heatingManualImages);
-                },
-              ),
-
-              // Landlord Gas Safety Certificate
-              ConditionItem(
-                name: "Landlord Gas Safety Certificate",
-                condition: landlordGasSafetyCertificate,
-                description: landlordGasSafetyCertificateDescription,
-                images: landlordGasSafetyCertificateImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    landlordGasSafetyCertificate = condition;
-                  });
-                  _savePreference(propertyId,'landlordGasSafetyCertificate', condition!); // Save preference
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    landlordGasSafetyCertificateDescription = description;
-                  });
-                  _savePreference(propertyId,'landlordGasSafetyCertificateDescription', description!); // Save preference
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    landlordGasSafetyCertificateImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId,'landlordGasSafetyCertificateImages', landlordGasSafetyCertificateImages);
-                },
-              ),
-
-              // Legionella Risk Assessment
-              ConditionItem(
-                name: "Legionella Risk Assessment",
-                condition: legionellaRiskAssessment,
-                description: legionellaRiskAssessmentDescription,
-                images: legionellaRiskAssessmentImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    legionellaRiskAssessment = condition;
-                  });
-                  _savePreference(propertyId,'legionellaRiskAssessment', condition!); // Save preference
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    legionellaRiskAssessmentDescription = description;
-                  });
-                  _savePreference(propertyId,'legionellaRiskAssessmentDescription', description!); // Save preference
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    legionellaRiskAssessmentImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId,'legionellaRiskAssessmentImages', legionellaRiskAssessmentImages);
-                },
-              ),
-
-              // Electrical Safety Certificate
-              ConditionItem(
-                name: "Electrical Safety Certificate",
-                condition: electricalSafetyCertificate,
-                description: electricalSafetyCertificateDescription,
-                images: electricalSafetyCertificateImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    electricalSafetyCertificate = condition;
-                  });
-                  _savePreference(propertyId,'electricalSafetyCertificate', condition!); // Save preference
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    electricalSafetyCertificateDescription = description;
-                  });
-                  _savePreference(propertyId,'electricalSafetyCertificateDescription', description!); // Save preference
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    electricalSafetyCertificateImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId,'electricalSafetyCertificateImages', electricalSafetyCertificateImages);
-                },
-              ),
-
-              // Energy Performance Certificate
-              ConditionItem(
-                name: "Energy Performance Certificate",
-                condition: energyPerformanceCertificate,
-                description: energyPerformanceCertificateDescription,
-                images: energyPerformanceCertificateImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    energyPerformanceCertificate = condition;
-                  });
-                  _savePreference(propertyId,'energyPerformanceCertificate', condition!); // Save preference
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    energyPerformanceCertificateDescription = description;
-                  });
-                  _savePreference(propertyId,'energyPerformanceCertificateDescription', description!); // Save preference
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    energyPerformanceCertificateImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId,'energyPerformanceCertificateImages', energyPerformanceCertificateImages);
-                },
-              ),
-
-              // Move In Checklist
-              ConditionItem(
-                name: "Move In Checklist",
-                condition: moveInChecklist,
-                description: moveInChecklistDescription,
-                images: moveInChecklistImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    moveInChecklist = condition;
-                  });
-                  _savePreference(propertyId,'moveInChecklist', condition!); // Save preference
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    moveInChecklistDescription = description;
-                  });
-                  _savePreference(propertyId,'moveInChecklistDescription', description!); // Save preference
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    moveInChecklistImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId,'moveInChecklistImages', moveInChecklistImages);
-                },
-              ),
-
-              // Add more ConditionItem widgets as needed
-            ],
           ),
         ),
       ),
-    ),canPop: false,);
+    );
   }
 }
+
 class ConditionItem extends StatelessWidget {
   final String name;
   final String? condition;

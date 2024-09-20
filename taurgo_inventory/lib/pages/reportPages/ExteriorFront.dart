@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:camera/camera.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart'; // Import shared_preferences
 import 'package:taurgo_inventory/pages/conditions/condition_details.dart';
@@ -20,10 +22,41 @@ class Exteriorfront extends StatefulWidget {
   @override
   State<Exteriorfront> createState() => _ExteriorfrontState();
 }
+Future<String?> uploadImageToFirebase(File imageFile, String propertyId, String collectionName, String documentId) async {
+  try {
+    // Step 1: Upload the image to Firebase Storage
+    String fileName = '${documentId}_${DateTime.now().millisecondsSinceEpoch}.jpg';
+    Reference storageReference = FirebaseStorage.instance
+        .ref()
+        .child('$propertyId/$collectionName/$documentId/$fileName');
+
+    UploadTask uploadTask = storageReference.putFile(imageFile);
+    TaskSnapshot snapshot = await uploadTask.whenComplete(() => null);
+
+    // Step 2: Get the download URL of the uploaded image
+    String downloadURL = await snapshot.ref.getDownloadURL();
+    print("Uploaded to Firebase: $downloadURL");
+
+    // Step 3: Save the download URL to Firestore
+    await FirebaseFirestore.instance
+        .collection('properties')
+        .doc(propertyId)
+        .collection(collectionName)
+        .doc(documentId)
+        .set({
+          'images': FieldValue.arrayUnion([downloadURL])
+        }, SetOptions(merge: true));
+
+    return downloadURL;
+  } catch (e) {
+    print("Error uploading image: $e");
+    return null;
+  }
+}
 
 class _ExteriorfrontState extends State<Exteriorfront> {
   String? newdoor;
-  String? ExteriorFrontDoorCondition;
+  String? exteriorFrontDoorCondition;
   String? exteriorFrontDoorDescription;
   String? exteriorFrontDoorFrameCondition;
   String? exteriorFrontDoorFrameDescription;
@@ -42,31 +75,25 @@ class _ExteriorfrontState extends State<Exteriorfront> {
     super.initState();
     capturedImages = widget.capturedImages ?? [];
     print("Property Id - SOC${widget.propertyId}");
-    _loadPreferences(widget.propertyId);
     // Load the saved preferences when the state is initialized
   }
 
-  // Function to load preferences
-  Future<void> _loadPreferences(String propertyId) async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      newdoor = prefs.getString('newdoor');
-      ExteriorFrontDoorCondition = prefs.getString('doorCondition');
-      exteriorFrontDoorDescription = prefs.getString('doorDescription');
-      exteriorFrontDoorFrameCondition = prefs.getString('doorFrameCondition');
-      exteriorFrontDoorFrameDescription = prefs.getString('doorFrameDescription');
-      exteriorFrontPorchCondition = prefs.getString('porchCondition');
-      exteriorFrontPorchDescription = prefs.getString('porchDescription');
-      exteriorFrontAdditionalItemsCondition = prefs.getString('additionalItemsCondition');
-      exteriorFrontAdditionalItemsDescription = prefs.getString('additionalItemsDescription');
-
-      exteriorFrontDoorImages = prefs.getStringList('doorImages') ?? [];
-      exteriorFrontDoorFrameImages = prefs.getStringList('doorFrameImages') ?? [];
-      exteriorFrontPorchImages = prefs.getStringList('porchImages') ?? [];
-      exteriorFrontAdditionalItemsImages = prefs.getStringList('additionalItemsImages') ?? [];
+  Stream<List<String>> _getImagesFromFirestore(String propertyId, String imageType) {
+    return FirebaseFirestore.instance
+        .collection('properties')
+        .doc(propertyId)
+        .collection('exterior_front')
+        .doc(imageType)
+        .snapshots()
+        .map((snapshot) {
+      print("Firestore snapshot data for $imageType: ${snapshot.data()}");
+      if (snapshot.exists && snapshot.data() != null) {
+        return List<String>.from(snapshot.data()!['images'] ?? []);
+      }
+      return [];
     });
   }
-
+  
   // Function to save a preference
   Future<void> _savePreference(String propertyId, String key, String value)
   async {
@@ -74,11 +101,7 @@ class _ExteriorfrontState extends State<Exteriorfront> {
     prefs.setString('${key}_$propertyId', value);
   }
 
-  Future<void> _savePreferenceList(String propertyId, String key, List<String> value) async {
-    final prefs = await SharedPreferences.getInstance();
-    prefs.setStringList('${key}_$propertyId', value);
-  }
-
+  
   @override
   Widget build(BuildContext context) {
      String propertyId = widget.propertyId;
@@ -284,107 +307,199 @@ class _ExteriorfrontState extends State<Exteriorfront> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Door
-              ConditionItem(
-                name: "Door",
-                condition: ExteriorFrontDoorCondition,
-                description: newdoor,
-                images: exteriorFrontDoorImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    ExteriorFrontDoorCondition = condition;
-                  });
-                  _savePreference(propertyId,'doorCondition', condition!);
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    newdoor = description;
-                  });
-                  _savePreference(propertyId,'newdoor', description!);
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    exteriorFrontDoorImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId,'doorImages', exteriorFrontDoorImages);
-                },
-              ),
+              StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'exteriorFrontDoorImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Yale images');
+                    }
+                    final exteriorFrontDoorImages = snapshot.data ?? [];
+                    return ConditionItem(
+                        name: "Door",
+                        condition: exteriorFrontDoorCondition,
+                        description: exteriorFrontDoorCondition,
+                        images: exteriorFrontDoorImages,
+                        onConditionSelected: (condition) {
+                        setState(() {
+                          exteriorFrontDoorCondition = condition;
+                        });
+                        _savePreference(propertyId, 'exteriorFrontDoorCondition', condition!);
+                      },
+                        onDescriptionSelected: (description) {
+                        setState(() {
+                          exteriorFrontDoorCondition = description;
+                        });
+                        _savePreference(propertyId, 'ExteriorFrontDoorCondition', description!);
+                      },
+                        onImageAdded: (imagePath) async {
+                          File imageFile = File(imagePath);
+                          String? downloadUrl = await uploadImageToFirebase(
+                              imageFile, propertyId,'exterior_front', 'exteriorFrontDoorImages');
+
+                          if (downloadUrl != null) {
+                            print(
+                                "Adding image URL to Firestore: $downloadUrl");
+                            FirebaseFirestore.instance
+                                .collection('properties')
+                                .doc(propertyId)
+                                .collection('exterior_front')
+                                .doc('exteriorFrontDoorImages')
+                                .update({
+                              'images': FieldValue.arrayUnion([downloadUrl]),
+                            });
+                          }
+                        });
+                  },
+                ),
               // Door Frame
-              ConditionItem(
-                name: "Door Frame",
-                condition: exteriorFrontDoorFrameCondition,
-                description: exteriorFrontDoorFrameDescription,
-                images: exteriorFrontDoorFrameImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    exteriorFrontDoorFrameCondition = condition;
-                  });
-                  _savePreference(propertyId,'doorFrameCondition', condition!); // Save preference
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    exteriorFrontDoorFrameDescription = description;
-                  });
-                  _savePreference(propertyId,'doorFrameDescription', description!); // Save preference
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    exteriorFrontDoorFrameImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId,'doorFrameImages', exteriorFrontDoorFrameImages); // Save preference
-                },
-              ),
+              StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'exteriorFrontDoorFrameImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Yale images');
+                    }
+                    final exteriorFrontDoorFrameImages = snapshot.data ?? [];
+                    return ConditionItem(
+                        name: "Door Frame",
+                        condition: exteriorFrontDoorFrameCondition,
+                        description: exteriorFrontDoorFrameCondition,
+                        images: exteriorFrontDoorFrameImages,
+                        onConditionSelected: (condition) {
+                        setState(() {
+                          exteriorFrontDoorFrameCondition = condition;
+                        });
+                        _savePreference(propertyId, 'exteriorFrontDoorFrameCondition', condition!);
+                      },
+                        onDescriptionSelected: (description) {
+                        setState(() {
+                          exteriorFrontDoorFrameCondition = description;
+                        });
+                        _savePreference(propertyId, 'exteriorFrontDoorFrameCondition', description!);
+                      },
+                        onImageAdded: (imagePath) async {
+                          File imageFile = File(imagePath);
+                          String? downloadUrl = await uploadImageToFirebase(
+                              imageFile, propertyId,'exterior_front', 'exteriorFrontDoorFrameImages');
+
+                          if (downloadUrl != null) {
+                            print(
+                                "Adding image URL to Firestore: $downloadUrl");
+                            FirebaseFirestore.instance
+                                .collection('properties')
+                                .doc(propertyId)
+                                .collection('exterior_front')
+                                .doc('exteriorFrontDoorFrameImages')
+                                .update({
+                              'images': FieldValue.arrayUnion([downloadUrl]),
+                            });
+                          }
+                        });
+                  },
+                ),
 
               // Porch
-              ConditionItem(
-                name: "Porch",
-                condition: exteriorFrontPorchCondition,
-                description: exteriorFrontPorchDescription,
-                images: exteriorFrontPorchImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    exteriorFrontPorchCondition = condition;
-                  });
-                  _savePreference(propertyId,'porchCondition', condition!); // Save preference
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    exteriorFrontPorchDescription = description;
-                  });
-                  _savePreference(propertyId,'porchDescription', description!); // Save preference
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    exteriorFrontPorchImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId,'porchImages', exteriorFrontPorchImages); // Save preference
-                },
-              ),
+               StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'exteriorFrontPorchImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Yale images');
+                    }
+                    final exteriorFrontPorchImages = snapshot.data ?? [];
+                    return ConditionItem(
+                        name: "Porch",
+                        condition: exteriorFrontPorchCondition,
+                        description: exteriorFrontPorchCondition,
+                        images: exteriorFrontPorchImages,
+                        onConditionSelected: (condition) {
+                        setState(() {
+                          exteriorFrontPorchCondition = condition;
+                        });
+                        _savePreference(propertyId, 'exteriorFrontPorchCondition', condition!);
+                      },
+                        onDescriptionSelected: (description) {
+                        setState(() {
+                          exteriorFrontPorchCondition = description;
+                        });
+                        _savePreference(propertyId, 'exteriorFrontPorchCondition', description!);
+                      },
+                        onImageAdded: (imagePath) async {
+                          File imageFile = File(imagePath);
+                          String? downloadUrl = await uploadImageToFirebase(
+                              imageFile, propertyId,'exterior_front', 'exteriorFrontPorchImages');
+
+                          if (downloadUrl != null) {
+                            print(
+                                "Adding image URL to Firestore: $downloadUrl");
+                            FirebaseFirestore.instance
+                                .collection('properties')
+                                .doc(propertyId)
+                                .collection('exterior_front')
+                                .doc('exteriorFrontPorchImages')
+                                .update({
+                              'images': FieldValue.arrayUnion([downloadUrl]),
+                            });
+                          }
+                        });
+                  },
+                ),
 
               // Additional Items
-              ConditionItem(
-                name: "Additional Items",
-                condition: exteriorFrontAdditionalItemsCondition,
-                description: exteriorFrontAdditionalItemsDescription,
-                images: exteriorFrontAdditionalItemsImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    exteriorFrontAdditionalItemsCondition = condition;
-                  });
-                  _savePreference(propertyId,'additionalItemsCondition', condition!); // Save preference
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    exteriorFrontAdditionalItemsDescription = description;
-                  });
-                  _savePreference(propertyId,'additionalItemsDescription', description!); // Save preference
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    exteriorFrontAdditionalItemsImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId,'additionalItemsImages', exteriorFrontAdditionalItemsImages); // Save preference
-                },
-              ),
+               StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'exteriorFrontAdditionalItemsImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Yale images');
+                    }
+                    final exteriorFrontAdditionalItemsImages = snapshot.data ?? [];
+                    return ConditionItem(
+                        name: "Additional Items",
+                        condition: exteriorFrontAdditionalItemsCondition,
+                        description: exteriorFrontAdditionalItemsCondition,
+                        images: exteriorFrontAdditionalItemsImages,
+                        onConditionSelected: (condition) {
+                        setState(() {
+                          exteriorFrontAdditionalItemsCondition = condition;
+                        });
+                        _savePreference(propertyId, 'exteriorFrontAdditionalItemsCondition', condition!);
+                      },
+                        onDescriptionSelected: (description) {
+                        setState(() {
+                          exteriorFrontAdditionalItemsCondition = description;
+                        });
+                        _savePreference(propertyId, 'exteriorFrontAdditionalItemsCondition', description!);
+                      },
+                        onImageAdded: (imagePath) async {
+                          File imageFile = File(imagePath);
+                          String? downloadUrl = await uploadImageToFirebase(
+                              imageFile, propertyId,'exterior_front', 'exteriorFrontAdditionalItemsImages');
+
+                          if (downloadUrl != null) {
+                            print(
+                                "Adding image URL to Firestore: $downloadUrl");
+                            FirebaseFirestore.instance
+                                .collection('properties')
+                                .doc(propertyId)
+                                .collection('exterior_front')
+                                .doc('exteriorFrontAdditionalItemsImages')
+                                .update({
+                              'images': FieldValue.arrayUnion([downloadUrl]),
+                            });
+                          }
+                        });
+                  },
+                ),
 
               // Display captured images
               ...capturedImages.map((file) => Image.file(file)).toList(),
@@ -560,9 +675,9 @@ class ConditionItem extends StatelessWidget {
               ? Wrap(
                   spacing: 8.0,
                   runSpacing: 8.0,
-                  children: images.map((imagePath) {
-                    return Image.file(
-                      File(imagePath),
+                  children: images.map((imageUrl) {
+                    return Image.network(
+                      imageUrl,
                       width: 100,
                       height: 100,
                       fit: BoxFit.cover,

@@ -8,7 +8,8 @@ import 'package:taurgo_inventory/pages/conditions/condition_details.dart';
 import 'package:taurgo_inventory/pages/edit_report_page.dart';
 import 'package:taurgo_inventory/pages/reportPages/camera_preview_page.dart'
 as reportPages;
-
+import 'package:cloud_firestore/cloud_firestore.dart'; // Firestore
+import 'package:firebase_storage/firebase_storage.dart';
 import '../../constants/AppColors.dart';
 import '../../widgets/add_action.dart';
 
@@ -21,6 +22,54 @@ class Bathroom extends StatefulWidget {
   @override
   State<Bathroom> createState() => _BathroomState();
 }
+ 
+ Future<String?> uploadImageToFirebase(File imageFile, String propertyId, String collectionName, String documentId) async {
+  try {
+    // Step 1: Upload the image to Firebase Storage
+    String fileName = '${documentId}_${DateTime.now().millisecondsSinceEpoch}.jpg';
+    Reference storageReference = FirebaseStorage.instance
+        .ref()
+        .child('$propertyId/$collectionName/$documentId/$fileName');
+
+    UploadTask uploadTask = storageReference.putFile(imageFile);
+    TaskSnapshot snapshot = await uploadTask.whenComplete(() => null);
+
+    // Step 2: Get the download URL of the uploaded image
+    String downloadURL = await snapshot.ref.getDownloadURL();
+    print("Uploaded to Firebase: $downloadURL");
+
+    // Step 3: Save the download URL to Firestore
+    await FirebaseFirestore.instance
+        .collection('properties')
+        .doc(propertyId)
+        .collection(collectionName)
+        .doc(documentId)
+        .set({
+          'images': FieldValue.arrayUnion([downloadURL])
+        }, SetOptions(merge: true));
+
+    return downloadURL;
+  } catch (e) {
+    print("Error uploading image: $e");
+    return null;
+  }
+}
+
+Stream<List<String>> _getImagesFromFirestore(String propertyId, String imageType) {
+    return FirebaseFirestore.instance
+        .collection('properties')
+        .doc(propertyId)
+        .collection('bathroom')
+        .doc(imageType)
+        .snapshots()
+        .map((snapshot) {
+      print("Firestore snapshot data for $imageType: ${snapshot.data()}");
+      if (snapshot.exists && snapshot.data() != null) {
+        return List<String>.from(snapshot.data()!['images'] ?? []);
+      }
+      return [];
+    });
+  }
 
 class _BathroomState extends State<Bathroom> {
   String? bathroomdoorCondition;
@@ -100,6 +149,7 @@ class _BathroomState extends State<Bathroom> {
   List<String> bathroomswitchBoardImages = [];
   List<String> bathroomsocketImages = [];
   List<String> bathroom = [];
+  List<String> bathroomheatingImages = [];
   List<String> bathroomaccessoriesImages = [];
   List<String> bathroomflooringImages = [];
   List<String> bathroomadditionItemsImages = [];
@@ -110,132 +160,11 @@ class _BathroomState extends State<Bathroom> {
     super.initState();
     bathroomcapturedImages = widget.bathroomcapturedImages ?? [];
     print("Property Id - SOC${widget.propertyId}");
-    _loadPreferences(widget.propertyId);
     // Load the saved preferences when the state is initialized
   }
 
-  // Load saved preferences
-  Future<void> _loadPreferences(String propertyId) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      bathroomdoorCondition =
-          prefs.getString('bathroomdoorCondition_${propertyId}');
-      bathroomdoorDescription =
-          prefs.getString('bathroomdoorDescription_${propertyId}');
-      bathroomdoorFrameCondition =
-          prefs.getString('bathroomdoorFrameCondition_${propertyId}');
-      bathroomdoorFrameDescription =
-          prefs.getString('bathroomdoorFrameDescription_${propertyId}');
-      bathroomceilingCondition =
-          prefs.getString('bathroomceilingCondition_${propertyId}');
-      bathroomceilingDescription =
-          prefs.getString('bathroomceilingDescription_${propertyId}');
-      bathroomextractorFanCondition =
-          prefs.getString('bathroomextractorFanCondition_${propertyId}');
-      bathroomextractorFanDescription =
-          prefs.getString('bathroomextractorFanDescription_${propertyId}');
-      bathroomlightingCondition =
-          prefs.getString('bathroomlightingCondition_${propertyId}');
-      bathroomlightingDescription =
-          prefs.getString('bathroomlightingDescription_${propertyId}');
-      bathroomwallsCondition =
-          prefs.getString('bathroomwallsCondition_${propertyId}');
-      bathroomwallsDescription =
-          prefs.getString('bathroomwallsDescription_${propertyId}');
-      bathroomskirtingCondition =
-          prefs.getString('bathroomskirtingCondition_${propertyId}');
-      bathroomskirtingDescription =
-          prefs.getString('bathroomskirtingDescription_${propertyId}');
-      bathroomwindowSillCondition =
-          prefs.getString('bathroomwindowSillCondition_${propertyId}');
-      bathroomwindowSillDescription =
-          prefs.getString('bathroomwindowSillDescription_${propertyId}');
-      bathroomcurtainsCondition =
-          prefs.getString('bathroomcurtainsCondition_${propertyId}');
-      bathroomcurtainsDescription =
-          prefs.getString('bathroomcurtainsDescription_${propertyId}');
-      bathroomblindsCondition =
-          prefs.getString('bathroomblindsCondition_${propertyId}');
-      bathroomblindsDescription =
-          prefs.getString('bathroomblindsDescription_${propertyId}');
-      bathroomtoiletCondition =
-          prefs.getString('bathroomtoiletCondition_${propertyId}');
-      bathroomtoiletDescription =
-          prefs.getString('bathroomtoiletDescription_${propertyId}');
-      bathroombasinCondition =
-          prefs.getString('bathroombasinCondition_${propertyId}');
-      bathroombasinDescription =
-          prefs.getString('bathroombasinDescription_${propertyId}');
-      bathroomshowerCubicleCondition =
-          prefs.getString('bathroomshowerCubicleCondition_${propertyId}');
-      bathroomshowerCubicleDescription =
-          prefs.getString('bathroomshowerCubicleDescription_${propertyId}');
-      bathroombathCondition =
-          prefs.getString('bathroombathCondition_${propertyId}');
-      bathroombathDescription =
-          prefs.getString('bathroombathDescription_${propertyId}');
-      bathroomswitchBoardCondition =
-          prefs.getString('bathroomswitchBoardCondition_${propertyId}');
-      bathroomswitchBoardDescription =
-          prefs.getString('bathroomswitchBoardDescription_${propertyId}');
-      bathroomsocketCondition =
-          prefs.getString('bathroomsocketCondition_${propertyId}');
-      bathroomsocketDescription =
-          prefs.getString('bathroomsocketDescription_${propertyId}');
-      bathroomheatingCondition =
-          prefs.getString('bathroomheatingCondition_${propertyId}');
-      bathroomheatingDescription =
-          prefs.getString('bathroomheatingDescription_${propertyId}');
-      bathroomaccessoriesCondition =
-          prefs.getString('bathroomaccessoriesCondition_${propertyId}');
-      bathroomaccessoriesDescription =
-          prefs.getString('bathroomaccessoriesDescription_${propertyId}');
-      bathroomflooringCondition =
-          prefs.getString('bathroomflooringCondition_${propertyId}');
-      bathroomflooringDescription =
-          prefs.getString('bathroomflooringDescription_${propertyId}');
-      bathroomadditionItemsCondition =
-          prefs.getString('bathroomadditionItemsCondition_${propertyId}');
-      bathroomadditionItemsDescription =
-          prefs.getString('bathroomadditionItemsDescription_${propertyId}');
-      bathroomcapturedImages =
-          (prefs.getStringList('bathroomcapturedImages_${propertyId}') ?? [])
-              .map((path) => File(path))
-              .toList();
-      bathroomdoorImages = prefs.getStringList('bathroomdoorImages') ?? [];
-      bathroomdoorFrameImages =
-          prefs.getStringList('bathroomdoorFrameImages') ?? [];
-      bathroomceilingImages =
-          prefs.getStringList('bathroomceilingImages') ?? [];
-      bathroomextractorFanImages =
-          prefs.getStringList('bathroomextractorFanImages') ?? [];
-      bathroomlightingImages =
-          prefs.getStringList('bathroomlightingImages') ?? [];
-      bathroomwallsImages = prefs.getStringList('bathroomwallsImages') ?? [];
-      bathroomskirtingImages =
-          prefs.getStringList('bathroomskirtingImages') ?? [];
-      bathroomwindowSillImages =
-          prefs.getStringList('bathroomwindowSillImages') ?? [];
-      bathroomcurtainsImages =
-          prefs.getStringList('bathroomcurtainsImages') ?? [];
-      bathroomblindsImages = prefs.getStringList('bathroomblindsImages') ?? [];
-      bathroomtoiletImages = prefs.getStringList('bathroomtoiletImages') ?? [];
-      bathroombasinImages = prefs.getStringList('bathroombasinImages') ?? [];
-      bathroomshowerCubicleImages =
-          prefs.getStringList('bathroomshowerCubicleImages') ?? [];
-      bathroombathImages = prefs.getStringList('bathroombathImages') ?? [];
-      bathroomswitchBoardImages =
-          prefs.getStringList('bathroomswitchBoardImages') ?? [];
-      bathroomsocketImages = prefs.getStringList('bathroomsocketImages') ?? [];
-      bathroom = prefs.getStringList('bathroom') ?? [];
-      bathroomaccessoriesImages =
-          prefs.getStringList('bathroomaccessoriesImages') ?? [];
-      bathroomflooringImages =
-          prefs.getStringList('bathroomflooringImages') ?? [];
-      bathroomadditionItemsImages =
-          prefs.getStringList('bathroomadditionItemsImages') ?? [];
-    });
-  }
+  
+  
 
   // Save preferences when a condition or description is selected
   Future<void> _savePreference(
@@ -244,12 +173,7 @@ class _BathroomState extends State<Bathroom> {
     prefs.setString('${key}_$propertyId', value);
   }
 
-  Future<void> _savePreferenceList(
-      String propertyId, String key, List<String> value) async {
-    final prefs = await SharedPreferences.getInstance();
-    prefs.setStringList('${key}_$propertyId', value);
-  }
-
+ 
   @override
   Widget build(BuildContext context) {
     String propertyId = widget.propertyId;
@@ -453,583 +377,981 @@ class _BathroomState extends State<Bathroom> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Door
-              ConditionItem(
-                name: "Door",
-                condition: bathroomdoorCondition,
-                description: bathroomdoorDescription,
-                images: bathroomdoorImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    bathroomdoorCondition = condition;
-                  });
-                  _savePreference(
-                      propertyId, 'bathroomdoorCondition', condition!);
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    bathroomdoorDescription = description;
-                  });
-                  _savePreference(
-                      propertyId, 'bathroomdoorDescription', description!);
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    bathroomdoorImages.add(imagePath);
-                  });
-                  _savePreferenceList(
-                      propertyId, 'bathroomdoorImages', bathroomdoorImages);
-                },
-              ),
+              StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'bathroomdoorImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Other images');
+                    }
+                    final bathroomdoorImages = snapshot.data ?? [];
+                    return ConditionItem(
+                      name: "Door",
+                      condition: bathroomdoorCondition,
+                      description: bathroomdoorDescription,
+                      images: bathroomdoorImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          bathroomdoorCondition = condition;
+                        });
+                        _savePreference(propertyId, 'bathroomdoorCondition', condition!);
+                      },
+                      onDescriptionSelected: (description) {
+                        setState(() {
+                          bathroomdoorDescription = description;
+                        });
+                        _savePreference(propertyId, 'bathroomdoorDescription', description!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile, propertyId,'bathroom', 'bathroomdoorImages');
+
+                        if (downloadUrl != null) {
+                          print("Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('bathroom')
+                              .doc('bathroomdoorImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      },
+                    );
+                  },
+                ),
 
               // Door Frame
-              ConditionItem(
-                name: "Door Frame",
-                condition: bathroomdoorFrameCondition,
-                description: bathroomdoorFrameDescription,
-                images: bathroomdoorFrameImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    bathroomdoorFrameCondition = condition;
-                  });
-                  _savePreference(
-                      propertyId, 'bathroomdoorFrameCondition', condition!);
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    bathroomdoorFrameDescription = description;
-                  });
-                  _savePreference(
-                      propertyId, 'bathroomdoorFrameDescription', description!);
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    bathroomdoorFrameImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId, 'bathroomdoorFrameImages',
-                      bathroomdoorFrameImages);
-                },
-              ),
+              StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'bathroomdoorFrameImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Other images');
+                    }
+                    final bathroomdoorFrameImages = snapshot.data ?? [];
+                    return ConditionItem(
+                      name: "Door Frame",
+                      condition:  bathroomdoorFrameCondition,
+                      description: bathroomdoorFrameCondition,
+                      images: bathroomdoorFrameImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          bathroomdoorFrameCondition = condition;
+                        });
+                        _savePreference(propertyId, 'bathroomdoorFrameCondition', condition!);
+                      },
+                      onDescriptionSelected: (description) {
+                        setState(() {
+                          bathroomdoorFrameCondition = description;
+                        });
+                        _savePreference(propertyId, 'bathroomdoorFrameCondition', description!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile, propertyId,'bathroom', 'bathroomdoorFrameImages');
+
+                        if (downloadUrl != null) {
+                          print("Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('bathroom')
+                              .doc('bathroomdoorFrameImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      },
+                    );
+                  },
+                ),
 
               // Ceiling
-              ConditionItem(
-                name: "Ceiling",
-                condition: bathroomceilingCondition,
-                description: bathroomceilingDescription,
-                images: bathroomceilingImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    bathroomceilingCondition = condition;
-                  });
-                  _savePreference(
-                      propertyId, 'bathroomceilingCondition', condition!);
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    bathroomceilingDescription = description;
-                  });
-                  _savePreference(
-                      propertyId, 'bathroomceilingDescription', description!);
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    bathroomceilingImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId, 'bathroomceilingImages',
-                      bathroomceilingImages);
-                },
-              ),
+              StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'bathroomceilingImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Other images');
+                    }
+                    final bathroomceilingImages = snapshot.data ?? [];
+                    return ConditionItem(
+                      name: "Ceiling",
+                      condition: bathroomceilingCondition,
+                      description: bathroomceilingCondition,
+                      images: bathroomceilingImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          bathroomceilingCondition = condition;
+                        });
+                        _savePreference(propertyId, 'bathroomceilingCondition,', condition!);
+                      },
+                      onDescriptionSelected: (description) {
+                        setState(() {
+                          bathroomceilingCondition = description;
+                        });
+                        _savePreference(propertyId, 'bathroomceilingCondition,', description!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile, propertyId,'bathroom', 'bathroomceilingImages');
+
+                        if (downloadUrl != null) {
+                          print("Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('bathroom')
+                              .doc('bathroomceilingImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      },
+                    );
+                  },
+                ),
 
               // Extractor Fan
-              ConditionItem(
-                name: "Extractor Fan",
-                condition: bathroomextractorFanCondition,
-                description: bathroomextractorFanDescription,
-                images: bathroomextractorFanImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    bathroomextractorFanCondition = condition;
-                  });
-                  _savePreference(
-                      propertyId, 'bathroomextractorFanCondition', condition!);
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    bathroomextractorFanDescription = description;
-                  });
-                  _savePreference(propertyId, 'bathroomextractorFanDescription',
-                      description!);
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    bathroomextractorFanImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId, 'bathroomextractorFanImages',
-                      bathroomextractorFanImages);
-                },
-              ),
+              StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'bathroomextractorFanImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Other images');
+                    }
+                    final bathroomextractorFanImages = snapshot.data ?? [];
+                    return ConditionItem(
+                      name: "Extractor Fan",
+                      condition: bathroomextractorFanCondition,
+                      description: bathroomextractorFanCondition,
+                      images: bathroomextractorFanImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          bathroomextractorFanCondition = condition;
+                        });
+                        _savePreference(propertyId, 'bathroomextractorFanCondition', condition!);
+                      },
+                      onDescriptionSelected: (description) {
+                        setState(() {
+                          bathroomextractorFanCondition = description;
+                        });
+                        _savePreference(propertyId, 'bathroomextractorFanCondition', description!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile, propertyId,'bathroom', 'bathroomextractorFanImages');
+
+                        if (downloadUrl != null) {
+                          print("Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('bathroom')
+                              .doc('bathroomextractorFanImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      },
+                    );
+                  },
+                ),
 
               // Lighting
-              ConditionItem(
-                name: "Lighting",
-                condition: bathroomlightingCondition,
-                description: bathroomlightingDescription,
-                images: bathroomlightingImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    bathroomlightingCondition = condition;
-                  });
-                  _savePreference(
-                      propertyId, 'bathroomlightingCondition', condition!);
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    bathroomlightingDescription = description;
-                  });
-                  _savePreference(
-                      propertyId, 'bathroomlightingDescription', description!);
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    bathroomlightingImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId, 'bathroomlightingImages',
-                      bathroomlightingImages);
-                },
-              ),
+              StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'bathroomlightingImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Other images');
+                    }
+                    final bathroomlightingImages = snapshot.data ?? [];
+                    return ConditionItem(
+                      name: "Lighting",
+                      condition: bathroomlightingCondition,
+                      description: bathroomlightingCondition,
+                      images: bathroomlightingImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          bathroomlightingCondition = condition;
+                        });
+                        _savePreference(propertyId, 'bathroomlightingCondition', condition!);
+                      },
+                      onDescriptionSelected: (description) {
+                        setState(() {
+                          bathroomlightingCondition = description;
+                        });
+                        _savePreference(propertyId, 'bathroomlightingCondition', description!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile, propertyId,'bathroom', 'bathroomlightingImages');
+
+                        if (downloadUrl != null) {
+                          print("Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('bathroom')
+                              .doc('bathroomlightingImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      },
+                    );
+                  },
+                ),
 
               // Walls
-              ConditionItem(
-                name: "Walls",
-                condition: bathroomwallsCondition,
-                description: bathroomwallsDescription,
-                images: bathroomwallsImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    bathroomwallsCondition = condition;
-                  });
-                  _savePreference(
-                      propertyId, 'bathroomwallsCondition', condition!);
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    bathroomwallsDescription = description;
-                  });
-                  _savePreference(
-                      propertyId, 'bathroomwallsDescription', description!);
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    bathroomwallsImages.add(imagePath);
-                  });
-                  _savePreferenceList(
-                      propertyId, 'bathroomwallsImages', bathroomwallsImages);
-                },
-              ),
+              StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'bathroomwallsImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Other images');
+                    }
+                    final bathroomwallsImages= snapshot.data ?? [];
+                    return ConditionItem(
+                      name: "Walls",
+                      condition: bathroomwallsCondition,
+                      description: bathroomwallsCondition,
+                      images: bathroomwallsImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          bathroomwallsCondition = condition;
+                        });
+                        _savePreference(propertyId, 'bathroomwallsCondition', condition!);
+                      },
+                      onDescriptionSelected: (description) {
+                        setState(() {
+                          bathroomwallsCondition = description;
+                        });
+                        _savePreference(propertyId, 'bathroomwallsCondition', description!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile, propertyId,'bathroom', 'bathroomwallsImages');
+
+                        if (downloadUrl != null) {
+                          print("Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('bathroom')
+                              .doc('bathroomwallsImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      },
+                    );
+                  },
+                ),
 
               // Skirting
-              ConditionItem(
-                name: "Skirting",
-                condition: bathroomskirtingCondition,
-                description: bathroomskirtingDescription,
-                images: bathroomskirtingImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    bathroomskirtingCondition = condition;
-                  });
-                  _savePreference(
-                      propertyId, 'bathroomskirtingCondition', condition!);
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    bathroomskirtingDescription = description;
-                  });
-                  _savePreference(
-                      propertyId, 'bathroomskirtingDescription', description!);
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    bathroomskirtingImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId, 'bathroomskirtingImages',
-                      bathroomskirtingImages);
-                },
-              ),
+              StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'bathroomskirtingImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Other images');
+                    }
+                    final bathroomskirtingImages = snapshot.data ?? [];
+                    return ConditionItem(
+                      name: "Skirting",
+                      condition: bathroomskirtingCondition,
+                      description: bathroomskirtingCondition,
+                      images: bathroomskirtingImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          bathroomskirtingCondition = condition;
+                        });
+                        _savePreference(propertyId, 'bathroomskirtingCondition', condition!);
+                      },
+                      onDescriptionSelected: (description) {
+                        setState(() {
+                          bathroomskirtingCondition = description;
+                        });
+                        _savePreference(propertyId, 'bathroomskirtingCondition', description!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile, propertyId,'bathroom', 'bathroomskirtingImages');
+
+                        if (downloadUrl != null) {
+                          print("Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('bathroom')
+                              .doc('bathroomskirtingImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      },
+                    );
+                  },
+                ),
 
               // Window Sill
-              ConditionItem(
-                name: "Window Sill",
-                condition: bathroomwindowSillCondition,
-                description: bathroomwindowSillDescription,
-                images: bathroomwindowSillImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    bathroomwindowSillCondition = condition;
-                  });
-                  _savePreference(
-                      propertyId, 'bathroomwindowSillCondition', condition!);
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    bathroomwindowSillDescription = description;
-                  });
-                  _savePreference(propertyId, 'bathroomwindowSillDescription',
-                      description!);
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    bathroomwindowSillImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId, 'bathroomwindowSillImages',
-                      bathroomwindowSillImages);
-                },
-              ),
+              StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'bathroomwindowSillImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Other images');
+                    }
+                    final bathroomwindowSillImages = snapshot.data ?? [];
+                    return ConditionItem(
+                      name: "Window Sill",
+                      condition: bathroomwindowSillCondition,
+                      description: bathroomwindowSillCondition,
+                      images: bathroomwindowSillImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          bathroomwindowSillCondition = condition;
+                        });
+                        _savePreference(propertyId, 'bathroomwindowSillCondition', condition!);
+                      },
+                      onDescriptionSelected: (description) {
+                        setState(() {
+                          bathroomwindowSillCondition = description;
+                        });
+                        _savePreference(propertyId, 'bathroomwindowSillCondition', description!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile, propertyId,'bathroom', 'bathroomwindowSillImages');
+
+                        if (downloadUrl != null) {
+                          print("Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('bathroom')
+                              .doc('bathroomwindowSillImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      },
+                    );
+                  },
+                ),
 
               // Curtains
-              ConditionItem(
-                name: "Curtains",
-                condition: bathroomcurtainsCondition,
-                description: bathroomcurtainsDescription,
-                images: bathroomcurtainsImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    bathroomcurtainsCondition = condition;
-                  });
-                  _savePreference(
-                      propertyId, 'bathroomcurtainsCondition', condition!);
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    bathroomcurtainsDescription = description;
-                  });
-                  _savePreference(
-                      propertyId, 'bathroomcurtainsDescription', description!);
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    bathroomcurtainsImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId, 'bathroomcurtainsImages',
-                      bathroomcurtainsImages);
-                },
-              ),
+              StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'bathroomcurtainsImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Other images');
+                    }
+                    final bathroomcurtainsImages = snapshot.data ?? [];
+                    return ConditionItem(
+                      name: "Curtains",
+                      condition: bathroomcurtainsCondition,
+                      description: bathroomcurtainsCondition,
+                      images: bathroomcurtainsImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          bathroomcurtainsCondition = condition;
+                        });
+                        _savePreference(propertyId, 'bathroomcurtainsCondition', condition!);
+                      },
+                      onDescriptionSelected: (description) {
+                        setState(() {
+                          bathroomcurtainsCondition = description;
+                        });
+                        _savePreference(propertyId, 'bathroomcurtainsCondition', description!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile, propertyId,'bathroom', 'bathroomcurtainsImages');
+
+                        if (downloadUrl != null) {
+                          print("Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('bathroom')
+                              .doc('bathroomcurtainsImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      },
+                    );
+                  },
+                ),
 
               // Blinds
-              ConditionItem(
-                name: "Blinds",
-                condition: bathroomblindsCondition,
-                description: bathroomblindsDescription,
-                images: bathroomblindsImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    bathroomblindsCondition = condition;
-                  });
-                  _savePreference(
-                      propertyId, 'bathroomblindsCondition', condition!);
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    bathroomblindsDescription = description;
-                  });
-                  _savePreference(
-                      propertyId, 'bathroomblindsDescription', description!);
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    bathroomblindsImages.add(imagePath);
-                  });
-                  _savePreferenceList(
-                      propertyId, 'bathroomblindsImages', bathroomblindsImages);
-                },
-              ),
+              StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'bathroomblindsImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Other images');
+                    }
+                    final bathroomblindsImages = snapshot.data ?? [];
+                    return ConditionItem(
+                      name: "Blinds",
+                      condition: bathroomblindsCondition,
+                      description: bathroomblindsCondition,
+                      images: bathroomblindsImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          bathroomblindsCondition = condition;
+                        });
+                        _savePreference(propertyId, 'bathroomblindsCondition', condition!);
+                      },
+                      onDescriptionSelected: (description) {
+                        setState(() {
+                          bathroomblindsCondition = description;
+                        });
+                        _savePreference(propertyId, 'bathroomblindsCondition', description!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile, propertyId,'bathroom', 'bathroomblindsImages');
+
+                        if (downloadUrl != null) {
+                          print("Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('bathroom')
+                              .doc('bathroomblindsImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      },
+                    );
+                  },
+                ),
 
               // Toilet
-              ConditionItem(
-                name: "Toilet",
-                condition: bathroomtoiletCondition,
-                description: bathroomtoiletDescription,
-                images: bathroomtoiletImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    bathroomtoiletCondition = condition;
-                  });
-                  _savePreference(
-                      propertyId, 'bathroomtoiletCondition', condition!);
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    bathroomtoiletDescription = description;
-                  });
-                  _savePreference(
-                      propertyId, 'bathroomtoiletDescription', description!);
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    bathroomtoiletImages.add(imagePath);
-                  });
-                  _savePreferenceList(
-                      propertyId, 'bathroomtoiletImages', bathroomtoiletImages);
-                },
-              ),
+              StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'bathroomtoiletImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Other images');
+                    }
+                    final bathroomtoiletImages = snapshot.data ?? [];
+                    return ConditionItem(
+                      name: "Toilet",
+                      condition: bathroomtoiletCondition,
+                      description: bathroomtoiletCondition,
+                      images: bathroomtoiletImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          bathroomtoiletCondition = condition;
+                        });
+                        _savePreference(propertyId, 'bathroomtoiletCondition', condition!);
+                      },
+                      onDescriptionSelected: (description) {
+                        setState(() {
+                          bathroomtoiletCondition = description;
+                        });
+                        _savePreference(propertyId, 'bathroomtoiletCondition', description!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile, propertyId,'bathroom', 'bathroomtoiletImages');
+
+                        if (downloadUrl != null) {
+                          print("Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('bathroom')
+                              .doc('bathroomtoiletImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      },
+                    );
+                  },
+                ),
 
               // Basin
-              ConditionItem(
-                name: "Basin",
-                condition: bathroombasinCondition,
-                description: bathroombasinDescription,
-                images: bathroombasinImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    bathroombasinCondition = condition;
-                  });
-                  _savePreference(
-                      propertyId, 'bathroombasinCondition', condition!);
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    bathroombasinDescription = description;
-                  });
-                  _savePreference(
-                      propertyId, 'bathroombasinDescription', description!);
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    bathroombasinImages.add(imagePath);
-                  });
-                  _savePreferenceList(
-                      propertyId, 'bathroombasinImages', bathroombasinImages);
-                },
-              ),
+             StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'bathroombasinImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Other images');
+                    }
+                    final bathroombasinImages = snapshot.data ?? [];
+                    return ConditionItem(
+                      name: "Basin",
+                      condition: bathroombasinCondition,
+                      description: bathroombasinCondition,
+                      images: bathroombasinImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          bathroombasinCondition = condition;
+                        });
+                        _savePreference(propertyId, 'bathroombasinCondition', condition!);
+                      },
+                      onDescriptionSelected: (description) {
+                        setState(() {
+                          bathroombasinCondition = description;
+                        });
+                        _savePreference(propertyId, 'bathroombasinCondition', description!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile, propertyId,'bathroom', 'bathroombasinImages');
+
+                        if (downloadUrl != null) {
+                          print("Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('bathroom')
+                              .doc('bathroombasinImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      },
+                    );
+                  },
+                ),
 
               // Shower Cubicle
-              ConditionItem(
-                name: "Shower Cubicle",
-                condition: bathroomshowerCubicleCondition,
-                description: bathroomshowerCubicleDescription,
-                images: bathroomshowerCubicleImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    bathroomshowerCubicleCondition = condition;
-                  });
-                  _savePreference(
-                      propertyId, 'bathroomshowerCubicleCondition', condition!);
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    bathroomshowerCubicleDescription = description;
-                  });
-                  _savePreference(propertyId,
-                      'bathroomshowerCubicleDescription', description!);
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    bathroomshowerCubicleImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId, 'bathroomshowerCubicleImages',
-                      bathroomshowerCubicleImages);
-                },
-              ),
+              StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'bathroomshowerCubicleImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Other images');
+                    }
+                    final bathroomshowerCubicleImages = snapshot.data ?? [];
+                    return ConditionItem(
+                      name: "Shower Cubicle",
+                      condition: bathroomshowerCubicleCondition,
+                      description: bathroomshowerCubicleCondition,
+                      images: bathroomshowerCubicleImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          bathroomshowerCubicleCondition = condition;
+                        });
+                        _savePreference(propertyId, 'bathroomshowerCubicleCondition', condition!);
+                      },
+                      onDescriptionSelected: (description) {
+                        setState(() {
+                          bathroomshowerCubicleCondition = description;
+                        });
+                        _savePreference(propertyId, 'bathroomshowerCubicleCondition', description!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile, propertyId,'bathroom', 'bathroomshowerCubicleImages');
+
+                        if (downloadUrl != null) {
+                          print("Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('bathroom')
+                              .doc('bathroomshowerCubicleImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      },
+                    );
+                  },
+                ),
 
               // Bath
-              ConditionItem(
-                name: "Bath",
-                condition: bathroombathCondition,
-                description: bathroombathDescription,
-                images: bathroombathImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    bathroombathCondition = condition;
-                  });
-                  _savePreference(
-                      propertyId, 'bathroombathCondition', condition!);
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    bathroombathDescription = description;
-                  });
-                  _savePreference(
-                      propertyId, 'bathroombathDescription', description!);
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    bathroombathImages.add(imagePath);
-                  });
-                  _savePreferenceList(
-                      propertyId, 'bathroombathImages', bathroombathImages);
-                },
-              ),
+              StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'bathroombathImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Other images');
+                    }
+                    final bathroombathImages = snapshot.data ?? [];
+                    return ConditionItem(
+                      name: "Bath",
+                      condition: bathroombathCondition,
+                      description: bathroombathCondition,
+                      images: bathroombathImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          bathroombathCondition = condition;
+                        });
+                        _savePreference(propertyId, 'bathroombathCondition', condition!);
+                      },
+                      onDescriptionSelected: (description) {
+                        setState(() {
+                          bathroombathCondition = description;
+                        });
+                        _savePreference(propertyId, 'bathroombathCondition', description!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile, propertyId,'bathroom', 'bathroombathImages');
+
+                        if (downloadUrl != null) {
+                          print("Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('bathroom')
+                              .doc('bathroombathImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      },
+                    );
+                  },
+                ),
 
               // Switch Board
-              ConditionItem(
-                name: "Switch Board",
-                condition: bathroomswitchBoardCondition,
-                description: bathroomswitchBoardDescription,
-                images: bathroomswitchBoardImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    bathroomswitchBoardCondition = condition;
-                  });
-                  _savePreference(
-                      propertyId, 'bathroomswitchBoardCondition', condition!);
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    bathroomswitchBoardDescription = description;
-                  });
-                  _savePreference(propertyId, 'bathroomswitchBoardDescription',
-                      description!);
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    bathroomswitchBoardImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId, 'bathroomswitchBoardImages',
-                      bathroomswitchBoardImages);
-                },
-              ),
+             StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'bathroomswitchBoardImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Other images');
+                    }
+                    final bathroomswitchBoardImages = snapshot.data ?? [];
+                    return ConditionItem(
+                      name: "Switch Board",
+                      condition: bathroomswitchBoardCondition,
+                      description: bathroomswitchBoardCondition,
+                      images: bathroomswitchBoardImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          bathroomswitchBoardCondition = condition;
+                        });
+                        _savePreference(propertyId, 'bathroomswitchBoardCondition', condition!);
+                      },
+                      onDescriptionSelected: (description) {
+                        setState(() {
+                          bathroomswitchBoardCondition = description;
+                        });
+                        _savePreference(propertyId, 'bathroomswitchBoardCondition', description!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile, propertyId,'bathroom', 'bathroomswitchBoardImages');
+
+                        if (downloadUrl != null) {
+                          print("Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('bathroom')
+                              .doc('bathroomswitchBoardImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      },
+                    );
+                  },
+                ),
 
               // Socket
-              ConditionItem(
-                name: "Socket",
-                condition: bathroomsocketCondition,
-                description: bathroomsocketDescription,
-                images: bathroomsocketImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    bathroomsocketCondition = condition;
-                  });
-                  _savePreference(
-                      propertyId, 'bathroomsocketCondition', condition!);
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    bathroomsocketDescription = description;
-                  });
-                  _savePreference(
-                      propertyId, 'bathroomsocketDescription', description!);
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    bathroomsocketImages.add(imagePath);
-                  });
-                  _savePreferenceList(
-                      propertyId, 'bathroomsocketImages', bathroomsocketImages);
-                },
-              ),
+              StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'bathroomsocketImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Other images');
+                    }
+                    final bathroomsocketImages = snapshot.data ?? [];
+                    return ConditionItem(
+                      name: "Socket",
+                      condition: bathroomsocketCondition,
+                      description: bathroomsocketCondition,
+                      images: bathroomsocketImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          bathroomsocketCondition = condition;
+                        });
+                        _savePreference(propertyId, 'bathroomsocketCondition', condition!);
+                      },
+                      onDescriptionSelected: (description) {
+                        setState(() {
+                          bathroomsocketCondition = description;
+                        });
+                        _savePreference(propertyId, 'bathroomsocketCondition', description!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile, propertyId,'bathroom', 'bathroomsocketImages');
 
+                        if (downloadUrl != null) {
+                          print("Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('bathroom')
+                              .doc('bathroomsocketImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      },
+                    );
+                  },
+                ),
               // Heating
-              ConditionItem(
-                name: "Heating",
-                condition: bathroomheatingCondition,
-                description: bathroomheatingDescription,
-                images: bathroom,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    bathroomheatingCondition = condition;
-                  });
-                  _savePreference(
-                      propertyId, 'bathroomheatingCondition', condition!);
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    bathroomheatingDescription = description;
-                  });
-                  _savePreference(
-                      propertyId, 'bathroomheatingDescription', description!);
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    bathroom.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId, 'bathroom', bathroom);
-                },
-              ),
+              StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'bathroomheatingImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Other images');
+                    }
+                    final bathroomheatingImages = snapshot.data ?? [];
+                    return ConditionItem(
+                      name: "Heating",
+                      condition:bathroomheatingCondition ,
+                      description: bathroomheatingCondition,
+                      images: bathroomheatingImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          bathroomheatingCondition = condition;
+                        });
+                        _savePreference(propertyId, 'bathroomheatingCondition', condition!);
+                      },
+                      onDescriptionSelected: (description) {
+                        setState(() {
+                          bathroomheatingCondition = description;
+                        });
+                        _savePreference(propertyId, 'bathroomheatingCondition', description!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile, propertyId,'bathroom', 'bathroomheatingImages');
+
+                        if (downloadUrl != null) {
+                          print("Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('bathroom')
+                              .doc('bathroomheatingImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      },
+                    );
+                  },
+                ),
 
               // Accessories
-              ConditionItem(
-                name: "Accessories",
-                condition: bathroomaccessoriesCondition,
-                description: bathroomaccessoriesDescription,
-                images: bathroomaccessoriesImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    bathroomaccessoriesCondition = condition;
-                  });
-                  _savePreference(
-                      propertyId, 'bathroomaccessoriesCondition', condition!);
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    bathroomaccessoriesDescription = description;
-                  });
-                  _savePreference(propertyId, 'bathroomaccessoriesDescription',
-                      description!);
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    bathroomaccessoriesImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId, 'bathroomaccessoriesImages',
-                      bathroomaccessoriesImages);
-                },
-              ),
+              StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'bathroomaccessoriesImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Other images');
+                    }
+                    final bathroomaccessoriesImages = snapshot.data ?? [];
+                    return ConditionItem(
+                      name: "Accessories",
+                      condition: bathroomaccessoriesCondition,
+                      description: bathroomaccessoriesCondition,
+                      images: bathroomaccessoriesImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          bathroomaccessoriesCondition = condition;
+                        });
+                        _savePreference(propertyId, 'bathroomaccessoriesCondition', condition!);
+                      },
+                      onDescriptionSelected: (description) {
+                        setState(() {
+                          bathroomaccessoriesCondition = description;
+                        });
+                        _savePreference(propertyId, 'bathroomaccessoriesCondition', description!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile, propertyId,'bathroom', 'bathroomaccessoriesImages');
 
+                        if (downloadUrl != null) {
+                          print("Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('bathroom')
+                              .doc('bathroomaccessoriesImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      },
+                    );
+                  },
+                ),
               // Flooring
-              ConditionItem(
-                name: "Flooring",
-                condition: bathroomflooringCondition,
-                description: bathroomflooringDescription,
-                images: bathroomflooringImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    bathroomflooringCondition = condition;
-                  });
-                  _savePreference(
-                      propertyId, 'bathroomflooringCondition', condition!);
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    bathroomflooringDescription = description;
-                  });
-                  _savePreference(
-                      propertyId, 'bathroomflooringDescription', description!);
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    bathroomflooringImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId, 'bathroomflooringImages',
-                      bathroomflooringImages);
-                },
-              ),
+              StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'bathroomflooringImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Other images');
+                    }
+                    final bathroomflooringImages = snapshot.data ?? [];
+                    return ConditionItem(
+                      name: "Flooring",
+                      condition: bathroomflooringCondition,
+                      description: bathroomflooringCondition,
+                      images: bathroomflooringImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          bathroomflooringCondition = condition;
+                        });
+                        _savePreference(propertyId, 'bathroomflooringCondition', condition!);
+                      },
+                      onDescriptionSelected: (description) {
+                        setState(() {
+                          bathroomflooringCondition = description;
+                        });
+                        _savePreference(propertyId, 'bathroomflooringCondition', description!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile, propertyId,'bathroom', 'bathroomflooringImages');
 
+                        if (downloadUrl != null) {
+                          print("Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('bathroom')
+                              .doc('bathroomflooringImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      },
+                    );
+                  },
+                ),
               // Addition Items
-              ConditionItem(
-                name: "Addition Items",
-                condition: bathroomadditionItemsCondition,
-                description: bathroomadditionItemsDescription,
-                images: bathroomadditionItemsImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    bathroomadditionItemsCondition = condition;
-                  });
-                  _savePreference(
-                      propertyId, 'bathroomadditionItemsCondition', condition!);
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    bathroomadditionItemsDescription = description;
-                  });
-                  _savePreference(propertyId,
-                      'bathroomadditionItemsDescription', description!);
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    bathroomadditionItemsImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId, 'bathroomadditionItemsImages',
-                      bathroomadditionItemsImages);
-                },
-              ),
+              StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'bathroomadditionItemsImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Other images');
+                    }
+                    final bathroomadditionItemsImages = snapshot.data ?? [];
+                    return ConditionItem(
+                      name: "Additional Items",
+                      condition: bathroomadditionItemsCondition,
+                      description: bathroomadditionItemsCondition,
+                      images: bathroomadditionItemsImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          bathroomadditionItemsCondition = condition;
+                        });
+                        _savePreference(propertyId, 'bathroomadditionItemsCondition', condition!);
+                      },
+                      onDescriptionSelected: (description) {
+                        setState(() {
+                          bathroomadditionItemsCondition = description;
+                        });
+                        _savePreference(propertyId, 'bathroomadditionItemsCondition', description!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile, propertyId,'bathroom', 'bathroomadditionItemsImages');
+
+                        if (downloadUrl != null) {
+                          print("Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('bathroom')
+                              .doc('bathroomadditionItemsImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      },
+                    );
+                  },
+                ),
 
               // Add more ConditionItem widgets as needed
             ],
@@ -1202,14 +1524,14 @@ class ConditionItem extends StatelessWidget {
               ? Wrap(
             spacing: 8.0,
             runSpacing: 8.0,
-            children: images.map((imagePath) {
-              return Image.file(
-                File(imagePath),
-                width: 100,
-                height: 100,
-                fit: BoxFit.cover,
-              );
-            }).toList(),
+            children: images.map((imageUrl) {
+                    return Image.network(
+                      imageUrl,
+                      width: 100,
+                      height: 100,
+                      fit: BoxFit.cover,
+                    );
+                  }).toList(),
           )
               : Text(
             "No images selected",

@@ -5,10 +5,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:camera/camera.dart';
 import 'package:taurgo_inventory/pages/conditions/condition_details.dart';
 import 'package:taurgo_inventory/pages/edit_report_page.dart';
-import 'package:taurgo_inventory/widgets/add_action.dart';
+
 import '../../constants/AppColors.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+
 import 'package:taurgo_inventory/pages/reportPages/camera_preview_page.dart'; // Import shared_preferences
+import 'package:cloud_firestore/cloud_firestore.dart'; // Firestore
+import 'package:firebase_storage/firebase_storage.dart';
 
 class ScheduleOfCondition extends StatefulWidget {
   final List<File>? capturedImages;
@@ -19,6 +21,40 @@ class ScheduleOfCondition extends StatefulWidget {
 
   @override
   State<ScheduleOfCondition> createState() => _ScheduleOfConditionState();
+}
+
+Future<String?> uploadImageToFirebase(File imageFile, String propertyId,
+    String collectionName, String documentId) async {
+  try {
+    // Step 1: Upload the image to Firebase Storage
+    String fileName =
+        '${documentId}_${DateTime.now().millisecondsSinceEpoch}.jpg';
+    Reference storageReference = FirebaseStorage.instance
+        .ref()
+        .child('$propertyId/$collectionName/$documentId/$fileName');
+
+    UploadTask uploadTask = storageReference.putFile(imageFile);
+    TaskSnapshot snapshot = await uploadTask.whenComplete(() => null);
+
+    // Step 2: Get the download URL of the uploaded image
+    String downloadURL = await snapshot.ref.getDownloadURL();
+    print("Uploaded to Firebase: $downloadURL");
+
+    // Step 3: Save the download URL to Firestore
+    await FirebaseFirestore.instance
+        .collection('properties')
+        .doc(propertyId)
+        .collection(collectionName)
+        .doc(documentId)
+        .set({
+      'images': FieldValue.arrayUnion([downloadURL])
+    }, SetOptions(merge: true));
+
+    return downloadURL;
+  } catch (e) {
+    print("Error uploading image: $e");
+    return null;
+  }
 }
 
 class _ScheduleOfConditionState extends State<ScheduleOfCondition> {
@@ -32,6 +68,7 @@ class _ScheduleOfConditionState extends State<ScheduleOfCondition> {
   String? curtains;
   String? hardFlooring;
   String? kitchenArea;
+  String? kitchen;
   String? oven;
   String? mattress;
   String? upholstrey;
@@ -46,6 +83,7 @@ class _ScheduleOfConditionState extends State<ScheduleOfCondition> {
   List<String> curtainsImages = [];
   List<String> hardFlooringImages = [];
   List<String> kitchenAreaImages = [];
+  List<String> kitchenImages = [];
   List<String> ovenImages = [];
   List<String> mattressImages = [];
   List<String> upholstreyImages = [];
@@ -58,52 +96,22 @@ class _ScheduleOfConditionState extends State<ScheduleOfCondition> {
     super.initState();
     capturedImages = widget.capturedImages ?? [];
     print("Property Id - SOC${widget.propertyId}");
-    _loadPreferences(widget.propertyId);
   }
 
-  Future<void> _loadPreferences(String propertyId) async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      overview = prefs.getString('overview_${propertyId}');
-      accessoryCleanliness =
-          prefs.getString('accessoryCleanliness_${propertyId}');
-      windowSill = prefs.getString('windowSill_${propertyId}');
-      carpets = prefs.getString('carpets_${propertyId}');
-      ceilings = prefs.getString('ceilings_${propertyId}');
-      curtains = prefs.getString('curtains_${propertyId}');
-      hardFlooring = prefs.getString('hardFlooring_${propertyId}');
-      kitchenArea = prefs.getString('kitchenArea_${propertyId}');
-      oven = prefs.getString('oven_${propertyId}');
-      mattress = prefs.getString('mattress_${propertyId}');
-      upholstrey = prefs.getString('upholstrey_${propertyId}');
-      wall = prefs.getString('wall_${propertyId}');
-      window = prefs.getString('window_${propertyId}');
-      woodwork = prefs.getString('woodwork_${propertyId}');
-
-      overviewImages =
-          prefs.getStringList('overviewImages_${propertyId}') ?? [];
-      accessoryCleanlinessImages =
-          prefs.getStringList('accessoryCleanlinessImages_${propertyId}') ?? [];
-      windowSillImages =
-          prefs.getStringList('windowSillImages_${propertyId}') ?? [];
-      carpetsImages = prefs.getStringList('carpetsImages_${propertyId}') ?? [];
-      ceilingsImages =
-          prefs.getStringList('ceilingsImages_${propertyId}') ?? [];
-      curtainsImages =
-          prefs.getStringList('curtainsImages_${propertyId}') ?? [];
-      hardFlooringImages =
-          prefs.getStringList('hardFlooringImages_${propertyId}') ?? [];
-      kitchenAreaImages =
-          prefs.getStringList('kitchenAreaImages_${propertyId}') ?? [];
-      ovenImages = prefs.getStringList('ovenImages_${propertyId}') ?? [];
-      mattressImages =
-          prefs.getStringList('mattressImages_${propertyId}') ?? [];
-      upholstreyImages =
-          prefs.getStringList('upholstreyImages_${propertyId}') ?? [];
-      wallImages = prefs.getStringList('wallImages_${propertyId}') ?? [];
-      windowImages = prefs.getStringList('windowImages_${propertyId}') ?? [];
-      woodworkImages =
-          prefs.getStringList('woodworkImages_${propertyId}') ?? [];
+  Stream<List<String>> _getImagesFromFirestore(
+      String propertyId, String imageType) {
+    return FirebaseFirestore.instance
+        .collection('properties')
+        .doc(propertyId)
+        .collection('ScheduleOfCondition')
+        .doc(imageType)
+        .snapshots()
+        .map((snapshot) {
+      print("Firestore snapshot data for $imageType: ${snapshot.data()}");
+      if (snapshot.exists && snapshot.data() != null) {
+        return List<String>.from(snapshot.data()!['images'] ?? []);
+      }
+      return [];
     });
   }
 
@@ -111,12 +119,6 @@ class _ScheduleOfConditionState extends State<ScheduleOfCondition> {
       String propertyId, String key, String value) async {
     final prefs = await SharedPreferences.getInstance();
     prefs.setString('${key}_$propertyId', value);
-  }
-
-  Future<void> _savePreferenceList(
-      String propertyId, String key, List<String> value) async {
-    final prefs = await SharedPreferences.getInstance();
-    prefs.setStringList('${key}_$propertyId', value);
   }
 
   @override
@@ -138,7 +140,7 @@ class _ScheduleOfConditionState extends State<ScheduleOfCondition> {
             centerTitle: true,
             backgroundColor: bWhite,
             leading: GestureDetector(
-              onTap: (){
+              onTap: () {
                 showDialog(
                   context: context,
                   builder: (BuildContext context) {
@@ -164,7 +166,7 @@ class _ScheduleOfConditionState extends State<ScheduleOfCondition> {
                       ),
                       content: Text(
                         'You may lost your data if you exit the process '
-                            'without saving',
+                        'without saving',
                         style: TextStyle(
                           color: Colors.grey[800],
                           fontSize: 14,
@@ -174,7 +176,8 @@ class _ScheduleOfConditionState extends State<ScheduleOfCondition> {
                       ),
                       actions: <Widget>[
                         TextButton(
-                          child: Text('Cancel',
+                          child: Text(
+                            'Cancel',
                             style: TextStyle(
                               color: kPrimaryColor,
                               fontSize: 16,
@@ -190,8 +193,9 @@ class _ScheduleOfConditionState extends State<ScheduleOfCondition> {
                             Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) =>
-                                      EditReportPage(propertyId: widget.propertyId)), // Replace HomePage with your
+                                  builder: (context) => EditReportPage(
+                                      propertyId: widget
+                                          .propertyId)), // Replace HomePage with your
                               // home page
                               // widget
                             );
@@ -225,7 +229,7 @@ class _ScheduleOfConditionState extends State<ScheduleOfCondition> {
             ),
             actions: [
               GestureDetector(
-                onTap: (){
+                onTap: () {
                   showDialog(
                     context: context,
                     builder: (BuildContext context) {
@@ -251,7 +255,7 @@ class _ScheduleOfConditionState extends State<ScheduleOfCondition> {
                         ),
                         content: Text(
                           'Please Make Sure You Have Added All the Necessary '
-                              'Information',
+                          'Information',
                           style: TextStyle(
                             color: Colors.grey[800],
                             fontSize: 14,
@@ -261,7 +265,8 @@ class _ScheduleOfConditionState extends State<ScheduleOfCondition> {
                         ),
                         actions: <Widget>[
                           TextButton(
-                            child: Text('Cancel',
+                            child: Text(
+                              'Cancel',
                               style: TextStyle(
                                 color: kPrimaryColor,
                                 fontSize: 16,
@@ -277,8 +282,9 @@ class _ScheduleOfConditionState extends State<ScheduleOfCondition> {
                               Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) =>
-                                        EditReportPage(propertyId: widget.propertyId)), // Replace HomePage with your
+                                    builder: (context) => EditReportPage(
+                                        propertyId: widget
+                                            .propertyId)), // Replace HomePage with your
                                 // home page
                                 // widget
                               );
@@ -325,407 +331,803 @@ class _ScheduleOfConditionState extends State<ScheduleOfCondition> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Overview
-                  ConditionItem(
-                    name: "Overview",
-                    condition: overview,
-                    description: overview,
-                    images: overviewImages,
-                    onConditionSelected: (condition) {
-                      setState(() {
-                        overview = condition;
-                      });
-                      _savePreference(propertyId, 'overview', condition!);
-                    },
-                    onDescriptionSelected: (description) {
-                      setState(() {
-                        overview = description;
-                      });
-                      _savePreference(propertyId, 'overview', description!);
-                    },
-                    onImageAdded: (imagePath) {
-                      setState(() {
-                        overviewImages.add(imagePath);
-                      });
-                      _savePreferenceList(
-                          propertyId, 'overviewImages', overviewImages);
+                  StreamBuilder<List<String>>(
+                    stream:
+                        _getImagesFromFirestore(propertyId, 'overviewImages'),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return CircularProgressIndicator();
+                      }
+                      if (snapshot.hasError) {
+                        return Text('Error loading Yale images');
+                      }
+                      final overviewImages = snapshot.data ?? [];
+                      return ConditionItem(
+                          name: "Overview",
+                          condition: overview,
+                          description: overview,
+                          images: overviewImages,
+                          onConditionSelected: (condition) {
+                            setState(() {
+                              overview = condition;
+                            });
+                            _savePreference(propertyId, 'overview', condition!);
+                          },
+                          onDescriptionSelected: (description) {
+                            setState(() {
+                              overview = description;
+                            });
+                            _savePreference(
+                                propertyId, 'overview', description!);
+                          },
+                          onImageAdded: (imagePath) async {
+                            File imageFile = File(imagePath);
+                            String? downloadUrl = await uploadImageToFirebase(
+                                imageFile,
+                                propertyId,
+                                'ScheduleOfCondition',
+                                'overviewImages');
+
+                            if (downloadUrl != null) {
+                              print(
+                                  "Adding image URL to Firestore: $downloadUrl");
+                              FirebaseFirestore.instance
+                                  .collection('properties')
+                                  .doc(propertyId)
+                                  .collection('ScheduleOfCondition')
+                                  .doc('overviewImages')
+                                  .update({
+                                'images': FieldValue.arrayUnion([downloadUrl]),
+                              });
+                            }
+                          });
                     },
                   ),
 
                   // Accessory Cleanliness
-                  ConditionItem(
-                    name: "Accessory - Cleanliness",
-                    condition: accessoryCleanliness,
-                    description: accessoryCleanliness,
-                    images: accessoryCleanlinessImages,
-                    onConditionSelected: (condition) {
-                      setState(() {
-                        accessoryCleanliness = condition;
-                      });
-                      _savePreference(propertyId, 'accessoryCleanliness',
-                          condition!); // Save preference
-                    },
-                    onDescriptionSelected: (description) {
-                      setState(() {
-                        accessoryCleanliness = description;
-                      });
-                      _savePreference(propertyId, 'accessoryCleanliness',
-                          description!); // Save preference
-                    },
-                    onImageAdded: (imagePath) {
-                      setState(() {
-                        accessoryCleanlinessImages.add(imagePath);
-                      });
-                      _savePreferenceList(
-                          propertyId,
-                          'accessoryCleanlinessImages',
-                          accessoryCleanlinessImages); // Save preference
+                  StreamBuilder<List<String>>(
+                    stream: _getImagesFromFirestore(
+                        propertyId, 'accessoryCleanlinessImages'),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return CircularProgressIndicator();
+                      }
+                      if (snapshot.hasError) {
+                        return Text('Error loading Yale images');
+                      }
+                      final accessoryCleanlinessImages = snapshot.data ?? [];
+                      return ConditionItem(
+                          name: "Accessory Cleanliness",
+                          condition: accessoryCleanliness,
+                          description: accessoryCleanliness,
+                          images: accessoryCleanlinessImages,
+                          onConditionSelected: (condition) {
+                            setState(() {
+                              accessoryCleanliness = condition;
+                            });
+                            _savePreference(propertyId, ' accessoryCleanliness',
+                                condition!);
+                          },
+                          onDescriptionSelected: (description) {
+                            setState(() {
+                              accessoryCleanliness = description;
+                            });
+                            _savePreference(propertyId, 'accessoryCleanliness',
+                                description!);
+                          },
+                          onImageAdded: (imagePath) async {
+                            File imageFile = File(imagePath);
+                            String? downloadUrl = await uploadImageToFirebase(
+                                imageFile,
+                                propertyId,
+                                'ScheduleOfCondition',
+                                'accessoryCleanlinessImages');
+
+                            if (downloadUrl != null) {
+                              print(
+                                  "Adding image URL to Firestore: $downloadUrl");
+                              FirebaseFirestore.instance
+                                  .collection('properties')
+                                  .doc(propertyId)
+                                  .collection('ScheduleOfCondition')
+                                  .doc('accessoryCleanlinessImages')
+                                  .update({
+                                'images': FieldValue.arrayUnion([downloadUrl]),
+                              });
+                            }
+                          });
                     },
                   ),
 
                   // Window Sill
-                  ConditionItem(
-                    name: "Window Sill",
-                    condition: windowSill,
-                    description: windowSill,
-                    images: windowSillImages,
-                    onConditionSelected: (condition) {
-                      setState(() {
-                        windowSill = condition;
-                      });
-                      _savePreference(propertyId, 'windowSill',
-                          condition!); // Save preference
-                    },
-                    onDescriptionSelected: (description) {
-                      setState(() {
-                        windowSill = description;
-                      });
-                      _savePreference(propertyId, 'windowSill',
-                          description!); // Save preference
-                    },
-                    onImageAdded: (imagePath) {
-                      setState(() {
-                        windowSillImages.add(imagePath);
-                      });
-                      _savePreferenceList(propertyId, 'windowSillImages',
-                          windowSillImages); // Save preference
+                  StreamBuilder<List<String>>(
+                    stream:
+                        _getImagesFromFirestore(propertyId, 'windowSillImages'),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return CircularProgressIndicator();
+                      }
+                      if (snapshot.hasError) {
+                        return Text('Error loading Yale images');
+                      }
+                      final windowSillImages = snapshot.data ?? [];
+                      return ConditionItem(
+                          name: "Window Sill",
+                          condition: windowSill,
+                          description: windowSill,
+                          images: windowSillImages,
+                          onConditionSelected: (condition) {
+                            setState(() {
+                              windowSill = condition;
+                            });
+                            _savePreference(
+                                propertyId, 'windowSill,', condition!);
+                          },
+                          onDescriptionSelected: (description) {
+                            setState(() {
+                              windowSill = description;
+                            });
+                            _savePreference(
+                                propertyId, 'windowSill,', description!);
+                          },
+                          onImageAdded: (imagePath) async {
+                            File imageFile = File(imagePath);
+                            String? downloadUrl = await uploadImageToFirebase(
+                                imageFile,
+                                propertyId,
+                                'ScheduleOfCondition',
+                                'windowSillImages');
+
+                            if (downloadUrl != null) {
+                              print(
+                                  "Adding image URL to Firestore: $downloadUrl");
+                              FirebaseFirestore.instance
+                                  .collection('properties')
+                                  .doc(propertyId)
+                                  .collection('ScheduleOfCondition')
+                                  .doc('windowSillImages')
+                                  .update({
+                                'images': FieldValue.arrayUnion([downloadUrl]),
+                              });
+                            }
+                          });
                     },
                   ),
 
                   // Carpets
-                  ConditionItem(
-                    name: "Carpets",
-                    condition: carpets,
-                    description: carpets,
-                    images: carpetsImages,
-                    onConditionSelected: (condition) {
-                      setState(() {
-                        carpets = condition;
-                      });
-                      _savePreference(
-                          propertyId, 'carpets', condition!); // Save preference
-                    },
-                    onDescriptionSelected: (description) {
-                      setState(() {
-                        carpets = description;
-                      });
-                      _savePreference(propertyId, 'carpets',
-                          description!); // Save preference
-                    },
-                    onImageAdded: (imagePath) {
-                      setState(() {
-                        carpetsImages.add(imagePath);
-                      });
-                      _savePreferenceList(propertyId, 'carpetsImages',
-                          carpetsImages); // Save preference
+                  StreamBuilder<List<String>>(
+                    stream:
+                        _getImagesFromFirestore(propertyId, 'carpetsImages'),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return CircularProgressIndicator();
+                      }
+                      if (snapshot.hasError) {
+                        return Text('Error loading Yale images');
+                      }
+                      final carpetsImages = snapshot.data ?? [];
+                      return ConditionItem(
+                          name: "Carpets",
+                          condition: carpets,
+                          description: carpets,
+                          images: carpetsImages,
+                          onConditionSelected: (condition) {
+                            setState(() {
+                              carpets = condition;
+                            });
+                            _savePreference(propertyId, 'carpets', condition!);
+                          },
+                          onDescriptionSelected: (description) {
+                            setState(() {
+                              carpets = description;
+                            });
+                            _savePreference(
+                                propertyId, 'carpets', description!);
+                          },
+                          onImageAdded: (imagePath) async {
+                            File imageFile = File(imagePath);
+                            String? downloadUrl = await uploadImageToFirebase(
+                                imageFile,
+                                propertyId,
+                                'ScheduleOfCondition',
+                                'carpetsImages');
+
+                            if (downloadUrl != null) {
+                              print(
+                                  "Adding image URL to Firestore: $downloadUrl");
+                              FirebaseFirestore.instance
+                                  .collection('properties')
+                                  .doc(propertyId)
+                                  .collection('ScheduleOfCondition')
+                                  .doc('carpetsImages')
+                                  .update({
+                                'images': FieldValue.arrayUnion([downloadUrl]),
+                              });
+                            }
+                          });
                     },
                   ),
 
                   // Ceilings
-                  ConditionItem(
-                    name: "Ceilings",
-                    condition: ceilings,
-                    description: ceilings,
-                    images: ceilingsImages,
-                    onConditionSelected: (condition) {
-                      setState(() {
-                        ceilings = condition;
-                      });
-                      _savePreference(propertyId, 'ceilings',
-                          condition!); // Save preference
-                    },
-                    onDescriptionSelected: (description) {
-                      setState(() {
-                        ceilings = description;
-                      });
-                      _savePreference(propertyId, 'ceilings',
-                          description!); // Save preference
-                    },
-                    onImageAdded: (imagePath) {
-                      setState(() {
-                        ceilingsImages.add(imagePath);
-                      });
-                      _savePreferenceList(propertyId, 'ceilingsImages',
-                          ceilingsImages); // Save preference
+                  StreamBuilder<List<String>>(
+                    stream:
+                        _getImagesFromFirestore(propertyId, 'ceilingsImages'),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return CircularProgressIndicator();
+                      }
+                      if (snapshot.hasError) {
+                        return Text('Error loading Yale images');
+                      }
+                      final ceilingsImages = snapshot.data ?? [];
+                      return ConditionItem(
+                          name: "Ceilings",
+                          condition: ceilings,
+                          description: ceilings,
+                          images: ceilingsImages,
+                          onConditionSelected: (condition) {
+                            setState(() {
+                              ceilings = condition;
+                            });
+                            _savePreference(propertyId, 'ceilings', condition!);
+                          },
+                          onDescriptionSelected: (description) {
+                            setState(() {
+                              ceilings = description;
+                            });
+                            _savePreference(
+                                propertyId, 'ceilings', description!);
+                          },
+                          onImageAdded: (imagePath) async {
+                            File imageFile = File(imagePath);
+                            String? downloadUrl = await uploadImageToFirebase(
+                                imageFile,
+                                propertyId,
+                                'ScheduleOfCondition',
+                                'ceilingsImages');
+
+                            if (downloadUrl != null) {
+                              print(
+                                  "Adding image URL to Firestore: $downloadUrl");
+                              FirebaseFirestore.instance
+                                  .collection('properties')
+                                  .doc(propertyId)
+                                  .collection('ScheduleOfCondition')
+                                  .doc('ceilingsImages')
+                                  .update({
+                                'images': FieldValue.arrayUnion([downloadUrl]),
+                              });
+                            }
+                          });
                     },
                   ),
 
                   // Curtains
-                  ConditionItem(
-                    name: "Curtains",
-                    condition: curtains,
-                    description: curtains,
-                    images: curtainsImages,
-                    onConditionSelected: (condition) {
-                      setState(() {
-                        curtains = condition;
-                      });
-                      _savePreference(propertyId, 'curtains',
-                          condition!); // Save preference
-                    },
-                    onDescriptionSelected: (description) {
-                      setState(() {
-                        curtains = description;
-                      });
-                      _savePreference(propertyId, 'curtains',
-                          description!); // Save preference
-                    },
-                    onImageAdded: (imagePath) {
-                      setState(() {
-                        curtainsImages.add(imagePath);
-                      });
-                      _savePreferenceList(propertyId, 'curtainsImages',
-                          curtainsImages); // Save preference
+                  StreamBuilder<List<String>>(
+                    stream:
+                        _getImagesFromFirestore(propertyId, 'curtainsImages'),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return CircularProgressIndicator();
+                      }
+                      if (snapshot.hasError) {
+                        return Text('Error loading Yale images');
+                      }
+                      final curtainsImages = snapshot.data ?? [];
+                      return ConditionItem(
+                          name: "Curtains",
+                          condition: curtains,
+                          description: curtains,
+                          images: curtainsImages,
+                          onConditionSelected: (condition) {
+                            setState(() {
+                              curtains = condition;
+                            });
+                            _savePreference(propertyId, 'curtains', condition!);
+                          },
+                          onDescriptionSelected: (description) {
+                            setState(() {
+                              curtains = description;
+                            });
+                            _savePreference(
+                                propertyId, 'curtains', description!);
+                          },
+                          onImageAdded: (imagePath) async {
+                            File imageFile = File(imagePath);
+                            String? downloadUrl = await uploadImageToFirebase(
+                                imageFile,
+                                propertyId,
+                                'ScheduleOfCondition',
+                                'curtainsImages');
+
+                            if (downloadUrl != null) {
+                              print(
+                                  "Adding image URL to Firestore: $downloadUrl");
+                              FirebaseFirestore.instance
+                                  .collection('properties')
+                                  .doc(propertyId)
+                                  .collection('ScheduleOfCondition')
+                                  .doc('curtainsImages')
+                                  .update({
+                                'images': FieldValue.arrayUnion([downloadUrl]),
+                              });
+                            }
+                          });
                     },
                   ),
 
                   // Hard Flooring
-                  ConditionItem(
-                    name: "Hard Flooring",
-                    condition: hardFlooring,
-                    description: hardFlooring,
-                    images: hardFlooringImages,
-                    onConditionSelected: (condition) {
-                      setState(() {
-                        hardFlooring = condition;
-                      });
-                      _savePreference(propertyId, 'hardFlooring',
-                          condition!); // Save preference
-                    },
-                    onDescriptionSelected: (description) {
-                      setState(() {
-                        hardFlooring = description;
-                      });
-                      _savePreference(propertyId, 'hardFlooring',
-                          description!); // Save preference
-                    },
-                    onImageAdded: (imagePath) {
-                      setState(() {
-                        hardFlooringImages.add(imagePath);
-                      });
-                      _savePreferenceList(propertyId, 'hardFlooringImages',
-                          hardFlooringImages); // Save preference
+                  StreamBuilder<List<String>>(
+                    stream: _getImagesFromFirestore(
+                        propertyId, 'hardFlooringImages'),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return CircularProgressIndicator();
+                      }
+                      if (snapshot.hasError) {
+                        return Text('Error loading Yale images');
+                      }
+                      final hardFlooringImages = snapshot.data ?? [];
+                      return ConditionItem(
+                          name: "Hard Flooring",
+                          condition: hardFlooring,
+                          description: hardFlooring,
+                          images: hardFlooringImages,
+                          onConditionSelected: (condition) {
+                            setState(() {
+                              hardFlooring = condition;
+                            });
+                            _savePreference(
+                                propertyId, 'hardFlooring', condition!);
+                          },
+                          onDescriptionSelected: (description) {
+                            setState(() {
+                              hardFlooring = description;
+                            });
+                            _savePreference(
+                                propertyId, 'hardFlooring', description!);
+                          },
+                          onImageAdded: (imagePath) async {
+                            File imageFile = File(imagePath);
+                            String? downloadUrl = await uploadImageToFirebase(
+                                imageFile,
+                                propertyId,
+                                'ScheduleOfCondition',
+                                'hardFlooringImages');
+
+                            if (downloadUrl != null) {
+                              print(
+                                  "Adding image URL to Firestore: $downloadUrl");
+                              FirebaseFirestore.instance
+                                  .collection('properties')
+                                  .doc(propertyId)
+                                  .collection('ScheduleOfCondition')
+                                  .doc('overviewImages')
+                                  .update({
+                                'images': FieldValue.arrayUnion([downloadUrl]),
+                              });
+                            }
+                          });
                     },
                   ),
 
                   // Kitchen Area
-                  ConditionItem(
-                    name: "Kitchen Area",
-                    condition: kitchenArea,
-                    description: kitchenArea,
-                    images: kitchenAreaImages,
-                    onConditionSelected: (condition) {
-                      setState(() {
-                        kitchenArea = condition;
-                      });
-                      _savePreference(propertyId, 'kitchenArea',
-                          condition!); // Save preference
-                    },
-                    onDescriptionSelected: (description) {
-                      setState(() {
-                        kitchenArea = description;
-                      });
-                      _savePreference(propertyId, 'kitchenArea',
-                          description!); // Save preference
-                    },
-                    onImageAdded: (imagePath) {
-                      setState(() {
-                        kitchenAreaImages.add(imagePath);
-                      });
-                      _savePreferenceList(propertyId, 'kitchenAreaImages',
-                          kitchenAreaImages); // Save preference
+                  StreamBuilder<List<String>>(
+                    stream: _getImagesFromFirestore(
+                        propertyId, 'kitchenAreaImages'),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return CircularProgressIndicator();
+                      }
+                      if (snapshot.hasError) {
+                        return Text('Error loading Yale images');
+                      }
+                      final kitchenAreaImages = snapshot.data ?? [];
+                      return ConditionItem(
+                          name: "Kitchen Area",
+                          condition: kitchenArea,
+                          description: kitchenArea,
+                          images: kitchenAreaImages,
+                          onConditionSelected: (condition) {
+                            setState(() {
+                              kitchenArea = condition;
+                            });
+                            _savePreference(
+                                propertyId, 'kitchenArea', condition!);
+                          },
+                          onDescriptionSelected: (description) {
+                            setState(() {
+                              kitchenArea = description;
+                            });
+                            _savePreference(
+                                propertyId, 'kitchenArea', description!);
+                          },
+                          onImageAdded: (imagePath) async {
+                            File imageFile = File(imagePath);
+                            String? downloadUrl = await uploadImageToFirebase(
+                                imageFile,
+                                propertyId,
+                                'ScheduleOfCondition',
+                                'kitchenAreaImages');
+
+                            if (downloadUrl != null) {
+                              print(
+                                  "Adding image URL to Firestore: $downloadUrl");
+                              FirebaseFirestore.instance
+                                  .collection('properties')
+                                  .doc(propertyId)
+                                  .collection('ScheduleOfCondition')
+                                  .doc('kitchenAreaImages')
+                                  .update({
+                                'images': FieldValue.arrayUnion([downloadUrl]),
+                              });
+                            }
+                          });
                     },
                   ),
 
+                    StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'kitchenImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Yale images');
+                    }
+                    final kitchenImages = snapshot.data ?? [];
+                    return ConditionItem(
+                        name: "Kitchen",
+                        condition: kitchen,
+                        description: kitchen,
+                        images: kitchenImages,
+                        onConditionSelected: (condition) {
+                        setState(() {
+                          kitchen = condition;
+                        });
+                        _savePreference(propertyId, 'kitchen', condition!);
+                      },
+                        onDescriptionSelected: (description) {
+                        setState(() {
+                          kitchen = description;
+                        });
+                        _savePreference(propertyId, 'kitchen', description!);
+                      },
+                        onImageAdded: (imagePath) async {
+                          File imageFile = File(imagePath);
+                          String? downloadUrl = await uploadImageToFirebase(
+                              imageFile, propertyId,'ScheduleOfCondition', 'kitchenImages');
+
+                          if (downloadUrl != null) {
+                            print(
+                                "Adding image URL to Firestore: $downloadUrl");
+                            FirebaseFirestore.instance
+                                .collection('properties')
+                                .doc(propertyId)
+                                .collection('ScheduleOfCondition')
+                                .doc('kitchenImages')
+                                .update({
+                              'images': FieldValue.arrayUnion([downloadUrl]),
+                            });
+                          }
+                        });
+                  },
+                ),
                   // Oven
-                  ConditionItem(
-                    name: "Oven",
-                    condition: oven,
-                    description: oven,
-                    images: ovenImages,
-                    onConditionSelected: (condition) {
-                      setState(() {
-                        oven = condition;
-                      });
-                      _savePreference(
-                          propertyId, 'oven', condition!); // Save preference
-                    },
-                    onDescriptionSelected: (description) {
-                      setState(() {
-                        oven = description;
-                      });
-                      _savePreference(
-                          propertyId, 'oven', description!); // Save preference
-                    },
-                    onImageAdded: (imagePath) {
-                      setState(() {
-                        ovenImages.add(imagePath);
-                      });
-                      _savePreferenceList(propertyId, 'ovenImages',
-                          ovenImages); // Save preference
+                  StreamBuilder<List<String>>(
+                    stream: _getImagesFromFirestore(propertyId, 'ovenImages'),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return CircularProgressIndicator();
+                      }
+                      if (snapshot.hasError) {
+                        return Text('Error loading Yale images');
+                      }
+                      final ovenImages = snapshot.data ?? [];
+                      return ConditionItem(
+                          name: "Oven",
+                          condition: oven,
+                          description: oven,
+                          images: ovenImages,
+                          onConditionSelected: (condition) {
+                            setState(() {
+                              oven = condition;
+                            });
+                            _savePreference(propertyId, 'oven', condition!);
+                          },
+                          onDescriptionSelected: (description) {
+                            setState(() {
+                              oven = description;
+                            });
+                            _savePreference(propertyId, 'oven', description!);
+                          },
+                          onImageAdded: (imagePath) async {
+                            File imageFile = File(imagePath);
+                            String? downloadUrl = await uploadImageToFirebase(
+                                imageFile,
+                                propertyId,
+                                'ScheduleOfCondition',
+                                'ovenImages');
+
+                            if (downloadUrl != null) {
+                              print(
+                                  "Adding image URL to Firestore: $downloadUrl");
+                              FirebaseFirestore.instance
+                                  .collection('properties')
+                                  .doc(propertyId)
+                                  .collection('ScheduleOfCondition')
+                                  .doc('ovenImages')
+                                  .update({
+                                'images': FieldValue.arrayUnion([downloadUrl]),
+                              });
+                            }
+                          });
                     },
                   ),
 
                   // Mattress
-                  ConditionItem(
-                    name: "Mattress",
-                    condition: mattress,
-                    description: mattress,
-                    images: mattressImages,
-                    onConditionSelected: (condition) {
-                      setState(() {
-                        mattress = condition;
-                      });
-                      _savePreference(propertyId, 'mattress',
-                          condition!); // Save preference
-                    },
-                    onDescriptionSelected: (description) {
-                      setState(() {
-                        mattress = description;
-                      });
-                      _savePreference(propertyId, 'mattress',
-                          description!); // Save preference
-                    },
-                    onImageAdded: (imagePath) {
-                      setState(() {
-                        mattressImages.add(imagePath);
-                      });
-                      _savePreferenceList(propertyId, 'mattressImages',
-                          mattressImages); // Save preference
+                  StreamBuilder<List<String>>(
+                    stream:
+                        _getImagesFromFirestore(propertyId, 'mattressImages'),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return CircularProgressIndicator();
+                      }
+                      if (snapshot.hasError) {
+                        return Text('Error loading Yale images');
+                      }
+                      final mattressImages = snapshot.data ?? [];
+                      return ConditionItem(
+                          name: "Mattress",
+                          condition: mattress,
+                          description: mattress,
+                          images: mattressImages,
+                          onConditionSelected: (condition) {
+                            setState(() {
+                              mattress = condition;
+                            });
+                            _savePreference(propertyId, 'mattress', condition!);
+                          },
+                          onDescriptionSelected: (description) {
+                            setState(() {
+                              mattress = description;
+                            });
+                            _savePreference(
+                                propertyId, 'mattress', description!);
+                          },
+                          onImageAdded: (imagePath) async {
+                            File imageFile = File(imagePath);
+                            String? downloadUrl = await uploadImageToFirebase(
+                                imageFile,
+                                propertyId,
+                                'ScheduleOfCondition',
+                                'mattressImages');
+
+                            if (downloadUrl != null) {
+                              print(
+                                  "Adding image URL to Firestore: $downloadUrl");
+                              FirebaseFirestore.instance
+                                  .collection('properties')
+                                  .doc(propertyId)
+                                  .collection('ScheduleOfCondition')
+                                  .doc('mattressImages')
+                                  .update({
+                                'images': FieldValue.arrayUnion([downloadUrl]),
+                              });
+                            }
+                          });
                     },
                   ),
 
                   // Upholstrey
-                  ConditionItem(
-                    name: "Upholstrey",
-                    condition: upholstrey,
-                    description: upholstrey,
-                    images: upholstreyImages,
-                    onConditionSelected: (condition) {
-                      setState(() {
-                        upholstrey = condition;
-                      });
-                      _savePreference(propertyId, 'upholstrey',
-                          condition!); // Save preference
-                    },
-                    onDescriptionSelected: (description) {
-                      setState(() {
-                        upholstrey = description;
-                      });
-                      _savePreference(propertyId, 'upholstrey',
-                          description!); // Save preference
-                    },
-                    onImageAdded: (imagePath) {
-                      setState(() {
-                        upholstreyImages.add(imagePath);
-                      });
-                      _savePreferenceList(propertyId, 'upholstreyImages',
-                          upholstreyImages); // Save preference
+                  StreamBuilder<List<String>>(
+                    stream:
+                        _getImagesFromFirestore(propertyId, 'upholstreyImages'),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return CircularProgressIndicator();
+                      }
+                      if (snapshot.hasError) {
+                        return Text('Error loading Yale images');
+                      }
+                      final upholstreyImages = snapshot.data ?? [];
+                      return ConditionItem(
+                          name: " Upholstrey",
+                          condition: upholstrey,
+                          description: upholstrey,
+                          images: upholstreyImages,
+                          onConditionSelected: (condition) {
+                            setState(() {
+                              upholstrey = condition;
+                            });
+                            _savePreference(
+                                propertyId, 'upholstrey', condition!);
+                          },
+                          onDescriptionSelected: (description) {
+                            setState(() {
+                              upholstrey = description;
+                            });
+                            _savePreference(
+                                propertyId, 'upholstrey', description!);
+                          },
+                          onImageAdded: (imagePath) async {
+                            File imageFile = File(imagePath);
+                            String? downloadUrl = await uploadImageToFirebase(
+                                imageFile,
+                                propertyId,
+                                'ScheduleOfCondition',
+                                'upholstreyImages');
+
+                            if (downloadUrl != null) {
+                              print(
+                                  "Adding image URL to Firestore: $downloadUrl");
+                              FirebaseFirestore.instance
+                                  .collection('properties')
+                                  .doc(propertyId)
+                                  .collection('ScheduleOfCondition')
+                                  .doc('upholstreyImages')
+                                  .update({
+                                'images': FieldValue.arrayUnion([downloadUrl]),
+                              });
+                            }
+                          });
                     },
                   ),
 
                   // Wall
-                  ConditionItem(
-                    name: "Wall",
-                    condition: wall,
-                    description: wall,
-                    images: wallImages,
-                    onConditionSelected: (condition) {
-                      setState(() {
-                        wall = condition;
-                      });
-                      _savePreference(
-                          propertyId, 'wall', condition!); // Save preference
-                    },
-                    onDescriptionSelected: (description) {
-                      setState(() {
-                        wall = description;
-                      });
-                      _savePreference(
-                          propertyId, 'wall', description!); // Save preference
-                    },
-                    onImageAdded: (imagePath) {
-                      setState(() {
-                        wallImages.add(imagePath);
-                      });
-                      _savePreferenceList(propertyId, 'wallImages',
-                          wallImages); // Save preference
+                  StreamBuilder<List<String>>(
+                    stream: _getImagesFromFirestore(propertyId, 'wallImages'),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return CircularProgressIndicator();
+                      }
+                      if (snapshot.hasError) {
+                        return Text('Error loading Yale images');
+                      }
+                      final wallImages = snapshot.data ?? [];
+                      return ConditionItem(
+                          name: "Wall",
+                          condition: wall,
+                          description: wall,
+                          images: wallImages,
+                          onConditionSelected: (condition) {
+                            setState(() {
+                              wall = condition;
+                            });
+                            _savePreference(propertyId, 'wall', condition!);
+                          },
+                          onDescriptionSelected: (description) {
+                            setState(() {
+                              wall = description;
+                            });
+                            _savePreference(propertyId, 'wall', description!);
+                          },
+                          onImageAdded: (imagePath) async {
+                            File imageFile = File(imagePath);
+                            String? downloadUrl = await uploadImageToFirebase(
+                                imageFile,
+                                propertyId,
+                                'ScheduleOfCondition',
+                                'wallImages');
+
+                            if (downloadUrl != null) {
+                              print(
+                                  "Adding image URL to Firestore: $downloadUrl");
+                              FirebaseFirestore.instance
+                                  .collection('properties')
+                                  .doc(propertyId)
+                                  .collection('ScheduleOfCondition')
+                                  .doc('wallImages')
+                                  .update({
+                                'images': FieldValue.arrayUnion([downloadUrl]),
+                              });
+                            }
+                          });
                     },
                   ),
                   // Window
-                  ConditionItem(
-                    name: "Window",
-                    condition: window,
-                    description: window,
-                    images: windowImages,
-                    onConditionSelected: (condition) {
-                      setState(() {
-                        window = condition;
-                      });
-                      _savePreference(
-                          propertyId, 'window', condition!); // Save preference
-                    },
-                    onDescriptionSelected: (description) {
-                      setState(() {
-                        window = description;
-                      });
-                      _savePreference(propertyId, 'window',
-                          description!); // Save preference
-                    },
-                    onImageAdded: (imagePath) {
-                      setState(() {
-                        windowImages.add(imagePath);
-                      });
-                      _savePreferenceList(propertyId, 'windowImages',
-                          windowImages); // Save preference
+                  StreamBuilder<List<String>>(
+                    stream: _getImagesFromFirestore(propertyId, 'windowImages'),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return CircularProgressIndicator();
+                      }
+                      if (snapshot.hasError) {
+                        return Text('Error loading Yale images');
+                      }
+                      final windowImages = snapshot.data ?? [];
+                      return ConditionItem(
+                          name: "Window",
+                          condition: window,
+                          description: window,
+                          images: windowImages,
+                          onConditionSelected: (condition) {
+                            setState(() {
+                              window = condition;
+                            });
+                            _savePreference(propertyId, 'window', condition!);
+                          },
+                          onDescriptionSelected: (description) {
+                            setState(() {
+                              window = description;
+                            });
+                            _savePreference(propertyId, 'window', description!);
+                          },
+                          onImageAdded: (imagePath) async {
+                            File imageFile = File(imagePath);
+                            String? downloadUrl = await uploadImageToFirebase(
+                                imageFile,
+                                propertyId,
+                                'ScheduleOfCondition',
+                                'windowImages');
+
+                            if (downloadUrl != null) {
+                              print(
+                                  "Adding image URL to Firestore: $downloadUrl");
+                              FirebaseFirestore.instance
+                                  .collection('properties')
+                                  .doc(propertyId)
+                                  .collection('ScheduleOfCondition')
+                                  .doc('windowImages')
+                                  .update({
+                                'images': FieldValue.arrayUnion([downloadUrl]),
+                              });
+                            }
+                          });
                     },
                   ),
 
                   // Woodwork
-                  ConditionItem(
-                    name: "Woodwork",
-                    condition: woodwork,
-                    description: woodwork,
-                    images: woodworkImages,
-                    onConditionSelected: (condition) {
-                      setState(() {
-                        woodwork = condition;
-                      });
-                      _savePreference(propertyId, 'woodwork',
-                          condition!); // Save preference
-                    },
-                    onDescriptionSelected: (description) {
-                      setState(() {
-                        woodwork = description;
-                      });
-                      _savePreference(propertyId, 'woodwork',
-                          description!); // Save preference
-                    },
-                    onImageAdded: (imagePath) {
-                      setState(() {
-                        woodworkImages.add(imagePath);
-                      });
-                      _savePreferenceList(propertyId, 'woodworkImages',
-                          woodworkImages); // Save preference
+                  StreamBuilder<List<String>>(
+                    stream:
+                        _getImagesFromFirestore(propertyId, 'woodworkImages'),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return CircularProgressIndicator();
+                      }
+                      if (snapshot.hasError) {
+                        return Text('Error loading Yale images');
+                      }
+                      final woodworkImages = snapshot.data ?? [];
+                      return ConditionItem(
+                          name: "Woodwork",
+                          condition: woodwork,
+                          description: woodwork,
+                          images: woodworkImages,
+                          onConditionSelected: (condition) {
+                            setState(() {
+                              woodwork = condition;
+                            });
+                            _savePreference(propertyId, 'woodwork', condition!);
+                          },
+                          onDescriptionSelected: (description) {
+                            setState(() {
+                              woodwork = description;
+                            });
+                            _savePreference(
+                                propertyId, 'woodwork', description!);
+                          },
+                          onImageAdded: (imagePath) async {
+                            File imageFile = File(imagePath);
+                            String? downloadUrl = await uploadImageToFirebase(
+                                imageFile,
+                                propertyId,
+                                'ScheduleOfCondition',
+                                'woodworkImages');
+
+                            if (downloadUrl != null) {
+                              print(
+                                  "Adding image URL to Firestore: $downloadUrl");
+                              FirebaseFirestore.instance
+                                  .collection('properties')
+                                  .doc(propertyId)
+                                  .collection('ScheduleOfCondition')
+                                  .doc('woodworkImages')
+                                  .update({
+                                'images': FieldValue.arrayUnion([downloadUrl]),
+                              });
+                            }
+                          });
                     },
                   ),
 
@@ -901,9 +1303,9 @@ class ConditionItem extends StatelessWidget {
               ? Wrap(
                   spacing: 8.0,
                   runSpacing: 8.0,
-                  children: images.map((imagePath) {
-                    return Image.file(
-                      File(imagePath),
+                  children: images.map((imageUrl) {
+                    return Image.network(
+                      imageUrl,
                       width: 100,
                       height: 100,
                       fit: BoxFit.cover,

@@ -5,6 +5,8 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart'; // Import shared_preferences
 import 'package:taurgo_inventory/pages/conditions/condition_details.dart';
+import 'package:cloud_firestore/cloud_firestore.dart'; // Firestore
+import 'package:firebase_storage/firebase_storage.dart'; // Firebase Storage
 import 'package:taurgo_inventory/pages/edit_report_page.dart';
 import 'package:taurgo_inventory/pages/reportPages/camera_preview_page.dart';
 
@@ -19,6 +21,40 @@ class Lounge extends StatefulWidget {
 
   @override
   State<Lounge> createState() => _LoungeState();
+}
+
+Future<String?> uploadImageToFirebase(File imageFile, String propertyId,
+    String collectionName, String documentId) async {
+  try {
+    // Step 1: Upload the image to Firebase Storage
+    String fileName =
+        '${documentId}_${DateTime.now().millisecondsSinceEpoch}.jpg';
+    Reference storageReference = FirebaseStorage.instance
+        .ref()
+        .child('$propertyId/$collectionName/$documentId/$fileName');
+
+    UploadTask uploadTask = storageReference.putFile(imageFile);
+    TaskSnapshot snapshot = await uploadTask.whenComplete(() => null);
+
+    // Step 2: Get the download URL of the uploaded image
+    String downloadURL = await snapshot.ref.getDownloadURL();
+    print("Uploaded to Firebase: $downloadURL");
+
+    // Step 3: Save the download URL to Firestore
+    await FirebaseFirestore.instance
+        .collection('properties')
+        .doc(propertyId)
+        .collection(collectionName)
+        .doc(documentId)
+        .set({
+      'images': FieldValue.arrayUnion([downloadURL])
+    }, SetOptions(merge: true));
+
+    return downloadURL;
+  } catch (e) {
+    print("Error uploading image: $e");
+    return null;
+  }
 }
 
 class _LoungeState extends State<Lounge> {
@@ -68,93 +104,25 @@ class _LoungeState extends State<Lounge> {
     super.initState();
     loungecapturedImages = widget.loungecapturedImages ?? [];
     print("Property Id - SOC${widget.propertyId}");
-    _loadPreferences(widget.propertyId);
+
     // Load the saved preferences when the state is initialized
   }
 
-  // Function to load preferences
-  Future<void> _loadPreferences(String propertyId) async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      lougeDoorCondition = prefs.getString('doorCondition_${propertyId}');
-      loungedoorDescription =
-          prefs.getString('loungedoorDescription_${propertyId}');
-      loungedoorFrameCondition =
-          prefs.getString('loungedoorFrameCondition_${propertyId}');
-      loungedoorFrameDescription =
-          prefs.getString('loungedoorFrameDescription_${propertyId}');
-      loungeceilingCondition =
-          prefs.getString('loungeceilingCondition_${propertyId}');
-      loungeceilingDescription =
-          prefs.getString('loungeceilingDescription_${propertyId}');
-      loungelightingCondition =
-          prefs.getString('loungelightingCondition_${propertyId}');
-      loungelightingDescription =
-          prefs.getString('loungelightingDescription_${propertyId}');
-      loungewallsCondition =
-          prefs.getString('loungewallsCondition_${propertyId}');
-      loungewallsDescription =
-          prefs.getString('loungewallsDescription_${propertyId}');
-      loungeskirtingCondition =
-          prefs.getString('loungeskirtingCondition_${propertyId}');
-      loungeskirtingDescription =
-          prefs.getString('loungeskirtingDescription_${propertyId}');
-      loungewindowSillCondition =
-          prefs.getString('loungewindowSillCondition_${propertyId}');
-      loungewindowSillDescription =
-          prefs.getString('loungewindowSillDescription_${propertyId}');
-      loungecurtainsCondition =
-          prefs.getString('loungecurtainsCondition_${propertyId}');
-      loungecurtainsDescription =
-          prefs.getString('loungecurtainsDescription_${propertyId}');
-      loungeblindsCondition =
-          prefs.getString('loungeblindsCondition_${propertyId}');
-      loungeblindsDescription =
-          prefs.getString('loungeblindsDescription_${propertyId}');
-      loungelightSwitchesCondition =
-          prefs.getString('loungelightSwitchesCondition_${propertyId}');
-      loungelightSwitchesDescription =
-          prefs.getString('loungelightSwitchesDescription_${propertyId}');
-      loungesocketsCondition =
-          prefs.getString('loungesocketsCondition_${propertyId}');
-      loungesocketsDescription =
-          prefs.getString('loungesocketsDescription_${propertyId}');
-      loungeflooringCondition =
-          prefs.getString('loungeflooringCondition_${propertyId}');
-      loungeflooringDescription =
-          prefs.getString('loungeflooringDescription_${propertyId}');
-      loungeadditionalItemsCondition =
-          prefs.getString('loungeadditionalItemsCondition_${propertyId}');
-      loungeadditionalItemsDescription =
-          prefs.getString('loungeadditionalItemsDescription_${propertyId}');
-
-      loungedoorImages =
-          prefs.getStringList('loungedoorImages_${propertyId}') ?? [];
-      loungedoorFrameImages =
-          prefs.getStringList('loungedoorFrameImages_${propertyId}') ?? [];
-      loungeceilingImages =
-          prefs.getStringList('loungeceilingImages_${propertyId}') ?? [];
-      loungelightingImages =
-          prefs.getStringList('loungelightingImages_${propertyId}') ?? [];
-      loungewallsImages =
-          prefs.getStringList('loungewallsImages_${propertyId}') ?? [];
-      loungeskirtingImages =
-          prefs.getStringList('loungeskirtingImages_${propertyId}') ?? [];
-      loungewindowSillImages =
-          prefs.getStringList('loungewindowSillImages_${propertyId}') ?? [];
-      loungecurtainsImages =
-          prefs.getStringList('loungecurtainsImages_${propertyId}') ?? [];
-      loungeblindsImages =
-          prefs.getStringList('loungeblindsImages_${propertyId}') ?? [];
-      loungelightSwitchesImages =
-          prefs.getStringList('loungelightSwitchesImages_${propertyId}') ?? [];
-      loungesocketsImages =
-          prefs.getStringList('loungesocketsImages_${propertyId}') ?? [];
-      loungeflooringImages =
-          prefs.getStringList('loungeflooringImages_${propertyId}') ?? [];
-      loungeadditionalItemsImages =
-          prefs.getStringList('loungeadditionalItemsImages_${propertyId}') ??
-              [];
+  // Fetch images from Firestore
+  Stream<List<String>> _getImagesFromFirestore(
+      String propertyId, String imageType) {
+    return FirebaseFirestore.instance
+        .collection('properties')
+        .doc(propertyId)
+        .collection('lounge')
+        .doc(imageType)
+        .snapshots()
+        .map((snapshot) {
+      print("Firestore snapshot data for $imageType: ${snapshot.data()}");
+      if (snapshot.exists && snapshot.data() != null) {
+        return List<String>.from(snapshot.data()!['images'] ?? []);
+      }
+      return [];
     });
   }
 
@@ -163,12 +131,6 @@ class _LoungeState extends State<Lounge> {
       String propertyId, String key, String value) async {
     final prefs = await SharedPreferences.getInstance();
     prefs.setString('${key}_$propertyId', value);
-  }
-
-  Future<void> _savePreferenceList(
-      String propertyId, String key, List<String> value) async {
-    final prefs = await SharedPreferences.getInstance();
-    prefs.setStringList('${key}_$propertyId', value);
   }
 
   @override
@@ -187,7 +149,7 @@ class _LoungeState extends State<Lounge> {
         centerTitle: true,
         backgroundColor: bWhite,
         leading: GestureDetector(
-          onTap: (){
+          onTap: () {
             showDialog(
               context: context,
               builder: (BuildContext context) {
@@ -213,7 +175,7 @@ class _LoungeState extends State<Lounge> {
                   ),
                   content: Text(
                     'You may lost your data if you exit the process '
-                        'without saving',
+                    'without saving',
                     style: TextStyle(
                       color: Colors.grey[800],
                       fontSize: 14,
@@ -223,7 +185,8 @@ class _LoungeState extends State<Lounge> {
                   ),
                   actions: <Widget>[
                     TextButton(
-                      child: Text('Cancel',
+                      child: Text(
+                        'Cancel',
                         style: TextStyle(
                           color: kPrimaryColor,
                           fontSize: 16,
@@ -239,15 +202,16 @@ class _LoungeState extends State<Lounge> {
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                              builder: (context) =>
-                                  EditReportPage(propertyId: widget.propertyId)), // Replace HomePage with your
+                              builder: (context) => EditReportPage(
+                                  propertyId: widget
+                                      .propertyId)), // Replace HomePage with your
                           // home page
                           // widget
                         );
                       },
                       style: TextButton.styleFrom(
-                        padding: EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 8),
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                         backgroundColor: kPrimaryColor,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
@@ -274,7 +238,7 @@ class _LoungeState extends State<Lounge> {
         ),
         actions: [
           GestureDetector(
-            onTap: (){
+            onTap: () {
               showDialog(
                 context: context,
                 builder: (BuildContext context) {
@@ -300,7 +264,7 @@ class _LoungeState extends State<Lounge> {
                     ),
                     content: Text(
                       'Please Make Sure You Have Added All the Necessary '
-                          'Information',
+                      'Information',
                       style: TextStyle(
                         color: Colors.grey[800],
                         fontSize: 14,
@@ -310,7 +274,8 @@ class _LoungeState extends State<Lounge> {
                     ),
                     actions: <Widget>[
                       TextButton(
-                        child: Text('Cancel',
+                        child: Text(
+                          'Cancel',
                           style: TextStyle(
                             color: kPrimaryColor,
                             fontSize: 16,
@@ -326,15 +291,16 @@ class _LoungeState extends State<Lounge> {
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
-                                builder: (context) =>
-                                    EditReportPage(propertyId: widget.propertyId)), // Replace HomePage with your
+                                builder: (context) => EditReportPage(
+                                    propertyId: widget
+                                        .propertyId)), // Replace HomePage with your
                             // home page
                             // widget
                           );
                         },
                         style: TextButton.styleFrom(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 8),
+                          padding:
+                              EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                           backgroundColor: kPrimaryColor,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
@@ -374,380 +340,691 @@ class _LoungeState extends State<Lounge> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Door
-              ConditionItem(
-                name: "Door",
-                condition: lougeDoorCondition,
-                description: loungedoorDescription,
-                images: loungedoorImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    lougeDoorCondition = condition;
-                  });
-                  _savePreference(propertyId, 'doorCondition',
-                      condition!); // Save preference
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    loungedoorDescription = description;
-                  });
-                  _savePreference(propertyId, 'loungedoorDescription',
-                      description!); // Save preference
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    loungedoorImages.add(imagePath);
-                  });
-                  _savePreferenceList(
-                      propertyId, 'loungedoorImages', loungedoorImages);
+              StreamBuilder<List<String>>(
+                stream: _getImagesFromFirestore(propertyId, 'loungedoorImages'),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  }
+                  if (snapshot.hasError) {
+                    return Text('Error loading Door images');
+                  }
+                  final loungedoorImages = snapshot.data ?? [];
+                  return ConditionItem(
+                      name: "Door",
+                      condition: lougeDoorCondition,
+                      description: loungedoorDescription,
+                      images: loungedoorImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          lougeDoorCondition = condition;
+                        });
+                        _savePreference(
+                            propertyId, 'lougeDoorCondition', condition!);
+                      },
+                      onDescriptionSelected: (description) {
+                        setState(() {
+                          loungedoorDescription = description;
+                        });
+                        _savePreference(
+                            propertyId, 'loungedoorDescription', description!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile,
+                            propertyId,
+                            'lounge',
+                            'loungedoorImages');
+
+                        if (downloadUrl != null) {
+                          print("Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('lounge')
+                              .doc('loungedoorImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      });
                 },
               ),
-
               // Door Frame
-              ConditionItem(
-                name: "Door Frame",
-                condition: loungedoorFrameCondition,
-                description: loungedoorFrameDescription,
-                images: loungedoorFrameImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    loungedoorFrameCondition = condition;
-                  });
-                  _savePreference(propertyId, 'loungedoorFrameCondition',
-                      condition!); // Save preference
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    loungedoorFrameDescription = description;
-                  });
-                  _savePreference(propertyId, 'loungedoorFrameDescription',
-                      description!); // Save preference
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    loungedoorFrameImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId, 'loungedoorFrameImages',
-                      loungedoorFrameImages);
+              StreamBuilder<List<String>>(
+                stream: _getImagesFromFirestore(
+                    propertyId, 'loungedoorFrameImages'),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  }
+                  if (snapshot.hasError) {
+                    return Text('Error loading Door Frame images');
+                  }
+                  final loungedoorFrameImages = snapshot.data ?? [];
+                  return ConditionItem(
+                      name: "Door Frame",
+                      condition: loungedoorFrameCondition,
+                      description: loungedoorFrameDescription,
+                      images: loungedoorFrameImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          loungedoorFrameCondition = condition;
+                        });
+                        _savePreference(
+                            propertyId, 'loungedoorFrameCondition', condition!);
+                      },
+                      onDescriptionSelected: (description) {
+                        setState(() {
+                          loungedoorFrameDescription = description;
+                        });
+                        _savePreference(propertyId,
+                            'loungedoorFrameDescription', description!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile,
+                            propertyId,
+                            'lounge',
+                            'loungedoorFrameImages');
+
+                        if (downloadUrl != null) {
+                          print("Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('lounge')
+                              .doc('loungedoorFrameImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      });
                 },
               ),
-
               // Ceiling
-              ConditionItem(
-                name: "Ceiling",
-                condition: loungeceilingCondition,
-                description: loungeceilingDescription,
-                images: loungeceilingImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    loungeceilingCondition = condition;
-                  });
-                  _savePreference(propertyId, 'loungeceilingCondition',
-                      condition!); // Save preference
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    loungeceilingDescription = description;
-                  });
-                  _savePreference(propertyId, 'loungeceilingDescription',
-                      description!); // Save preference
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    loungeceilingImages.add(imagePath);
-                  });
-                  _savePreferenceList(
-                      propertyId, 'loungeceilingImages', loungeceilingImages);
+              StreamBuilder<List<String>>(
+                stream:
+                    _getImagesFromFirestore(propertyId, 'loungeceilingImages'),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  }
+                  if (snapshot.hasError) {
+                    return Text('Error loading Ceiling images');
+                  }
+                  final loungeceilingImages = snapshot.data ?? [];
+                  return ConditionItem(
+                      name: "Ceiling",
+                      condition: loungeceilingCondition,
+                      description: loungeceilingDescription,
+                      images: loungeceilingImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          loungeceilingCondition = condition;
+                        });
+                        _savePreference(
+                            propertyId, 'loungeceilingCondition', condition!);
+                      },
+                      onDescriptionSelected: (description) {
+                        setState(() {
+                          loungeceilingDescription = description;
+                        });
+                        _savePreference(propertyId, 'loungeceilingDescription',
+                            description!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile,
+                            propertyId,
+                            'lounge',
+                            'loungeceilingImages');
+
+                        if (downloadUrl != null) {
+                          print("Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('lounge')
+                              .doc('loungeceilingImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      });
                 },
               ),
-
               // Lighting
-              ConditionItem(
-                name: "Lighting",
-                condition: loungelightingCondition,
-                description: loungelightingDescription,
-                images: loungelightingImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    loungelightingCondition = condition;
-                  });
-                  _savePreference(propertyId, 'loungelightingCondition',
-                      condition!); // Save preference
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    loungelightingDescription = description;
-                  });
-                  _savePreference(propertyId, 'loungelightingDescription',
-                      description!); // Save preference
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    loungelightingImages.add(imagePath);
-                  });
-                  _savePreferenceList(
-                      propertyId, 'loungelightingImages', loungelightingImages);
+              StreamBuilder<List<String>>(
+                stream:
+                    _getImagesFromFirestore(propertyId, 'loungelightingImages'),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  }
+                  if (snapshot.hasError) {
+                    return Text('Error loading Lighting images');
+                  }
+                  final loungelightingImages = snapshot.data ?? [];
+                  return ConditionItem(
+                      name: "Lighting",
+                      condition: loungelightingCondition,
+                      description: loungelightingDescription,
+                      images: loungelightingImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          loungelightingCondition = condition;
+                        });
+                        _savePreference(
+                            propertyId, 'loungelightingCondition', condition!);
+                      },
+                      onDescriptionSelected: (description) {
+                        setState(() {
+                          loungelightingDescription = description;
+                        });
+                        _savePreference(propertyId, 'loungelightingDescription',
+                            description!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile,
+                            propertyId,
+                            'lounge',
+                            'loungelightingImages');
+
+                        if (downloadUrl != null) {
+                          print("Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('lounge')
+                              .doc('loungelightingImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      });
                 },
               ),
-
               // Walls
-              ConditionItem(
-                name: "Walls",
-                condition: loungewallsCondition,
-                description: loungewallsDescription,
-                images: loungewallsImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    loungewallsCondition = condition;
-                  });
-                  _savePreference(propertyId, 'loungewallsCondition',
-                      condition!); // Save preference
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    loungewallsDescription = description;
-                  });
-                  _savePreference(propertyId, 'loungewallsDescription',
-                      description!); // Save preference
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    loungewallsImages.add(imagePath);
-                  });
-                  _savePreferenceList(
-                      propertyId, 'loungewallsImages', loungewallsImages);
+              StreamBuilder<List<String>>(
+                stream:
+                    _getImagesFromFirestore(propertyId, 'loungewallsImages'),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  }
+                  if (snapshot.hasError) {
+                    return Text('Error loading Walls images');
+                  }
+                  final loungewallsImages = snapshot.data ?? [];
+                  return ConditionItem(
+                      name: "Walls",
+                      condition: loungewallsCondition,
+                      description: loungewallsDescription,
+                      images: loungewallsImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          loungewallsCondition = condition;
+                        });
+                        _savePreference(
+                            propertyId, 'loungewallsCondition', condition!);
+                      },
+                      onDescriptionSelected: (description) {
+                        setState(() {
+                          loungewallsDescription = description;
+                        });
+                        _savePreference(
+                            propertyId, 'loungewallsDescription', description!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile,
+                            propertyId,
+                            'lounge',
+                            'loungewallsImages');
+
+                        if (downloadUrl != null) {
+                          print("Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('lounge')
+                              .doc('loungewallsImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      });
                 },
               ),
-
               // Skirting
-              ConditionItem(
-                name: "Skirting",
-                condition: loungeskirtingCondition,
-                description: loungeskirtingDescription,
-                images: loungeskirtingImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    loungeskirtingCondition = condition;
-                  });
-                  _savePreference(propertyId, 'loungeskirtingCondition',
-                      condition!); // Save preference
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    loungeskirtingDescription = description;
-                  });
-                  _savePreference(propertyId, 'loungeskirtingDescription',
-                      description!); // Save preference
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    loungeskirtingImages.add(imagePath);
-                  });
-                  _savePreferenceList(
-                      propertyId, 'loungeskirtingImages', loungeskirtingImages);
+              StreamBuilder<List<String>>(
+                stream:
+                    _getImagesFromFirestore(propertyId, 'loungeskirtingImages'),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  }
+                  if (snapshot.hasError) {
+                    return Text('Error loading Skirting images');
+                  }
+                  final loungeskirtingImages = snapshot.data ?? [];
+                  return ConditionItem(
+                      name: "Skirting",
+                      condition: loungeskirtingCondition,
+                      description: loungeskirtingDescription,
+                      images: loungeskirtingImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          loungeskirtingCondition = condition;
+                        });
+                        _savePreference(
+                            propertyId, 'loungeskirtingCondition', condition!);
+                      },
+                      onDescriptionSelected: (description) {
+                        setState(() {
+                          loungeskirtingDescription = description;
+                        });
+                        _savePreference(propertyId, 'loungeskirtingDescription',
+                            description!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile,
+                            propertyId,
+                            'lounge',
+                            'loungeskirtingImages');
+
+                        if (downloadUrl != null) {
+                          print("Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('lounge')
+                              .doc('loungeskirtingImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      });
                 },
               ),
-
               // Window Sill
-              ConditionItem(
-                name: "Window Sill",
-                condition: loungewindowSillCondition,
-                description: loungewindowSillDescription,
-                images: loungewindowSillImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    loungewindowSillCondition = condition;
-                  });
-                  _savePreference(propertyId, 'loungewindowSillCondition',
-                      condition!); // Save preference
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    loungewindowSillDescription = description;
-                  });
-                  _savePreference(propertyId, 'loungewindowSillDescription',
-                      description!); // Save preference
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    loungewindowSillImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId, 'loungewindowSillImages',
-                      loungewindowSillImages);
+              StreamBuilder<List<String>>(
+                stream: _getImagesFromFirestore(
+                    propertyId, 'loungewindowSillImages'),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  }
+                  if (snapshot.hasError) {
+                    return Text('Error loading Window Sill images');
+                  }
+                  final loungewindowSillImages = snapshot.data ?? [];
+                  return ConditionItem(
+                      name: "Window Sill",
+                      condition: loungewindowSillCondition,
+                      description: loungewindowSillDescription,
+                      images: loungewindowSillImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          loungewindowSillCondition = condition;
+                        });
+                        _savePreference(propertyId, 'loungewindowSillCondition',
+                            condition!);
+                      },
+                      onDescriptionSelected: (description) {
+                        setState(() {
+                          loungewindowSillDescription = description;
+                        });
+                        _savePreference(propertyId,
+                            'loungewindowSillDescription', description!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile,
+                            propertyId,
+                            'lounge',
+                            'loungewindowSillImages');
+
+                        if (downloadUrl != null) {
+                          print("Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('lounge')
+                              .doc('loungewindowSillImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      });
                 },
               ),
-
               // Curtains
-              ConditionItem(
-                name: "Curtains",
-                condition: loungecurtainsCondition,
-                description: loungecurtainsDescription,
-                images: loungecurtainsImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    loungecurtainsCondition = condition;
-                  });
-                  _savePreference(propertyId, 'loungecurtainsCondition',
-                      condition!); // Save preference
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    loungecurtainsDescription = description;
-                  });
-                  _savePreference(propertyId, 'loungecurtainsDescription',
-                      description!); // Save preference
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    loungecurtainsImages.add(imagePath);
-                  });
-                  _savePreferenceList(
-                      propertyId, 'loungecurtainsImages', loungecurtainsImages);
+              StreamBuilder<List<String>>(
+                stream:
+                    _getImagesFromFirestore(propertyId, 'loungecurtainsImages'),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  }
+                  if (snapshot.hasError) {
+                    return Text('Error loading Curtains images');
+                  }
+                  final loungecurtainsImages = snapshot.data ?? [];
+                  return ConditionItem(
+                      name: "Curtains",
+                      condition: loungecurtainsCondition,
+                      description: loungecurtainsDescription,
+                      images: loungecurtainsImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          loungecurtainsCondition = condition;
+                        });
+                        _savePreference(
+                            propertyId, 'loungecurtainsCondition', condition!);
+                      },
+                      onDescriptionSelected: (description) {
+                        setState(() {
+                          loungecurtainsDescription = description;
+                        });
+                        _savePreference(propertyId, 'loungecurtainsDescription',
+                            description!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile,
+                            propertyId,
+                            'lounge',
+                            'loungecurtainsImages');
+
+                        if (downloadUrl != null) {
+                          print("Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('lounge')
+                              .doc('loungecurtainsImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      });
                 },
               ),
-
               // Blinds
-              ConditionItem(
-                name: "Blinds",
-                condition: loungeblindsCondition,
-                description: loungeblindsDescription,
-                images: loungeblindsImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    loungeblindsCondition = condition;
-                  });
-                  _savePreference(propertyId, 'loungeblindsCondition',
-                      condition!); // Save preference
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    loungeblindsDescription = description;
-                  });
-                  _savePreference(propertyId, 'loungeblindsDescription',
-                      description!); // Save preference
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    loungeblindsImages.add(imagePath);
-                  });
-                  _savePreferenceList(
-                      propertyId, 'loungeblindsImages', loungeblindsImages);
+              StreamBuilder<List<String>>(
+                stream:
+                    _getImagesFromFirestore(propertyId, 'loungeblindsImages'),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  }
+                  if (snapshot.hasError) {
+                    return Text('Error loading Blinds images');
+                  }
+                  final loungeblindsImages = snapshot.data ?? [];
+                  return ConditionItem(
+                      name: "Blinds",
+                      condition: loungeblindsCondition,
+                      description: loungeblindsDescription,
+                      images: loungeblindsImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          loungeblindsCondition = condition;
+                        });
+                        _savePreference(
+                            propertyId, 'loungeblindsCondition', condition!);
+                      },
+                      onDescriptionSelected: (description) {
+                        setState(() {
+                          loungeblindsDescription = description;
+                        });
+                        _savePreference(propertyId, 'loungeblindsDescription',
+                            description!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile,
+                            propertyId,
+                            'lounge',
+                            'loungeblindsImages');
+
+                        if (downloadUrl != null) {
+                          print("Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('lounge')
+                              .doc('loungeblindsImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      });
                 },
               ),
               // Light Switches
-              ConditionItem(
-                name: "Light Switches",
-                condition: loungelightSwitchesCondition,
-                description: loungelightSwitchesDescription,
-                images: loungelightSwitchesImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    loungelightSwitchesCondition = condition;
-                  });
-                  _savePreference(propertyId, 'loungelightSwitchesCondition',
-                      condition!); // Save preference
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    loungelightSwitchesDescription = description;
-                  });
-                  _savePreference(propertyId, 'loungelightSwitchesDescription',
-                      description!); // Save preference
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    loungelightSwitchesImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId, 'loungelightSwitchesImages',
-                      loungelightSwitchesImages);
+              StreamBuilder<List<String>>(
+                stream: _getImagesFromFirestore(
+                    propertyId, 'loungelightSwitchesImages'),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  }
+                  if (snapshot.hasError) {
+                    return Text('Error loading Light Switches images');
+                  }
+                  final loungelightSwitchesImages = snapshot.data ?? [];
+                  return ConditionItem(
+                      name: "Light Switches",
+                      condition: loungelightSwitchesCondition,
+                      description: loungelightSwitchesDescription,
+                      images: loungelightSwitchesImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          loungelightSwitchesCondition = condition;
+                        });
+                        _savePreference(propertyId,
+                            'loungelightSwitchesCondition', condition!);
+                      },
+                      onDescriptionSelected: (description) {
+                        setState(() {
+                          loungelightSwitchesDescription = description;
+                        });
+                        _savePreference(propertyId,
+                            'loungelightSwitchesDescription', description!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile,
+                            propertyId,
+                            'lounge',
+                            'loungelightSwitchesImages');
+
+                        if (downloadUrl != null) {
+                          print("Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('lounge')
+                              .doc('loungelightSwitchesImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      });
                 },
               ),
-
               // Sockets
-              ConditionItem(
-                name: "Sockets",
-                condition: loungesocketsCondition,
-                description: loungesocketsDescription,
-                images: loungesocketsImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    loungesocketsCondition = condition;
-                  });
-                  _savePreference(propertyId, 'loungesocketsCondition',
-                      condition!); // Save preference
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    loungesocketsDescription = description;
-                  });
-                  _savePreference(propertyId, 'loungesocketsDescription',
-                      description!); // Save preference
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    loungesocketsImages.add(imagePath);
-                  });
-                  _savePreferenceList(
-                      propertyId, 'loungesocketsImages', loungesocketsImages);
+              StreamBuilder<List<String>>(
+                stream:
+                    _getImagesFromFirestore(propertyId, 'loungesocketsImages'),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  }
+                  if (snapshot.hasError) {
+                    return Text('Error loading Sockets images');
+                  }
+                  final loungesocketsImages = snapshot.data ?? [];
+                  return ConditionItem(
+                      name: "Sockets",
+                      condition: loungesocketsCondition,
+                      description: loungesocketsDescription,
+                      images: loungesocketsImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          loungesocketsCondition = condition;
+                        });
+                        _savePreference(
+                            propertyId, 'loungesocketsCondition', condition!);
+                      },
+                      onDescriptionSelected: (description) {
+                        setState(() {
+                          loungesocketsDescription = description;
+                        });
+                        _savePreference(propertyId, 'loungesocketsDescription',
+                            description!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile,
+                            propertyId,
+                            'lounge',
+                            'loungesocketsImages');
+
+                        if (downloadUrl != null) {
+                          print("Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('lounge')
+                              .doc('loungesocketsImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      });
                 },
               ),
-
               // Flooring
-              ConditionItem(
-                name: "Flooring",
-                condition: loungeflooringCondition,
-                description: loungeflooringDescription,
-                images: loungeflooringImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    loungeflooringCondition = condition;
-                  });
-                  _savePreference(propertyId, 'loungeflooringCondition',
-                      condition!); // Save preference
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    loungeflooringDescription = description;
-                  });
-                  _savePreference(propertyId, 'loungeflooringDescription',
-                      description!); // Save preference
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    loungeflooringImages.add(imagePath);
-                  });
-                  _savePreferenceList(
-                      propertyId, 'loungeflooringImages', loungeflooringImages);
+              StreamBuilder<List<String>>(
+                stream:
+                    _getImagesFromFirestore(propertyId, 'loungeflooringImages'),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  }
+                  if (snapshot.hasError) {
+                    return Text('Error loading Flooring images');
+                  }
+                  final loungeflooringImages = snapshot.data ?? [];
+                  return ConditionItem(
+                      name: "Flooring",
+                      condition: loungeflooringCondition,
+                      description: loungeflooringDescription,
+                      images: loungeflooringImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          loungeflooringCondition = condition;
+                        });
+                        _savePreference(
+                            propertyId, 'loungeflooringCondition', condition!);
+                      },
+                      onDescriptionSelected: (description) {
+                        setState(() {
+                          loungeflooringDescription = description;
+                        });
+                        _savePreference(propertyId, 'loungeflooringDescription',
+                            description!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile,
+                            propertyId,
+                            'lounge',
+                            'loungeflooringImages');
+
+                        if (downloadUrl != null) {
+                          print("Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('lounge')
+                              .doc('loungeflooringImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      });
                 },
               ),
-
               // Additional Items
-              ConditionItem(
-                name: "Additional Items",
-                condition: loungeadditionalItemsCondition,
-                description: loungeadditionalItemsDescription,
-                images: loungeadditionalItemsImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    loungeadditionalItemsCondition = condition;
-                  });
-                  _savePreference(propertyId, 'loungeadditionalItemsCondition',
-                      condition!); // Save preference
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    loungeadditionalItemsDescription = description;
-                  });
-                  _savePreference(
-                      propertyId,
-                      'loungeadditionalItemsDescription',
-                      description!); // Save preference
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    loungeadditionalItemsImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId, 'loungeadditionalItemsImages',
-                      loungeadditionalItemsImages);
+              StreamBuilder<List<String>>(
+                stream: _getImagesFromFirestore(
+                    propertyId, 'loungeadditionalItemsImages'),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  }
+                  if (snapshot.hasError) {
+                    return Text('Error loading Additional Items images');
+                  }
+                  final loungeadditionalItemsImages = snapshot.data ?? [];
+                  return ConditionItem(
+                      name: "Additional Items",
+                      condition: loungeadditionalItemsCondition,
+                      description: loungeadditionalItemsDescription,
+                      images: loungeadditionalItemsImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          loungeadditionalItemsCondition = condition;
+                        });
+                        _savePreference(propertyId,
+                            'loungeadditionalItemsCondition', condition!);
+                      },
+                      onDescriptionSelected: (description) {
+                        setState(() {
+                          loungeadditionalItemsDescription = description;
+                        });
+                        _savePreference(propertyId,
+                            'loungeadditionalItemsDescription', description!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile,
+                            propertyId,
+                            'lounge',
+                            'loungeadditionalItemsImages');
+
+                        if (downloadUrl != null) {
+                          print("Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('lounge')
+                              .doc('loungeadditionalItemsImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      });
                 },
               ),
 
@@ -920,26 +1197,26 @@ class ConditionItem extends StatelessWidget {
           ),
           images.isNotEmpty
               ? Wrap(
-            spacing: 8.0,
-            runSpacing: 8.0,
-            children: images.map((imagePath) {
-              return Image.file(
-                File(imagePath),
-                width: 100,
-                height: 100,
-                fit: BoxFit.cover,
-              );
-            }).toList(),
-          )
+                  spacing: 8.0,
+                  runSpacing: 8.0,
+                  children: images.map((imageUrl) {
+                    return Image.network(
+                      imageUrl,
+                      width: 100,
+                      height: 100,
+                      fit: BoxFit.cover,
+                    );
+                  }).toList(),
+                )
               : Text(
-            "No images selected",
-            style: TextStyle(
-              fontSize: 12.0,
-              fontWeight: FontWeight.w700,
-              color: kPrimaryTextColourTwo,
-              fontStyle: FontStyle.italic,
-            ),
-          ),
+                  "No images selected",
+                  style: TextStyle(
+                    fontSize: 12.0,
+                    fontWeight: FontWeight.w700,
+                    color: kPrimaryTextColourTwo,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
           Divider(thickness: 1, color: Color(0xFFC2C2C2)),
         ],
       ),

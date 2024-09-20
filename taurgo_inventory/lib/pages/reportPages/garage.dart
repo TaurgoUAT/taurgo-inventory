@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:camera/camera.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart'; // Import shared_preferences
 import 'package:taurgo_inventory/pages/conditions/condition_details.dart';
@@ -82,88 +84,57 @@ class _GarageState extends State<Garage> {
     super.initState();
     capturedImages = widget.capturedImages ?? [];
     print("Property Id - SOC${widget.propertyId}");
-    _loadPreferences(widget.propertyId);
     // Load the saved preferences when the state is initialized
   }
 
-  // Function to load preferences
-  Future<void> _loadPreferences(String propertyId) async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      newdoor = prefs.getString('newdoor_${propertyId}');
-      garageDoorCondition = prefs.getString('doorCondition_${propertyId}');
-      garageDoorDescription = prefs.getString('doorDescription_${propertyId}');
-      garageDoorFrameCondition =
-          prefs.getString('doorFrameCondition_${propertyId}');
-      garageDoorFrameDescription =
-          prefs.getString('doorFrameDescription_${propertyId}');
-      garageceilingCondition =
-          prefs.getString('ceilingCondition_${propertyId}');
-      garageceilingDescription =
-          prefs.getString('ceilingDescription_${propertyId}');
-      garagelightingCondition =
-          prefs.getString('lightingCondition_${propertyId}');
-      garagelightingDescription =
-          prefs.getString('lightingDescription_${propertyId}');
-      garagewallsCondition = prefs.getString('wallsCondition_${propertyId}');
-      garagewallsDescription =
-          prefs.getString('wallsDescription_${propertyId}');
-      garageskirtingCondition =
-          prefs.getString('skirtingCondition_${propertyId}');
-      garageskirtingDescription =
-          prefs.getString('skirtingDescription_${propertyId}');
-      garagewindowSillCondition =
-          prefs.getString('windowSillCondition_${propertyId}');
-      garagewindowSillDescription =
-          prefs.getString('windowSillDescription_${propertyId}');
-      garagecurtainsCondition =
-          prefs.getString('curtainsCondition_${propertyId}');
-      garagecurtainsDescription =
-          prefs.getString('curtainsDescription_${propertyId}');
-      garageblindsCondition = prefs.getString('blindsCondition_${propertyId}');
-      garageblindsDescription =
-          prefs.getString('blindsDescription_${propertyId}');
-      garagelightSwitchesCondition =
-          prefs.getString('lightSwitchesCondition_${propertyId}');
-      garagelightSwitchesDescription =
-          prefs.getString('lightSwitchesDescription_${propertyId}');
-      garagesocketsCondition =
-          prefs.getString('socketsCondition_${propertyId}');
-      garagesocketsDescription =
-          prefs.getString('socketsDescription_${propertyId}');
-      garageflooringCondition =
-          prefs.getString('flooringCondition_${propertyId}');
-      garageflooringDescription =
-          prefs.getString('flooringDescription_${propertyId}');
-      garageadditionalItemsCondition =
-          prefs.getString('additionalItemsCondition_${propertyId}');
-      garageadditionalItemsDescription =
-          prefs.getString('additionalItemsDescription_${propertyId}');
+  Future<String?> uploadImageToFirebase(File imageFile, String propertyId,
+      String collectionName, String documentId) async {
+    try {
+      // Step 1: Upload the image to Firebase Storage
+      String fileName =
+          '${documentId}_${DateTime.now().millisecondsSinceEpoch}.jpg';
+      Reference storageReference = FirebaseStorage.instance
+          .ref()
+          .child('$propertyId/$collectionName/$documentId/$fileName');
 
-      garagedoorFrameImages =
-          prefs.getStringList('doorFrameImages_${propertyId}') ?? [];
-      garageceilingImages =
-          prefs.getStringList('ceilingImages_${propertyId}') ?? [];
-      garagelightingImages =
-          prefs.getStringList('lightingImages_${propertyId}') ?? [];
-      garagewallsImages =
-          prefs.getStringList('wallsImages_${propertyId}') ?? [];
-      garageskirtingImages =
-          prefs.getStringList('skirtingImages_${propertyId}') ?? [];
-      garagewindowSillImages =
-          prefs.getStringList('windowSillImages_${propertyId}') ?? [];
-      garagecurtainsImages =
-          prefs.getStringList('curtainsImages_${propertyId}') ?? [];
-      garageblindsImages =
-          prefs.getStringList('blindsImages_${propertyId}') ?? [];
-      garagelightSwitchesImages =
-          prefs.getStringList('lightSwitchesImages_${propertyId}') ?? [];
-      garagesocketsImages =
-          prefs.getStringList('socketsImages_${propertyId}') ?? [];
-      garageflooringImages =
-          prefs.getStringList('flooringImages_${propertyId}') ?? [];
-      garageadditionalItemsImages =
-          prefs.getStringList('additionalItemsImages_${propertyId}') ?? [];
+      UploadTask uploadTask = storageReference.putFile(imageFile);
+      TaskSnapshot snapshot = await uploadTask.whenComplete(() => null);
+
+      // Step 2: Get the download URL of the uploaded image
+      String downloadURL = await snapshot.ref.getDownloadURL();
+      print("Uploaded to Firebase: $downloadURL");
+
+      // Step 3: Save the download URL to Firestore
+      await FirebaseFirestore.instance
+          .collection('properties')
+          .doc(propertyId)
+          .collection(collectionName)
+          .doc(documentId)
+          .set({
+        'images': FieldValue.arrayUnion([downloadURL])
+      }, SetOptions(merge: true));
+
+      return downloadURL;
+    } catch (e) {
+      print("Error uploading image: $e");
+      return null;
+    }
+  }
+
+  Stream<List<String>> _getImagesFromFirestore(
+      String propertyId, String imageType) {
+    return FirebaseFirestore.instance
+        .collection('properties')
+        .doc(propertyId)
+        .collection('garage')
+        .doc(imageType)
+        .snapshots()
+        .map((snapshot) {
+      print("Firestore snapshot data for $imageType: ${snapshot.data()}");
+      if (snapshot.exists && snapshot.data() != null) {
+        return List<String>.from(snapshot.data()!['images'] ?? []);
+      }
+      return [];
     });
   }
 
@@ -172,12 +143,6 @@ class _GarageState extends State<Garage> {
       String propertyId, String key, String value) async {
     final prefs = await SharedPreferences.getInstance();
     prefs.setString('${key}_$propertyId', value);
-  }
-
-  Future<void> _savePreferenceList(
-      String propertyId, String key, List<String> value) async {
-    final prefs = await SharedPreferences.getInstance();
-    prefs.setStringList('${key}_$propertyId', value);
   }
 
   @override
@@ -198,7 +163,7 @@ class _GarageState extends State<Garage> {
             centerTitle: true,
             backgroundColor: bWhite,
             leading: GestureDetector(
-              onTap: (){
+              onTap: () {
                 showDialog(
                   context: context,
                   builder: (BuildContext context) {
@@ -224,7 +189,7 @@ class _GarageState extends State<Garage> {
                       ),
                       content: Text(
                         'You may lost your data if you exit the process '
-                            'without saving',
+                        'without saving',
                         style: TextStyle(
                           color: Colors.grey[800],
                           fontSize: 14,
@@ -234,7 +199,8 @@ class _GarageState extends State<Garage> {
                       ),
                       actions: <Widget>[
                         TextButton(
-                          child: Text('Cancel',
+                          child: Text(
+                            'Cancel',
                             style: TextStyle(
                               color: kPrimaryColor,
                               fontSize: 16,
@@ -250,8 +216,9 @@ class _GarageState extends State<Garage> {
                             Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) =>
-                                      EditReportPage(propertyId: widget.propertyId)), // Replace HomePage with your
+                                  builder: (context) => EditReportPage(
+                                      propertyId: widget
+                                          .propertyId)), // Replace HomePage with your
                               // home page
                               // widget
                             );
@@ -285,7 +252,7 @@ class _GarageState extends State<Garage> {
             ),
             actions: [
               GestureDetector(
-                onTap: (){
+                onTap: () {
                   showDialog(
                     context: context,
                     builder: (BuildContext context) {
@@ -311,7 +278,7 @@ class _GarageState extends State<Garage> {
                         ),
                         content: Text(
                           'Please Make Sure You Have Added All the Necessary '
-                              'Information',
+                          'Information',
                           style: TextStyle(
                             color: Colors.grey[800],
                             fontSize: 14,
@@ -321,7 +288,8 @@ class _GarageState extends State<Garage> {
                         ),
                         actions: <Widget>[
                           TextButton(
-                            child: Text('Cancel',
+                            child: Text(
+                              'Cancel',
                               style: TextStyle(
                                 color: kPrimaryColor,
                                 fontSize: 16,
@@ -337,8 +305,9 @@ class _GarageState extends State<Garage> {
                               Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) =>
-                                        EditReportPage(propertyId: widget.propertyId)), // Replace HomePage with your
+                                    builder: (context) => EditReportPage(
+                                        propertyId: widget
+                                            .propertyId)), // Replace HomePage with your
                                 // home page
                                 // widget
                               );
@@ -385,377 +354,712 @@ class _GarageState extends State<Garage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Door
-                  ConditionItem(
-                    name: "Door",
-                    condition: garageDoorCondition,
-                    description: newdoor,
-                    images: garagedoorImages,
-                    onConditionSelected: (condition) {
-                      setState(() {
-                        garageDoorCondition = condition;
-                      });
-                      _savePreference(propertyId, 'doorCondition', condition!);
-                    },
-                    onDescriptionSelected: (description) {
-                      setState(() {
-                        newdoor = description;
-                      });
-                      _savePreference(propertyId, 'newdoor', description!);
-                    },
-                    onImageAdded: (imagePath) {
-                      setState(() {
-                        garagedoorImages.add(imagePath);
-                      });
-                      _savePreferenceList(
-                          propertyId, 'doorImages', garagedoorImages);
+                  StreamBuilder<List<String>>(
+                    stream: _getImagesFromFirestore(propertyId, 'garagedoorImages'),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return CircularProgressIndicator();
+                      }
+                      if (snapshot.hasError) {
+                        return Text('Error loading Yale images');
+                      }
+                      final garagedoorImages = snapshot.data ?? [];
+                      return ConditionItem(
+                          name: "Door",
+                          condition: garageDoorCondition,
+                          description: garageDoorCondition,
+                          images: garagedoorImages,
+                          onConditionSelected: (condition) {
+                            setState(() {
+                              garageDoorCondition = condition;
+                            });
+                            _savePreference(
+                                propertyId, 'garageDoorCondition', condition!);
+                          },
+                          onDescriptionSelected: (description) {
+                            setState(() {
+                              garageDoorCondition = description;
+                            });
+                            _savePreference(propertyId, 'garageDoorCondition',
+                                description!);
+                          },
+                          onImageAdded: (imagePath) async {
+                            File imageFile = File(imagePath);
+                            String? downloadUrl = await uploadImageToFirebase(
+                                imageFile, propertyId, 'garage', 'garagedoorImages');
+
+                            if (downloadUrl != null) {
+                              print(
+                                  "Adding image URL to Firestore: $downloadUrl");
+                              FirebaseFirestore.instance
+                                  .collection('properties')
+                                  .doc(propertyId)
+                                  .collection('garage')
+                                  .doc('garagedoorImages')
+                                  .update({
+                                'images': FieldValue.arrayUnion([downloadUrl]),
+                              });
+                            }
+                          });
                     },
                   ),
 
                   // Door Frame
-                  ConditionItem(
-                    name: "Door Frame",
-                    condition: garageDoorFrameCondition,
-                    description: garageDoorFrameDescription,
-                    images: garagedoorFrameImages,
-                    onConditionSelected: (condition) {
-                      setState(() {
-                        garageDoorFrameCondition = condition;
-                      });
-                      _savePreference(propertyId, 'doorFrameCondition',
-                          condition!); // Save preference
-                    },
-                    onDescriptionSelected: (description) {
-                      setState(() {
-                        garageDoorFrameDescription = description;
-                      });
-                      _savePreference(propertyId, 'doorFrameDescription',
-                          description!); // Save preference
-                    },
-                    onImageAdded: (imagePath) {
-                      setState(() {
-                        garagedoorFrameImages.add(imagePath);
-                      });
-                      _savePreferenceList(propertyId, 'doorFrameImages',
-                          garagedoorFrameImages); // Save preference
+                  StreamBuilder<List<String>>(
+                    stream: _getImagesFromFirestore(
+                        propertyId, 'garagedoorFrameImages'),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return CircularProgressIndicator();
+                      }
+                      if (snapshot.hasError) {
+                        return Text('Error loading Yale images');
+                      }
+                      final garagedoorFrameImages = snapshot.data ?? [];
+                      return ConditionItem(
+                          name: "Door Frame",
+                          condition: garageDoorFrameCondition,
+                          description: garageDoorFrameCondition,
+                          images: garagedoorFrameImages,
+                          onConditionSelected: (condition) {
+                            setState(() {
+                              garageDoorFrameCondition = condition;
+                            });
+                            _savePreference(propertyId,
+                                'garageDoorFrameCondition', condition!);
+                          },
+                          onDescriptionSelected: (description) {
+                            setState(() {
+                              garageDoorFrameCondition = description;
+                            });
+                            _savePreference(propertyId,
+                                'garageDoorFrameCondition', description!);
+                          },
+                          onImageAdded: (imagePath) async {
+                            File imageFile = File(imagePath);
+                            String? downloadUrl = await uploadImageToFirebase(
+                                imageFile,
+                                propertyId,
+                                'garage',
+                                'garagedoorFrameImages');
+
+                            if (downloadUrl != null) {
+                              print(
+                                  "Adding image URL to Firestore: $downloadUrl");
+                              FirebaseFirestore.instance
+                                  .collection('properties')
+                                  .doc(propertyId)
+                                  .collection('garage')
+                                  .doc('garagedoorFrameImages')
+                                  .update({
+                                'images': FieldValue.arrayUnion([downloadUrl]),
+                              });
+                            }
+                          });
                     },
                   ),
 
                   // Ceiling
-                  ConditionItem(
-                    name: "Ceiling",
-                    condition: garageceilingCondition,
-                    description: garageceilingDescription,
-                    images: garageceilingImages,
-                    onConditionSelected: (condition) {
-                      setState(() {
-                        garageceilingCondition = condition;
-                      });
-                      _savePreference(propertyId, 'ceilingCondition',
-                          condition!); // Save preference
-                    },
-                    onDescriptionSelected: (description) {
-                      setState(() {
-                        garageceilingDescription = description;
-                      });
-                      _savePreference(propertyId, 'ceilingDescription',
-                          description!); // Save preference
-                    },
-                    onImageAdded: (imagePath) {
-                      setState(() {
-                        garageceilingImages.add(imagePath);
-                      });
-                      _savePreferenceList(propertyId, 'lightingImages',
-                          garageceilingImages); // Save preference
+                  StreamBuilder<List<String>>(
+                    stream: _getImagesFromFirestore(
+                        propertyId, 'garageceilingImages'),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return CircularProgressIndicator();
+                      }
+                      if (snapshot.hasError) {
+                        return Text('Error loading Yale images');
+                      }
+                      final garageceilingImages = snapshot.data ?? [];
+                      return ConditionItem(
+                          name: "Ceiling",
+                          condition: garageceilingCondition,
+                          description: garageceilingCondition,
+                          images: garageceilingImages,
+                          onConditionSelected: (condition) {
+                            setState(() {
+                              garageceilingCondition = condition;
+                            });
+                            _savePreference(propertyId,
+                                'garageceilingCondition', condition!);
+                          },
+                          onDescriptionSelected: (description) {
+                            setState(() {
+                              garageceilingCondition = description;
+                            });
+                            _savePreference(propertyId,
+                                'garageceilingCondition', description!);
+                          },
+                          onImageAdded: (imagePath) async {
+                            File imageFile = File(imagePath);
+                            String? downloadUrl = await uploadImageToFirebase(
+                                imageFile,
+                                propertyId,
+                                'garage',
+                                'garageceilingImages');
+
+                            if (downloadUrl != null) {
+                              print(
+                                  "Adding image URL to Firestore: $downloadUrl");
+                              FirebaseFirestore.instance
+                                  .collection('properties')
+                                  .doc(propertyId)
+                                  .collection('garage')
+                                  .doc('garageceilingImages')
+                                  .update({
+                                'images': FieldValue.arrayUnion([downloadUrl]),
+                              });
+                            }
+                          });
                     },
                   ),
 
                   // Lighting
-                  ConditionItem(
-                    name: "Lighting",
-                    condition: garagelightingCondition,
-                    description: garagelightingDescription,
-                    images: garagelightingImages,
-                    onConditionSelected: (condition) {
-                      setState(() {
-                        garagelightingCondition = condition;
-                      });
-                      _savePreference(propertyId, 'lightingCondition',
-                          condition!); // Save preference
-                    },
-                    onDescriptionSelected: (description) {
-                      setState(() {
-                        garagelightingDescription = description;
-                      });
-                      _savePreference(propertyId, 'lightingDescription',
-                          description!); // Save preference
-                    },
-                    onImageAdded: (imagePath) {
-                      setState(() {
-                        garagelightingImages.add(imagePath);
-                      });
-                      _savePreferenceList(propertyId, 'lightingImages',
-                          garagelightingImages); // Save preference
+                  StreamBuilder<List<String>>(
+                    stream: _getImagesFromFirestore(
+                        propertyId, 'garagelightingImages'),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return CircularProgressIndicator();
+                      }
+                      if (snapshot.hasError) {
+                        return Text('Error loading Yale images');
+                      }
+                      final garagelightingImages = snapshot.data ?? [];
+                      return ConditionItem(
+                          name: "Lighting",
+                          condition: garagelightingCondition,
+                          description: garagelightingCondition,
+                          images: garagelightingImages,
+                          onConditionSelected: (condition) {
+                            setState(() {
+                              garagelightingCondition = condition;
+                            });
+                            _savePreference(propertyId,
+                                'garagelightingCondition', condition!);
+                          },
+                          onDescriptionSelected: (description) {
+                            setState(() {
+                              garagelightingCondition = description;
+                            });
+                            _savePreference(propertyId,
+                                'garagelightingCondition', description!);
+                          },
+                          onImageAdded: (imagePath) async {
+                            File imageFile = File(imagePath);
+                            String? downloadUrl = await uploadImageToFirebase(
+                                imageFile,
+                                propertyId,
+                                'garage',
+                                'garagelightingImages');
+
+                            if (downloadUrl != null) {
+                              print(
+                                  "Adding image URL to Firestore: $downloadUrl");
+                              FirebaseFirestore.instance
+                                  .collection('properties')
+                                  .doc(propertyId)
+                                  .collection('garage')
+                                  .doc('garagelightingImages')
+                                  .update({
+                                'images': FieldValue.arrayUnion([downloadUrl]),
+                              });
+                            }
+                          });
                     },
                   ),
 
                   // Walls
-                  ConditionItem(
-                    name: "Walls",
-                    condition: garagewallsCondition,
-                    description: garagewallsDescription,
-                    images: garagewallsImages,
-                    onConditionSelected: (condition) {
-                      setState(() {
-                        garagewallsCondition = condition;
-                      });
-                      _savePreference(propertyId, 'wallsCondition',
-                          condition!); // Save preference
-                    },
-                    onDescriptionSelected: (description) {
-                      setState(() {
-                        garagewallsDescription = description;
-                      });
-                      _savePreference(propertyId, 'wallsDescription',
-                          description!); // Save preference
-                    },
-                    onImageAdded: (imagePath) {
-                      setState(() {
-                        garagewallsImages.add(imagePath);
-                      });
-                      _savePreferenceList(propertyId, 'wallsImages',
-                          garagewallsImages); // Save preference
+                  StreamBuilder<List<String>>(
+                    stream: _getImagesFromFirestore(
+                        propertyId, 'garagewallsImages'),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return CircularProgressIndicator();
+                      }
+                      if (snapshot.hasError) {
+                        return Text('Error loading Yale images');
+                      }
+                      final garagewallsImages = snapshot.data ?? [];
+                      return ConditionItem(
+                          name: "Walls",
+                          condition: garagewallsCondition,
+                          description: garagewallsCondition,
+                          images: garagewallsImages,
+                          onConditionSelected: (condition) {
+                            setState(() {
+                              garagewallsCondition = condition;
+                            });
+                            _savePreference(
+                                propertyId, 'garagewallsCondition', condition!);
+                          },
+                          onDescriptionSelected: (description) {
+                            setState(() {
+                              garagewallsCondition = description;
+                            });
+                            _savePreference(propertyId, 'garagewallsCondition',
+                                description!);
+                          },
+                          onImageAdded: (imagePath) async {
+                            File imageFile = File(imagePath);
+                            String? downloadUrl = await uploadImageToFirebase(
+                                imageFile,
+                                propertyId,
+                                'garage',
+                                'garagewallsImages');
+
+                            if (downloadUrl != null) {
+                              print(
+                                  "Adding image URL to Firestore: $downloadUrl");
+                              FirebaseFirestore.instance
+                                  .collection('properties')
+                                  .doc(propertyId)
+                                  .collection('garage')
+                                  .doc('garagewallsImages')
+                                  .update({
+                                'images': FieldValue.arrayUnion([downloadUrl]),
+                              });
+                            }
+                          });
                     },
                   ),
 
                   // Skirting
-                  ConditionItem(
-                    name: "Skirting",
-                    condition: garageskirtingCondition,
-                    description: garageskirtingDescription,
-                    images: garageskirtingImages,
-                    onConditionSelected: (condition) {
-                      setState(() {
-                        garageskirtingCondition = condition;
-                      });
-                      _savePreference(propertyId, 'skirtingCondition',
-                          condition!); // Save preference
-                    },
-                    onDescriptionSelected: (description) {
-                      setState(() {
-                        garageskirtingDescription = description;
-                      });
-                      _savePreference(propertyId, 'skirtingDescription',
-                          description!); // Save preference
-                    },
-                    onImageAdded: (imagePath) {
-                      setState(() {
-                        garageskirtingImages.add(imagePath);
-                      });
-                      _savePreferenceList(propertyId, 'skirtingImages',
-                          garageskirtingImages); // Save preference
+                  StreamBuilder<List<String>>(
+                    stream: _getImagesFromFirestore(
+                        propertyId, 'garageskirtingImages'),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return CircularProgressIndicator();
+                      }
+                      if (snapshot.hasError) {
+                        return Text('Error loading Yale images');
+                      }
+                      final garageskirtingImages = snapshot.data ?? [];
+                      return ConditionItem(
+                          name: "Skirting",
+                          condition: garageskirtingCondition,
+                          description: garageskirtingCondition,
+                          images: garageskirtingImages,
+                          onConditionSelected: (condition) {
+                            setState(() {
+                              garageskirtingCondition = condition;
+                            });
+                            _savePreference(propertyId,
+                                'garageskirtingCondition', condition!);
+                          },
+                          onDescriptionSelected: (description) {
+                            setState(() {
+                              garageskirtingCondition = description;
+                            });
+                            _savePreference(propertyId,
+                                'garageskirtingCondition', description!);
+                          },
+                          onImageAdded: (imagePath) async {
+                            File imageFile = File(imagePath);
+                            String? downloadUrl = await uploadImageToFirebase(
+                                imageFile,
+                                propertyId,
+                                'garage',
+                                'garageskirtingImages');
+
+                            if (downloadUrl != null) {
+                              print(
+                                  "Adding image URL to Firestore: $downloadUrl");
+                              FirebaseFirestore.instance
+                                  .collection('properties')
+                                  .doc(propertyId)
+                                  .collection('garage')
+                                  .doc('garageskirtingImages')
+                                  .update({
+                                'images': FieldValue.arrayUnion([downloadUrl]),
+                              });
+                            }
+                          });
                     },
                   ),
-
                   // Window Sill
-                  ConditionItem(
-                    name: "Window Sill",
-                    condition: garagewindowSillCondition,
-                    description: garagewindowSillDescription,
-                    images: garagewindowSillImages,
-                    onConditionSelected: (condition) {
-                      setState(() {
-                        garagewindowSillCondition = condition;
-                      });
-                      _savePreference(propertyId, 'windowSillCondition',
-                          condition!); // Save preference
-                    },
-                    onDescriptionSelected: (description) {
-                      setState(() {
-                        garagewindowSillDescription = description;
-                      });
-                      _savePreference(propertyId, 'windowSillDescription',
-                          description!); // Save preference
-                    },
-                    onImageAdded: (imagePath) {
-                      setState(() {
-                        garagewindowSillImages.add(imagePath);
-                      });
-                      _savePreferenceList(propertyId, 'windowSillImages',
-                          garagewindowSillImages); // Save preference
+                  StreamBuilder<List<String>>(
+                    stream: _getImagesFromFirestore(
+                        propertyId, 'garagewindowSillImages'),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return CircularProgressIndicator();
+                      }
+                      if (snapshot.hasError) {
+                        return Text('Error loading Yale images');
+                      }
+                      final garagewindowSillImages = snapshot.data ?? [];
+                      return ConditionItem(
+                          name: "Window Sill",
+                          condition: garagewindowSillCondition,
+                          description: garagewindowSillCondition,
+                          images: garagewindowSillImages,
+                          onConditionSelected: (condition) {
+                            setState(() {
+                              garagewindowSillCondition = condition;
+                            });
+                            _savePreference(propertyId,
+                                'garagewindowSillCondition', condition!);
+                          },
+                          onDescriptionSelected: (description) {
+                            setState(() {
+                              garagewindowSillCondition = description;
+                            });
+                            _savePreference(propertyId,
+                                'garagewindowSillCondition', description!);
+                          },
+                          onImageAdded: (imagePath) async {
+                            File imageFile = File(imagePath);
+                            String? downloadUrl = await uploadImageToFirebase(
+                                imageFile,
+                                propertyId,
+                                'garage',
+                                'garagewindowSillImages');
+
+                            if (downloadUrl != null) {
+                              print(
+                                  "Adding image URL to Firestore: $downloadUrl");
+                              FirebaseFirestore.instance
+                                  .collection('properties')
+                                  .doc(propertyId)
+                                  .collection('garage')
+                                  .doc('garagewindowSillImages')
+                                  .update({
+                                'images': FieldValue.arrayUnion([downloadUrl]),
+                              });
+                            }
+                          });
                     },
                   ),
 
                   // Curtains
-                  ConditionItem(
-                    name: "Curtains",
-                    condition: garagecurtainsCondition,
-                    description: garagecurtainsDescription,
-                    images: garagecurtainsImages,
-                    onConditionSelected: (condition) {
-                      setState(() {
-                        garagecurtainsCondition = condition;
-                      });
-                      _savePreference(propertyId, 'curtainsCondition',
-                          condition!); // Save preference
-                    },
-                    onDescriptionSelected: (description) {
-                      setState(() {
-                        garagecurtainsDescription = description;
-                      });
-                      _savePreference(propertyId, 'curtainsDescription',
-                          description!); // Save preference
-                    },
-                    onImageAdded: (imagePath) {
-                      setState(() {
-                        garagecurtainsImages.add(imagePath);
-                      });
-                      _savePreferenceList(propertyId, 'curtainsImages',
-                          garagecurtainsImages); // Save preference
+                  StreamBuilder<List<String>>(
+                    stream: _getImagesFromFirestore(
+                        propertyId, 'garagecurtainsImages'),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return CircularProgressIndicator();
+                      }
+                      if (snapshot.hasError) {
+                        return Text('Error loading Yale images');
+                      }
+                      final garagecurtainsImages = snapshot.data ?? [];
+                      return ConditionItem(
+                          name: "Curtains",
+                          condition: garagecurtainsCondition,
+                          description: garagecurtainsCondition,
+                          images: garagecurtainsImages,
+                          onConditionSelected: (condition) {
+                            setState(() {
+                              garagecurtainsCondition = condition;
+                            });
+                            _savePreference(propertyId,
+                                'garagecurtainsCondition', condition!);
+                          },
+                          onDescriptionSelected: (description) {
+                            setState(() {
+                              garagecurtainsCondition = description;
+                            });
+                            _savePreference(propertyId,
+                                'garagecurtainsCondition', description!);
+                          },
+                          onImageAdded: (imagePath) async {
+                            File imageFile = File(imagePath);
+                            String? downloadUrl = await uploadImageToFirebase(
+                                imageFile,
+                                propertyId,
+                                'garage',
+                                'garagecurtainsImages');
+
+                            if (downloadUrl != null) {
+                              print(
+                                  "Adding image URL to Firestore: $downloadUrl");
+                              FirebaseFirestore.instance
+                                  .collection('properties')
+                                  .doc(propertyId)
+                                  .collection('garage')
+                                  .doc('garagecurtainsImages')
+                                  .update({
+                                'images': FieldValue.arrayUnion([downloadUrl]),
+                              });
+                            }
+                          });
                     },
                   ),
 
                   // Blinds
-                  ConditionItem(
-                    name: "Blinds",
-                    condition: garageblindsCondition,
-                    description: garageblindsDescription,
-                    images: garageblindsImages,
-                    onConditionSelected: (condition) {
-                      setState(() {
-                        garageblindsCondition = condition;
-                      });
-                      _savePreference(propertyId, 'blindsCondition',
-                          condition!); // Save preference
-                    },
-                    onDescriptionSelected: (description) {
-                      setState(() {
-                        garageblindsDescription = description;
-                      });
-                      _savePreference(propertyId, 'blindsDescription',
-                          description!); // Save preference
-                    },
-                    onImageAdded: (imagePath) {
-                      setState(() {
-                        garageblindsImages.add(imagePath);
-                      });
-                      _savePreferenceList(propertyId, 'blindsImages',
-                          garageblindsImages); // Save preference
+                  StreamBuilder<List<String>>(
+                    stream: _getImagesFromFirestore(
+                        propertyId, 'garageblindsImages'),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return CircularProgressIndicator();
+                      }
+                      if (snapshot.hasError) {
+                        return Text('Error loading Yale images');
+                      }
+                      final garageblindsImages = snapshot.data ?? [];
+                      return ConditionItem(
+                          name: "Blinds",
+                          condition: garageblindsCondition,
+                          description: garageblindsCondition,
+                          images: garageblindsImages,
+                          onConditionSelected: (condition) {
+                            setState(() {
+                              garageblindsCondition = condition;
+                            });
+                            _savePreference(propertyId, 'garageblindsCondition',
+                                condition!);
+                          },
+                          onDescriptionSelected: (description) {
+                            setState(() {
+                              garageblindsCondition = description;
+                            });
+                            _savePreference(propertyId, 'garageblindsCondition',
+                                description!);
+                          },
+                          onImageAdded: (imagePath) async {
+                            File imageFile = File(imagePath);
+                            String? downloadUrl = await uploadImageToFirebase(
+                                imageFile,
+                                propertyId,
+                                'garage',
+                                'garageblindsImages');
+
+                            if (downloadUrl != null) {
+                              print(
+                                  "Adding image URL to Firestore: $downloadUrl");
+                              FirebaseFirestore.instance
+                                  .collection('properties')
+                                  .doc(propertyId)
+                                  .collection('garage')
+                                  .doc('garageblindsImages')
+                                  .update({
+                                'images': FieldValue.arrayUnion([downloadUrl]),
+                              });
+                            }
+                          });
                     },
                   ),
 
                   // Light Switches
-                  ConditionItem(
-                    name: "Light Switches",
-                    condition: garagelightSwitchesCondition,
-                    description: garagelightSwitchesDescription,
-                    images: garagelightSwitchesImages,
-                    onConditionSelected: (condition) {
-                      setState(() {
-                        garagelightSwitchesCondition = condition;
-                      });
-                      _savePreference(propertyId, 'lightSwitchesCondition',
-                          condition!); // Save preference
-                    },
-                    onDescriptionSelected: (description) {
-                      setState(() {
-                        garagelightSwitchesDescription = description;
-                      });
-                      _savePreference(propertyId, 'lightSwitchesDescription',
-                          description!); // Save preference
-                    },
-                    onImageAdded: (imagePath) {
-                      setState(() {
-                        garagelightSwitchesImages.add(imagePath);
-                      });
-                      _savePreferenceList(propertyId, 'lightSwitchesImages',
-                          garagelightSwitchesImages); // Save preference
+                  StreamBuilder<List<String>>(
+                    stream: _getImagesFromFirestore(
+                        propertyId, 'garagelightSwitchesImages'),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return CircularProgressIndicator();
+                      }
+                      if (snapshot.hasError) {
+                        return Text('Error loading Yale images');
+                      }
+                      final garagelightSwitchesImages = snapshot.data ?? [];
+                      return ConditionItem(
+                          name: "Light Switches",
+                          condition: garagelightSwitchesCondition,
+                          description: garagelightSwitchesCondition,
+                          images: garagelightSwitchesImages,
+                          onConditionSelected: (condition) {
+                            setState(() {
+                              garagelightSwitchesCondition = condition;
+                            });
+                            _savePreference(propertyId,
+                                'garagelightSwitchesCondition', condition!);
+                          },
+                          onDescriptionSelected: (description) {
+                            setState(() {
+                              garagelightSwitchesCondition = description;
+                            });
+                            _savePreference(propertyId,
+                                'garagelightSwitchesCondition', description!);
+                          },
+                          onImageAdded: (imagePath) async {
+                            File imageFile = File(imagePath);
+                            String? downloadUrl = await uploadImageToFirebase(
+                                imageFile,
+                                propertyId,
+                                'garage',
+                                'garagelightSwitchesImages');
+
+                            if (downloadUrl != null) {
+                              print(
+                                  "Adding image URL to Firestore: $downloadUrl");
+                              FirebaseFirestore.instance
+                                  .collection('properties')
+                                  .doc(propertyId)
+                                  .collection('garage')
+                                  .doc('garagelightSwitchesImages')
+                                  .update({
+                                'images': FieldValue.arrayUnion([downloadUrl]),
+                              });
+                            }
+                          });
                     },
                   ),
 
                   // Sockets
-                  ConditionItem(
-                    name: "Sockets",
-                    condition: garagesocketsCondition,
-                    description: garagesocketsDescription,
-                    images: garagesocketsImages,
-                    onConditionSelected: (condition) {
-                      setState(() {
-                        garagesocketsCondition = condition;
-                      });
-                      _savePreference(propertyId, 'socketsCondition',
-                          condition!); // Save preference
-                    },
-                    onDescriptionSelected: (description) {
-                      setState(() {
-                        garagesocketsDescription = description;
-                      });
-                      _savePreference(propertyId, 'socketsDescription',
-                          description!); // Save preference
-                    },
-                    onImageAdded: (imagePath) {
-                      setState(() {
-                        garagesocketsImages.add(imagePath);
-                      });
-                      _savePreferenceList(propertyId, 'socketsImages',
-                          garagesocketsImages); // Save preference
+                  StreamBuilder<List<String>>(
+                    stream: _getImagesFromFirestore(
+                        propertyId, 'garagesocketsImages'),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return CircularProgressIndicator();
+                      }
+                      if (snapshot.hasError) {
+                        return Text('Error loading Yale images');
+                      }
+                      final garagesocketsImages = snapshot.data ?? [];
+                      return ConditionItem(
+                          name: "Sockets",
+                          condition: garagesocketsCondition,
+                          description: garagesocketsCondition,
+                          images: garagesocketsImages,
+                          onConditionSelected: (condition) {
+                            setState(() {
+                              garagesocketsCondition = condition;
+                            });
+                            _savePreference(propertyId,
+                                'garagesocketsCondition', condition!);
+                          },
+                          onDescriptionSelected: (description) {
+                            setState(() {
+                              garagesocketsCondition = description;
+                            });
+                            _savePreference(propertyId,
+                                'garagesocketsCondition', description!);
+                          },
+                          onImageAdded: (imagePath) async {
+                            File imageFile = File(imagePath);
+                            String? downloadUrl = await uploadImageToFirebase(
+                                imageFile,
+                                propertyId,
+                                'garage',
+                                'garagesocketsImages');
+
+                            if (downloadUrl != null) {
+                              print(
+                                  "Adding image URL to Firestore: $downloadUrl");
+                              FirebaseFirestore.instance
+                                  .collection('properties')
+                                  .doc(propertyId)
+                                  .collection('garage')
+                                  .doc('garagesocketsImages')
+                                  .update({
+                                'images': FieldValue.arrayUnion([downloadUrl]),
+                              });
+                            }
+                          });
                     },
                   ),
 
                   // Flooring
-                  ConditionItem(
-                    name: "Flooring",
-                    condition: garageflooringCondition,
-                    description: garageflooringDescription,
-                    images: garageflooringImages,
-                    onConditionSelected: (condition) {
-                      setState(() {
-                        garageflooringCondition = condition;
-                      });
-                      _savePreference(propertyId, 'flooringCondition',
-                          condition!); // Save preference
-                    },
-                    onDescriptionSelected: (description) {
-                      setState(() {
-                        garageflooringDescription = description;
-                      });
-                      _savePreference(propertyId, 'flooringDescription',
-                          description!); // Save preference
-                    },
-                    onImageAdded: (imagePath) {
-                      setState(() {
-                        garageflooringImages.add(imagePath);
-                      });
-                      _savePreferenceList(propertyId, 'flooringImages',
-                          garageflooringImages); // Save preference
+                  StreamBuilder<List<String>>(
+                    stream: _getImagesFromFirestore(
+                        propertyId, 'garageflooringImages'),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return CircularProgressIndicator();
+                      }
+                      if (snapshot.hasError) {
+                        return Text('Error loading Yale images');
+                      }
+                      final garageflooringImages = snapshot.data ?? [];
+                      return ConditionItem(
+                          name: "Flooring",
+                          condition: garageflooringCondition,
+                          description: garageflooringCondition,
+                          images: garageflooringImages,
+                          onConditionSelected: (condition) {
+                            setState(() {
+                              garageflooringCondition = condition;
+                            });
+                            _savePreference(propertyId,
+                                'garageflooringCondition', condition!);
+                          },
+                          onDescriptionSelected: (description) {
+                            setState(() {
+                              garageflooringCondition = description;
+                            });
+                            _savePreference(propertyId,
+                                'garageflooringCondition', description!);
+                          },
+                          onImageAdded: (imagePath) async {
+                            File imageFile = File(imagePath);
+                            String? downloadUrl = await uploadImageToFirebase(
+                                imageFile,
+                                propertyId,
+                                'garage',
+                                'garageflooringImages');
+
+                            if (downloadUrl != null) {
+                              print(
+                                  "Adding image URL to Firestore: $downloadUrl");
+                              FirebaseFirestore.instance
+                                  .collection('properties')
+                                  .doc(propertyId)
+                                  .collection('garage')
+                                  .doc('garageflooringImages')
+                                  .update({
+                                'images': FieldValue.arrayUnion([downloadUrl]),
+                              });
+                            }
+                          });
                     },
                   ),
 
                   // Additional Items
-                  ConditionItem(
-                    name: "Additional Items",
-                    condition: garageadditionalItemsCondition,
-                    description: garageadditionalItemsDescription,
-                    images: garageadditionalItemsImages,
-                    onConditionSelected: (condition) {
-                      setState(() {
-                        garageadditionalItemsCondition = condition;
-                      });
-                      _savePreference(propertyId, 'additionalItemsCondition',
-                          condition!); // Save preference
-                    },
-                    onDescriptionSelected: (description) {
-                      setState(() {
-                        garageadditionalItemsDescription = description;
-                      });
-                      _savePreference(propertyId, 'additionalItemsDescription',
-                          description!); // Save preference
-                    },
-                    onImageAdded: (imagePath) {
-                      setState(() {
-                        garageadditionalItemsImages.add(imagePath);
-                      });
-                      _savePreferenceList(propertyId, 'additionalItemsImages',
-                          garageadditionalItemsImages); // Save preference
+                  StreamBuilder<List<String>>(
+                    stream: _getImagesFromFirestore(
+                        propertyId, 'garageadditionalItemsImages'),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return CircularProgressIndicator();
+                      }
+                      if (snapshot.hasError) {
+                        return Text('Error loading Yale images');
+                      }
+                      final garageadditionalItemsImages = snapshot.data ?? [];
+                      return ConditionItem(
+                          name: "Additional Items",
+                          condition: garageadditionalItemsCondition,
+                          description: garageadditionalItemsCondition,
+                          images: garageadditionalItemsImages,
+                          onConditionSelected: (condition) {
+                            setState(() {
+                              garageadditionalItemsCondition = condition;
+                            });
+                            _savePreference(propertyId,
+                                'garageadditionalItemsCondition', condition!);
+                          },
+                          onDescriptionSelected: (description) {
+                            setState(() {
+                              garageadditionalItemsCondition = description;
+                            });
+                            _savePreference(propertyId,
+                                'garageadditionalItemsCondition', description!);
+                          },
+                          onImageAdded: (imagePath) async {
+                            File imageFile = File(imagePath);
+                            String? downloadUrl = await uploadImageToFirebase(
+                                imageFile,
+                                propertyId,
+                                'garage',
+                                'garageadditionalItemsImages');
+
+                            if (downloadUrl != null) {
+                              print(
+                                  "Adding image URL to Firestore: $downloadUrl");
+                              FirebaseFirestore.instance
+                                  .collection('properties')
+                                  .doc(propertyId)
+                                  .collection('garage')
+                                  .doc('garageadditionalItemsImages')
+                                  .update({
+                                'images': FieldValue.arrayUnion([downloadUrl]),
+                              });
+                            }
+                          });
                     },
                   ),
 
@@ -930,9 +1234,9 @@ class ConditionItem extends StatelessWidget {
               ? Wrap(
                   spacing: 8.0,
                   runSpacing: 8.0,
-                  children: images.map((imagePath) {
-                    return Image.file(
-                      File(imagePath),
+                  children: images.map((imageUrl) {
+                    return Image.network(
+                      imageUrl,
                       width: 100,
                       height: 100,
                       fit: BoxFit.cover,

@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:camera/camera.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart'; // Import shared_preferences
 import 'package:taurgo_inventory/pages/conditions/condition_details.dart';
@@ -19,6 +21,40 @@ class DiningRoom extends StatefulWidget {
 
   @override
   State<DiningRoom> createState() => _DiningRoomState();
+}
+
+Future<String?> uploadImageToFirebase(File imageFile, String propertyId,
+    String collectionName, String documentId) async {
+  try {
+    // Step 1: Upload the image to Firebase Storage
+    String fileName =
+        '${documentId}_${DateTime.now().millisecondsSinceEpoch}.jpg';
+    Reference storageReference = FirebaseStorage.instance
+        .ref()
+        .child('$propertyId/$collectionName/$documentId/$fileName');
+
+    UploadTask uploadTask = storageReference.putFile(imageFile);
+    TaskSnapshot snapshot = await uploadTask.whenComplete(() => null);
+
+    // Step 2: Get the download URL of the uploaded image
+    String downloadURL = await snapshot.ref.getDownloadURL();
+    print("Uploaded to Firebase: $downloadURL");
+
+    // Step 3: Save the download URL to Firestore
+    await FirebaseFirestore.instance
+        .collection('properties')
+        .doc(propertyId)
+        .collection(collectionName)
+        .doc(documentId)
+        .set({
+      'images': FieldValue.arrayUnion([downloadURL])
+    }, SetOptions(merge: true));
+
+    return downloadURL;
+  } catch (e) {
+    print("Error uploading image: $e");
+    return null;
+  }
 }
 
 class _DiningRoomState extends State<DiningRoom> {
@@ -41,38 +77,23 @@ class _DiningRoomState extends State<DiningRoom> {
     super.initState();
     diningCapturedImages = widget.diningCapturedImages ?? [];
     print("Property Id - SOC${widget.propertyId}");
-    _loadPreferences(widget.propertyId);
     // Load the saved preferences when the state is initialized
   }
 
-  // Function to load preferences
-  Future<void> _loadPreferences(String propertyId) async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      diningGasMeterCondition =
-          prefs.getString('diningGasMeterCondition_${propertyId}');
-      diningGasMeterLocation =
-          prefs.getString('diningGasMeterLocation_${propertyId}');
-      diningElectricMeterCondition =
-          prefs.getString('diningElectricMeterCondition_${propertyId}');
-      diningElectricMeterLocation =
-          prefs.getString('diningElectricMeterLocation_${propertyId}');
-      diningWaterMeterCondition =
-          prefs.getString('diningWaterMeterCondition_${propertyId}');
-      diningWaterMeterLocation =
-          prefs.getString('diningWaterMeterLocation_${propertyId}');
-      diningOilMeterCondition =
-          prefs.getString('diningOilMeterCondition_${propertyId}');
-      diningOilMeterLocation =
-          prefs.getString('diningOilMeterLocation_${propertyId}');
-      diningGasMeterImages =
-          prefs.getStringList('diningGasMeterImages_${propertyId}') ?? [];
-      diningElectricMeterImages =
-          prefs.getStringList('diningElectricMeterImages_${propertyId}') ?? [];
-      diningWaterMeterImages =
-          prefs.getStringList('diningWaterMeterImages_${propertyId}') ?? [];
-      diningOilMeterImages =
-          prefs.getStringList('diningOilMeterImages_${propertyId}') ?? [];
+  Stream<List<String>> _getImagesFromFirestore(
+      String propertyId, String imageType) {
+    return FirebaseFirestore.instance
+        .collection('properties')
+        .doc(propertyId)
+        .collection('dining_room')
+        .doc(imageType)
+        .snapshots()
+        .map((snapshot) {
+      print("Firestore snapshot data for $imageType: ${snapshot.data()}");
+      if (snapshot.exists && snapshot.data() != null) {
+        return List<String>.from(snapshot.data()!['images'] ?? []);
+      }
+      return [];
     });
   }
 
@@ -81,12 +102,6 @@ class _DiningRoomState extends State<DiningRoom> {
       String propertyId, String key, String value) async {
     final prefs = await SharedPreferences.getInstance();
     prefs.setString('${key}_$propertyId', value);
-  }
-
-  Future<void> _savePreferenceList(
-      String propertyId, String key, List<String> value) async {
-    final prefs = await SharedPreferences.getInstance();
-    prefs.setStringList('${key}_$propertyId', value);
   }
 
   @override
@@ -105,7 +120,7 @@ class _DiningRoomState extends State<DiningRoom> {
         centerTitle: true,
         backgroundColor: bWhite,
         leading: GestureDetector(
-          onTap: (){
+          onTap: () {
             showDialog(
               context: context,
               builder: (BuildContext context) {
@@ -131,7 +146,7 @@ class _DiningRoomState extends State<DiningRoom> {
                   ),
                   content: Text(
                     'You may lost your data if you exit the process '
-                        'without saving',
+                    'without saving',
                     style: TextStyle(
                       color: Colors.grey[800],
                       fontSize: 14,
@@ -141,7 +156,8 @@ class _DiningRoomState extends State<DiningRoom> {
                   ),
                   actions: <Widget>[
                     TextButton(
-                      child: Text('Cancel',
+                      child: Text(
+                        'Cancel',
                         style: TextStyle(
                           color: kPrimaryColor,
                           fontSize: 16,
@@ -157,15 +173,16 @@ class _DiningRoomState extends State<DiningRoom> {
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                              builder: (context) =>
-                                  EditReportPage(propertyId: widget.propertyId)), // Replace HomePage with your
+                              builder: (context) => EditReportPage(
+                                  propertyId: widget
+                                      .propertyId)), // Replace HomePage with your
                           // home page
                           // widget
                         );
                       },
                       style: TextButton.styleFrom(
-                        padding: EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 8),
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                         backgroundColor: kPrimaryColor,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
@@ -192,7 +209,7 @@ class _DiningRoomState extends State<DiningRoom> {
         ),
         actions: [
           GestureDetector(
-            onTap: (){
+            onTap: () {
               showDialog(
                 context: context,
                 builder: (BuildContext context) {
@@ -218,7 +235,7 @@ class _DiningRoomState extends State<DiningRoom> {
                     ),
                     content: Text(
                       'Please Make Sure You Have Added All the Necessary '
-                          'Information',
+                      'Information',
                       style: TextStyle(
                         color: Colors.grey[800],
                         fontSize: 14,
@@ -228,7 +245,8 @@ class _DiningRoomState extends State<DiningRoom> {
                     ),
                     actions: <Widget>[
                       TextButton(
-                        child: Text('Cancel',
+                        child: Text(
+                          'Cancel',
                           style: TextStyle(
                             color: kPrimaryColor,
                             fontSize: 16,
@@ -244,15 +262,16 @@ class _DiningRoomState extends State<DiningRoom> {
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
-                                builder: (context) =>
-                                    EditReportPage(propertyId: widget.propertyId)), // Replace HomePage with your
+                                builder: (context) => EditReportPage(
+                                    propertyId: widget
+                                        .propertyId)), // Replace HomePage with your
                             // home page
                             // widget
                           );
                         },
                         style: TextButton.styleFrom(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 8),
+                          padding:
+                              EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                           backgroundColor: kPrimaryColor,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
@@ -292,115 +311,203 @@ class _DiningRoomState extends State<DiningRoom> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Gas Meter
-              ConditionItem(
-                name: "Gas Meter",
-                condition: diningGasMeterCondition,
-                location: diningGasMeterLocation,
-                images: diningGasMeterImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    diningGasMeterCondition = condition;
-                  });
-                  _savePreference(propertyId, 'diningGasMeterCondition',
-                      condition!); // Save preference
-                },
-                onlocationSelected: (location) {
-                  setState(() {
-                    diningGasMeterLocation = location;
-                  });
-                  _savePreference(propertyId, 'diningGasMeterLocation',
-                      location!); // Save preference
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    diningGasMeterImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId, 'diningGasMeterImages',
-                      diningGasMeterImages); // Save preference
+              StreamBuilder<List<String>>(
+                stream: _getImagesFromFirestore(propertyId, 'diningGasMeterImages'),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  }
+                  if (snapshot.hasError) {
+                    return Text('Error loading Yale images');
+                  }
+                  final diningGasMeterImages = snapshot.data ?? [];
+                  return ConditionItem(
+                      name: "Gas Meter",
+                      condition: diningGasMeterCondition,
+                      description: diningGasMeterCondition,
+                      images: diningGasMeterImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          diningGasMeterCondition = condition;
+                        });
+                        _savePreference(propertyId, 'diningGasMeterCondition', condition!);
+                      },
+                      onDescriptionSelected: (description) {
+                        setState(() {
+                          diningGasMeterCondition = description;
+                        });
+                        _savePreference(propertyId, 'diningGasMeterCondition', description!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile,
+                            propertyId,
+                            'dining_room',
+                            'diningGasMeterImages');
+
+                        if (downloadUrl != null) {
+                          print("Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('dining_room')
+                              .doc('diningGasMeterImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      });
                 },
               ),
               // Electric Meter
-              ConditionItem(
-                name: "Electric Meter",
-                condition: diningElectricMeterCondition,
-                location: diningElectricMeterLocation,
-                images: diningElectricMeterImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    diningElectricMeterCondition = condition;
-                  });
-                  _savePreference(propertyId, 'diningElectricMeterCondition',
-                      condition!); // Save preference
-                },
-                onlocationSelected: (location) {
-                  setState(() {
-                    diningElectricMeterLocation = location;
-                  });
-                  _savePreference(propertyId, 'diningElectricMeterLocation',
-                      location!); // Save preference
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    diningElectricMeterImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId, 'diningElectricMeterImages',
-                      diningElectricMeterImages); // Save preference
+              StreamBuilder<List<String>>(
+                stream: _getImagesFromFirestore(propertyId, 'diningElectricMeterImages'),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  }
+                  if (snapshot.hasError) {
+                    return Text('Error loading Yale images');
+                  }
+                  final diningElectricMeterImages = snapshot.data ?? [];
+                  return ConditionItem(
+                      name: " Electric Meter",
+                      condition: diningElectricMeterCondition,
+                      description: diningElectricMeterCondition,
+                      images: diningElectricMeterImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          diningElectricMeterCondition = condition;
+                        });
+                        _savePreference(propertyId, 'diningElectricMeterCondition', condition!);
+                      },
+                      onDescriptionSelected: (description) {
+                        setState(() {
+                          diningElectricMeterCondition = description;
+                        });
+                        _savePreference(propertyId, 'diningElectricMeterCondition', description!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile,
+                            propertyId,
+                            'dining_room',
+                            'diningElectricMeterImages');
+
+                        if (downloadUrl != null) {
+                          print("Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('dining_room')
+                              .doc('diningElectricMeterImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      });
                 },
               ),
               // Water Meter
-              ConditionItem(
-                name: "Water Meter",
-                condition: diningWaterMeterCondition,
-                location: diningWaterMeterLocation,
-                images: diningWaterMeterImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    diningWaterMeterCondition = condition;
-                  });
-                  _savePreference(propertyId, 'diningWaterMeterCondition',
-                      condition!); // Save preference
-                },
-                onlocationSelected: (location) {
-                  setState(() {
-                    diningWaterMeterLocation = location;
-                  });
-                  _savePreference(propertyId, 'diningWaterMeterLocation',
-                      location!); // Save preference
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    diningWaterMeterImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId, 'diningWaterMeterImages',
-                      diningWaterMeterImages); // Save preference
+              StreamBuilder<List<String>>(
+                stream: _getImagesFromFirestore(propertyId, 'diningWaterMeterImages'),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  }
+                  if (snapshot.hasError) {
+                    return Text('Error loading Yale images');
+                  }
+                  final diningWaterMeterImages = snapshot.data ?? [];
+                  return ConditionItem(
+                      name: "Water Meter",
+                      condition: diningWaterMeterCondition,
+                      description: diningWaterMeterCondition,
+                      images: diningWaterMeterImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          diningWaterMeterCondition = condition;
+                        });
+                        _savePreference(propertyId, 'diningWaterMeterCondition', condition!);
+                      },
+                      onDescriptionSelected: (description) {
+                        setState(() {
+                          diningWaterMeterCondition = description;
+                        });
+                        _savePreference(propertyId, 'diningWaterMeterCondition', description!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile,
+                            propertyId,
+                            'dining_room',
+                            'diningWaterMeterImages');
+
+                        if (downloadUrl != null) {
+                          print("Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('dining_room')
+                              .doc('diningWaterMeterImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      });
                 },
               ),
               // Oil Meter
-              ConditionItem(
-                name: "Oil Meter",
-                condition: diningOilMeterCondition,
-                location: diningOilMeterLocation,
-                images: diningOilMeterImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    diningOilMeterCondition = condition;
-                  });
-                  _savePreference(propertyId, 'diningOilMeterCondition',
-                      condition!); // Save preference
-                },
-                onlocationSelected: (location) {
-                  setState(() {
-                    diningOilMeterLocation = location;
-                  });
-                  _savePreference(propertyId, 'diningOilMeterLocation',
-                      location!); // Save preference
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    diningOilMeterImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId, 'diningOilMeterImages',
-                      diningOilMeterImages); // Save preference
+              StreamBuilder<List<String>>(
+                stream: _getImagesFromFirestore(propertyId, 'diningOilMeterImages'),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  }
+                  if (snapshot.hasError) {
+                    return Text('Error loading Yale images');
+                  }
+                  final diningOilMeterImages = snapshot.data ?? [];
+                  return ConditionItem(
+                      name: " Oil Meter",
+                      condition: diningOilMeterCondition,
+                      description: diningOilMeterCondition,
+                      images: diningOilMeterImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          diningOilMeterCondition = condition;
+                        });
+                        _savePreference(propertyId, 'diningOilMeterCondition', condition!);
+                      },
+                      onDescriptionSelected: (description) {
+                        setState(() {
+                          diningOilMeterCondition = description;
+                        });
+                        _savePreference(propertyId, 'diningOilMeterCondition', description!);
+                      },
+                      onImageAdded: (imagePath) async {
+                        File imageFile = File(imagePath);
+                        String? downloadUrl = await uploadImageToFirebase(
+                            imageFile,
+                            propertyId,
+                            'dining_room',
+                            'diningOilMeterImages');
+
+                        if (downloadUrl != null) {
+                          print("Adding image URL to Firestore: $downloadUrl");
+                          FirebaseFirestore.instance
+                              .collection('properties')
+                              .doc(propertyId)
+                              .collection('dining_room')
+                              .doc('diningOilMeterImages')
+                              .update({
+                            'images': FieldValue.arrayUnion([downloadUrl]),
+                          });
+                        }
+                      });
                 },
               ),
               // Add more ConditionItem widgets as needed
@@ -415,20 +522,20 @@ class _DiningRoomState extends State<DiningRoom> {
 class ConditionItem extends StatelessWidget {
   final String name;
   final String? condition;
-  final String? location;
+  final String? description;
   final List<String> images;
   final Function(String?) onConditionSelected;
-  final Function(String?) onlocationSelected;
+  final Function(String?) onDescriptionSelected;
   final Function(String) onImageAdded;
 
   const ConditionItem({
     Key? key,
     required this.name,
     this.condition,
-    this.location,
+    this.description,
     required this.images,
     required this.onConditionSelected,
-    required this.onlocationSelected,
+    required this.onDescriptionSelected,
     required this.onImageAdded,
   }) : super(key: key);
 
@@ -547,18 +654,18 @@ class ConditionItem extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) => ConditionDetails(
-                    initialCondition: location,
+                    initialCondition:   description,
                     type: name,
                   ),
                 ),
               );
 
               if (result != null) {
-                onlocationSelected(result);
+                  onDescriptionSelected(result);
               }
             },
             child: Text(
-              location?.isNotEmpty == true ? location! : "Location",
+              description?.isNotEmpty == true ? description! : "Description",
               style: TextStyle(
                 fontSize: 12.0,
                 fontWeight: FontWeight.w700,
@@ -572,26 +679,26 @@ class ConditionItem extends StatelessWidget {
           ),
           images.isNotEmpty
               ? Wrap(
-            spacing: 8.0,
-            runSpacing: 8.0,
-            children: images.map((imagePath) {
-              return Image.file(
-                File(imagePath),
-                width: 100,
-                height: 100,
-                fit: BoxFit.cover,
-              );
-            }).toList(),
-          )
+                  spacing: 8.0,
+                  runSpacing: 8.0,
+                  children: images.map((imageUrl) {
+                    return Image.network(
+                      imageUrl,
+                      width: 100,
+                      height: 100,
+                      fit: BoxFit.cover,
+                    );
+                  }).toList(),
+                )
               : Text(
-            "No images selected",
-            style: TextStyle(
-              fontSize: 12.0,
-              fontWeight: FontWeight.w700,
-              color: kPrimaryTextColourTwo,
-              fontStyle: FontStyle.italic,
-            ),
-          ),
+                  "No images selected",
+                  style: TextStyle(
+                    fontSize: 12.0,
+                    fontWeight: FontWeight.w700,
+                    color: kPrimaryTextColourTwo,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
           Divider(thickness: 1, color: Color(0xFFC2C2C2)),
         ],
       ),

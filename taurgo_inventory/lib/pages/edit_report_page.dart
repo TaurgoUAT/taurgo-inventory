@@ -225,7 +225,7 @@ class _EditReportPageState extends State<EditReportPage> {
                   context,
                   MaterialPageRoute(
                     builder: (context) => InspectionConfimationPage
-                      (propertyId: widget.propertyId,),
+                      (propertyId: widget.propertyId, propertyType: '', imageType: '',),
                   ),
                 );
                 // showDialog(

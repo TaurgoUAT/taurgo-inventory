@@ -25,6 +25,7 @@ class _FaqPageState extends State<FaqPage> {
       canPop: false,
       child: Scaffold(
         appBar: AppBar(
+          scrolledUnderElevation: 0,
           title: Text(
             'FAQs',
             style: TextStyle(

@@ -7,7 +7,8 @@ import 'package:shared_preferences/shared_preferences.dart'; // Import shared_pr
 import 'package:taurgo_inventory/pages/conditions/condition_details.dart';
 import 'package:taurgo_inventory/pages/edit_report_page.dart';
 import 'package:taurgo_inventory/pages/reportPages/camera_preview_page.dart' as reportPages;
-
+import 'package:cloud_firestore/cloud_firestore.dart'; // Firestore
+import 'package:firebase_storage/firebase_storage.dart';
 import '../../constants/AppColors.dart';
 import '../../widgets/add_action.dart';
 import '../camera_preview_page.dart';
@@ -22,6 +23,37 @@ class HealthAndSafety extends StatefulWidget {
   _HealthAndSafetyState createState() => _HealthAndSafetyState();
 }
 
+Future<String?> uploadImageToFirebase(File imageFile, String propertyId, String collectionName, String documentId) async {
+  try {
+    // Step 1: Upload the image to Firebase Storage
+    String fileName = '${documentId}_${DateTime.now().millisecondsSinceEpoch}.jpg';
+    Reference storageReference = FirebaseStorage.instance
+        .ref()
+        .child('$propertyId/$collectionName/$documentId/$fileName');
+
+    UploadTask uploadTask = storageReference.putFile(imageFile);
+    TaskSnapshot snapshot = await uploadTask.whenComplete(() => null);
+
+    // Step 2: Get the download URL of the uploaded image
+    String downloadURL = await snapshot.ref.getDownloadURL();
+    print("Uploaded to Firebase: $downloadURL");
+
+    // Step 3: Save the download URL to Firestore
+    await FirebaseFirestore.instance
+        .collection('properties')
+        .doc(propertyId)
+        .collection(collectionName)
+        .doc(documentId)
+        .set({
+          'images': FieldValue.arrayUnion([downloadURL])
+        }, SetOptions(merge: true));
+
+    return downloadURL;
+  } catch (e) {
+    print("Error uploading image: $e");
+    return null;
+  }
+}
 class _HealthAndSafetyState extends State<HealthAndSafety> {
   
   String? smokeAlarmCondition;
@@ -43,25 +75,25 @@ class _HealthAndSafetyState extends State<HealthAndSafety> {
     super.initState();
     capturedImages = widget.capturedImages ?? [];
     print("Property Id - SOC${widget.propertyId}");
-    _loadPreferences(widget.propertyId);
     // Load the saved preferences when the state is initialized
   }
 
-  // Function to load preferences
-  Future<void> _loadPreferences(String propertyId) async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      heatSensorCondition = prefs.getString('heatSensorCondition_${propertyId}');
-      heatSensorDescription = prefs.getString('heatSensorDescription_${propertyId}');
-      smokeAlarmCondition = prefs.getString('smokeAlarmCondition_${propertyId}');
-      smokeAlarmDescription = prefs.getString('smokeAlarmDescription_${propertyId}');
-      carbonMonoxideCondition = prefs.getString('carbonMonoxideCondition_${propertyId}');
-      carbonMonoxideDescription = prefs.getString('carbonMonoxideDescription_${propertyId}');
-      smokeAlarmImages = prefs.getStringList('smokeAlarmImages_${propertyId}') ?? [];
-      heatSensorImages = prefs.getStringList('heatSensorImages_${propertyId}') ?? [];
-      carbonMonxideImages = prefs.getStringList('carbonMonxideImages_${propertyId}') ?? [];
+ Stream<List<String>> _getImagesFromFirestore(String propertyId, String imageType) {
+    return FirebaseFirestore.instance
+        .collection('properties')
+        .doc(propertyId)
+        .collection('healthAndSafety')
+        .doc(imageType)
+        .snapshots()
+        .map((snapshot) {
+      print("Firestore snapshot data for $imageType: ${snapshot.data()}");
+      if (snapshot.exists && snapshot.data() != null) {
+        return List<String>.from(snapshot.data()!['images'] ?? []);
+      }
+      return [];
     });
   }
+  
 
   // Function to save a preference
   Future<void> _savePreference(
@@ -70,12 +102,7 @@ class _HealthAndSafetyState extends State<HealthAndSafety> {
     prefs.setString('${key}_$propertyId', value);
   }
 
-  Future<void> _savePreferenceList(
-      String propertyId, String key, List<String> value) async {
-    final prefs = await SharedPreferences.getInstance();
-    prefs.setStringList('${key}_$propertyId', value);
-  }
-
+  
   @override
   Widget build(BuildContext context) {
     String propertyId = widget.propertyId;
@@ -282,91 +309,151 @@ class _HealthAndSafetyState extends State<HealthAndSafety> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Yale
-              ConditionItem(
-                name: "Heat Sensor",
-                condition: heatSensorCondition,
-                description: heatSensorDescription,
-                images: heatSensorImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    heatSensorCondition = condition;
-                  });
-                  _savePreference(propertyId,
-                      'heatSensorCondition', condition!); // Save preference
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    heatSensorDescription = description;
-                  });
-                  _savePreference(propertyId,'heatSensorDescription',
-                      description!); // Save preference
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    heatSensorImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId,'heatSensorImages',
-                      heatSensorImages); // Save preference
-                },
-              ),
+              StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'heatSensorImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Yale images');
+                    }
+                    final heatSensorImages = snapshot.data ?? [];
+                    return ConditionItem(
+                        name: "Heat Sensor",
+                        condition: heatSensorCondition,
+                        description: heatSensorCondition,
+                        images: heatSensorImages,
+                        onConditionSelected: (condition) {
+                        setState(() {
+                          heatSensorCondition = condition;
+                        });
+                        _savePreference(propertyId, 'heatSensorCondition', condition!);
+                      },
+                        onDescriptionSelected: (description) {
+                        setState(() {
+                          heatSensorCondition = description;
+                        });
+                        _savePreference(propertyId, 'heatSensorCondition', description!);
+                      },
+                        onImageAdded: (imagePath) async {
+                          File imageFile = File(imagePath);
+                          String? downloadUrl = await uploadImageToFirebase(
+                              imageFile, propertyId,'healthAndSafety', 'heatSensorImages');
+
+                          if (downloadUrl != null) {
+                            print(
+                                "Adding image URL to Firestore: $downloadUrl");
+                            FirebaseFirestore.instance
+                                .collection('properties')
+                                .doc(propertyId)
+                                .collection('healthAndSafety')
+                                .doc('heatSensorImages')
+                                .update({
+                              'images': FieldValue.arrayUnion([downloadUrl]),
+                            });
+                          }
+                        });
+                  },
+                ),
 
               // Mortice
-              ConditionItem(
-                name: "Smoke Alarm",
-                condition: smokeAlarmCondition,
-                description: smokeAlarmDescription,
-                images: smokeAlarmImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    smokeAlarmCondition = condition;
-                  });
-                  _savePreference(propertyId,
-                      'smokeAlarmCondition', condition!); // Save preference
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    smokeAlarmDescription = description;
-                  });
-                  _savePreference(propertyId,'smokeAlarmDescription',
-                      description!); // Save preference
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    smokeAlarmImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId,'smokeAlarmImages',
-                      smokeAlarmImages); // Save preference
-                },
-              ),
+              StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'smokeAlarmImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Yale images');
+                    }
+                    final smokeAlarmImages = snapshot.data ?? [];
+                    return ConditionItem(
+                        name: "Heat Sensor",
+                        condition: smokeAlarmCondition,
+                        description: smokeAlarmCondition,
+                        images: smokeAlarmImages,
+                        onConditionSelected: (condition) {
+                        setState(() {
+                          smokeAlarmCondition = condition;
+                        });
+                        _savePreference(propertyId, 'smokeAlarmCondition', condition!);
+                      },
+                        onDescriptionSelected: (description) {
+                        setState(() {
+                          smokeAlarmCondition = description;
+                        });
+                        _savePreference(propertyId, 'smokeAlarmCondition', description!);
+                      },
+                        onImageAdded: (imagePath) async {
+                          File imageFile = File(imagePath);
+                          String? downloadUrl = await uploadImageToFirebase(
+                              imageFile, propertyId,'healthAndSafety', 'smokeAlarmImages');
+
+                          if (downloadUrl != null) {
+                            print(
+                                "Adding image URL to Firestore: $downloadUrl");
+                            FirebaseFirestore.instance
+                                .collection('properties')
+                                .doc(propertyId)
+                                .collection('healthAndSafety')
+                                .doc('smokeAlarmImages')
+                                .update({
+                              'images': FieldValue.arrayUnion([downloadUrl]),
+                            });
+                          }
+                        });
+                  },
+                ),
 
               // Other
-              ConditionItem(
-                name: "Other",
-                condition: carbonMonoxideCondition,
-                description: carbonMonoxideDescription,
-                images: carbonMonxideImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    carbonMonoxideCondition = condition;
-                  });
-                  _savePreference(propertyId,'carbonMonoxideCondition',
-                      condition!); // Save preference
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    carbonMonoxideDescription = description;
-                  });
-                  _savePreference(propertyId,'carbonMonoxideDescription',
-                      description!); // Save preference
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    carbonMonxideImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId,'carbonMonxideImages',
-                      carbonMonxideImages); // Save preference
-                },
-              ),
+              StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'carbonMonxideImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Yale images');
+                    }
+                    final  carbonMonxideImages = snapshot.data ?? [];
+                    return ConditionItem(
+                        name: "Other Sensor",
+                        condition: carbonMonoxideCondition,
+                        description: carbonMonoxideCondition,
+                        images: carbonMonxideImages,
+                        onConditionSelected: (condition) {
+                        setState(() {
+                          carbonMonoxideCondition = condition;
+                        });
+                        _savePreference(propertyId, 'carbonMonoxideCondition', condition!);
+                      },
+                        onDescriptionSelected: (description) {
+                        setState(() {
+                          carbonMonoxideCondition = description;
+                        });
+                        _savePreference(propertyId, 'carbonMonoxideCondition', description!);
+                      },
+                        onImageAdded: (imagePath) async {
+                          File imageFile = File(imagePath);
+                          String? downloadUrl = await uploadImageToFirebase(
+                              imageFile, propertyId,'healthAndSafety', 'carbonMonxideImages');
+
+                          if (downloadUrl != null) {
+                            print(
+                                "Adding image URL to Firestore: $downloadUrl");
+                            FirebaseFirestore.instance
+                                .collection('properties')
+                                .doc(propertyId)
+                                .collection('healthAndSafety')
+                                .doc('carbonMonxideImages')
+                                .update({
+                              'images': FieldValue.arrayUnion([downloadUrl]),
+                            });
+                          }
+                        });
+                  },
+                ),
 
               // Add more ConditionItem widgets as needed
             ],
@@ -539,9 +626,9 @@ class ConditionItem extends StatelessWidget {
               ? Wrap(
                   spacing: 8.0,
                   runSpacing: 8.0,
-                  children: images.map((imagePath) {
-                    return Image.file(
-                      File(imagePath),
+                  children: images.map((imageUrl) {
+                    return Image.network(
+                      imageUrl,
                       width: 100,
                       height: 100,
                       fit: BoxFit.cover,

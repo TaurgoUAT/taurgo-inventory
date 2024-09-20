@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:camera/camera.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart'; // Import shared_preferences
 import 'package:taurgo_inventory/pages/conditions/condition_details.dart';
@@ -19,12 +21,65 @@ class EntranceHallway extends StatefulWidget {
   @override
   State<EntranceHallway> createState() => _EntranceHallwayState();
 }
+Future<String?> uploadImageToFirebase(File imageFile, String propertyId, String collectionName, String documentId) async {
+  try {
+    // Step 1: Upload the image to Firebase Storage
+    String fileName = '${documentId}_${DateTime.now().millisecondsSinceEpoch}.jpg';
+    Reference storageReference = FirebaseStorage.instance
+        .ref()
+        .child('$propertyId/$collectionName/$documentId/$fileName');
+
+    UploadTask uploadTask = storageReference.putFile(imageFile);
+    TaskSnapshot snapshot = await uploadTask.whenComplete(() => null);
+
+    // Step 2: Get the download URL of the uploaded image
+    String downloadURL = await snapshot.ref.getDownloadURL();
+    print("Uploaded to Firebase: $downloadURL");
+
+    // Step 3: Save the download URL to Firestore
+    await FirebaseFirestore.instance
+        .collection('properties')
+        .doc(propertyId)
+        .collection(collectionName)
+        .doc(documentId)
+        .set({
+          'images': FieldValue.arrayUnion([downloadURL])
+        }, SetOptions(merge: true));
+
+    return downloadURL;
+  } catch (e) {
+    print("Error uploading image: $e");
+    return null;
+  }
+}
+
+Stream<List<String>> _getImagesFromFirestore(String propertyId, String imageType) {
+    return FirebaseFirestore.instance
+        .collection('properties')
+        .doc(propertyId)
+        .collection('entranceHallway')
+        .doc(imageType)
+        .snapshots()
+        .map((snapshot) {
+      print("Firestore snapshot data for $imageType: ${snapshot.data()}");
+      if (snapshot.exists && snapshot.data() != null) {
+        return List<String>.from(snapshot.data()!['images'] ?? []);
+      }
+      return [];
+    });
+  }
+  Future<void> _savePreference(
+      String propertyId, String key, String value) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setString('${key}_$propertyId', value);
+  }
 
 class _EntranceHallwayState extends State<EntranceHallway> {
   String? entranceDoorCondition;
   String? entranceDoorLocation;
   String? entranceDoorFrameCondition;
   String? entranceDoorFrameLocation;
+ String? entranceDoorBellCondition;
   String? entranceCeilingCondition;
   String? entranceCeilingLocation;
   String? entranceLightingCondition;
@@ -39,6 +94,7 @@ class _EntranceHallwayState extends State<EntranceHallway> {
   String? entranceCurtainsLocation;
   String? entranceBlindsCondition;
   String? entranceBlindsLocation;
+  String? entranceHeatingCondition;
   String? entranceLightSwitchesCondition;
   String? entranceLightSwitchesLocation;
   String? entranceSocketsCondition;
@@ -63,6 +119,7 @@ class _EntranceHallwayState extends State<EntranceHallway> {
 
   List<String> entranceDoorImages = [];
   List<String> entranceDoorFrameImages = [];
+    List<String> entranceDoorBellImages = [];
   List<String> entranceCeilingImages = [];
   List<String> entranceLightingImages = [];
   List<String> entranceWallsImages = [];
@@ -73,6 +130,7 @@ class _EntranceHallwayState extends State<EntranceHallway> {
   List<String> entranceLightSwitchesImages = [];
   List<String> entranceSocketsImages = [];
   List<String> entranceFlooringImages = [];
+   List<String> entranceHeatingImages = [];
   List<String> entranceAdditionalItemsImages = [];
   late List<File> capturedImages;
 
@@ -81,57 +139,11 @@ class _EntranceHallwayState extends State<EntranceHallway> {
     super.initState();
     capturedImages = widget.capturedImages ?? [];
     print("Property Id - SOC${widget.propertyId}");
-    _loadPreferences(widget.propertyId);
     // Load the saved preferences when the state is initialized
   }
 
   // Function to load preferences
-  Future<void> _loadPreferences(String propertyId) async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      entranceDoorCondition = prefs.getString('doorCondition_${propertyId}');
-      entranceDoorLocation = prefs.getString('doorLocation_${propertyId}');
-      entranceDoorFrameCondition = prefs.getString('doorFrameCondition_${propertyId}');
-      entranceDoorFrameLocation = prefs.getString('doorFrameLocation_${propertyId}');
-      entranceCeilingCondition = prefs.getString('ceilingCondition_${propertyId}');
-      entranceCeilingLocation = prefs.getString('ceilingLocation_${propertyId}');
-      entranceLightingCondition = prefs.getString('lightingCondition_${propertyId}');
-      entranceLightingLocation = prefs.getString('lightingLocation_${propertyId}');
-      entranceWallsCondition = prefs.getString('wallsCondition_${propertyId}');
-      entranceWallsLocation = prefs.getString('wallsLocation_${propertyId}');
-      entranceSkirtingCondition = prefs.getString('skirtingCondition_${propertyId}');
-      entranceSkirtingLocation = prefs.getString('skirtingLocation_${propertyId}');
-      entranceWindowSillCondition = prefs.getString('windowSillCondition_${propertyId}');
-      entranceWindowSillLocation = prefs.getString('windowSillLocation_${propertyId}');
-      entranceCurtainsCondition = prefs.getString('curtainsCondition_${propertyId}');
-      entranceCurtainsLocation = prefs.getString('curtainsLocation_${propertyId}');
-      entranceBlindsCondition = prefs.getString('blindsCondition_${propertyId}');
-      entranceBlindsLocation = prefs.getString('blindsLocation_${propertyId}');
-      entranceLightSwitchesCondition = prefs.getString('lightSwitchesCondition_${propertyId}');
-      entranceLightSwitchesLocation = prefs.getString('lightSwitchesLocation_${propertyId}');
-      entranceSocketsCondition = prefs.getString('socketsCondition_${propertyId}');
-      entranceSocketsLocation = prefs.getString('socketsLocation_${propertyId}');
-      entranceFlooringCondition = prefs.getString('flooringCondition_${propertyId}');
-      entranceFlooringLocation = prefs.getString('flooringLocation_${propertyId}');
-      entranceAdditionalItemsCondition = prefs.getString('additionalItemsCondition_${propertyId}');
-      entranceAdditionalItemsLocation = prefs.getString('additionalItemsLocation_${propertyId}');
-
-      entranceDoorImages = prefs.getStringList('doorImages_${propertyId}') ?? [];
-      entranceDoorFrameImages = prefs.getStringList('doorFrameImages_${propertyId}') ?? [];
-      entranceCeilingImages = prefs.getStringList('ceilingImages_${propertyId}') ?? [];
-      entranceLightingImages = prefs.getStringList('lightingImages_${propertyId}') ?? [];
-      entranceWallsImages = prefs.getStringList('wallsImages_${propertyId}') ?? [];
-      entranceSkirtingImages = prefs.getStringList('skirtingImages_${propertyId}') ?? [];
-      entranceWindowSillImages = prefs.getStringList('windowSillImages_${propertyId}') ?? [];
-      entranceCurtainsImages = prefs.getStringList('curtainsImages_${propertyId}') ?? [];
-      entranceBlindsImages = prefs.getStringList('blindsImages_${propertyId}') ?? [];
-      entranceLightSwitchesImages = prefs.getStringList('lightSwitchesImages_${propertyId}') ?? [];
-      entranceSocketsImages = prefs.getStringList('socketsImages_${propertyId}') ?? [];
-      entranceFlooringImages = prefs.getStringList('flooringImages_${propertyId}') ?? [];
-      entranceAdditionalItemsImages =
-          prefs.getStringList('additionalItemsImages_${propertyId}') ?? [];
-    });
-  }
+  
 
   // Function to save a preference
  Future<void> _savePreference(String propertyId, String key, String value)
@@ -140,15 +152,14 @@ class _EntranceHallwayState extends State<EntranceHallway> {
     prefs.setString('${key}_$propertyId', value);
   }
 
-  Future<void> _savePreferenceList(String propertyId, String key, List<String> value) async {
-    final prefs = await SharedPreferences.getInstance();
-    prefs.setStringList('${key}_$propertyId', value);
-  }
+  
 
   @override
   Widget build(BuildContext context) {
      String propertyId = widget.propertyId;
-    return PopScope(child: Scaffold(
+    return PopScope(
+      canPop: false,
+      child: Scaffold(
       appBar: AppBar(
         title: Text(
           'Entrance Hallway',
@@ -348,393 +359,762 @@ class _EntranceHallwayState extends State<EntranceHallway> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Door
-              ConditionItem(
-                name: "Door",
-                condition: entranceDoorCondition,
-                location: entranceDoorLocation,
-                images: entranceDoorImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    entranceDoorCondition = condition;
-                  });
-                  _savePreference(
-                      propertyId,'doorCondition', condition!); // Save preference
-                },
-                onLocationSelected: (location) {
-                  setState(() {
-                    entranceDoorLocation = location;
-                  });
-                  _savePreference(propertyId,'doorLocation', location!); // Save preference
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    entranceDoorImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId,'doorImages', entranceDoorImages);
-                },
-              ),
+              StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'entranceDoorImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Yale images');
+                    }
+                    final entranceDoorImages = snapshot.data ?? [];
+                    return ConditionItem(
+                        name: "Door",
+                        condition: entranceDoorCondition,
+                        description: entranceDoorCondition,
+                        images: entranceDoorImages,
+                        onConditionSelected: (condition) {
+                        setState(() {
+                          entranceDoorCondition = condition;
+                        });
+                        _savePreference(propertyId, 'entranceDoorCondition', condition!);
+                      },
+                        onDescriptionSelected: (description) {
+                        setState(() {
+                          entranceDoorCondition = description;
+                        });
+                        _savePreference(propertyId, 'entranceDoorCondition', description!);
+                      },
+                        onImageAdded: (imagePath) async {
+                          File imageFile = File(imagePath);
+                          String? downloadUrl = await uploadImageToFirebase(
+                              imageFile, propertyId,'entranceHallway', 'entranceDoorImages');
+
+                          if (downloadUrl != null) {
+                            print(
+                                "Adding image URL to Firestore: $downloadUrl");
+                            FirebaseFirestore.instance
+                                .collection('properties')
+                                .doc(propertyId)
+                                .collection('entranceHallway')
+                                .doc('entranceDoorImages')
+                                .update({
+                              'images': FieldValue.arrayUnion([downloadUrl]),
+                            });
+                          }
+                        });
+                  },
+                ),
 
               // Door Frame
-              ConditionItem(
-                name: "Door Frame",
-                condition: entranceDoorFrameCondition,
-                location: entranceDoorFrameLocation,
-                images: entranceDoorFrameImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    entranceDoorFrameCondition = condition;
-                  });
-                  _savePreference(
-                      propertyId,'doorFrameCondition', condition!); // Save preference
-                },
-                onLocationSelected: (location) {
-                  setState(() {
-                    entranceDoorFrameLocation = location;
-                  });
-                  _savePreference(
-                      propertyId,'doorFrameLocation', location!); // Save preference
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    entranceDoorFrameImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId,'doorFrameImages', entranceDoorFrameImages);
-                },
-              ),
+              StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'entranceDoorFrameImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Yale images');
+                    }
+                    final entranceDoorFrameImages = snapshot.data ?? [];
+                    return ConditionItem(
+                        name: "Door Frame",
+                        condition: entranceDoorFrameCondition,
+                        description: entranceDoorFrameCondition,
+                        images: entranceDoorFrameImages,
+                        onConditionSelected: (condition) {
+                        setState(() {
+                          entranceDoorFrameCondition = condition;
+                        });
+                        _savePreference(propertyId, 'entranceDoorFrameCondition', condition!);
+                      },
+                        onDescriptionSelected: (description) {
+                        setState(() {
+                          entranceDoorFrameCondition = description;
+                        });
+                        _savePreference(propertyId, 'entranceDoorFrameCondition', description!);
+                      },
+                        onImageAdded: (imagePath) async {
+                          File imageFile = File(imagePath);
+                          String? downloadUrl = await uploadImageToFirebase(
+                              imageFile, propertyId,'entranceHallway', 'entranceDoorFrameImages');
+
+                          if (downloadUrl != null) {
+                            print(
+                                "Adding image URL to Firestore: $downloadUrl");
+                            FirebaseFirestore.instance
+                                .collection('properties')
+                                .doc(propertyId)
+                                .collection('entranceHallway')
+                                .doc('entranceDoorFrameImages')
+                                .update({
+                              'images': FieldValue.arrayUnion([downloadUrl]),
+                            });
+                          }
+                        });
+                  },
+                ),
 
               // Ceiling
-              ConditionItem(
-                name: "Ceiling",
-                condition: entranceCeilingCondition,
-                location: entranceCeilingLocation,
-                images: entranceCeilingImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    entranceCeilingCondition = condition;
-                  });
-                  _savePreference(
-                      propertyId, 'ceilingCondition', condition!); // Save preference
-                },
-                onLocationSelected: (location) {
-                  setState(() {
-                    entranceCeilingLocation = location;
-                  });
-                  _savePreference(
-                      propertyId,'ceilingLocation', location!); // Save preference
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    entranceCeilingImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId,'ceilingImages', entranceCeilingImages);
-                },
-              ),
+              StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'entranceCeilingImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Yale images');
+                    }
+                    final entranceCeilingImages = snapshot.data ?? [];
+                    return ConditionItem(
+                        name: "Ceiling",
+                        condition: entranceCeilingCondition,
+                        description: entranceCeilingCondition,
+                        images: entranceCeilingImages,
+                        onConditionSelected: (condition) {
+                        setState(() {
+                          entranceCeilingCondition = condition;
+                        });
+                        _savePreference(propertyId, 'entranceCeilingCondition', condition!);
+                      },
+                        onDescriptionSelected: (description) {
+                        setState(() {
+                          entranceCeilingCondition = description;
+                        });
+                        _savePreference(propertyId, 'entranceCeilingCondition', description!);
+                      },
+                        onImageAdded: (imagePath) async {
+                          File imageFile = File(imagePath);
+                          String? downloadUrl = await uploadImageToFirebase(
+                              imageFile, propertyId,'entranceHallway', 'entranceCeilingImages');
+
+                          if (downloadUrl != null) {
+                            print(
+                                "Adding image URL to Firestore: $downloadUrl");
+                            FirebaseFirestore.instance
+                                .collection('properties')
+                                .doc(propertyId)
+                                .collection('entranceHallway')
+                                .doc('entranceCeilingImages')
+                                .update({
+                              'images': FieldValue.arrayUnion([downloadUrl]),
+                            });
+                          }
+                        });
+                  },
+                ),
+
+
+                StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'entranceDoorBellImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Yale images');
+                    }
+                    final entranceDoorBellImages = snapshot.data ?? [];
+                    return ConditionItem(
+                        name: "Door Bell",
+                        condition: entranceDoorBellCondition,
+                        description: entranceDoorBellCondition,
+                        images: entranceDoorBellImages,
+                        onConditionSelected: (condition) {
+                        setState(() {
+                          entranceDoorBellCondition = condition;
+                        });
+                        _savePreference(propertyId, 'entranceDoorBellCondition', condition!);
+                      },
+                        onDescriptionSelected: (description) {
+                        setState(() {
+                          entranceDoorBellCondition = description;
+                        });
+                        _savePreference(propertyId, 'entranceDoorBellCondition', description!);
+                      },
+                        onImageAdded: (imagePath) async {
+                          File imageFile = File(imagePath);
+                          String? downloadUrl = await uploadImageToFirebase(
+                              imageFile, propertyId,'entranceHallway', 'entranceDoorBellImages');
+
+                          if (downloadUrl != null) {
+                            print(
+                                "Adding image URL to Firestore: $downloadUrl");
+                            FirebaseFirestore.instance
+                                .collection('properties')
+                                .doc(propertyId)
+                                .collection('entranceHallway')
+                                .doc('entranceDoorBellImages')
+                                .update({
+                              'images': FieldValue.arrayUnion([downloadUrl]),
+                            });
+                          }
+                        });
+                  },
+                ),
+
 
               // Lighting
-              ConditionItem(
-                name: "Lighting",
-                condition: entranceLightingCondition,
-                location: entranceLightingLocation,
-                images: entranceLightingImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    entranceLightingCondition = condition;
-                  });
-                  _savePreference(
-                      propertyId,'lightingCondition', condition!); // Save preference
-                },
-                onLocationSelected: (location) {
-                  setState(() {
-                    entranceLightingLocation = location;
-                  });
-                  _savePreference(
-                      propertyId,'lightingLocation', location!); // Save preference
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    entranceLightingImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId,'lightingImages', entranceLightingImages);
-                },
-              ),
+              StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'entranceLightingImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Yale images');
+                    }
+                    final entranceLightingImages= snapshot.data ?? [];
+                    return ConditionItem(
+                        name: "Lighting",
+                        condition: entranceLightingCondition,
+                        description: entranceLightingCondition,
+                        images: entranceLightingImages,
+                        onConditionSelected: (condition) {
+                        setState(() {
+                          entranceLightingCondition = condition;
+                        });
+                        _savePreference(propertyId, 'entranceLightingCondition', condition!);
+                      },
+                        onDescriptionSelected: (description) {
+                        setState(() {
+                          entranceLightingCondition = description;
+                        });
+                        _savePreference(propertyId, 'entranceLightingCondition', description!);
+                      },
+                        onImageAdded: (imagePath) async {
+                          File imageFile = File(imagePath);
+                          String? downloadUrl = await uploadImageToFirebase(
+                              imageFile, propertyId,'entranceHallway', 'entranceLightingImages');
+
+                          if (downloadUrl != null) {
+                            print(
+                                "Adding image URL to Firestore: $downloadUrl");
+                            FirebaseFirestore.instance
+                                .collection('properties')
+                                .doc(propertyId)
+                                .collection('entranceHallway')
+                                .doc('entranceLightingImages')
+                                .update({
+                              'images': FieldValue.arrayUnion([downloadUrl]),
+                            });
+                          }
+                        });
+                  },
+                ),
 
               // Walls
-              ConditionItem(
-                name: "Walls",
-                condition: entranceWallsCondition,
-                location: entranceWallsLocation,
-                images: entranceWallsImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    entranceWallsCondition = condition;
-                  });
-                  _savePreference(
-                      propertyId, 'wallsCondition', condition!); // Save preference
-                },
-                onLocationSelected: (location) {
-                  setState(() {
-                    entranceWallsLocation = location;
-                  });
-                  _savePreference(propertyId,'wallsLocation', location!); // Save preference
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    entranceWallsImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId,'wallsImages', entranceWallsImages);
-                },
-              ),
+              StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'entranceWallsImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Yale images');
+                    }
+                    final entranceWallsImages = snapshot.data ?? [];
+                    return ConditionItem(
+                        name: "Walls",
+                        condition: entranceWallsCondition,
+                        description: entranceWallsCondition,
+                        images: entranceWallsImages,
+                        onConditionSelected: (condition) {
+                        setState(() {
+                          entranceWallsCondition = condition;
+                        });
+                        _savePreference(propertyId, 'entranceWallsCondition', condition!);
+                      },
+                        onDescriptionSelected: (description) {
+                        setState(() {
+                          entranceWallsCondition = description;
+                        });
+                        _savePreference(propertyId, 'entranceWallsCondition', description!);
+                      },
+                        onImageAdded: (imagePath) async {
+                          File imageFile = File(imagePath);
+                          String? downloadUrl = await uploadImageToFirebase(
+                              imageFile, propertyId,'entranceHallway', 'entranceWallsImages');
+
+                          if (downloadUrl != null) {
+                            print(
+                                "Adding image URL to Firestore: $downloadUrl");
+                            FirebaseFirestore.instance
+                                .collection('properties')
+                                .doc(propertyId)
+                                .collection('entranceHallway')
+                                .doc('entranceWallsImages')
+                                .update({
+                              'images': FieldValue.arrayUnion([downloadUrl]),
+                            });
+                          }
+                        });
+                  },
+                ),
 
               // Skirting
-              ConditionItem(
-                name: "Skirting",
-                condition: entranceSkirtingCondition,
-                location: entranceSkirtingLocation,
-                images: entranceSkirtingImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    entranceSkirtingCondition = condition;
-                  });
-                  _savePreference(
-                      propertyId, 'skirtingCondition', condition!); // Save preference
-                },
-                onLocationSelected: (location) {
-                  setState(() {
-                    entranceSkirtingLocation = location;
-                  });
-                  _savePreference(
-                      propertyId, 'skirtingLocation', location!); // Save preference
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    entranceSkirtingImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId,'skirtingImages', entranceSkirtingImages);
-                },
-              ),
+              StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'entranceSkirtingImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Yale images');
+                    }
+                    final entranceSkirtingImages = snapshot.data ?? [];
+                    return ConditionItem(
+                        name: "Skirting",
+                        condition: entranceSkirtingCondition,
+                        description: entranceSkirtingCondition,
+                        images: entranceSkirtingImages,
+                        onConditionSelected: (condition) {
+                        setState(() {
+                          entranceSkirtingCondition = condition;
+                        });
+                        _savePreference(propertyId, 'entranceSkirtingCondition', condition!);
+                      },
+                        onDescriptionSelected: (description) {
+                        setState(() {
+                          entranceSkirtingCondition = description;
+                        });
+                        _savePreference(propertyId, 'entranceSkirtingCondition', description!);
+                      },
+                        onImageAdded: (imagePath) async {
+                          File imageFile = File(imagePath);
+                          String? downloadUrl = await uploadImageToFirebase(
+                              imageFile, propertyId,'entranceHallway', 'entranceSkirtingImages');
+
+                          if (downloadUrl != null) {
+                            print(
+                                "Adding image URL to Firestore: $downloadUrl");
+                            FirebaseFirestore.instance
+                                .collection('properties')
+                                .doc(propertyId)
+                                .collection('entranceHallway')
+                                .doc('entranceSkirtingImages')
+                                .update({
+                              'images': FieldValue.arrayUnion([downloadUrl]),
+                            });
+                          }
+                        });
+                  },
+                ),
 
               // Window Sill
-              ConditionItem(
-                name: "Window Sill",
-                condition: entranceWindowSillCondition,
-                location: entranceWindowSillLocation,
-                images: entranceWindowSillImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    entranceWindowSillCondition = condition;
-                  });
-                  _savePreference(
-                      propertyId, 'windowSillCondition', condition!); // Save preference
-                },
-                onLocationSelected: (location) {
-                  setState(() {
-                    entranceWindowSillLocation = location;
-                  });
-                  _savePreference(
-                      propertyId, 'windowSillLocation', location!); // Save preference
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    entranceWindowSillImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId,'windowSillImages', entranceWindowSillImages);
-                },
-              ),
+              StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'entranceWindowSillImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Yale images');
+                    }
+                    final entranceWindowSillImages = snapshot.data ?? [];
+                    return ConditionItem(
+                        name: "Window Sill",
+                        condition: entranceWindowSillCondition,
+                        description: entranceWindowSillCondition,
+                        images: entranceWindowSillImages,
+                        onConditionSelected: (condition) {
+                        setState(() {
+                          entranceWindowSillCondition = condition;
+                        });
+                        _savePreference(propertyId, 'entranceWindowSillCondition', condition!);
+                      },
+                        onDescriptionSelected: (description) {
+                        setState(() {
+                          entranceWindowSillCondition = description;
+                        });
+                        _savePreference(propertyId, 'entranceWindowSillCondition', description!);
+                      },
+                        onImageAdded: (imagePath) async {
+                          File imageFile = File(imagePath);
+                          String? downloadUrl = await uploadImageToFirebase(
+                              imageFile, propertyId,'entranceHallway', 'entranceWindowSillImages');
+
+                          if (downloadUrl != null) {
+                            print(
+                                "Adding image URL to Firestore: $downloadUrl");
+                            FirebaseFirestore.instance
+                                .collection('properties')
+                                .doc(propertyId)
+                                .collection('entranceHallway')
+                                .doc('entranceWindowSillImages')
+                                .update({
+                              'images': FieldValue.arrayUnion([downloadUrl]),
+                            });
+                          }
+                        });
+                  },
+                ),
 
               // Curtains
-              ConditionItem(
-                name: "Curtains",
-                condition: entranceCurtainsCondition,
-                location: entranceCurtainsLocation,
-                images: entranceCurtainsImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    entranceCurtainsCondition = condition;
-                  });
-                  _savePreference(
-                      propertyId, 'curtainsCondition', condition!); // Save preference
-                },
-                onLocationSelected: (location) {
-                  setState(() {
-                    entranceCurtainsLocation = location;
-                  });
-                  _savePreference(
-                      propertyId,'curtainsLocation', location!); // Save preference
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    entranceCurtainsImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId,'curtainsImages', entranceCurtainsImages);
-                },
-              ),
+              StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'entranceCurtainsImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Yale images');
+                    }
+                    final entranceCurtainsImages = snapshot.data ?? [];
+                    return ConditionItem(
+                        name: "Curtains",
+                        condition: entranceCurtainsCondition,
+                        description: entranceCurtainsCondition,
+                        images: entranceCurtainsImages,
+                        onConditionSelected: (condition) {
+                        setState(() {
+                          entranceCurtainsCondition = condition;
+                        });
+                        _savePreference(propertyId, 'entranceCurtainsCondition', condition!);
+                      },
+                        onDescriptionSelected: (description) {
+                        setState(() {
+                          entranceCurtainsCondition = description;
+                        });
+                        _savePreference(propertyId, 'entranceCurtainsCondition', description!);
+                      },
+                        onImageAdded: (imagePath) async {
+                          File imageFile = File(imagePath);
+                          String? downloadUrl = await uploadImageToFirebase(
+                              imageFile, propertyId,'entranceHallway', 'entranceCurtainsImages');
+
+                          if (downloadUrl != null) {
+                            print(
+                                "Adding image URL to Firestore: $downloadUrl");
+                            FirebaseFirestore.instance
+                                .collection('properties')
+                                .doc(propertyId)
+                                .collection('entranceHallway')
+                                .doc('entranceCurtainsImages')
+                                .update({
+                              'images': FieldValue.arrayUnion([downloadUrl]),
+                            });
+                          }
+                        });
+                  },
+                ),
 
               // Blinds
-              ConditionItem(
-                name: "Blinds",
-                condition: entranceBlindsCondition,
-                location: entranceBlindsLocation,
-                images: entranceBlindsImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    entranceBlindsCondition = condition;
-                  });
-                  _savePreference(
-                      propertyId,'blindsCondition', condition!); // Save preference
-                },
-                onLocationSelected: (location) {
-                  setState(() {
-                    entranceBlindsLocation = location;
-                  });
-                  _savePreference(
-                      propertyId,'blindsLocation', location!); // Save preference
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    entranceBlindsImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId,'blindsImages', entranceBlindsImages);
-                },
-              ),
+              StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'entranceBlindsImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Yale images');
+                    }
+                    final entranceBlindsImages = snapshot.data ?? [];
+                    return ConditionItem(
+                        name: "Blinds",
+                        condition: entranceBlindsCondition,
+                        description: entranceBlindsCondition,
+                        images: entranceBlindsImages,
+                        onConditionSelected: (condition) {
+                        setState(() {
+                          entranceBlindsCondition = condition;
+                        });
+                        _savePreference(propertyId, 'entranceBlindsCondition', condition!);
+                      },
+                        onDescriptionSelected: (description) {
+                        setState(() {
+                          entranceBlindsCondition = description;
+                        });
+                        _savePreference(propertyId, 'entranceBlindsCondition', description!);
+                      },
+                        onImageAdded: (imagePath) async {
+                          File imageFile = File(imagePath);
+                          String? downloadUrl = await uploadImageToFirebase(
+                              imageFile, propertyId,'entranceHallway', 'entranceBlindsImages');
+
+                          if (downloadUrl != null) {
+                            print(
+                                "Adding image URL to Firestore: $downloadUrl");
+                            FirebaseFirestore.instance
+                                .collection('properties')
+                                .doc(propertyId)
+                                .collection('entranceHallway')
+                                .doc('entranceBlindsImages')
+                                .update({
+                              'images': FieldValue.arrayUnion([downloadUrl]),
+                            });
+                          }
+                        });
+                  },
+                ),
 
               // Light Switches
-              ConditionItem(
-                name: "Light Switches",
-                condition: entranceLightSwitchesCondition,
-                location: entranceLightSwitchesLocation,
-                images: entranceLightSwitchesImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    entranceLightSwitchesCondition = condition;
-                  });
-                  _savePreference(
-                      propertyId, 'lightSwitchesCondition', condition!); // Save preference
-                },
-                onLocationSelected: (location) {
-                  setState(() {
-                    entranceLightSwitchesLocation = location;
-                  });
-                  _savePreference(
-                      propertyId,'lightSwitchesLocation', location!); // Save preference
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    entranceLightSwitchesImages.add(imagePath);
-                  });
-                  _savePreferenceList(
-                      propertyId, 'lightSwitchesImages', entranceLightSwitchesImages);
-                },
-              ),
+             StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'entranceLightSwitchesImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Yale images');
+                    }
+                    final entranceLightSwitchesImages = snapshot.data ?? [];
+                    return ConditionItem(
+                        name: "Light Switches",
+                        condition: entranceLightSwitchesCondition,
+                        description: entranceLightSwitchesCondition,
+                        images: entranceLightSwitchesImages,
+                        onConditionSelected: (condition) {
+                        setState(() {
+                          entranceLightSwitchesCondition = condition;
+                        });
+                        _savePreference(propertyId, 'entranceLightSwitchesCondition', condition!);
+                      },
+                        onDescriptionSelected: (description) {
+                        setState(() {
+                          entranceLightSwitchesCondition = description;
+                        });
+                        _savePreference(propertyId, 'entranceLightSwitchesCondition', description!);
+                      },
+                        onImageAdded: (imagePath) async {
+                          File imageFile = File(imagePath);
+                          String? downloadUrl = await uploadImageToFirebase(
+                              imageFile, propertyId,'entranceHallway', 'entranceLightSwitchesImages');
+
+                          if (downloadUrl != null) {
+                            print(
+                                "Adding image URL to Firestore: $downloadUrl");
+                            FirebaseFirestore.instance
+                                .collection('properties')
+                                .doc(propertyId)
+                                .collection('entranceHallway')
+                                .doc('entranceLightSwitchesImages')
+                                .update({
+                              'images': FieldValue.arrayUnion([downloadUrl]),
+                            });
+                          }
+                        });
+                  },
+                ),
 
               // Sockets
-              ConditionItem(
-                name: "Sockets",
-                condition: entranceSocketsCondition,
-                location: entranceSocketsLocation,
-                images: entranceSocketsImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    entranceSocketsCondition = condition;
-                  });
-                  _savePreference(
-                      propertyId,'socketsCondition', condition!); // Save preference
-                },
-                onLocationSelected: (location) {
-                  setState(() {
-                    entranceSocketsLocation = location;
-                  });
-                  _savePreference(
-                      propertyId, 'socketsLocation', location!); // Save preference
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    entranceSocketsImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId,'socketsImages', entranceSocketsImages);
-                },
-              ),
+              StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'entranceSocketsImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Yale images');
+                    }
+                    final entranceSocketsImages = snapshot.data ?? [];
+                    return ConditionItem(
+                        name: "Socket",
+                        condition: entranceSocketsCondition,
+                        description: entranceSocketsCondition,
+                        images: entranceSocketsImages,
+                        onConditionSelected: (condition) {
+                        setState(() {
+                          entranceSocketsCondition = condition;
+                        });
+                        _savePreference(propertyId, 'entranceSocketsCondition', condition!);
+                      },
+                        onDescriptionSelected: (description) {
+                        setState(() {
+                          entranceSocketsCondition = description;
+                        });
+                        _savePreference(propertyId, 'entranceSocketsCondition', description!);
+                      },
+                        onImageAdded: (imagePath) async {
+                          File imageFile = File(imagePath);
+                          String? downloadUrl = await uploadImageToFirebase(
+                              imageFile, propertyId,'entranceHallway', 'entranceSocketsImages');
 
+                          if (downloadUrl != null) {
+                            print(
+                                "Adding image URL to Firestore: $downloadUrl");
+                            FirebaseFirestore.instance
+                                .collection('properties')
+                                .doc(propertyId)
+                                .collection('entranceHallway')
+                                .doc('entranceSocketsImages')
+                                .update({
+                              'images': FieldValue.arrayUnion([downloadUrl]),
+                            });
+                          }
+                        });
+                  },
+                ),
+                StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'entranceHeatingImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Yale images');
+                    }
+                    final entranceHeatingImages = snapshot.data ?? [];
+                    return ConditionItem(
+                        name: "Heating",
+                        condition: entranceHeatingCondition,
+                        description: entranceHeatingCondition,
+                        images: entranceHeatingImages,
+                        onConditionSelected: (condition) {
+                        setState(() {
+                          entranceHeatingCondition = condition;
+                        });
+                        _savePreference(propertyId, 'entranceHeatingCondition', condition!);
+                      },
+                        onDescriptionSelected: (description) {
+                        setState(() {
+                          entranceHeatingCondition = description;
+                        });
+                        _savePreference(propertyId, 'entranceHeatingCondition', description!);
+                      },
+                        onImageAdded: (imagePath) async {
+                          File imageFile = File(imagePath);
+                          String? downloadUrl = await uploadImageToFirebase(
+                              imageFile, propertyId,'entranceHallway', 'entranceHeatingImages');
+
+                          if (downloadUrl != null) {
+                            print(
+                                "Adding image URL to Firestore: $downloadUrl");
+                            FirebaseFirestore.instance
+                                .collection('properties')
+                                .doc(propertyId)
+                                .collection('entranceHallway')
+                                .doc('entranceHeatingImages')
+                                .update({
+                              'images': FieldValue.arrayUnion([downloadUrl]),
+                            });
+                          }
+                        });
+                  },
+                ),
               // Flooring
-              ConditionItem(
-                name: "Flooring",
-                condition: entranceFlooringCondition,
-                location: entranceFlooringLocation,
-                images: entranceFlooringImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    entranceFlooringCondition = condition;
-                  });
-                  _savePreference(
-                      propertyId,  'flooringCondition', condition!); // Save preference
-                },
-                onLocationSelected: (location) {
-                  setState(() {
-                    entranceFlooringLocation = location;
-                  });
-                  _savePreference(
-                      propertyId, 'flooringLocation', location!); // Save preference
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    entranceFlooringImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId,'flooringImages', entranceFlooringImages);
-                },
-              ),
+              StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'entranceFlooringImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Yale images');
+                    }
+                    final entranceFlooringImages = snapshot.data ?? [];
+                    return ConditionItem(
+                        name: "Flooring",
+                        condition: entranceFlooringCondition,
+                        description: entranceFlooringCondition,
+                        images: entranceFlooringImages,
+                        onConditionSelected: (condition) {
+                        setState(() {
+                          entranceFlooringCondition = condition;
+                        });
+                        _savePreference(propertyId, 'entranceFlooringCondition', condition!);
+                      },
+                        onDescriptionSelected: (description) {
+                        setState(() {
+                          entranceFlooringCondition = description;
+                        });
+                        _savePreference(propertyId, 'entranceFlooringCondition', description!);
+                      },
+                        onImageAdded: (imagePath) async {
+                          File imageFile = File(imagePath);
+                          String? downloadUrl = await uploadImageToFirebase(
+                              imageFile, propertyId,'entranceHallway', 'entranceFlooringImages');
+
+                          if (downloadUrl != null) {
+                            print(
+                                "Adding image URL to Firestore: $downloadUrl");
+                            FirebaseFirestore.instance
+                                .collection('properties')
+                                .doc(propertyId)
+                                .collection('entranceHallway')
+                                .doc('entranceFlooringImages')
+                                .update({
+                              'images': FieldValue.arrayUnion([downloadUrl]),
+                            });
+                          }
+                        });
+                  },
+                ),
 
               // Additional Items
-              ConditionItem(
-                name: "Additional Items",
-                condition: entranceAdditionalItemsCondition,
-                location: entranceAdditionalItemsLocation,
-                images: entranceAdditionalItemsImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    entranceAdditionalItemsCondition = condition;
-                  });
-                  _savePreference(
-                      propertyId,'additionalItemsCondition', condition!); // Save preference
-                },
-                onLocationSelected: (location) {
-                  setState(() {
-                    entranceAdditionalItemsLocation = location;
-                  });
-                  _savePreference(
-                      propertyId, 'additionalItemsLocation', location!); // Save preference
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    entranceAdditionalItemsImages.add(imagePath);
-                  });
-                  _savePreferenceList(
-                      propertyId,'additionalItemsImages', entranceAdditionalItemsImages);
-                },
-              ),
+              StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'entranceAdditionalItemsImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Yale images');
+                    }
+                    final entranceAdditionalItemsImages = snapshot.data ?? [];
+                    return ConditionItem(
+                        name: "Additional Items",
+                        condition: entranceAdditionalItemsCondition,
+                        description: entranceAdditionalItemsCondition,
+                        images: entranceAdditionalItemsImages,
+                        onConditionSelected: (condition) {
+                        setState(() {
+                          entranceAdditionalItemsCondition = condition;
+                        });
+                        _savePreference(propertyId, 'entranceAdditionalItemsCondition', condition!);
+                      },
+                        onDescriptionSelected: (description) {
+                        setState(() {
+                          entranceAdditionalItemsCondition = description;
+                        });
+                        _savePreference(propertyId, 'entranceAdditionalItemsCondition', description!);
+                      },
+                        onImageAdded: (imagePath) async {
+                          File imageFile = File(imagePath);
+                          String? downloadUrl = await uploadImageToFirebase(
+                              imageFile, propertyId,'entranceHallway', 'entranceAdditionalItemsImages');
+
+                          if (downloadUrl != null) {
+                            print(
+                                "Adding image URL to Firestore: $downloadUrl");
+                            FirebaseFirestore.instance
+                                .collection('properties')
+                                .doc(propertyId)
+                                .collection('entranceHallway')
+                                .doc('entranceAdditionalItemsImages')
+                                .update({
+                              'images': FieldValue.arrayUnion([downloadUrl]),
+                            });
+                          }
+                        });
+                  },
+                ),
             ],
           ),
         ),
       ),
-    ),canPop: false,);
+    ),);
   }
 }
 
 class ConditionItem extends StatelessWidget {
   final String name;
   final String? condition;
-  final String? location;
+  final String? description;
   final List<String> images;
   final Function(String?) onConditionSelected;
-  final Function(String?) onLocationSelected;
+  final Function(String?) onDescriptionSelected;
   final Function(String) onImageAdded;
 
   const ConditionItem({
     Key? key,
     required this.name,
     this.condition,
-    this.location,
+    this.description,
     required this.images,
     required this.onConditionSelected,
-    required this.onLocationSelected,
+    required this.onDescriptionSelected,
     required this.onImageAdded,
   }) : super(key: key);
 
@@ -880,9 +1260,9 @@ class ConditionItem extends StatelessWidget {
               ? Wrap(
                   spacing: 8.0,
                   runSpacing: 8.0,
-                  children: images.map((imagePath) {
-                    return Image.file(
-                      File(imagePath),
+                  children: images.map((imageUrl) {
+                    return Image.network(
+                      imageUrl,
                       width: 100,
                       height: 100,
                       fit: BoxFit.cover,

@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:camera/camera.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart'; // Import shared_preferences
 import 'package:taurgo_inventory/pages/conditions/condition_details.dart';
@@ -20,7 +22,52 @@ class RearGarden extends StatefulWidget {
   @override
   State<RearGarden> createState() => _RearGardenState();
 }
+Future<String?> uploadImageToFirebase(File imageFile, String propertyId, String collectionName, String documentId) async {
+  try {
+    // Step 1: Upload the image to Firebase Storage
+    String fileName = '${documentId}_${DateTime.now().millisecondsSinceEpoch}.jpg';
+    Reference storageReference = FirebaseStorage.instance
+        .ref()
+        .child('$propertyId/$collectionName/$documentId/$fileName');
 
+    UploadTask uploadTask = storageReference.putFile(imageFile);
+    TaskSnapshot snapshot = await uploadTask.whenComplete(() => null);
+
+    // Step 2: Get the download URL of the uploaded image
+    String downloadURL = await snapshot.ref.getDownloadURL();
+    print("Uploaded to Firebase: $downloadURL");
+
+    // Step 3: Save the download URL to Firestore
+    await FirebaseFirestore.instance
+        .collection('properties')
+        .doc(propertyId)
+        .collection(collectionName)
+        .doc(documentId)
+        .set({
+          'images': FieldValue.arrayUnion([downloadURL])
+        }, SetOptions(merge: true));
+
+    return downloadURL;
+  } catch (e) {
+    print("Error uploading image: $e");
+    return null;
+  }
+}
+Stream<List<String>> _getImagesFromFirestore(String propertyId, String imageType) {
+    return FirebaseFirestore.instance
+        .collection('properties')
+        .doc(propertyId)
+        .collection('rearGarden')
+        .doc(imageType)
+        .snapshots()
+        .map((snapshot) {
+      print("Firestore snapshot data for $imageType: ${snapshot.data()}");
+      if (snapshot.exists && snapshot.data() != null) {
+        return List<String>.from(snapshot.data()!['images'] ?? []);
+      }
+      return [];
+    });
+  }
 class _RearGardenState extends State<RearGarden> {
   String? reargardenDescription;
   String? rearGardenOutsideLighting;
@@ -39,40 +86,11 @@ class _RearGardenState extends State<RearGarden> {
     super.initState();
     rearGardencapturedImages = widget.rearGardencapturedImages ?? [];
     print("Property Id - SOC${widget.propertyId}");
-    _loadPreferences(widget.propertyId);
     // Load the saved preferences when the state is initialized
   }
 
-  // Function to load preferences
-  Future<void> _loadPreferences(String propertyId) async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      reargardenDescription =
-          prefs.getString('reargardenDescription_${propertyId}');
-      rearGardenOutsideLighting =
-          prefs.getString('rearGardenOutsideLighting_${propertyId}');
-      rearGardensummerHouse =
-          prefs.getString('rearGardensummerHouse_${propertyId}');
-      rearGardenshed = prefs.getString('rearGardenshed_${propertyId}');
-      rearGardenadditionalInformation =
-          prefs.getString('rearGardenadditionalInformation_${propertyId}');
 
-      reargardenDescriptionImages =
-          prefs.getStringList('reargardenDescriptionImages_${propertyId}') ??
-              [];
-      rearGardenOutsideLightingImages = prefs
-          .getStringList('rearGardenOutsideLightingImages_${propertyId}') ??
-          [];
-      rearGardensummerHouseImages =
-          prefs.getStringList('rearGardensummerHouseImages_${propertyId}') ??
-              [];
-      rearGardenshedImages =
-          prefs.getStringList('rearGardenshedImages_${propertyId}') ?? [];
-      rearGardenadditionalInformationImages = prefs.getStringList(
-          'rearGardenadditionalInformationImages_${propertyId}') ??
-          [];
-    });
-  }
+  
 
   // Function to save a preference
   Future<void> _savePreference(
@@ -81,11 +99,7 @@ class _RearGardenState extends State<RearGarden> {
     prefs.setString('${key}_$propertyId', value);
   }
 
-  Future<void> _savePreferenceList(
-      String propertyId, String key, List<String> value) async {
-    final prefs = await SharedPreferences.getInstance();
-    prefs.setStringList('${key}_$propertyId', value);
-  }
+ 
 
   @override
   Widget build(BuildContext context) {
@@ -290,153 +304,264 @@ class _RearGardenState extends State<RearGarden> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Garden Description
-              ConditionItem(
-                name: "Garden Description",
-                condition: reargardenDescription,
-                description: reargardenDescription,
-                images: reargardenDescriptionImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    reargardenDescription = condition;
-                  });
-                  _savePreference(propertyId, 'reargardenDescription',
-                      condition!); // Save preference
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    reargardenDescription = description;
-                  });
-                  _savePreference(propertyId, 'reargardenDescription',
-                      description!); // Save preference
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    reargardenDescriptionImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId, 'reargardenDescriptionImages',
-                      reargardenDescriptionImages); // Save preference
-                },
-              ),
+              StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'reargardenDescriptionImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Yale images');
+                    }
+                    final reargardenDescriptionImages= snapshot.data ?? [];
+                    return ConditionItem(
+                        name: "Garden Description",
+                        condition: reargardenDescription,
+                        description: reargardenDescription,
+                        images: reargardenDescriptionImages,
+                        onConditionSelected: (condition) {
+                          setState(() {
+                            reargardenDescription = condition;
+                          });
+                          _savePreference(propertyId, 'reargardenDescription', condition!);
+                        },
+                        onDescriptionSelected: (description) {
+                          setState(() {
+                            reargardenDescription = description;
+                          });
+                          _savePreference(propertyId, 'toiletDoorFrameCondition', description!);
+                        },
+                        onImageAdded: (imagePath) async {
+                          File imageFile = File(imagePath);
+                          String? downloadUrl = await uploadImageToFirebase(
+                              imageFile,
+                              propertyId,
+                              'rearGarden',
+                              'reargardenDescriptionImages');
+
+                          if (downloadUrl != null) {
+                            print(
+                                "Adding image URL to Firestore: $downloadUrl");
+                            FirebaseFirestore.instance
+                                .collection('properties')
+                                .doc(propertyId)
+                                .collection('rearGarden')
+                                .doc('reargardenDescriptionImages')
+                                .update({
+                              'images': FieldValue.arrayUnion([downloadUrl]),
+                            });
+                          }
+                        });
+                  },
+                ),
 
               // Outside Lighting
-              ConditionItem(
-                name: "Outside Lighting",
-                condition: rearGardenOutsideLighting,
-                description: rearGardenOutsideLighting,
-                images: rearGardenOutsideLightingImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    rearGardenOutsideLighting = condition;
-                  });
-                  _savePreference(propertyId, 'rearGardenOutsideLighting',
-                      condition!); // Save preference
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    rearGardenOutsideLighting = description;
-                  });
-                  _savePreference(propertyId, 'rearGardenOutsideLighting',
-                      description!); // Save preference
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    rearGardenOutsideLightingImages.add(imagePath);
-                  });
-                  _savePreferenceList(
-                      propertyId,
-                      'rearGardenOutsideLightingImages',
-                      rearGardenOutsideLightingImages); // Save preference
-                },
-              ),
+              StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'rearGardenOutsideLightingImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Yale images');
+                    }
+                    final rearGardenOutsideLightingImages= snapshot.data ?? [];
+                    return ConditionItem(
+                        name: "Outside Lighting",
+                        condition: rearGardenOutsideLighting,
+                        description: rearGardenOutsideLighting,
+                        images: rearGardenOutsideLightingImages,
+                        onConditionSelected: (condition) {
+                          setState(() {
+                            rearGardenOutsideLighting = condition;
+                          });
+                          _savePreference(propertyId, 'rearGardenOutsideLighting', condition!);
+                        },
+                        onDescriptionSelected: (description) {
+                          setState(() {
+                            rearGardenOutsideLighting = description;
+                          });
+                          _savePreference(propertyId, 'rearGardenOutsideLighting', description!);
+                        },
+                        onImageAdded: (imagePath) async {
+                          File imageFile = File(imagePath);
+                          String? downloadUrl = await uploadImageToFirebase(
+                              imageFile,
+                              propertyId,
+                              'rearGarden',
+                              'rearGardenOutsideLightingImages');
+
+                          if (downloadUrl != null) {
+                            print(
+                                "Adding image URL to Firestore: $downloadUrl");
+                            FirebaseFirestore.instance
+                                .collection('properties')
+                                .doc(propertyId)
+                                .collection('rearGarden')
+                                .doc('rearGardenOutsideLightingImages')
+                                .update({
+                              'images': FieldValue.arrayUnion([downloadUrl]),
+                            });
+                          }
+                        });
+                  },
+                ),
 
               // Summer House
-              ConditionItem(
-                name: "Summer House",
-                condition: rearGardensummerHouse,
-                description: rearGardensummerHouse,
-                images: rearGardensummerHouseImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    rearGardensummerHouse = condition;
-                  });
-                  _savePreference(propertyId, 'rearGardensummerHouse',
-                      condition!); // Save preference
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    rearGardensummerHouse = description;
-                  });
-                  _savePreference(propertyId, 'rearGardensummerHouse',
-                      description!); // Save preference
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    rearGardensummerHouseImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId, 'rearGardensummerHouseImages',
-                      rearGardensummerHouseImages); // Save preference
-                },
-              ),
+              StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'rearGardensummerHouseImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Yale images');
+                    }
+                    final rearGardensummerHouseImages= snapshot.data ?? [];
+                    return ConditionItem(
+                        name: "Summer House",
+                        condition: rearGardensummerHouse,
+                        description: rearGardensummerHouse,
+                        images: rearGardensummerHouseImages,
+                        onConditionSelected: (condition) {
+                          setState(() {
+                            rearGardensummerHouse = condition;
+                          });
+                          _savePreference(propertyId, 'rearGardensummerHouse,', condition!);
+                        },
+                        onDescriptionSelected: (description) {
+                          setState(() {
+                            rearGardensummerHouse = description;
+                          });
+                          _savePreference(propertyId, 'rearGardensummerHouse', description!);
+                        },
+                        onImageAdded: (imagePath) async {
+                          File imageFile = File(imagePath);
+                          String? downloadUrl = await uploadImageToFirebase(
+                              imageFile,
+                              propertyId,
+                              'rearGarden',
+                              'rearGardensummerHouseImages');
+
+                          if (downloadUrl != null) {
+                            print(
+                                "Adding image URL to Firestore: $downloadUrl");
+                            FirebaseFirestore.instance
+                                .collection('properties')
+                                .doc(propertyId)
+                                .collection('rearGarden')
+                                .doc('rearGardensummerHouseImages')
+                                .update({
+                              'images': FieldValue.arrayUnion([downloadUrl]),
+                            });
+                          }
+                        });
+                  },
+                ),
 
               // rearGardenShed
-              ConditionItem(
-                name: "rearGardenShed",
-                condition: rearGardenshed,
-                description: rearGardenshed,
-                images: rearGardenshedImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    rearGardenshed = condition;
-                  });
-                  _savePreference(propertyId, 'rearGardenshed',
-                      condition!); // Save preference
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    rearGardenshed = description;
-                  });
-                  _savePreference(propertyId, 'rearGardenshed',
-                      description!); // Save preference
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    rearGardenshedImages.add(imagePath);
-                  });
-                  _savePreferenceList(propertyId, 'rearGardenshedImages',
-                      rearGardenshedImages); // Save preference
-                },
-              ),
+              StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'rearGardenshedImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Yale images');
+                    }
+                    final rearGardenshedImages= snapshot.data ?? [];
+                    return ConditionItem(
+                        name: "Shed",
+                        condition: rearGardenshed,
+                        description: rearGardenshed,
+                        images: rearGardenshedImages,
+                        onConditionSelected: (condition) {
+                          setState(() {
+                            rearGardenshed = condition;
+                          });
+                          _savePreference(propertyId, 'rearGardenshed', condition!);
+                        },
+                        onDescriptionSelected: (description) {
+                          setState(() {
+                            rearGardenshed = description;
+                          });
+                          _savePreference(propertyId, 'rearGardenshed', description!);
+                        },
+                        onImageAdded: (imagePath) async {
+                          File imageFile = File(imagePath);
+                          String? downloadUrl = await uploadImageToFirebase(
+                              imageFile,
+                              propertyId,
+                              'rearGarden',
+                              'rearGardenshedImages');
+
+                          if (downloadUrl != null) {
+                            print(
+                                "Adding image URL to Firestore: $downloadUrl");
+                            FirebaseFirestore.instance
+                                .collection('properties')
+                                .doc(propertyId)
+                                .collection('rearGarden')
+                                .doc('rearGardenshedImages')
+                                .update({
+                              'images': FieldValue.arrayUnion([downloadUrl]),
+                            });
+                          }
+                        });
+                  },
+                ),
 
               // Additional Information
-              ConditionItem(
-                name: "Additional Information",
-                condition: rearGardenadditionalInformation,
-                description: rearGardenadditionalInformation,
-                images: rearGardenadditionalInformationImages,
-                onConditionSelected: (condition) {
-                  setState(() {
-                    rearGardenadditionalInformation = condition;
-                  });
-                  _savePreference(propertyId, 'rearGardenadditionalInformation',
-                      condition!); // Save preference
-                },
-                onDescriptionSelected: (description) {
-                  setState(() {
-                    rearGardenadditionalInformation = description;
-                  });
-                  _savePreference(propertyId, 'rearGardenadditionalInformation',
-                      description!); // Save preference
-                },
-                onImageAdded: (imagePath) {
-                  setState(() {
-                    rearGardenadditionalInformationImages.add(imagePath);
-                  });
-                  _savePreferenceList(
-                      propertyId,
-                      'rearGardenadditionalInformationImages',
-                      rearGardenadditionalInformationImages); // Save preference
-                },
-              ),
+              StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'rearGardenadditionalInformationImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Yale images');
+                    }
+                    final rearGardenadditionalInformationImages= snapshot.data ?? [];
+                    return ConditionItem(
+                        name: "Shed",
+                        condition: rearGardenadditionalInformation,
+                        description: rearGardenadditionalInformation,
+                        images: rearGardenadditionalInformationImages,
+                        onConditionSelected: (condition) {
+                          setState(() {
+                            rearGardenadditionalInformation = condition;
+                          });
+                          _savePreference(propertyId, 'rearGardenadditionalInformation,', condition!);
+                        },
+                        onDescriptionSelected: (description) {
+                          setState(() {
+                            rearGardenadditionalInformation = description;
+                          });
+                          _savePreference(propertyId, 'rearGardenadditionalInformation,', description!);
+                        },
+                        onImageAdded: (imagePath) async {
+                          File imageFile = File(imagePath);
+                          String? downloadUrl = await uploadImageToFirebase(
+                              imageFile,
+                              propertyId,
+                              'rearGarden',
+                              'rearGardenadditionalInformationImages');
+
+                          if (downloadUrl != null) {
+                            print(
+                                "Adding image URL to Firestore: $downloadUrl");
+                            FirebaseFirestore.instance
+                                .collection('properties')
+                                .doc(propertyId)
+                                .collection('rearGarden')
+                                .doc('rearGardenadditionalInformationImages')
+                                .update({
+                              'images': FieldValue.arrayUnion([downloadUrl]),
+                            });
+                          }
+                        });
+                  },
+                ),
 
               // Add more ConditionItem widgets as needed
             ],
@@ -609,14 +734,14 @@ class ConditionItem extends StatelessWidget {
               ? Wrap(
             spacing: 8.0,
             runSpacing: 8.0,
-            children: images.map((imagePath) {
-              return Image.file(
-                File(imagePath),
-                width: 100,
-                height: 100,
-                fit: BoxFit.cover,
-              );
-            }).toList(),
+            children: images.map((imageUrl) {
+                    return Image.network(
+                      imageUrl,
+                      width: 100,
+                      height: 100,
+                      fit: BoxFit.cover,
+                    );
+                  }).toList(),
           )
               : Text(
             "No images selected",

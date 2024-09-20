@@ -2,11 +2,13 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:camera/camera.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart'; // Import shared_preferences
 import 'package:taurgo_inventory/pages/conditions/condition_details.dart';
 import 'package:taurgo_inventory/pages/edit_report_page.dart';
 import 'package:taurgo_inventory/pages/reportPages/camera_preview_page.dart';
+import 'package:taurgo_inventory/pages/reportPages/ev_charger.dart';
 
 import '../../constants/AppColors.dart';
 import '../../widgets/add_action.dart';
@@ -39,7 +41,7 @@ class _KeysState extends State<Keys> {
   List<String> yaleImages = [];
   List<String> morticeImages = [];
   List<String> windowLockImages = [];
-  List<String> gasMeterImages = [];
+  List<String> keygasMeterImages = [];
   List<String> carPassImages = [];
   List<String> remoteImages = [];
   List<String> otherImages = [];
@@ -50,37 +52,22 @@ class _KeysState extends State<Keys> {
     super.initState();
     capturedImages = widget.capturedImages ?? [];
     print("Property Id - SOC${widget.propertyId}");
-    _loadPreferences(widget.propertyId);
   }
 
-  // Function to load preferences
-  Future<void> _loadPreferences(String propertyId) async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      yaleLocation = prefs.getString('yaleLocation_${propertyId}');
-      yaleReading = prefs.getString('yaleReading_${propertyId}');
-      morticeLocation = prefs.getString('morticeLocation_${propertyId}');
-      morticeReading = prefs.getString('morticeReading_${propertyId}');
-      windowLockLocation = prefs.getString('windowLockLocation_${propertyId}');
-      windowLockReading = prefs.getString('windowLockReading_${propertyId}');
-      gasMeterLocation = prefs.getString('gasMeterLocation_${propertyId}');
-      gasMeterReading = prefs.getString('gasMeterReading_${propertyId}');
-      carPassLocation = prefs.getString('carPassLocation_${propertyId}');
-      carPassReading = prefs.getString('carPassReading_${propertyId}');
-      remoteLocation = prefs.getString('remoteLocation_${propertyId}');
-      remoteReading = prefs.getString('remoteReading_${propertyId}');
-      otherLocation = prefs.getString('otherLocation_${propertyId}');
-      otherReading = prefs.getString('otherReading_${propertyId}');
-
-      yaleImages = prefs.getStringList('yaleImages_${propertyId}') ?? [];
-      morticeImages = prefs.getStringList('morticeImages_${propertyId}') ?? [];
-      windowLockImages =
-          prefs.getStringList('windowLockImages_${propertyId}') ?? [];
-      gasMeterImages =
-          prefs.getStringList('gasMeterImages_${propertyId}') ?? [];
-      carPassImages = prefs.getStringList('carPassImages_${propertyId}') ?? [];
-      remoteImages = prefs.getStringList('remoteImages_${propertyId}') ?? [];
-      otherImages = prefs.getStringList('otherImages_${propertyId}') ?? [];
+  Stream<List<String>> _getImagesFromFirestore(
+      String propertyId, String imageType) {
+    return FirebaseFirestore.instance
+        .collection('properties')
+        .doc(propertyId)
+        .collection('keys')
+        .doc(imageType)
+        .snapshots()
+        .map((snapshot) {
+      print("Firestore snapshot data for $imageType: ${snapshot.data()}");
+      if (snapshot.exists && snapshot.data() != null) {
+        return List<String>.from(snapshot.data()!['images'] ?? []);
+      }
+      return [];
     });
   }
 
@@ -89,12 +76,6 @@ class _KeysState extends State<Keys> {
       String propertyId, String key, String value) async {
     final prefs = await SharedPreferences.getInstance();
     prefs.setString('${key}_$propertyId', value);
-  }
-
-  Future<void> _savePreferenceList(
-      String propertyId, String key, List<String> value) async {
-    final prefs = await SharedPreferences.getInstance();
-    prefs.setStringList('${key}_$propertyId', value);
   }
 
   @override
@@ -115,7 +96,7 @@ class _KeysState extends State<Keys> {
             centerTitle: true,
             backgroundColor: bWhite,
             leading: GestureDetector(
-              onTap: (){
+              onTap: () {
                 showDialog(
                   context: context,
                   builder: (BuildContext context) {
@@ -141,7 +122,7 @@ class _KeysState extends State<Keys> {
                       ),
                       content: Text(
                         'You may lost your data if you exit the process '
-                            'without saving',
+                        'without saving',
                         style: TextStyle(
                           color: Colors.grey[800],
                           fontSize: 14,
@@ -151,7 +132,8 @@ class _KeysState extends State<Keys> {
                       ),
                       actions: <Widget>[
                         TextButton(
-                          child: Text('Cancel',
+                          child: Text(
+                            'Cancel',
                             style: TextStyle(
                               color: kPrimaryColor,
                               fontSize: 16,
@@ -167,8 +149,9 @@ class _KeysState extends State<Keys> {
                             Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) =>
-                                      EditReportPage(propertyId: widget.propertyId)), // Replace HomePage with your
+                                  builder: (context) => EditReportPage(
+                                      propertyId: widget
+                                          .propertyId)), // Replace HomePage with your
                               // home page
                               // widget
                             );
@@ -202,7 +185,7 @@ class _KeysState extends State<Keys> {
             ),
             actions: [
               GestureDetector(
-                onTap: (){
+                onTap: () {
                   showDialog(
                     context: context,
                     builder: (BuildContext context) {
@@ -228,7 +211,7 @@ class _KeysState extends State<Keys> {
                         ),
                         content: Text(
                           'Please Make Sure You Have Added All the Necessary '
-                              'Information',
+                          'Information',
                           style: TextStyle(
                             color: Colors.grey[800],
                             fontSize: 14,
@@ -238,7 +221,8 @@ class _KeysState extends State<Keys> {
                         ),
                         actions: <Widget>[
                           TextButton(
-                            child: Text('Cancel',
+                            child: Text(
+                              'Cancel',
                               style: TextStyle(
                                 color: kPrimaryColor,
                                 fontSize: 16,
@@ -254,8 +238,9 @@ class _KeysState extends State<Keys> {
                               Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) =>
-                                        EditReportPage(propertyId: widget.propertyId)), // Replace HomePage with your
+                                    builder: (context) => EditReportPage(
+                                        propertyId: widget
+                                            .propertyId)), // Replace HomePage with your
                                 // home page
                                 // widget
                               );
@@ -302,207 +287,357 @@ class _KeysState extends State<Keys> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Yale
-                  ConditionItem(
-                    name: "Yale",
-                    location: yaleLocation,
-                    reading: yaleReading,
-                    images: yaleImages,
-                    onLocationSelected: (location) {
-                      setState(() {
-                        yaleLocation = location;
-                      });
-                      _savePreference(propertyId, 'yaleLocation', location!); //
-                      // Save preference
-                    },
-                    onReadingSelected: (reading) {
-                      setState(() {
-                        yaleReading = reading;
-                      });
-                      _savePreference(propertyId, 'yaleReading',
-                          reading!); // Save preference
-                    },
-                    onImageAdded: (imagePath) {
-                      setState(() {
-                        yaleImages.add(imagePath);
-                      });
-                      _savePreferenceList(propertyId, 'yaleImages',
-                          yaleImages); // Save preference
+                  StreamBuilder<List<String>>(
+                    stream: _getImagesFromFirestore(propertyId, 'yaleImages'),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return CircularProgressIndicator();
+                      }
+                      if (snapshot.hasError) {
+                        return Text('Error loading Yale images');
+                      }
+                      final yaleImages = snapshot.data ?? [];
+                      return ConditionItem(
+                          name: "Yale",
+                          condition: yaleLocation,
+                          description: yaleLocation,
+                          images: yaleImages,
+                          onConditionSelected: (condition) {
+                            setState(() {
+                              yaleLocation = condition;
+                            });
+                            _savePreference(
+                                propertyId, 'yaleLocation', condition!);
+                          },
+                          onDescriptionSelected: (description) {
+                            setState(() {
+                              yaleLocation = description;
+                            });
+                            _savePreference(
+                                propertyId, 'yaleLocation', description!);
+                          },
+                          onImageAdded: (imagePath) async {
+                            File imageFile = File(imagePath);
+                            String? downloadUrl = await uploadImageToFirebase(
+                                imageFile, propertyId, 'keys', 'yaleImages');
+
+                            if (downloadUrl != null) {
+                              print(
+                                  "Adding image URL to Firestore: $downloadUrl");
+                              FirebaseFirestore.instance
+                                  .collection('properties')
+                                  .doc(propertyId)
+                                  .collection('keys')
+                                  .doc('yaleImages')
+                                  .update({
+                                'images': FieldValue.arrayUnion([downloadUrl]),
+                              });
+                            }
+                          });
                     },
                   ),
 
                   // Mortice
-                  ConditionItem(
-                    name: "Mortice",
-                    location: morticeLocation,
-                    reading: morticeReading,
-                    images: morticeImages,
-                    onLocationSelected: (location) {
-                      setState(() {
-                        morticeLocation = location;
-                      });
-                      _savePreference(propertyId, 'morticeLocation',
-                          location!); // Save preference
-                    },
-                    onReadingSelected: (reading) {
-                      setState(() {
-                        morticeReading = reading;
-                      });
-                      _savePreference(propertyId, 'morticeReading',
-                          reading!); // Save preference
-                    },
-                    onImageAdded: (imagePath) {
-                      setState(() {
-                        morticeImages.add(imagePath);
-                      });
-                      _savePreferenceList(propertyId, 'morticeImages',
-                          morticeImages); // Save preference
+                  StreamBuilder<List<String>>(
+                    stream:
+                        _getImagesFromFirestore(propertyId, 'morticeImages'),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return CircularProgressIndicator();
+                      }
+                      if (snapshot.hasError) {
+                        return Text('Error loading Yale images');
+                      }
+                      final morticeImages = snapshot.data ?? [];
+                      return ConditionItem(
+                          name: "Mortice",
+                          condition: morticeLocation,
+                          description: morticeLocation,
+                          images: morticeImages,
+                          onConditionSelected: (condition) {
+                            setState(() {
+                              morticeLocation = condition;
+                            });
+                            _savePreference(
+                                propertyId, 'morticeLocation', condition!);
+                          },
+                          onDescriptionSelected: (description) {
+                            setState(() {
+                              morticeLocation = description;
+                            });
+                            _savePreference(
+                                propertyId, 'morticeLocation', description!);
+                          },
+                          onImageAdded: (imagePath) async {
+                            File imageFile = File(imagePath);
+                            String? downloadUrl = await uploadImageToFirebase(
+                                imageFile, propertyId, 'keys', 'morticeImages');
+
+                            if (downloadUrl != null) {
+                              print(
+                                  "Adding image URL to Firestore: $downloadUrl");
+                              FirebaseFirestore.instance
+                                  .collection('properties')
+                                  .doc(propertyId)
+                                  .collection('keys')
+                                  .doc('morticeImages')
+                                  .update({
+                                'images': FieldValue.arrayUnion([downloadUrl]),
+                              });
+                            }
+                          });
                     },
                   ),
 
                   // Window Lock
-                  ConditionItem(
-                    name: "Window Lock",
-                    location: windowLockLocation,
-                    reading: windowLockReading,
-                    images: windowLockImages,
-                    onLocationSelected: (location) {
-                      setState(() {
-                        windowLockLocation = location;
-                      });
-                      _savePreference(propertyId, 'windowLockLocation',
-                          location!); // Save preference
-                    },
-                    onReadingSelected: (reading) {
-                      setState(() {
-                        windowLockReading = reading;
-                      });
-                      _savePreference(propertyId, 'windowLockReading',
-                          reading!); // Save preference
-                    },
-                    onImageAdded: (imagePath) {
-                      setState(() {
-                        windowLockImages.add(imagePath);
-                      });
-                      _savePreferenceList(propertyId, 'windowLockImages',
-                          windowLockImages); // Save preference
-                    },
-                  ),
+                  StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'windowLockImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Yale images');
+                    }
+                    final windowLockImages = snapshot.data ?? [];
+                    return ConditionItem(
+                        name: "Window Lock",
+                        condition: windowLockLocation,
+                        description: windowLockLocation,
+                        images: windowLockImages,
+                        onConditionSelected: (condition) {
+                        setState(() {
+                          windowLockLocation = condition;
+                        });
+                        _savePreference(propertyId, 'windowLockLocation', condition!);
+                      },
+                        onDescriptionSelected: (description) {
+                        setState(() {
+                          windowLockLocation = description;
+                        });
+                        _savePreference(propertyId, 'windowLockLocation', description!);
+                      },
+                        onImageAdded: (imagePath) async {
+                          File imageFile = File(imagePath);
+                          String? downloadUrl = await uploadImageToFirebase(
+                              imageFile, propertyId,'keys', 'windowLockImages');
+
+                          if (downloadUrl != null) {
+                            print(
+                                "Adding image URL to Firestore: $downloadUrl");
+                            FirebaseFirestore.instance
+                                .collection('properties')
+                                .doc(propertyId)
+                                .collection('keys')
+                                .doc('windowLockImages')
+                                .update({
+                              'images': FieldValue.arrayUnion([downloadUrl]),
+                            });
+                          }
+                        });
+                  },
+                ),
+
 
                   // Gas Meter
-                  ConditionItem(
-                    name: "Gas Meter",
-                    location: gasMeterLocation,
-                    reading: gasMeterReading,
-                    images: gasMeterImages,
-                    onLocationSelected: (location) {
-                      setState(() {
-                        gasMeterLocation = location;
-                      });
-                      _savePreference(propertyId, 'gasMeterLocation',
-                          location!); // Save preference
-                    },
-                    onReadingSelected: (reading) {
-                      setState(() {
-                        gasMeterReading = reading;
-                      });
-                      _savePreference(propertyId, 'gasMeterReading',
-                          reading!); // Save preference
-                    },
-                    onImageAdded: (imagePath) {
-                      setState(() {
-                        gasMeterImages.add(imagePath);
-                      });
-                      _savePreferenceList(propertyId, 'gasMeterImages',
-                          gasMeterImages); // Save preference
-                    },
-                  ),
+                  StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'keygasMeterImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Yale images');
+                    }
+                    final keygasMeterImages = snapshot.data ?? [];
+                    return ConditionItem(
+                        name: "Gas Meter",
+                        condition: gasMeterLocation,
+                        description: gasMeterLocation,
+                        images: keygasMeterImages,
+                        onConditionSelected: (condition) {
+                        setState(() {
+                          gasMeterLocation = condition;
+                        });
+                        _savePreference(propertyId, 'gasMeterLocation', condition!);
+                      },
+                        onDescriptionSelected: (description) {
+                        setState(() {
+                          gasMeterLocation = description;
+                        });
+                        _savePreference(propertyId, 'gasMeterLocation', description!);
+                      },
+                        onImageAdded: (imagePath) async {
+                          File imageFile = File(imagePath);
+                          String? downloadUrl = await uploadImageToFirebase(
+                              imageFile, propertyId,'keys', 'keygasMeterImages');
+
+                          if (downloadUrl != null) {
+                            print(
+                                "Adding image URL to Firestore: $downloadUrl");
+                            FirebaseFirestore.instance
+                                .collection('properties')
+                                .doc(propertyId)
+                                .collection('keys')
+                                .doc('keygasMeterImages')
+                                .update({
+                              'images': FieldValue.arrayUnion([downloadUrl]),
+                            });
+                          }
+                        });
+                  },
+                ),
+
 
                   // Car Pass
-                  ConditionItem(
-                    name: "Car Pass",
-                    location: carPassLocation,
-                    reading: carPassReading,
-                    images: carPassImages,
-                    onLocationSelected: (location) {
-                      setState(() {
-                        carPassLocation = location;
-                      });
-                      _savePreference(propertyId, 'carPassLocation',
-                          location!); // Save preference
-                    },
-                    onReadingSelected: (reading) {
-                      setState(() {
-                        carPassReading = reading;
-                      });
-                      _savePreference(propertyId, 'carPassReading',
-                          reading!); // Save preference
-                    },
-                    onImageAdded: (imagePath) {
-                      setState(() {
-                        carPassImages.add(imagePath);
-                      });
-                      _savePreferenceList(propertyId, 'carPassImages',
-                          carPassImages); // Save preference
-                    },
-                  ),
+                  StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'carPassImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Yale images');
+                    }
+                    final carPassImages = snapshot.data ?? [];
+                    return ConditionItem(
+                        name: "Car Pass",
+                        condition: carPassLocation,
+                        description: carPassLocation,
+                        images: carPassImages,
+                        onConditionSelected: (condition) {
+                        setState(() {
+                          carPassLocation = condition;
+                        });
+                        _savePreference(propertyId, 'carPassLocation', condition!);
+                      },
+                        onDescriptionSelected: (description) {
+                        setState(() {
+                          carPassLocation = description;
+                        });
+                        _savePreference(propertyId, 'carPassLocation', description!);
+                      },
+                        onImageAdded: (imagePath) async {
+                          File imageFile = File(imagePath);
+                          String? downloadUrl = await uploadImageToFirebase(
+                              imageFile, propertyId,'keys', 'carPassImages');
+
+                          if (downloadUrl != null) {
+                            print(
+                                "Adding image URL to Firestore: $downloadUrl");
+                            FirebaseFirestore.instance
+                                .collection('properties')
+                                .doc(propertyId)
+                                .collection('keys')
+                                .doc('carPassImages')
+                                .update({
+                              'images': FieldValue.arrayUnion([downloadUrl]),
+                            });
+                          }
+                        });
+                  },
+                ),
+
 
                   // Remote
-                  ConditionItem(
-                    name: "Remote",
-                    location: remoteLocation,
-                    reading: remoteReading,
-                    images: remoteImages,
-                    onLocationSelected: (location) {
-                      setState(() {
-                        remoteLocation = location;
-                      });
-                      _savePreference(propertyId, 'remoteLocation',
-                          location!); // Save preference
-                    },
-                    onReadingSelected: (reading) {
-                      setState(() {
-                        remoteReading = reading;
-                      });
-                      _savePreference(propertyId, 'remoteReading',
-                          reading!); // Save preference
-                    },
-                    onImageAdded: (imagePath) {
-                      setState(() {
-                        remoteImages.add(imagePath);
-                      });
-                      _savePreferenceList(propertyId, 'remoteImages',
-                          remoteImages); // Save preference
-                    },
-                  ),
+                 StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'remoteImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Yale images');
+                    }
+                    final remoteImages = snapshot.data ?? [];
+                    return ConditionItem(
+                        name: " Remote",
+                        condition: remoteLocation,
+                        description: remoteLocation,
+                        images: remoteImages,
+                        onConditionSelected: (condition) {
+                        setState(() {
+                          remoteLocation = condition;
+                        });
+                        _savePreference(propertyId, 'remoteLocation', condition!);
+                      },
+                        onDescriptionSelected: (description) {
+                        setState(() {
+                          remoteLocation = description;
+                        });
+                        _savePreference(propertyId, 'remoteLocation', description!);
+                      },
+                        onImageAdded: (imagePath) async {
+                          File imageFile = File(imagePath);
+                          String? downloadUrl = await uploadImageToFirebase(
+                              imageFile, propertyId,'keys', 'remoteImages');
+
+                          if (downloadUrl != null) {
+                            print(
+                                "Adding image URL to Firestore: $downloadUrl");
+                            FirebaseFirestore.instance
+                                .collection('properties')
+                                .doc(propertyId)
+                                .collection('keys')
+                                .doc('remoteImages')
+                                .update({
+                              'images': FieldValue.arrayUnion([downloadUrl]),
+                            });
+                          }
+                        });
+                  },
+                ),
+
 
                   // Other
-                  ConditionItem(
-                    name: "Other",
-                    location: otherLocation,
-                    reading: otherReading,
-                    images: otherImages,
-                    onLocationSelected: (location) {
-                      setState(() {
-                        otherLocation = location;
-                      });
-                      _savePreference(propertyId, 'otherLocation',
-                          location!); // Save preference
-                    },
-                    onReadingSelected: (reading) {
-                      setState(() {
-                        otherReading = reading;
-                      });
-                      _savePreference(propertyId, 'otherReading',
-                          reading!); // Save preference
-                    },
-                    onImageAdded: (imagePath) {
-                      setState(() {
-                        otherImages.add(imagePath);
-                      });
-                      _savePreferenceList(propertyId, 'otherImages',
-                          otherImages); // Save preference
-                    },
-                  ),
+                  StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'otherImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Yale images');
+                    }
+                    final otherImages = snapshot.data ?? [];
+                    return ConditionItem(
+                        name: "Other",
+                        condition: otherLocation,
+                        description: otherLocation,
+                        images: otherImages,
+                        onConditionSelected: (condition) {
+                        setState(() {
+                          otherLocation = condition;
+                        });
+                        _savePreference(propertyId, 'otherLocation', condition!);
+                      },
+                        onDescriptionSelected: (description) {
+                        setState(() {
+                          otherLocation = description;
+                        });
+                        _savePreference(propertyId, 'otherLocation', description!);
+                      },
+                        onImageAdded: (imagePath) async {
+                          File imageFile = File(imagePath);
+                          String? downloadUrl = await uploadImageToFirebase(
+                              imageFile, propertyId,'keys', 'otherImages');
+
+                          if (downloadUrl != null) {
+                            print(
+                                "Adding image URL to Firestore: $downloadUrl");
+                            FirebaseFirestore.instance
+                                .collection('properties')
+                                .doc(propertyId)
+                                .collection('keys')
+                                .doc('otherImages')
+                                .update({
+                              'images': FieldValue.arrayUnion([downloadUrl]),
+                            });
+                          }
+                        });
+                  },
+                ),
+
 
                   // Add more ConditionItem widgets as needed
                 ],
@@ -515,21 +650,21 @@ class _KeysState extends State<Keys> {
 
 class ConditionItem extends StatelessWidget {
   final String name;
-  final String? location;
-  final String? reading;
+  final String? condition;
+  final String? description;
   final List<String> images;
-  final Function(String?) onLocationSelected;
-  final Function(String?) onReadingSelected;
+  final Function(String?) onConditionSelected;
+  final Function(String?) onDescriptionSelected;
   final Function(String) onImageAdded;
 
   const ConditionItem({
     Key? key,
     required this.name,
-    this.location,
-    this.reading,
+    this.condition,
+    this.description,
     required this.images,
-    required this.onLocationSelected,
-    required this.onReadingSelected,
+    required this.onConditionSelected,
+    required this.onDescriptionSelected,
     required this.onImageAdded,
   }) : super(key: key);
 
@@ -619,18 +754,18 @@ class ConditionItem extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) => ConditionDetails(
-                    initialCondition: location,
+                    initialCondition: description,
                     type: name,
                   ),
                 ),
               );
 
               if (result != null) {
-                onLocationSelected(result);
+                onDescriptionSelected(result);
               }
             },
             child: Text(
-              location?.isNotEmpty == true ? location! : "Location",
+              description?.isNotEmpty == true ? description! : "Description",
               style: TextStyle(
                 fontSize: 12.0,
                 fontWeight: FontWeight.w700,
@@ -675,9 +810,9 @@ class ConditionItem extends StatelessWidget {
               ? Wrap(
                   spacing: 8.0,
                   runSpacing: 8.0,
-                  children: images.map((imagePath) {
-                    return Image.file(
-                      File(imagePath),
+                  children: images.map((imageUrl) {
+                    return Image.network(
+                      imageUrl,
                       width: 100,
                       height: 100,
                       fit: BoxFit.cover,
