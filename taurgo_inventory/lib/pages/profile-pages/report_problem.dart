@@ -1,14 +1,18 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:http/http.dart' as http;
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:taurgo_inventory/pages/conditions/condition_details.dart';
 import 'package:taurgo_inventory/pages/edit_report_page.dart';
 import 'package:taurgo_inventory/pages/home_page.dart';
 import '../../constants/AppColors.dart';
+import '../../constants/UrlConstants.dart';
 import '../../widgets/add_action.dart';
 import '../camera_preview_page.dart';
 class ReportProblem extends StatefulWidget {
@@ -22,6 +26,101 @@ class _ReportProblemState extends State<ReportProblem> {
 
   var subjectController = TextEditingController();
   var problemController = TextEditingController();
+  Future<void> _reportProblem(String subject, String description) async {
+
+    // Show loading indicator
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Center(
+          child: SizedBox(
+            width: 60.0,
+            height: 60.0,
+            child: CircularProgressIndicator(
+              color: kPrimaryColor,
+              strokeWidth: 3.0,
+              strokeCap: StrokeCap.square,
+            ),
+          ),
+        );
+      },
+    );
+
+    try {
+      var uri = Uri.parse('$baseURL/report/addReport');
+
+      final request = http.MultipartRequest('POST', uri)
+        ..fields['subject'] = subject
+        ..fields['description'] = description;
+
+      var response = await request.send();
+
+      print('Response status: ${response.statusCode}');
+
+      if (response.statusCode == 200) {
+        print('Property Updated, Please start uploading your tours');
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: kPrimaryColor,
+            content: Text(
+              'Thank You for your response. We will look into the Issue and '
+                  'Sort them out in the future builds',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                fontFamily: "Inter",
+              ),
+            ),
+          ),
+        );
+
+        // Hide the loading indicator
+        Navigator.of(context).pop();
+
+        // Navigate to the confirmation page
+        HomePage.homePageKey.currentState?.navigateToPage(1);
+
+      } else {
+        print('Failed to Upload the Property Details ${response.statusCode}');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: Colors.redAccent,
+            content: Text(
+              'Failed to Upload the Property Details: ${response.statusCode}',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                fontFamily: "Inter",
+              ),
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      print('Network error: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: Colors.redAccent,
+          content: Text(
+            'Network error: $e',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+              fontFamily: "Inter",
+            ),
+          ),
+        ),
+      );
+    } finally {
+      // Ensure the dialog is dismissed
+      Navigator.of(context).pop();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return PopScope(child: Scaffold(
@@ -140,7 +239,8 @@ class _ReportProblemState extends State<ReportProblem> {
               Center(
                 child: GestureDetector(
                   onTap: () {
-
+                    _reportProblem(subjectController.text.trim(),problemController
+                        .text.trim());
                   },
                   child: Container(
                     width: double.maxFinite,

@@ -44,16 +44,12 @@ class _AddPropertyDetailsPageSecondState extends State<AddPropertyDetailsPageSec
   String? keysIwth;
 
   Map<String, String>? selectedPackage;
-  final List<String> types = [
+  final List<String> inventoryType = [
     'Inventory & Schedule of Condition',
     'Check In',
-    'Standalone Inspection',
-    'Update',
     "Checkout",
     'Inventory & Check In',
     'Risk Assessment',
-    'Midterm Inventory',
-    'Self Service Inspection'
   ];
 
   final List<String> keys = [
@@ -210,6 +206,7 @@ class _AddPropertyDetailsPageSecondState extends State<AddPropertyDetailsPageSec
       canPop: false,
       child: Scaffold(
         appBar: AppBar(
+          scrolledUnderElevation: 0,
           title: Text(
             'Create Inspection', // Replace with the actual location
             style: TextStyle(
@@ -509,7 +506,7 @@ class _AddPropertyDetailsPageSecondState extends State<AddPropertyDetailsPageSec
                     style: TextStyle(
                       fontSize: 14.0,
                       fontWeight: FontWeight.w700,
-                      color: kPrimaryTextColourTwo,
+                      color: kPrimaryColor,
                     ),
                   ),
                 ),
@@ -522,7 +519,12 @@ class _AddPropertyDetailsPageSecondState extends State<AddPropertyDetailsPageSec
                   child:  DropdownButtonFormField<String>(
                     dropdownColor: bWhite,
                     value: selectedType,
-                    hint: Text('Select Type'),
+                    hint: Text('Select Type',style: TextStyle(
+                      color: kPrimaryColor,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      fontFamily: "Inter",
+                    )),
                     decoration: InputDecoration(
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10.0),
@@ -552,7 +554,7 @@ class _AddPropertyDetailsPageSecondState extends State<AddPropertyDetailsPageSec
                       Icons.arrow_drop_down,
                       color: kPrimaryColor,
                     ),
-                    items: types.map((String type) {
+                    items: inventoryType.map((String type) {
                       return DropdownMenuItem<String>(
                         value: type,
                         child: Padding(
@@ -562,7 +564,7 @@ class _AddPropertyDetailsPageSecondState extends State<AddPropertyDetailsPageSec
                             child: Text(
                               type,
                               style: TextStyle(
-                                color: kPrimaryTextColour,
+                                color: kPrimaryColor,
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500,
                                 fontFamily: "Inter",
@@ -575,7 +577,6 @@ class _AddPropertyDetailsPageSecondState extends State<AddPropertyDetailsPageSec
                     onChanged: (String? newValue) {
                       setState(() {
                         selectedType = newValue;
-                        selectedPackage = null; // Reset the selected package
                       });
                     },
                   ),
@@ -595,7 +596,7 @@ class _AddPropertyDetailsPageSecondState extends State<AddPropertyDetailsPageSec
                           style: TextStyle(
                             fontSize: 14.0,
                             fontWeight: FontWeight.w700,
-                            color: kPrimaryTextColourTwo,
+                            color: kPrimaryColor,
                           ),
                         ),
                         Row(
@@ -635,7 +636,7 @@ class _AddPropertyDetailsPageSecondState extends State<AddPropertyDetailsPageSec
                           style: TextStyle(
                             fontSize: 14.0,
                             fontWeight: FontWeight.w700,
-                            color: kPrimaryTextColourTwo,
+                            color: kPrimaryColor,
                           ),
                         ),
                         Row(
@@ -672,7 +673,7 @@ class _AddPropertyDetailsPageSecondState extends State<AddPropertyDetailsPageSec
                     style: TextStyle(
                       fontSize: 14.0,
                       fontWeight: FontWeight.w700,
-                      color: kPrimaryTextColourTwo,
+                      color: kPrimaryColor,
                     ),
                   ),
                 ),
@@ -684,7 +685,12 @@ class _AddPropertyDetailsPageSecondState extends State<AddPropertyDetailsPageSec
                   child:  DropdownButtonFormField<String>(
                     dropdownColor: bWhite,
                     value: keysIwth,
-                    hint: Text('Key Location'),
+                    hint: Text('Key Location',style: TextStyle(
+                      color: kPrimaryColor,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      fontFamily: "Inter",
+                    )),
                     decoration: InputDecoration(
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10.0),
@@ -724,7 +730,7 @@ class _AddPropertyDetailsPageSecondState extends State<AddPropertyDetailsPageSec
                             child: Text(
                               type,
                               style: TextStyle(
-                                color: kPrimaryTextColour,
+                                color: kPrimaryColor,
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500,
                                 fontFamily: "Inter",
@@ -744,51 +750,36 @@ class _AddPropertyDetailsPageSecondState extends State<AddPropertyDetailsPageSec
                 SizedBox(height: 12.0),
 
 
-                //Line One
-                Padding(
-                  padding: EdgeInsets.all(0.0),
-                  child: TextField(
-                    cursorColor: kPrimaryColor,
-                    controller: referenceController,
-                    decoration: InputDecoration(
-                      labelText: "Reference",
-                      labelStyle: TextStyle(
-                        fontSize: 14.0,
-                        fontWeight: FontWeight.w700,
-                        color: kPrimaryTextColourTwo,
+
+
+                TextField(
+                  cursorColor: kPrimaryColor,
+                  controller: internalNotesController,
+                  maxLines: 5,
+                  decoration: InputDecoration(
+                    hintText: 'Additional Notes',
+                    hintStyle: TextStyle(
+                        color: kPrimaryColor,
+                        fontSize: 14// Change the label text color
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: kPrimaryColor, // Change the border color when not focused
+                        width: 1.0,
                       ),
-                      border: UnderlineInputBorder(
-                        borderSide: BorderSide(color: kPrimaryColor),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: kPrimaryColor, // Change the border color when focused
+                        width: 2.0,
                       ),
-                      focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: kPrimaryColor),
-                      ),
-                      contentPadding: EdgeInsets.symmetric(horizontal: 0.0),
+                      borderRadius: BorderRadius.circular(8),
                     ),
                   ),
-                ),
-
-                //Line two
-                Padding(
-                  padding: EdgeInsets.all(0.0),
-                  child: TextField(
-                    cursorColor: kPrimaryColor,
-                    controller: internalNotesController,
-                    decoration: InputDecoration(
-                      labelText: "Internal Notes",
-                      labelStyle: TextStyle(
-                        fontSize: 14.0,
-                        fontWeight: FontWeight.w700,
-                        color: kPrimaryTextColourTwo,
-                      ),
-                      border: UnderlineInputBorder(
-                        borderSide: BorderSide(color: kPrimaryColor),
-                      ),
-                      focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: kPrimaryColor),
-                      ),
-                      contentPadding: EdgeInsets.symmetric(horizontal: 0.0),
-                    ),
+                  style: TextStyle(
+                      color: kSecondaryTextColourTwo,
+                      fontSize: 12// Change the text color inside the TextField
                   ),
                 ),
 

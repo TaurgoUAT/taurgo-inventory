@@ -7,7 +7,6 @@ import 'package:taurgo_inventory/pages/property_details_view_page.dart';
 import '../constants/AppColors.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import '../widgets/DottedCirclepainter.dart';
 import 'authentication/controller/authController.dart';
 
 class LandingScreen extends StatefulWidget {
@@ -239,6 +238,7 @@ class _LandingScreenState extends State<LandingScreen> with TickerProviderStateM
       canPop: false,
         child: Scaffold(
           appBar: AppBar(
+            scrolledUnderElevation: 0,
             title: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -248,7 +248,7 @@ class _LandingScreenState extends State<LandingScreen> with TickerProviderStateM
                   children: [
                     Text(
                       userDetails.isNotEmpty ? userDetails[0]['userName'] ?? ''
-                          'Abishan' : 'Abishan',
+                          'Taurgo' : 'Taurgo',
                       style: TextStyle(
                         color: kPrimaryColor,
                         fontSize: 16,
@@ -307,7 +307,89 @@ class _LandingScreenState extends State<LandingScreen> with TickerProviderStateM
                   color: Colors.red,
                 ),
                 onPressed: () {
-                  AuthController.instance.logOut();
+                  showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          elevation: 10,
+                          backgroundColor: Colors.white,
+                          title: Row(
+                            children: [
+                              Icon(Icons.info_outline,
+                                  color: kPrimaryColor),
+                              SizedBox(width: 10),
+                              Text(
+                                'Log Out',
+                                style: TextStyle(
+                                  color: kPrimaryColor,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                          content: Text(
+                            'Are you sure want to Logout?',
+                            textAlign: TextAlign.left,
+                            style: TextStyle(
+                              color: Colors.grey[800],
+                              fontSize: 14,
+                              fontWeight: FontWeight.w400,
+                              height: 1.5,
+                            ),
+                          ),
+                          actions: <Widget>[
+                            TextButton(
+                              child: Text(
+                                'Cancel',
+                                style: TextStyle(
+                                  color: kPrimaryColor,
+                                  fontSize: 16,
+                                ),
+                              ),
+                              onPressed: () {
+                                Navigator.of(context)
+                                    .pop(); // Close the dialog
+                              },
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                AuthController.instance.logOut();
+                                // print(propertyId);
+                                // Navigator.pushReplacement(
+                                //   context,
+                                //   MaterialPageRoute(
+                                //       builder: (context) =>
+                                //           EditReportPage(
+                                //             propertyId: propertyId,
+                                //           )), // Replace HomePage
+                                //   // with your home page
+                                //   // widget
+                                // ); // Close the dialog
+                              },
+                              style: TextButton.styleFrom(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 16, vertical: 8),
+                                backgroundColor:
+                                Colors.red.withOpacity(0.8),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              child: Text(
+                                'Log Out',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ),
+                          ],
+                        );
+                      });
                 },
               ),
             ],

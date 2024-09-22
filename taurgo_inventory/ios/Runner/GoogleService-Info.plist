@@ -26,5 +26,7 @@
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
 	<string>1:568871054473:ios:cb3a3056044fb92a512a58</string>
+	<key>DATABASE_URL</key>
+	<string>https://taurgo-inventory-default-rtdb.asia-southeast1.firebasedatabase.app</string>
 </dict>
 </plist>

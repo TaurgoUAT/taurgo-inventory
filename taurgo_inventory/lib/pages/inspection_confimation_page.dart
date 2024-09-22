@@ -8761,7 +8761,15 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
       canPop: false,
       child: Scaffold(
         appBar: AppBar(
-          title: Text('Inspection Confirmation'),
+          scrolledUnderElevation: 0,
+          title: Text(
+            'Inspection Confirmation', // Replace with the actual location
+            style: TextStyle(
+              color: kPrimaryColor,
+              fontSize: 14, // Adjust the font size
+              fontFamily: "Inter",
+            ),
+          ),
           leading: GestureDetector(
             onTap: () {
               Navigator.pushReplacement(
@@ -8783,10 +8791,16 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
                 sendPropertyData(
                     context, property); // Link the save button to the function
               },
-              child: Icon(
-                Icons.save,
-                size: 20,
-                color: kPrimaryColor,
+              child: Container(
+                margin: EdgeInsets.all(16),
+                child: Text(
+                  'Save', // Replace with the actual location
+                  style: TextStyle(
+                    color: kPrimaryColor,
+                    fontSize: 14, // Adjust the font size
+                    fontFamily: "Inter",
+                  ),
+                ),
               ),
             ),
           ],
@@ -8849,64 +8863,64 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
                   },
                 ),
                 const SizedBox(height: 15),
-                const Text('Declaration',
-                    style: TextStyle(
-                      color: kPrimaryColor,
-                      fontSize: 14, // Adjust the font size
-                      fontFamily: "Inter",
-                    )),
-                const SizedBox(height: 15),
-                const Text(
-                    'I/We the undersigned, affirm  that if I/we do not'
-                        ' comment on the inventory in writing within seven days '
-                        'of receipt of this inventory I/We accept the inventory '
-                        'as being an accurate record of the contents and '
-                        'conditions of the property',
-                    textAlign: TextAlign.justify,
-                    style: TextStyle(
-                      color: kPrimaryTextColourTwo,
-                      fontSize: 12, // Adjust the font size
-                      fontFamily: "Inter",
-                    )),
-                const SizedBox(height: 15),
-                const Text('Please put the signature here',
-                    style: TextStyle(
-                      color: kPrimaryColor,
-                      fontSize: 14, // Adjust the font size
-                      fontFamily: "Inter",
-                    )),
-                const SizedBox(height: 15),
-                Card(
-                  child: Center(
-                    child: Signature(
-                      height: 200,
-                      width: double.maxFinite,
-                      controller: controller!,
-                      backgroundColor: bWhite,
-                    ),
-                  ),
-                ),
-                buttonWidgets(context)!,
-                const SizedBox(height: 30),
-                signature != null
-                    ? Column(
-                  children: [
-                    Center(child: Image.memory(signature!)),
-                    const SizedBox(height: 10),
-                    MaterialButton(
-                      color: Colors.green,
-                      onPressed: () {},
-                      child: const Text(
-                        "Submit",
-                        style: TextStyle(
-                          fontSize: 12,
-                        ),
-                      ),
-                    ),
-                  ],
-                )
-                    : Container(),
-                const SizedBox(height: 30),
+                // const Text('Declaration',
+                //     style: TextStyle(
+                //       color: kPrimaryColor,
+                //       fontSize: 14, // Adjust the font size
+                //       fontFamily: "Inter",
+                //     )),
+                // const SizedBox(height: 15),
+                // const Text(
+                //     'I/We the undersigned, affirm  that if I/we do not'
+                //         ' comment on the inventory in writing within seven days '
+                //         'of receipt of this inventory I/We accept the inventory '
+                //         'as being an accurate record of the contents and '
+                //         'conditions of the property',
+                //     textAlign: TextAlign.justify,
+                //     style: TextStyle(
+                //       color: kPrimaryTextColourTwo,
+                //       fontSize: 12, // Adjust the font size
+                //       fontFamily: "Inter",
+                //     )),
+                // const SizedBox(height: 15),
+                // const Text('Please put the signature here',
+                //     style: TextStyle(
+                //       color: kPrimaryColor,
+                //       fontSize: 14, // Adjust the font size
+                //       fontFamily: "Inter",
+                //     )),
+                // const SizedBox(height: 15),
+                // Card(
+                //   child: Center(
+                //     child: Signature(
+                //       height: 200,
+                //       width: double.maxFinite,
+                //       controller: controller!,
+                //       backgroundColor: bWhite,
+                //     ),
+                //   ),
+                // ),
+                // buttonWidgets(context)!,
+                // const SizedBox(height: 30),
+                // signature != null
+                //     ? Column(
+                //   children: [
+                //     Center(child: Image.memory(signature!)),
+                //     const SizedBox(height: 10),
+                //     MaterialButton(
+                //       color: Colors.green,
+                //       onPressed: () {},
+                //       child: const Text(
+                //         "Submit",
+                //         style: TextStyle(
+                //           fontSize: 12,
+                //         ),
+                //       ),
+                //     ),
+                //   ],
+                // )
+                //     : Container(),
+                // const SizedBox(height: 30),
               ],
             ),
           ),

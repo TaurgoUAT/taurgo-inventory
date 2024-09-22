@@ -1,31 +1,19 @@
 import 'dart:async';
-import 'dart:io';
-import 'package:camera/camera.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:taurgo_inventory/pages/conditions/condition_details.dart';
-import 'package:taurgo_inventory/pages/edit_report_page.dart';
 import 'package:taurgo_inventory/pages/profile-pages/edit_profile.dart';
 import 'package:taurgo_inventory/pages/profile-pages/faq_page.dart';
 import 'package:taurgo_inventory/pages/profile-pages/report_problem.dart';
 import 'package:taurgo_inventory/pages/profile-pages/setting_page.dart';
 import '../../constants/AppColors.dart';
-import '../../widgets/add_action.dart';
-import '../widgets/CurvePainter.dart';
-import 'authentication/controller/authController.dart';
-import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
 import 'package:taurgo_inventory/constants/UrlConstants.dart';
-import 'package:taurgo_inventory/pages/add_property_details_page.dart';
-import 'package:taurgo_inventory/pages/property_details_view_page.dart';
-import '../constants/AppColors.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
+
+import '../widgets/ButtonSquare.dart';
+import 'authentication/controller/authController.dart';
 
 class AccountPage extends StatefulWidget {
   const AccountPage({super.key});
@@ -116,24 +104,7 @@ class _AccountPageState extends State<AccountPage> {
     return PopScope(
       canPop: false,
       child: Scaffold(
-        // appBar: AppBar(
-        //   backgroundColor: bWhite,
-        //   // leading: GestureDetector(
-        //   //   onTap: () {
-        //   //     Navigator.push(
-        //   //       context,
-        //   //       MaterialPageRoute(
-        //   //         builder: (context) => EditReportPage(),
-        //   //       ),
-        //   //     );
-        //   //   },
-        //   //   child: Icon(
-        //   //     Icons.arrow_back_ios_new,
-        //   //     color: kPrimaryColor,
-        //   //     size: 24,
-        //   //   ),
-        //   // ),
-        // ),
+
         body: SingleChildScrollView(
           // color: bWhite,
           child: Padding(
@@ -141,46 +112,64 @@ class _AccountPageState extends State<AccountPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // CustomPaint(
-                //   painter: CurvePainter(),
-                //   child: Container(),
-                // ),
                 Center(
                   child: Padding(
                     padding: const EdgeInsets.all(8.0), // Add some padding around the image
-                    child: Container(
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle, // Ensure the container remains a circle
-                        border: Border.all(
-                          color: kPrimaryColor, // Set the border color
-                          width: 2.0, // Set the border width
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(0.5), // Shadow color
-                            spreadRadius: 4, // How wide the shadow spreads
-                            blurRadius: 10, // Softness of the shadow
-                            offset: Offset(0, 4), // Offset for the shadow
-                            // position
+                    child: Stack(
+                      children: [
+                        Container(
+                          // decoration: BoxDecoration(
+                          //   shape: BoxShape.circle, // Ensure the container remains a circle
+                          //   border: Border.all(
+                          //     color: kPrimaryColor, // Set the border color
+                          //     width: 2.0, // Set the border width
+                          //   ),
+                          //   boxShadow: [
+                          //     BoxShadow(
+                          //       color: Colors.grey.withOpacity(0.5), // Shadow color
+                          //       spreadRadius: 4, // How wide the shadow spreads
+                          //       blurRadius: 10, // Softness of the shadow
+                          //       offset: Offset(0, 4), // Offset for the shadow position
+                          //     ),
+                          //   ],
+                          // ),
+                          child: ClipOval(
+                            child: Image.asset(
+                              'assets/images/profile.png', // Replace with your image path
+                              width: 150, // Adjust width to match height for a perfect circle
+                              height: 150, // Adjust height as needed
+                              fit: BoxFit.cover, // Image fit mode
+                            ),
                           ),
-                        ],
-                      ),
-                      child: ClipOval(
-                        child: Image.asset(
-                          'assets/images/no-img.png', // Replace with your image path
-                          width: 150, // Adjust width to match height for a perfect circle
-                          height: 150, // Adjust height as needed
-                          fit: BoxFit.cover, // Image fit mode
                         ),
-                      ),
+                        // Positioned(
+                        //   width: 30,
+                        //   height: 30,
+                        //   bottom: 6, // Adjust position of the icon
+                        //   right: 6,  // Adjust position of the icon
+                        //   child: CircleAvatar(
+                        //     radius: 20, // Size of the edit icon
+                        //     backgroundColor: kPrimaryColor, // Background color for the
+                        //     // icon
+                        //     child: IconButton(
+                        //       icon: Icon(Icons.camera_alt_outlined, color: bWhite,
+                        //         size: 16,),
+                        //       // Edit icon
+                        //       onPressed: () {
+                        //         // Add your edit function here
+                        //       },
+                        //     ),
+                        //   ),
+                        // ),
+                      ],
                     ),
                   ),
                 ),
                 SizedBox(height: 15.0),
                 Center(
-                  child: Text("Hi, ${userDetails.isNotEmpty ?
-                  userDetails[0]['firstName'] ?? ''
-                      'Abishan' : 'Abishan'}"
+                  child: Text("${userDetails.isNotEmpty ?
+                  userDetails[0]['userName'] ?? ''
+                      'Taurgo' : 'Taurgo'}"
                     ,
                     style: TextStyle(
                       fontSize: 24.0,
@@ -196,8 +185,8 @@ class _AccountPageState extends State<AccountPage> {
                     userDetails.isNotEmpty
                         ? userDetails[0]['email'] ??
                             ''
-                                'Abishan'
-                        : 'Abishan',
+                                'info@taurgo.com'
+                        : 'info@taurgo.com',
                     style: TextStyle(
                       fontSize: 11.0,
                       fontWeight: FontWeight.w700,
@@ -206,120 +195,100 @@ class _AccountPageState extends State<AccountPage> {
                   ),
                 ),
                 SizedBox(height: 10),
-                Center(
-                  child: Container(
-                    padding: EdgeInsets.all(0.0),
-                    width: double.infinity,
-                    height: 100,
-                    decoration: BoxDecoration(
-                      color: bWhite, // Background color of the container
-                      borderRadius: BorderRadius.circular(12),
-                      // boxShadow: [
-                      //   BoxShadow(
-                      //     color: Colors.grey.withOpacity(0.5),
-                      //     spreadRadius: 2,
-                      //     blurRadius: 5,
-                      //     offset: Offset(0, 4),
-                      //   ),
-                      // ],
-                      border: Border.all(
-                        color: kPrimaryColor, // Border color
-                        width: 2.0, // Border width
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        // First Stat
-                        Expanded(
-                          child: Column(
+                Padding(
+                  padding: const EdgeInsets.all(0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    // Adjust spacing between containers
+                    children: [
+                      ButtonSquare(
+                          width: 100,
+                          height: 100,
+                          bgColor: kPrimaryColor,
+                          borderColor: kPrimaryColor,
+                          childWidget: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                '12',
+                                '-',
                                 style: TextStyle(
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.bold,
-                                  color: kPrimaryColor,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                  fontFamily: "Inter",
+                                  color: bWhite,
                                 ),
                               ),
-                              SizedBox(height: 8),
                               Text(
-                                'Active Inspections',
-                                textAlign: TextAlign.center,
+                                'Assigned',
                                 style: TextStyle(
-                                  fontSize: 12,
-                                  color: kPrimaryTextColourTwo,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w500,
+                                  fontFamily: "Inter",
+                                  color: bWhite,
                                 ),
                               ),
                             ],
-                          ),
-                        ),
-                        VerticalDivider(
-                          indent: 20,
-                          endIndent: 20,
-                          width: 20, // Space between elements
-                          thickness: 2, // Thickness of the divider
-                          color: kPrimaryColor, // Color of the divider
-                        ),
-                        // Second Stat
-                        Expanded(
-                          child: Column(
+                          )),
+                      ButtonSquare(
+                          width: 100,
+                          height: 100,
+                          bgColor: bWhite,
+                          borderColor: kPrimaryColor,
+                          childWidget: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                '12',
+                                '-',
                                 style: TextStyle(
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                  fontFamily: "Inter",
                                   color: kPrimaryColor,
                                 ),
                               ),
-                              SizedBox(height: 8),
                               Text(
-                                'Completed Inspections',
-                                textAlign: TextAlign.center,
+                                'Completed',
                                 style: TextStyle(
-                                  fontSize: 12,
-                                  color: kPrimaryTextColourTwo,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w500,
+                                  fontFamily: "Inter",
+                                  color: kPrimaryColor,
                                 ),
                               ),
                             ],
-                          ),
-                        ),
-                        VerticalDivider(
-                          indent: 20,
-                          endIndent: 20,
-                          width: 20, // Space between elements
-                          thickness: 2, // Thickness of the divider
-                          color: kPrimaryColor, // Color of the divider
-                        ),
-                        Expanded(
-                          child: Column(
+                          )),
+                      ButtonSquare(
+                          width: 100,
+                          height: 100,
+                          bgColor: bWhite,
+                          borderColor: kPrimaryColor,
+                          childWidget: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                '12',
+                                '-',
                                 style: TextStyle(
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                  fontFamily: "Inter",
                                   color: kPrimaryColor,
                                 ),
                               ),
-                              SizedBox(height: 8),
                               Text(
-                                'Total Inspections',
-                                textAlign: TextAlign.center,
+                                'Total',
                                 style: TextStyle(
-                                  fontSize: 12,
-                                  color: kPrimaryTextColourTwo,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w500,
+                                  fontFamily: "Inter",
+                                  color: kPrimaryColor,
                                 ),
                               ),
                             ],
-                          ),
-                        ),
-                      ],
-                    ),
+                          )),
+                    ],
                   ),
                 ),
 
@@ -420,20 +389,9 @@ class _AccountPageState extends State<AccountPage> {
                             Container(
                               decoration: BoxDecoration(
                                 color: kPrimaryColor.withOpacity(0.3),
-                                // Background color of
-                                // the container
                                 shape: BoxShape.rectangle,
                                 // You can use BoxShape.circle for a circular container
                                 borderRadius: BorderRadius.circular(15.0), //
-                                // Rounded corners
-                                // boxShadow: [
-                                //   BoxShadow(
-                                //     color: Colors.black.withOpacity(0.1), // Shadow color
-                                //     spreadRadius: 2,
-                                //     blurRadius: 5,
-                                //     offset: Offset(0, 3), // Shadow position
-                                //   ),
-                                // ],
                               ),
                               padding: EdgeInsets.all(8.0),
                               // Space inside the container around the icon
@@ -569,15 +527,6 @@ class _AccountPageState extends State<AccountPage> {
                                 shape: BoxShape.rectangle,
                                 // You can use BoxShape.circle for a circular container
                                 borderRadius: BorderRadius.circular(15.0), //
-                                // Rounded corners
-                                // boxShadow: [
-                                //   BoxShadow(
-                                //     color: Colors.black.withOpacity(0.1), // Shadow color
-                                //     spreadRadius: 2,
-                                //     blurRadius: 5,
-                                //     offset: Offset(0, 3), // Shadow position
-                                //   ),
-                                // ],
                               ),
                               padding: EdgeInsets.all(8.0),
                               // Space inside the container around the icon
@@ -694,88 +643,86 @@ class _AccountPageState extends State<AccountPage> {
                       showDialog(
                           context: context,
                           builder: (BuildContext context) {
-                        return AlertDialog(
-                          shape: RoundedRectangleBorder(
-                            borderRadius:
-                            BorderRadius.circular(20),
-                          ),
-                          elevation: 10,
-                          backgroundColor: Colors.white,
-                          title: Row(
-                            children: [
-                              Icon(Icons.info_outline,
-                                  color: kPrimaryColor),
-                              SizedBox(width: 10),
-                              Text(
-                                'Log Out',
+                            return AlertDialog(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              elevation: 10,
+                              backgroundColor: Colors.white,
+                              title: Row(
+                                children: [
+                                  Icon(Icons.info_outline,
+                                      color: kPrimaryColor),
+                                  SizedBox(width: 10),
+                                  Text(
+                                    'Log Out',
+                                    style: TextStyle(
+                                      color: kPrimaryColor,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              content: Text(
+                                'Are you sure want to Logout?',
+                                textAlign: TextAlign.left,
                                 style: TextStyle(
-                                  color: kPrimaryColor,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
+                                  color: Colors.grey[800],
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w400,
+                                  height: 1.5,
                                 ),
                               ),
-                            ],
-                          ),
-                          content: Text(
-                            'Are you sure want to Logout?',
-                            textAlign: TextAlign.left,
-                            style: TextStyle(
-                              color: Colors.grey[800],
-                              fontSize: 14,
-                              fontWeight: FontWeight.w400,
-                              height: 1.5,
-                            ),
-                          ),
-                          actions: <Widget>[
-                            TextButton(
-                              child: Text(
-                                'Cancel',
-                                style: TextStyle(
-                                  color: kPrimaryColor,
-                                  fontSize: 16,
+                              actions: <Widget>[
+                                TextButton(
+                                  child: Text(
+                                    'Cancel',
+                                    style: TextStyle(
+                                      color: kPrimaryColor,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                  onPressed: () {
+                                    Navigator.of(context)
+                                        .pop(); // Close the dialog
+                                  },
                                 ),
-                              ),
-                              onPressed: () {
-                                Navigator.of(context)
-                                    .pop(); // Close the dialog
-                              },
-                            ),
-                            TextButton(
-                              onPressed: () {
-                                // print(propertyId);
-                                // Navigator.pushReplacement(
-                                //   context,
-                                //   MaterialPageRoute(
-                                //       builder: (context) =>
-                                //           EditReportPage(
-                                //             propertyId: propertyId,
-                                //           )), // Replace HomePage
-                                //   // with your home page
-                                //   // widget
-                                // ); // Close the dialog
-                              },
-                              style: TextButton.styleFrom(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 16,
-                                    vertical: 8),
-                                backgroundColor: Colors.red.withOpacity(0.8),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius:
-                                  BorderRadius.circular(10),
+                                TextButton(
+                                  onPressed: () {
+                                    AuthController.instance.logOut();
+                                    // print(propertyId);
+                                    // Navigator.pushReplacement(
+                                    //   context,
+                                    //   MaterialPageRoute(
+                                    //       builder: (context) =>
+                                    //           EditReportPage(
+                                    //             propertyId: propertyId,
+                                    //           )), // Replace HomePage
+                                    //   // with your home page
+                                    //   // widget
+                                    // ); // Close the dialog
+                                  },
+                                  style: TextButton.styleFrom(
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 16, vertical: 8),
+                                    backgroundColor:
+                                    Colors.red.withOpacity(0.8),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    'Log Out',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 16,
+                                    ),
+                                  ),
                                 ),
-                              ),
-                              child: Text(
-                                'Log Out',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 16,
-                                ),
-                              ),
-                            ),
-                          ],
-                        );
-                      }
-                      );
+                              ],
+                            );
+                          });
                     },
                     child: Container(
                       width: double.maxFinite,

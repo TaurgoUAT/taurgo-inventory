@@ -1,25 +1,14 @@
 import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:taurgo_inventory/constants/UrlConstants.dart';
-import 'package:taurgo_inventory/pages/conditions/condition_details.dart';
+import 'package:taurgo_inventory/pages/edit_details_page.dart';
 import 'package:taurgo_inventory/pages/edit_report_page.dart';
 import 'package:taurgo_inventory/pages/home_page.dart';
 import 'package:taurgo_inventory/pages/landing_screen.dart';
 import '../../constants/AppColors.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
-import 'package:taurgo_inventory/constants/UrlConstants.dart';
-import 'package:taurgo_inventory/pages/add_property_details_page.dart';
-import 'package:taurgo_inventory/pages/property_details_view_page.dart';
-import '../constants/AppColors.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'authentication/controller/authController.dart';
 
 class DetailsConfirmationPage extends StatefulWidget {
 
@@ -56,10 +45,26 @@ class _DetailsConfirmationPageState extends State<DetailsConfirmationPage> {
   User? user;
   late String firebaseId;
 
+  late TextEditingController lineOneAddressController;
+  late TextEditingController lineTwoAddressController;
+  late TextEditingController cityController;
+  late TextEditingController stateController;
+  late TextEditingController countryController;
+  late TextEditingController postalCodeController;
+  late TextEditingController clientController;
+
+
   @override
   void initState() {
     super.initState();
     getFirebaseUserId();
+    lineOneAddressController = TextEditingController(text: widget.lineOneAddress ?? '');
+    lineTwoAddressController = TextEditingController(text: widget.lineTwoAddress ?? '');
+    cityController = TextEditingController(text: widget.city ?? '');
+    stateController = TextEditingController(text: widget.state ?? '');
+    countryController = TextEditingController(text: widget.country ?? '');
+    postalCodeController = TextEditingController(text: widget.postalCode ?? '');
+    clientController = TextEditingController(text: widget.client ?? '');
   }
   Future<void> getFirebaseUserId() async {
     try {
@@ -99,13 +104,9 @@ class _DetailsConfirmationPageState extends State<DetailsConfirmationPage> {
 
     try {
       var uri = Uri.parse('$baseURL/property/addProps');
-      // var uri = Uri.parse('http://192.168.1.18:9090/partner/add-partner');
 
       final request = http.MultipartRequest('POST', uri)
-
         ..fields['firebaseId'] = firebaseId
-
-
       //Address
         ..fields['addressLineOne'] = widget.lineOneAddress ?? 'N/A'
         ..fields['addressLineTwo'] = widget.lineTwoAddress ?? 'N/A'
@@ -113,8 +114,6 @@ class _DetailsConfirmationPageState extends State<DetailsConfirmationPage> {
         ..fields['state'] = widget.state ?? 'N/A'
         ..fields['country'] = widget.country ?? 'N/A'
         ..fields['postalCode'] = widget.postalCode ?? 'N/A'
-
-
       //Details
         ..fields['ref'] = widget.reference ?? 'N/A'
         ..fields['client'] = widget.client ?? 'N/A'
@@ -132,9 +131,6 @@ class _DetailsConfirmationPageState extends State<DetailsConfirmationPage> {
         ..fields['keyLocation'] = widget.keyLocation ?? 'N/A'
         ..fields['referneceKey'] = widget.referenceForKey ?? 'N/A'
         ..fields['internalNotes'] = widget.internalNotes ?? 'N/A';
-
-      // ..fields['status'] = false as String
-      // ..fields['referenceCode'] = amount;
 
       var response = await request.send();
 
@@ -158,14 +154,12 @@ class _DetailsConfirmationPageState extends State<DetailsConfirmationPage> {
           ),
         );
 
-
-
         // Hide the loading indicator
         Navigator.of(context).pop();
 
         // Navigate to the confirmation page
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          Navigator.pushReplacement(
+          Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) =>HomePage(),
@@ -210,8 +204,17 @@ class _DetailsConfirmationPageState extends State<DetailsConfirmationPage> {
       Navigator.of(context).pop();
     }
   }
-
-
+  @override
+  void dispose() {
+    // Dispose controllers when not needed
+    lineOneAddressController.dispose();
+    lineTwoAddressController.dispose();
+    cityController.dispose();
+    stateController.dispose();
+    countryController.dispose();
+    postalCodeController.dispose();
+    super.dispose();
+  }
   @override
   Widget build(BuildContext context) {
     return PopScope(
@@ -246,15 +249,15 @@ class _DetailsConfirmationPageState extends State<DetailsConfirmationPage> {
         actions: [
           GestureDetector(
             onTap: (){
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => LandingScreen()),
-              );
+              // Navigator.push(
+              //   context,
+              //   MaterialPageRoute(builder: (context) => EditDetailsPage()),
+              // );
             },
             child: Container(
               margin: EdgeInsets.all(16),
               child: Text(
-                'Save', // Replace with the actual location
+                'Edit', // Replace with the actual location
                 style: TextStyle(
                   color: kPrimaryColor,
                   fontSize: 14, // Adjust the font size
@@ -641,10 +644,6 @@ class _DetailsConfirmationPageState extends State<DetailsConfirmationPage> {
                   ),
                 ),
               )
-
-
-
-
             ],
           ),
         ),

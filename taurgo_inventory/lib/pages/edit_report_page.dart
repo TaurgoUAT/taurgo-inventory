@@ -41,7 +41,6 @@ class EditReportPage extends StatefulWidget {
 class _EditReportPageState extends State<EditReportPage> {
   String? selectedType;
 
-
   @override
   Widget build(BuildContext context) {
     final List<String> types = [
@@ -126,6 +125,7 @@ class _EditReportPageState extends State<EditReportPage> {
       canPop: false,
       child: Scaffold(
         appBar: AppBar(
+          scrolledUnderElevation: 0,
           title: Text(
             'Report',
             style: TextStyle(

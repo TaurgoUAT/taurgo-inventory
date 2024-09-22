@@ -147,117 +147,141 @@ class _SettingPageState extends State<SettingPage> {
                   onTap: () {},
                 ),
                 Spacer(),
-                Container(
-                  padding: const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 30.0),
-                  width: double.maxFinite,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 5.0),
-                    child: ElevatedButton(
-                      onPressed: () {
-                        showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return AlertDialog(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius:
-                                  BorderRadius.circular(20),
-                                ),
-                                elevation: 10,
-                                backgroundColor: Colors.white,
-                                title: Row(
-                                  children: [
-                                    Icon(Icons.info_outline,
-                                        color: kPrimaryColor),
-                                    SizedBox(width: 10),
-                                    Text(
-                                      'Delete Account',
-                                      style: TextStyle(
-                                        color: kPrimaryColor,
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                content: Text(
-                                  'Are you sure want to Delete the Account? '
-                                      'One you delete the Account you will '
-                                      'lose all the Data',
-                                  textAlign: TextAlign.left,
-                                  style: TextStyle(
-                                    color: Colors.grey[800],
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w400,
-                                    height: 1.5,
-                                  ),
-                                ),
-                                actions: <Widget>[
-                                  TextButton(
-                                    child: Text(
-                                      'Cancel',
-                                      style: TextStyle(
-                                        color: kPrimaryColor,
-                                        fontSize: 16,
-                                      ),
-                                    ),
-                                    onPressed: () {
-                                      Navigator.of(context)
-                                          .pop(); // Close the dialog
-                                    },
-                                  ),
-                                  TextButton(
-                                    onPressed: () {
-                                      // print(propertyId);
-                                      // Navigator.pushReplacement(
-                                      //   context,
-                                      //   MaterialPageRoute(
-                                      //       builder: (context) =>
-                                      //           EditReportPage(
-                                      //             propertyId: propertyId,
-                                      //           )), // Replace HomePage
-                                      //   // with your home page
-                                      //   // widget
-                                      // ); // Close the dialog
-                                    },
-                                    style: TextButton.styleFrom(
-                                      padding: EdgeInsets.symmetric(
-                                          horizontal: 16,
-                                          vertical: 8),
-                                      backgroundColor: Colors.red.withOpacity(0.8),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                        BorderRadius.circular(10),
-                                      ),
-                                    ),
-                                    child: Text(
-                                      'Delete',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 16,
-                                      ),
+
+
+                Center(
+                  child: GestureDetector(
+                    onTap: () {
+                      // AuthController.instance.logOut();
+                      showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              shape: RoundedRectangleBorder(
+                                borderRadius:
+                                BorderRadius.circular(20),
+                              ),
+                              elevation: 10,
+                              backgroundColor: Colors.white,
+                              title: Row(
+                                children: [
+                                  Icon(Icons.info_outline,
+                                      color: kPrimaryColor),
+                                  SizedBox(width: 10),
+                                  Text(
+                                    'Delete Account',
+                                    style: TextStyle(
+                                      color: kPrimaryColor,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
                                     ),
                                   ),
                                 ],
-                              );
-                            }
-                        );
-                        // AuthController.instance.deleteAccount();
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 10),
-                        child: Text(
-                          'Delete Account',
-                          style: TextStyle(fontSize: 18),
+                              ),
+                              content: Text(
+                                'Are you sure want to Delete the Account? '
+                                    'One you delete the Account you will '
+                                    'lose all the Data',
+                                textAlign: TextAlign.left,
+                                style: TextStyle(
+                                  color: Colors.grey[800],
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w400,
+                                  height: 1.5,
+                                ),
+                              ),
+                              actions: <Widget>[
+                                TextButton(
+                                  child: Text(
+                                    'Cancel',
+                                    style: TextStyle(
+                                      color: kPrimaryColor,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                  onPressed: () {
+                                    Navigator.of(context)
+                                        .pop(); // Close the dialog
+                                  },
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    // print(propertyId);
+                                    // Navigator.pushReplacement(
+                                    //   context,
+                                    //   MaterialPageRoute(
+                                    //       builder: (context) =>
+                                    //           EditReportPage(
+                                    //             propertyId: propertyId,
+                                    //           )), // Replace HomePage
+                                    //   // with your home page
+                                    //   // widget
+                                    // ); // Close the dialog
+                                  },
+                                  style: TextButton.styleFrom(
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 16,
+                                        vertical: 8),
+                                    backgroundColor: Colors.red.withOpacity(0.8),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius:
+                                      BorderRadius.circular(10),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    'Delete',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            );
+                          }
+                      );
+                    },
+                    child: Container(
+                      width: double.maxFinite,
+                      decoration: BoxDecoration(
+                        color: Colors.redAccent.withOpacity(0.8), // Background color of the
+                        // container
+                        borderRadius: BorderRadius.circular(10.0), // Rounded corners
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1), // Shadow color
+                            spreadRadius: 2,
+                            blurRadius: 5,
+                            offset: Offset(0, 3), // Shadow position
+                          ),
+                        ],
+                        border: Border.all(
+                          color: bWhite, // Border color
+                          width: 2.0, // Border width
                         ),
                       ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red.withOpacity(0.8),
-                        foregroundColor: bWhite, // Background color
-                        shape: RoundedRectangleBorder(
-                          borderRadius:
-                          BorderRadius.circular(50), // Button corner radius
-                        ),
+                      padding: EdgeInsets.symmetric(
+                        vertical: 12.0,
+                        horizontal: 16.0,
+                      ), // Padding inside the container
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.remove_circle_outline_outlined,
+                            color: bWhite, // Customize the icon color
+                          ),
+                          SizedBox(width: 8.0), // Space between the icon and the text
+                          Text(
+                            "Delete Account", // Customize the text
+                            style: TextStyle(
+                              color: bWhite, // Text color
+                              fontSize: 16.0, // Font size
+                              fontWeight: FontWeight.bold, // Font weight
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
