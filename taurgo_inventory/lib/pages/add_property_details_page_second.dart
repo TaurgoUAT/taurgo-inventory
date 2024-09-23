@@ -50,6 +50,8 @@ class _AddPropertyDetailsPageSecondState extends State<AddPropertyDetailsPageSec
     "Checkout",
     'Inventory & Check In',
     'Risk Assessment',
+    'Midterm Inventory',
+    'Self Service Inspection'
   ];
 
   final List<String> keys = [
