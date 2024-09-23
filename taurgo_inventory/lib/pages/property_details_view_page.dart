@@ -5,6 +5,7 @@ import 'package:taurgo_inventory/pages/InspectionReportsPages/inspection_only_pa
 import 'package:taurgo_inventory/pages/edit_details_page.dart';
 import 'package:taurgo_inventory/pages/edit_report_page.dart';
 import 'package:taurgo_inventory/pages/home_page.dart';
+import 'package:taurgo_inventory/pages/view_pdf.dart';
 import '../constants/AppColors.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -377,313 +378,338 @@ class _PropertyDetailsViewPageState extends State<PropertyDetailsViewPage> {
                                       ),
                                       ElevatedButton(
                                         onPressed: () {
-                                         if(properties[0]['inspectionType']
-                                             == "Inventory & Schedule of "
-                                                 "Condition" ||properties[0]['inspectionType']
-                                             == "Check In" || properties[0]['inspectionType']
-                                             == "Checkout" || properties[0]['inspectionType']
-                                             == "Inventory & Check In" || properties[0]['inspectionType']
-                                             == "Risk Assessment"){
-                                           showDialog(
-                                             context: context,
-                                             builder: (BuildContext context) {
-                                               return AlertDialog(
-                                                 shape: RoundedRectangleBorder(
-                                                   borderRadius:
-                                                   BorderRadius.circular(20),
-                                                 ),
-                                                 elevation: 10,
-                                                 backgroundColor: Colors.white,
-                                                 title: Row(
-                                                   children: [
-                                                     Icon(Icons.info_outline,
-                                                         color: kPrimaryColor),
-                                                     SizedBox(width: 10),
-                                                     Text(
-                                                       'Sync information',
-                                                       style: TextStyle(
-                                                         color: kPrimaryColor,
-                                                         fontSize: 18,
-                                                         fontWeight:
-                                                         FontWeight.bold,
-                                                       ),
-                                                     ),
-                                                   ],
-                                                 ),
-                                                 content: Text(
-                                                   'Please Make Sure you have stable internet before continue, Your process will not be saved if you exit the Process',
-                                                   textAlign: TextAlign.left,
-                                                   style: TextStyle(
-                                                     color: Colors.grey[800],
-                                                     fontSize: 14,
-                                                     fontWeight: FontWeight.w400,
-                                                     height: 1.5,
-                                                   ),
-                                                 ),
-                                                 actions: <Widget>[
-                                                   TextButton(
-                                                     child: Text(
-                                                       'Cancel',
-                                                       style: TextStyle(
-                                                         color: kPrimaryColor,
-                                                         fontSize: 16,
-                                                       ),
-                                                     ),
-                                                     onPressed: () {
-                                                       Navigator.of(context)
-                                                           .pop(); // Close the dialog
-                                                     },
-                                                   ),
-                                                   TextButton(
-                                                     onPressed: () {
-                                                       print(propertyId);
-                                                       Navigator.pushReplacement(
-                                                         context,
-                                                         MaterialPageRoute(
-                                                             builder: (context) =>
-                                                                 EditReportPage(
-                                                                   propertyId:
-                                                                   propertyId,
-                                                                 )), // Replace HomePage
-                                                         // with your home page
-                                                         // widget
-                                                       ); // Close the dialog
-                                                     },
-                                                     style: TextButton.styleFrom(
-                                                       padding:
-                                                       EdgeInsets.symmetric(
-                                                           horizontal: 16,
-                                                           vertical: 8),
-                                                       backgroundColor:
-                                                       kPrimaryColor,
-                                                       shape:
-                                                       RoundedRectangleBorder(
-                                                         borderRadius:
-                                                         BorderRadius
-                                                             .circular(10),
-                                                       ),
-                                                     ),
-                                                     child: Text(
-                                                       'Agree',
-                                                       style: TextStyle(
-                                                         color: Colors.white,
-                                                         fontSize: 16,
-                                                       ),
-                                                     ),
-                                                   ),
-                                                 ],
-                                               );
-                                             },
-                                           );
-                                         }
-                                         else if(properties[0]['inspectionType']
-                                             == "Midterm Inventory" ||
-                                             properties[0]['inspectionType']
-                                                 == "Self Service Inspection" ){
-                                           showDialog(
-                                             context: context,
-                                             builder: (BuildContext context) {
-                                               return AlertDialog(
-                                                 shape: RoundedRectangleBorder(
-                                                   borderRadius:
-                                                   BorderRadius.circular(20),
-                                                 ),
-                                                 elevation: 10,
-                                                 backgroundColor: Colors.white,
-                                                 title: Row(
-                                                   children: [
-                                                     Icon(Icons.info_outline,
-                                                         color: kPrimaryColor),
-                                                     SizedBox(width: 10),
-                                                     Text(
-                                                       'Sync information',
-                                                       style: TextStyle(
-                                                         color: kPrimaryColor,
-                                                         fontSize: 18,
-                                                         fontWeight:
-                                                         FontWeight.bold,
-                                                       ),
-                                                     ),
-                                                   ],
-                                                 ),
-                                                 content: Text(
-                                                   'Please Make Sure you have stable internet before continue, Your process will not be saved if you exit the Process',
-                                                   textAlign: TextAlign.left,
-                                                   style: TextStyle(
-                                                     color: Colors.grey[800],
-                                                     fontSize: 14,
-                                                     fontWeight: FontWeight.w400,
-                                                     height: 1.5,
-                                                   ),
-                                                 ),
-                                                 actions: <Widget>[
-                                                   TextButton(
-                                                     child: Text(
-                                                       'Cancel',
-                                                       style: TextStyle(
-                                                         color: kPrimaryColor,
-                                                         fontSize: 16,
-                                                       ),
-                                                     ),
-                                                     onPressed: () {
-                                                       Navigator.of(context)
-                                                           .pop(); // Close the dialog
-                                                     },
-                                                   ),
-                                                   TextButton(
-                                                     onPressed: () {
-                                                       print(propertyId);
-                                                       Navigator.pushReplacement(
-                                                         context,
-                                                         MaterialPageRoute(
-                                                             builder: (context) =>
-                                                                 InspectionOnlyPage(
-                                                                   propertyId:
-                                                                   propertyId,
-                                                                 )), // Replace HomePage
-                                                         // with your home page
-                                                         // widget
-                                                       ); // Close the dialog
-                                                     },
-                                                     style: TextButton.styleFrom(
-                                                       padding:
-                                                       EdgeInsets.symmetric(
-                                                           horizontal: 16,
-                                                           vertical: 8),
-                                                       backgroundColor:
-                                                       kPrimaryColor,
-                                                       shape:
-                                                       RoundedRectangleBorder(
-                                                         borderRadius:
-                                                         BorderRadius
-                                                             .circular(10),
-                                                       ),
-                                                     ),
-                                                     child: Text(
-                                                       'Agree',
-                                                       style: TextStyle(
-                                                         color: Colors.white,
-                                                         fontSize: 16,
-                                                       ),
-                                                     ),
-                                                   ),
-                                                 ],
-                                               );
-                                             },
-                                           );
-                                         }
-                                         else{
-                                           showDialog(
-                                             context: context,
-                                             builder: (BuildContext context) {
-                                               return AlertDialog(
-                                                 shape: RoundedRectangleBorder(
-                                                   borderRadius:
-                                                   BorderRadius.circular(20),
-                                                 ),
-                                                 elevation: 10,
-                                                 backgroundColor: Colors.white,
-                                                 title: Row(
-                                                   children: [
-                                                     Icon(Icons.info_outline,
-                                                         color: kPrimaryColor),
-                                                     SizedBox(width: 10),
-                                                     Text(
-                                                       'Invalid Inspection '
-                                                           'Type',
-                                                       style: TextStyle(
-                                                         color: kPrimaryColor,
-                                                         fontSize: 18,
-                                                         fontWeight:
-                                                         FontWeight.bold,
-                                                       ),
-                                                     ),
-                                                   ],
-                                                 ),
-                                                 content: Text(
-                                                   'Please Make Sure you have'
-                                                       ' selected the correct'
-                                                       ' Inspection or '
-                                                       'Inventory Type',
-                                                   textAlign: TextAlign.left,
-                                                   style: TextStyle(
-                                                     color: Colors.grey[800],
-                                                     fontSize: 14,
-                                                     fontWeight: FontWeight.w400,
-                                                     height: 1.5,
-                                                   ),
-                                                 ),
-                                                 actions: <Widget>[
-                                                   TextButton(
-                                                     child: Text(
-                                                       'Cancel',
-                                                       style: TextStyle(
-                                                         color: kPrimaryColor,
-                                                         fontSize: 16,
-                                                       ),
-                                                     ),
-                                                     onPressed: () {
-                                                       Navigator.of(context)
-                                                           .pop(); // Close the dialog
-                                                     },
-                                                   ),
-                                                   TextButton(
-                                                     onPressed: () {
-                                                       print(propertyId);
-                                                       Navigator.pushReplacement(
-                                                         context,
-                                                         MaterialPageRoute(
-                                                             builder: (context) =>
-                                                                 EditReportPage(
-                                                                   propertyId:
-                                                                   propertyId,
-                                                                 )), // Replace HomePage
-                                                         // with your home page
-                                                         // widget
-                                                       ); // Close the dialog
-                                                     },
-                                                     style: TextButton.styleFrom(
-                                                       padding:
-                                                       EdgeInsets.symmetric(
-                                                           horizontal: 16,
-                                                           vertical: 8),
-                                                       backgroundColor:
-                                                       kPrimaryColor,
-                                                       shape:
-                                                       RoundedRectangleBorder(
-                                                         borderRadius:
-                                                         BorderRadius
-                                                             .circular(10),
-                                                       ),
-                                                     ),
-                                                     child: Text(
-                                                       'Agree',
-                                                       style: TextStyle(
-                                                         color: Colors.white,
-                                                         fontSize: 16,
-                                                       ),
-                                                     ),
-                                                   ),
-                                                 ],
-                                               );
-                                             },
-                                           );
-                                         }
+                                          // Check if the status is completed
+                                          if (properties[0]['status'] == "Completed") {
+                                            // Navigate to InfoPage
+                                            showDialog(
+                                              context: context,
+                                              builder: (BuildContext context) {
+                                                return AlertDialog(
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius: BorderRadius.circular(20),
+                                                  ),
+                                                  elevation: 10,
+                                                  backgroundColor: Colors.white,
+                                                  title: Row(
+                                                    children: [
+                                                      Icon(Icons.info_outline, color: kPrimaryColor),
+                                                      SizedBox(width: 10),
+                                                      Text(
+                                                        'Completed',
+                                                        style: TextStyle(
+                                                          color: kPrimaryColor,
+                                                          fontSize: 18,
+                                                          fontWeight: FontWeight.bold,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  content: Text(
+                                                    'You have already '
+                                                        'completed this '
+                                                        'inspection ',
+                                                    textAlign: TextAlign.left,
+                                                    style: TextStyle(
+                                                      color: Colors.grey[800],
+                                                      fontSize: 14,
+                                                      fontWeight: FontWeight.w400,
+                                                      height: 1.5,
+                                                    ),
+                                                  ),
+                                                  actions: <Widget>[
+                                                    TextButton(
+                                                      child: Text(
+                                                        'Cancel',
+                                                        style: TextStyle(
+                                                          color: kPrimaryColor,
+                                                          fontSize: 16,
+                                                        ),
+                                                      ),
+                                                      onPressed: () {
+                                                        Navigator.of(context).pop(); // Close the dialog
+                                                      },
+                                                    ),
+                                                    TextButton(
+                                                      onPressed: () {
+                                                        print(propertyId);
+                                                        Navigator.pushReplacement(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                            builder:
+                                                                (context) =>
+                                                                    ViewPdf(
+                                                                      propertyId: propertyId),
+                                                          ),
+                                                        ); // Close the dialog
+                                                      },
+                                                      style: TextButton.styleFrom(
+                                                        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                                        backgroundColor: kPrimaryColor,
+                                                        shape: RoundedRectangleBorder(
+                                                          borderRadius: BorderRadius.circular(10),
+                                                        ),
+                                                      ),
+                                                      child: Text(
+                                                        'View',
+                                                        style: TextStyle(
+                                                          color: Colors.white,
+                                                          fontSize: 16,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                );
+                                              },
+                                            );
+                                          }
+                                          else if (properties[0]['inspectionType'] == "Inventory & Schedule of Condition" ||
+                                              properties[0]['inspectionType'] == "Check In" ||
+                                              properties[0]['inspectionType'] == "Checkout" ||
+                                              properties[0]['inspectionType'] == "Inventory & Check In" ||
+                                              properties[0]['inspectionType'] == "Risk Assessment") {
+                                            showDialog(
+                                              context: context,
+                                              builder: (BuildContext context) {
+                                                return AlertDialog(
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius: BorderRadius.circular(20),
+                                                  ),
+                                                  elevation: 10,
+                                                  backgroundColor: Colors.white,
+                                                  title: Row(
+                                                    children: [
+                                                      Icon(Icons.info_outline, color: kPrimaryColor),
+                                                      SizedBox(width: 10),
+                                                      Text(
+                                                        'Sync information',
+                                                        style: TextStyle(
+                                                          color: kPrimaryColor,
+                                                          fontSize: 18,
+                                                          fontWeight: FontWeight.bold,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  content: Text(
+                                                    'Please Make Sure you have stable internet before continue, Your process will not be saved if you exit the Process',
+                                                    textAlign: TextAlign.left,
+                                                    style: TextStyle(
+                                                      color: Colors.grey[800],
+                                                      fontSize: 14,
+                                                      fontWeight: FontWeight.w400,
+                                                      height: 1.5,
+                                                    ),
+                                                  ),
+                                                  actions: <Widget>[
+                                                    TextButton(
+                                                      child: Text(
+                                                        'Cancel',
+                                                        style: TextStyle(
+                                                          color: kPrimaryColor,
+                                                          fontSize: 16,
+                                                        ),
+                                                      ),
+                                                      onPressed: () {
+                                                        Navigator.of(context).pop(); // Close the dialog
+                                                      },
+                                                    ),
+                                                    TextButton(
+                                                      onPressed: () {
+                                                        print(propertyId);
+                                                        Navigator.pushReplacement(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                            builder: (context) => EditReportPage(propertyId: propertyId),
+                                                          ),
+                                                        ); // Close the dialog
+                                                      },
+                                                      style: TextButton.styleFrom(
+                                                        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                                        backgroundColor: kPrimaryColor,
+                                                        shape: RoundedRectangleBorder(
+                                                          borderRadius: BorderRadius.circular(10),
+                                                        ),
+                                                      ),
+                                                      child: Text(
+                                                        'Agree',
+                                                        style: TextStyle(
+                                                          color: Colors.white,
+                                                          fontSize: 16,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                );
+                                              },
+                                            );
+                                          } else if (properties[0]['inspectionType'] == "Midterm Inventory" ||
+                                              properties[0]['inspectionType'] == "Self Service Inspection") {
+                                            showDialog(
+                                              context: context,
+                                              builder: (BuildContext context) {
+                                                return AlertDialog(
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius: BorderRadius.circular(20),
+                                                  ),
+                                                  elevation: 10,
+                                                  backgroundColor: Colors.white,
+                                                  title: Row(
+                                                    children: [
+                                                      Icon(Icons.info_outline, color: kPrimaryColor),
+                                                      SizedBox(width: 10),
+                                                      Text(
+                                                        'Sync information',
+                                                        style: TextStyle(
+                                                          color: kPrimaryColor,
+                                                          fontSize: 18,
+                                                          fontWeight: FontWeight.bold,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  content: Text(
+                                                    'Please Make Sure you have stable internet before continue, Your process will not be saved if you exit the Process',
+                                                    textAlign: TextAlign.left,
+                                                    style: TextStyle(
+                                                      color: Colors.grey[800],
+                                                      fontSize: 14,
+                                                      fontWeight: FontWeight.w400,
+                                                      height: 1.5,
+                                                    ),
+                                                  ),
+                                                  actions: <Widget>[
+                                                    TextButton(
+                                                      child: Text(
+                                                        'Cancel',
+                                                        style: TextStyle(
+                                                          color: kPrimaryColor,
+                                                          fontSize: 16,
+                                                        ),
+                                                      ),
+                                                      onPressed: () {
+                                                        Navigator.of(context).pop(); // Close the dialog
+                                                      },
+                                                    ),
+                                                    TextButton(
+                                                      onPressed: () {
+                                                        print(propertyId);
+                                                        Navigator.pushReplacement(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                            builder: (context) => InspectionOnlyPage(propertyId: propertyId),
+                                                          ),
+                                                        ); // Close the dialog
+                                                      },
+                                                      style: TextButton.styleFrom(
+                                                        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                                        backgroundColor: kPrimaryColor,
+                                                        shape: RoundedRectangleBorder(
+                                                          borderRadius: BorderRadius.circular(10),
+                                                        ),
+                                                      ),
+                                                      child: Text(
+                                                        'Agree',
+                                                        style: TextStyle(
+                                                          color: Colors.white,
+                                                          fontSize: 16,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                );
+                                              },
+                                            );
+                                          } else {
+                                            showDialog(
+                                              context: context,
+                                              builder: (BuildContext context) {
+                                                return AlertDialog(
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius: BorderRadius.circular(20),
+                                                  ),
+                                                  elevation: 10,
+                                                  backgroundColor: Colors.white,
+                                                  title: Row(
+                                                    children: [
+                                                      Icon(Icons.info_outline, color: kPrimaryColor),
+                                                      SizedBox(width: 10),
+                                                      Text(
+                                                        'Invalid Inspection Type',
+                                                        style: TextStyle(
+                                                          color: kPrimaryColor,
+                                                          fontSize: 18,
+                                                          fontWeight: FontWeight.bold,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  content: Text(
+                                                    'Please Make Sure you have selected the correct Inspection or Inventory Type',
+                                                    textAlign: TextAlign.left,
+                                                    style: TextStyle(
+                                                      color: Colors.grey[800],
+                                                      fontSize: 14,
+                                                      fontWeight: FontWeight.w400,
+                                                      height: 1.5,
+                                                    ),
+                                                  ),
+                                                  actions: <Widget>[
+                                                    TextButton(
+                                                      child: Text(
+                                                        'Cancel',
+                                                        style: TextStyle(
+                                                          color: kPrimaryColor,
+                                                          fontSize: 16,
+                                                        ),
+                                                      ),
+                                                      onPressed: () {
+                                                        Navigator.of(context).pop(); // Close the dialog
+                                                      },
+                                                    ),
+                                                    TextButton(
+                                                      onPressed: () {
+                                                        print(propertyId);
+                                                        Navigator.pushReplacement(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                            builder: (context) => EditReportPage(propertyId: propertyId),
+                                                          ),
+                                                        ); // Close the dialog
+                                                      },
+                                                      style: TextButton.styleFrom(
+                                                        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                                        backgroundColor: kPrimaryColor,
+                                                        shape: RoundedRectangleBorder(
+                                                          borderRadius: BorderRadius.circular(10),
+                                                        ),
+                                                      ),
+                                                      child: Text(
+                                                        'Agree',
+                                                        style: TextStyle(
+                                                          color: Colors.white,
+                                                          fontSize: 16,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                );
+                                              },
+                                            );
+                                          }
                                         },
                                         child: Padding(
                                           padding: const EdgeInsets.all(7.5),
-                                          child: Text('Edit Report',
-                                              style: TextStyle(fontSize: 12)),
+                                          child: Text('Edit Report', style: TextStyle(fontSize: 12)),
                                         ),
                                         style: ElevatedButton.styleFrom(
                                           backgroundColor: kPrimaryColor,
                                           foregroundColor: Colors.white,
                                           shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
+                                            borderRadius: BorderRadius.circular(10),
                                           ),
                                         ),
                                       )
+
                                     ],
                                   ),
                                 ),

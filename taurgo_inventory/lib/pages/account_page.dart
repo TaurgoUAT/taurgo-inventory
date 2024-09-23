@@ -31,12 +31,15 @@ class _AccountPageState extends State<AccountPage> {
   List<Map<String, dynamic>> properties = [];
   List<Map<String, dynamic>> userDetails = [];
   User? user;
+  Map<String, dynamic>? propertyCounts;
+  bool hasError = false;
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   @override
   void initState() {
     super.initState();
     getFirebaseUserId();
+    fetchPropertyCounts();
   }
 
   late String firebaseId;
@@ -94,6 +97,42 @@ class _AccountPageState extends State<AccountPage> {
       if (mounted) {
         setState(() {
           isLoading = false;
+        });
+      }
+    }
+  }
+
+  Future<void> fetchPropertyCounts() async {
+    try {
+      final response = await http.get(Uri.parse
+        ('$baseURL/property/counts/${firebaseId}'));
+
+      if (response.statusCode == 200) {
+        print(response.statusCode);
+        final Map<String, dynamic> countsData = json.decode(response.body);
+
+        if (mounted) {
+          setState(() {
+            propertyCounts = countsData;
+            isLoading = false;
+            hasError = false;
+          });
+        }
+      } else {
+        print("Failed to load property counts: ${response.statusCode}");
+        if (mounted) {
+          setState(() {
+            isLoading = false;
+            hasError = true;
+          });
+        }
+      }
+    } catch (e) {
+      print("Error fetching property counts: $e");
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+          hasError = true;
         });
       }
     }
@@ -211,7 +250,7 @@ class _AccountPageState extends State<AccountPage> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                '-',
+                                propertyCounts != null ? propertyCounts!['pendingCount'].toString() : '0', // Use a default value if null
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w500,
@@ -240,7 +279,7 @@ class _AccountPageState extends State<AccountPage> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                '-',
+                                propertyCounts != null ? propertyCounts!['completedCount'].toString() : '0', // Use a default value if null
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w500,
@@ -269,7 +308,7 @@ class _AccountPageState extends State<AccountPage> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                '-',
+                                propertyCounts != null ? propertyCounts!['allCount'].toString() : '0', // Use a default value if null
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w500,

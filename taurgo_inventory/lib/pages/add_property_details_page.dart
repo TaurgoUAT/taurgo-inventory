@@ -75,7 +75,6 @@ class _AddPropertyDetailsPageState extends State<AddPropertyDetailsPage> {
   bool _validateInputs() {
     if (addressLineOneController.text.isEmpty ||
         cityController.text.isEmpty ||
-        stateController.text.isEmpty ||
         countryController.text.isEmpty ||
         postCodeController.text.isEmpty) {
       return false;
@@ -434,7 +433,7 @@ class _AddPropertyDetailsPageState extends State<AddPropertyDetailsPage> {
                   cursorColor: kPrimaryColor,
                   controller: stateController,
                   decoration: InputDecoration(
-                    labelText: 'State *',
+                    labelText: 'State',
                     labelStyle: TextStyle(
                         color: kPrimaryColor,
                         fontSize: 14// Change the label text color

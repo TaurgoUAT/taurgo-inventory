@@ -246,27 +246,27 @@ class _DetailsConfirmationPageState extends State<DetailsConfirmationPage> {
             size: 24,
           ),
         ),
-        actions: [
-          GestureDetector(
-            onTap: (){
-              // Navigator.push(
-              //   context,
-              //   MaterialPageRoute(builder: (context) => EditDetailsPage()),
-              // );
-            },
-            child: Container(
-              margin: EdgeInsets.all(16),
-              child: Text(
-                'Edit', // Replace with the actual location
-                style: TextStyle(
-                  color: kPrimaryColor,
-                  fontSize: 14, // Adjust the font size
-                  fontFamily: "Inter",
-                ),
-              ),
-            ),
-          )
-        ],
+        // actions: [
+        //   GestureDetector(
+        //     onTap: (){
+        //       // Navigator.push(
+        //       //   context,
+        //       //   MaterialPageRoute(builder: (context) => EditDetailsPage()),
+        //       // );
+        //     },
+        //     child: Container(
+        //       margin: EdgeInsets.all(16),
+        //       child: Text(
+        //         'Edit', // Replace with the actual location
+        //         style: TextStyle(
+        //           color: kPrimaryColor,
+        //           fontSize: 14, // Adjust the font size
+        //           fontFamily: "Inter",
+        //         ),
+        //       ),
+        //     ),
+        //   )
+        // ],
       ),
 
       body: Container(

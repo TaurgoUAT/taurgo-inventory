@@ -770,13 +770,13 @@ class _LandingScreenState extends State<LandingScreen> with TickerProviderStateM
                         width: 100,
                         margin: EdgeInsets.only(bottom: 0.0, top: 0),
                         decoration: BoxDecoration(
-                          color: kPrimaryColor,
+                          color: status == 'Completed' ? kPendingColor : kPrimaryColor,
+                          // Change color based on status
                           borderRadius: BorderRadius.circular(25.0),
                         ),
                         child: Center(
                           child: Text(
                             status,
-                            // The text you want to display
                             style: TextStyle(
                               color: Colors.white, // Text color
                               fontSize: 11.0, // Font size
@@ -784,7 +784,8 @@ class _LandingScreenState extends State<LandingScreen> with TickerProviderStateM
                             ),
                           ),
                         ),
-                      )
+                      ),
+
                     ],
                   ),
                   SizedBox(height: 12.0),
