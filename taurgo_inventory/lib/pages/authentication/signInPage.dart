@@ -123,6 +123,7 @@ class _SignInPageState extends State<SignInPage> {
                 ),
                 const SizedBox(height: 12),
 
+
                 Padding(
                   padding: EdgeInsets.only(right: 16, left: 16),
                   child: TextField(
@@ -178,6 +179,36 @@ class _SignInPageState extends State<SignInPage> {
                     ),
                   ),
                 ),
+                Padding(
+                  padding: EdgeInsets.only(right: 16, left: 16, top: 8),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end, // Align the text to the right
+                    children: [
+                      RichText(
+                        text: TextSpan(
+                          children: [
+                            TextSpan(
+                              text: "Forget Password?",
+                              style: TextStyle(
+                                color: kPrimaryColor,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              recognizer: TapGestureRecognizer()
+                                ..onTap = () {
+                                  // Step 3: Call the forgot password function
+                                  AuthController.instance.resetPassword
+                                    (context,emailController.text);
+                                },
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+
                 const SizedBox(height: 30),
                 Padding(
                   padding: EdgeInsets.only(right: 16, left: 16),
@@ -253,9 +284,9 @@ class _SignInPageState extends State<SignInPage> {
                   ),
                 ),
                 const SizedBox(height: 18),
-                Center(
-                  child: SocialMediaLogin(),
-                ),
+                // Center(
+                //   child: SocialMediaLogin(),
+                // ),
               ],
             )
           ],

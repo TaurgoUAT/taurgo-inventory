@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
@@ -203,23 +204,27 @@ class _PreviewInspectionPageState extends State<PreviewInspectionPage> {
   void showLoadingDialog(BuildContext context) {
     showDialog(
       context: context,
-      barrierDismissible:
-          false, // Prevent dismissing the dialog by tapping outside
+      barrierDismissible: false, // Prevent dismissing the dialog by tapping outside
       builder: (BuildContext context) {
         return Center(
           child: SizedBox(
-            width: 60.0,
-            height: 60.0,
-            child: CircularProgressIndicator(
-              color: kPrimaryColor,
-              strokeWidth: 3.0,
+            width: 120.0,
+            height: 100.0,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                CircularProgressIndicator(
+                  color: kPrimaryColor,
+                  strokeWidth: 3.0,
+                ),
+                // DotLoadingText(), // A custom widget to show animated text with three dots
+              ],
             ),
           ),
         );
       },
     );
   }
-
   @override
   Widget build(BuildContext context) {
     return PopScope(
@@ -407,4 +412,52 @@ class _PreviewInspectionPageState extends State<PreviewInspectionPage> {
   //     ],
   //   );
   // }
+}
+class DotLoadingText extends StatefulWidget {
+  @override
+  _DotLoadingTextState createState() => _DotLoadingTextState();
+}
+
+class _DotLoadingTextState extends State<DotLoadingText> {
+  String _dots = "";
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _startTimer();
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  void _startTimer() {
+    _timer = Timer.periodic(const Duration(milliseconds: 500), (timer) {
+      setState(() {
+        if (_dots.length < 3) {
+          _dots += ".";
+        } else {
+          _dots = "";
+        }
+      });
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Flexible( // Allow text to resize properly
+      child: Text(
+        "Generating Report$_dots",
+        style: const TextStyle(
+          color: kPrimaryColor,
+          fontSize: 14, // Adjust the font size
+          fontFamily: "Inter",
+        ),
+        overflow: TextOverflow.ellipsis, // Prevent overflow
+      ),
+    );
+  }
 }

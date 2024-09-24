@@ -147,95 +147,258 @@ class _AccountPageState extends State<AccountPage> {
         body: SingleChildScrollView(
           // color: bWhite,
           child: Padding(
-            padding: EdgeInsets.only(left: 16.0,right: 16, bottom: 16,top: 75),
+            padding: EdgeInsets.only(bottom: 16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0), // Add some padding around the image
+                // Center(
+                //   child: Padding(
+                //     padding: const EdgeInsets.all(8.0), // Add some padding around the image
+                //     child: Stack(
+                //       children: [
+                //         Container(
+                //           // decoration: BoxDecoration(
+                //           //   shape: BoxShape.circle, // Ensure the container remains a circle
+                //           //   border: Border.all(
+                //           //     color: kPrimaryColor, // Set the border color
+                //           //     width: 2.0, // Set the border width
+                //           //   ),
+                //           //   boxShadow: [
+                //           //     BoxShadow(
+                //           //       color: Colors.grey.withOpacity(0.5), // Shadow color
+                //           //       spreadRadius: 4, // How wide the shadow spreads
+                //           //       blurRadius: 10, // Softness of the shadow
+                //           //       offset: Offset(0, 4), // Offset for the shadow position
+                //           //     ),
+                //           //   ],
+                //           // ),
+                //           child: ClipOval(
+                //             child: Image.asset(
+                //               'assets/images/profile.png', // Replace with your image path
+                //               width: 150, // Adjust width to match height for a perfect circle
+                //               height: 150, // Adjust height as needed
+                //               fit: BoxFit.cover, // Image fit mode
+                //             ),
+                //           ),
+                //         ),
+                //         // Positioned(
+                //         //   width: 30,
+                //         //   height: 30,
+                //         //   bottom: 6, // Adjust position of the icon
+                //         //   right: 6,  // Adjust position of the icon
+                //         //   child: CircleAvatar(
+                //         //     radius: 20, // Size of the edit icon
+                //         //     backgroundColor: kPrimaryColor, // Background color for the
+                //         //     // icon
+                //         //     child: IconButton(
+                //         //       icon: Icon(Icons.camera_alt_outlined, color: bWhite,
+                //         //         size: 16,),
+                //         //       // Edit icon
+                //         //       onPressed: () {
+                //         //         // Add your edit function here
+                //         //       },
+                //         //     ),
+                //         //   ),
+                //         // ),
+                //       ],
+                //     ),
+                //   ),
+                // ),
+                // SizedBox(height: 15.0),
+                ClipPath(
+                  clipper: AccountWaveClipper(),
+                  // Custom clipper for the bottom border
+                  child: Container(
+                    height: MediaQuery.of(context).size.height * 0.375,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          kPrimaryColor,
+                          kPrimaryColor,
+                        ],
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                      ),
+                    ),
                     child: Stack(
                       children: [
-                        Container(
-                          // decoration: BoxDecoration(
-                          //   shape: BoxShape.circle, // Ensure the container remains a circle
-                          //   border: Border.all(
-                          //     color: kPrimaryColor, // Set the border color
-                          //     width: 2.0, // Set the border width
-                          //   ),
-                          //   boxShadow: [
-                          //     BoxShadow(
-                          //       color: Colors.grey.withOpacity(0.5), // Shadow color
-                          //       spreadRadius: 4, // How wide the shadow spreads
-                          //       blurRadius: 10, // Softness of the shadow
-                          //       offset: Offset(0, 4), // Offset for the shadow position
-                          //     ),
-                          //   ],
-                          // ),
-                          child: ClipOval(
-                            child: Image.asset(
-                              'assets/images/profile.png', // Replace with your image path
-                              width: 150, // Adjust width to match height for a perfect circle
-                              height: 150, // Adjust height as needed
-                              fit: BoxFit.cover, // Image fit mode
-                            ),
+
+
+                        Positioned(
+                          top: 40,
+                          right: 16,
+                          child: IconButton(
+                            icon: Icon(Icons.logout_outlined,
+                                color: Colors.white, size: 30),
+                            onPressed: () {
+                              showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      elevation: 10,
+                                      backgroundColor: Colors.white,
+                                      title: Row(
+                                        children: [
+                                          Icon(Icons.info_outline,
+                                              color: kPrimaryColor),
+                                          SizedBox(width: 10),
+                                          Text(
+                                            'Log Out',
+                                            style: TextStyle(
+                                              color: kPrimaryColor,
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      content: Text(
+                                        'Are you sure want to Logout?',
+                                        textAlign: TextAlign.left,
+                                        style: TextStyle(
+                                          color: Colors.grey[800],
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w400,
+                                          height: 1.5,
+                                        ),
+                                      ),
+                                      actions: <Widget>[
+                                        TextButton(
+                                          child: Text(
+                                            'Cancel',
+                                            style: TextStyle(
+                                              color: kPrimaryColor,
+                                              fontSize: 16,
+                                            ),
+                                          ),
+                                          onPressed: () {
+                                            Navigator.of(context)
+                                                .pop(); // Close the dialog
+                                          },
+                                        ),
+                                        TextButton(
+                                          onPressed: () {
+                                            AuthController.instance.logOut();
+                                            // print(propertyId);
+                                            // Navigator.pushReplacement(
+                                            //   context,
+                                            //   MaterialPageRoute(
+                                            //       builder: (context) =>
+                                            //           EditReportPage(
+                                            //             propertyId: propertyId,
+                                            //           )), // Replace HomePage
+                                            //   // with your home page
+                                            //   // widget
+                                            // ); // Close the dialog
+                                          },
+                                          style: TextButton.styleFrom(
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 16, vertical: 8),
+                                            backgroundColor:
+                                            Colors.red.withOpacity(0.8),
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(10),
+                                            ),
+                                          ),
+                                          child: Text(
+                                            'Log Out',
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 16,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    );
+                                  });
+                            },
                           ),
                         ),
+
                         // Positioned(
-                        //   width: 30,
-                        //   height: 30,
-                        //   bottom: 6, // Adjust position of the icon
-                        //   right: 6,  // Adjust position of the icon
-                        //   child: CircleAvatar(
-                        //     radius: 20, // Size of the edit icon
-                        //     backgroundColor: kPrimaryColor, // Background color for the
-                        //     // icon
-                        //     child: IconButton(
-                        //       icon: Icon(Icons.camera_alt_outlined, color: bWhite,
-                        //         size: 16,),
-                        //       // Edit icon
-                        //       onPressed: () {
-                        //         // Add your edit function here
-                        //       },
+                        //   top: 100, // Adjust this value to position it vertically
+                        //   right: 16,
+                        //   child: GestureDetector(
+                        //     child: Container(
+                        //       // padding: const EdgeInsets.only(right: 16,left: 16),
+                        //       height: 40,
+                        //       width: 70,
+                        //       decoration: BoxDecoration(
+                        //         color: bWhite, // Background color of the container
+                        //         borderRadius: BorderRadius.circular(30.0), // Rounded corners
+                        //         boxShadow: [
+                        //           BoxShadow(
+                        //             color: Colors.black.withOpacity(0.1), // Shadow color
+                        //             spreadRadius: 2,
+                        //             blurRadius: 5,
+                        //             offset: Offset(0, 3), // Shadow position
+                        //           ),
+                        //         ],
+                        //         border: Border.all(
+                        //           color: kPrimaryColor, // Border color
+                        //           width: 2.0, // Border width
+                        //         ),
+                        //       ),
+                        //       padding: EdgeInsets.symmetric(
+                        //         vertical: 12.0,
+                        //         horizontal: 16.0,
+                        //       ), // Padding inside the container
+                        //       child: Text(
+                        //         textAlign: TextAlign.center,
+                        //         "Edit", // Customize the text
+                        //         style: TextStyle(
+                        //           color: kPrimaryColor, // Text color
+                        //           fontSize: 10.0, // Font size
+                        //           fontWeight: FontWeight.bold, // Font weight
+                        //         ),
+                        //       ),
                         //     ),
                         //   ),
                         // ),
+
+                        Positioned(
+                          top: 80,
+                          // Adjust this value to position it vertically
+                          left: 16,
+                          child: Text("${userDetails.isNotEmpty ?
+                          userDetails[0]['userName'] ?? ''
+                              'Taurgo' : 'Taurgo'}"
+                            ,
+                            style: TextStyle(
+                              fontSize: 26.0,
+                              fontWeight: FontWeight.w700,
+                              color: bWhite,
+                            ),
+                          ),
+                        ),
+
+                        Positioned(
+                          top: 135,
+                          // Adjust this value to position it vertically
+                          left: 16,
+                          child: Text(
+                            userDetails.isNotEmpty
+                                ? userDetails[0]['email'] ??
+                                ''
+                                    'info@taurgo.co.uk'
+                                : 'info@taurgo.co.uk',
+                            style: TextStyle(
+                              fontSize: 12.0,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.white70,
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   ),
                 ),
-                SizedBox(height: 15.0),
-                Center(
-                  child: Text("${userDetails.isNotEmpty ?
-                  userDetails[0]['userName'] ?? ''
-                      'Taurgo' : 'Taurgo'}"
-                    ,
-                    style: TextStyle(
-                      fontSize: 24.0,
-                      fontWeight: FontWeight.w700,
-                      color: kPrimaryColor,
-                    ),
-                  ),
-                ),
 
-                SizedBox(height: 2.0),
-                Center(
-                  child: Text(
-                    userDetails.isNotEmpty
-                        ? userDetails[0]['email'] ??
-                            ''
-                                'info@taurgo.com'
-                        : 'info@taurgo.com',
-                    style: TextStyle(
-                      fontSize: 11.0,
-                      fontWeight: FontWeight.w700,
-                      color: kPrimaryTextColourTwo,
-                    ),
-                  ),
-                ),
-                SizedBox(height: 10),
                 Padding(
-                  padding: const EdgeInsets.all(0),
+                  padding: const EdgeInsets.only(right: 16, left: 16),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     // Adjust spacing between containers
@@ -333,7 +496,7 @@ class _AccountPageState extends State<AccountPage> {
 
                 SizedBox(height: 20.0),
                 Padding(
-                  padding: EdgeInsets.all(0),
+                  padding: const EdgeInsets.only(right: 16, left: 16),
                   child: Text(
                     "General",
                     style: TextStyle(
@@ -345,7 +508,7 @@ class _AccountPageState extends State<AccountPage> {
                 ),
                 SizedBox(height: 12.0),
                 Padding(
-                  padding: EdgeInsets.all(0),
+                    padding: const EdgeInsets.only(right: 16, left: 16),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -418,7 +581,7 @@ class _AccountPageState extends State<AccountPage> {
                 ),
                 SizedBox(height: 15.0),
                 Padding(
-                    padding: EdgeInsets.all(0),
+                    padding: const EdgeInsets.only(right: 16, left: 16),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -479,7 +642,7 @@ class _AccountPageState extends State<AccountPage> {
                     )),
                 SizedBox(height: 15.0),
                 Padding(
-                    padding: EdgeInsets.all(0),
+                    padding: const EdgeInsets.only(right: 16, left: 16),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -551,7 +714,7 @@ class _AccountPageState extends State<AccountPage> {
                     )),
                 SizedBox(height: 15.0),
                 Padding(
-                    padding: EdgeInsets.all(0),
+                    padding: const EdgeInsets.only(right: 16, left: 16),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -614,7 +777,7 @@ class _AccountPageState extends State<AccountPage> {
                     )),
                 SizedBox(height: 15.0),
                 Padding(
-                    padding: EdgeInsets.all(0),
+                    padding: const EdgeInsets.only(right: 16, left: 16),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -675,138 +838,143 @@ class _AccountPageState extends State<AccountPage> {
                       ],
                     )),
                 SizedBox(height: 30.0),
-                Center(
-                  child: GestureDetector(
-                    onTap: () {
-                      // AuthController.instance.logOut();
-                      showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              elevation: 10,
-                              backgroundColor: Colors.white,
-                              title: Row(
-                                children: [
-                                  Icon(Icons.info_outline,
-                                      color: kPrimaryColor),
-                                  SizedBox(width: 10),
-                                  Text(
-                                    'Log Out',
-                                    style: TextStyle(
-                                      color: kPrimaryColor,
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
+                Padding(
+                  padding: const EdgeInsets.only(right: 16, left: 16),
+                  child: Center(
+                    child: GestureDetector(
+                      onTap: () {
+                        // AuthController.instance.logOut();
+                        showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                elevation: 10,
+                                backgroundColor: Colors.white,
+                                title: Row(
+                                  children: [
+                                    Icon(Icons.info_outline,
+                                        color: kPrimaryColor),
+                                    SizedBox(width: 10),
+                                    Text(
+                                      'Log Out',
+                                      style: TextStyle(
+                                        color: kPrimaryColor,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                content: Text(
+                                  'Are you sure want to Logout?',
+                                  textAlign: TextAlign.left,
+                                  style: TextStyle(
+                                    color: Colors.grey[800],
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w400,
+                                    height: 1.5,
+                                  ),
+                                ),
+                                actions: <Widget>[
+                                  TextButton(
+                                    child: Text(
+                                      'Cancel',
+                                      style: TextStyle(
+                                        color: kPrimaryColor,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                    onPressed: () {
+                                      Navigator.of(context)
+                                          .pop(); // Close the dialog
+                                    },
+                                  ),
+                                  TextButton(
+                                    onPressed: () {
+                                      AuthController.instance.logOut();
+                                      // print(propertyId);
+                                      // Navigator.pushReplacement(
+                                      //   context,
+                                      //   MaterialPageRoute(
+                                      //       builder: (context) =>
+                                      //           EditReportPage(
+                                      //             propertyId: propertyId,
+                                      //           )), // Replace HomePage
+                                      //   // with your home page
+                                      //   // widget
+                                      // ); // Close the dialog
+                                    },
+                                    style: TextButton.styleFrom(
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 16, vertical: 8),
+                                      backgroundColor:
+                                      Colors.red.withOpacity(0.8),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                    ),
+                                    child: Text(
+                                      'Log Out',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 16,
+                                      ),
                                     ),
                                   ),
                                 ],
-                              ),
-                              content: Text(
-                                'Are you sure want to Logout?',
-                                textAlign: TextAlign.left,
-                                style: TextStyle(
-                                  color: Colors.grey[800],
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w400,
-                                  height: 1.5,
-                                ),
-                              ),
-                              actions: <Widget>[
-                                TextButton(
-                                  child: Text(
-                                    'Cancel',
-                                    style: TextStyle(
-                                      color: kPrimaryColor,
-                                      fontSize: 16,
-                                    ),
-                                  ),
-                                  onPressed: () {
-                                    Navigator.of(context)
-                                        .pop(); // Close the dialog
-                                  },
-                                ),
-                                TextButton(
-                                  onPressed: () {
-                                    AuthController.instance.logOut();
-                                    // print(propertyId);
-                                    // Navigator.pushReplacement(
-                                    //   context,
-                                    //   MaterialPageRoute(
-                                    //       builder: (context) =>
-                                    //           EditReportPage(
-                                    //             propertyId: propertyId,
-                                    //           )), // Replace HomePage
-                                    //   // with your home page
-                                    //   // widget
-                                    // ); // Close the dialog
-                                  },
-                                  style: TextButton.styleFrom(
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: 16, vertical: 8),
-                                    backgroundColor:
-                                    Colors.red.withOpacity(0.8),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                  ),
-                                  child: Text(
-                                    'Log Out',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 16,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            );
-                          });
-                    },
-                    child: Container(
-                      width: double.maxFinite,
-                      decoration: BoxDecoration(
-                        color: bWhite, // Background color of the container
-                        borderRadius: BorderRadius.circular(10.0), // Rounded corners
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1), // Shadow color
-                            spreadRadius: 2,
-                            blurRadius: 5,
-                            offset: Offset(0, 3), // Shadow position
-                          ),
-                        ],
-                        border: Border.all(
-                          color: kPrimaryColor, // Border color
-                          width: 2.0, // Border width
-                        ),
-                      ),
-                      padding: EdgeInsets.symmetric(
-                        vertical: 12.0,
-                        horizontal: 16.0,
-                      ), // Padding inside the container
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.logout,
-                            color: kPrimaryColor, // Customize the icon color
-                          ),
-                          SizedBox(width: 8.0), // Space between the icon and the text
-                          Text(
-                            "Log Out", // Customize the text
-                            style: TextStyle(
-                              color: kPrimaryColor, // Text color
-                              fontSize: 16.0, // Font size
-                              fontWeight: FontWeight.bold, // Font weight
+                              );
+                            });
+                      },
+                      child: Container(
+                        width: double.maxFinite,
+                        decoration: BoxDecoration(
+                          color: bWhite, // Background color of the container
+                          borderRadius: BorderRadius.circular(10.0), // Rounded corners
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1), // Shadow color
+                              spreadRadius: 2,
+                              blurRadius: 5,
+                              offset: Offset(0, 3), // Shadow position
                             ),
+                          ],
+                          border: Border.all(
+                            color: kPrimaryColor, // Border color
+                            width: 2.0, // Border width
                           ),
-                        ],
+                        ),
+                        padding: EdgeInsets.symmetric(
+                          vertical: 12.0,
+                          horizontal: 16.0,
+                        ), // Padding inside the container
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.logout,
+                              color: kPrimaryColor, // Customize the icon color
+                            ),
+                            SizedBox(width: 8.0), // Space between the icon and the text
+                            Text(
+                              "Log Out", // Customize the text
+                              style: TextStyle(
+                                color: kPrimaryColor, // Text color
+                                fontSize: 16.0, // Font size
+                                fontWeight: FontWeight.bold, // Font weight
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
+
                 )
+
               ],
             ),
           ),
@@ -824,4 +992,32 @@ class _AccountPageState extends State<AccountPage> {
 
     Share.share(shareText);
   }
+}
+
+
+
+class AccountWaveClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    var path = Path();
+    path.lineTo(0.0, size.height - 150);
+
+    // Create a smooth curve
+    var firstControlPoint = Offset(size.width / 8, size.height);
+    var firstEndPoint = Offset(size.width / 2, size.height - 60);
+    var secondControlPoint = Offset(size.width / 2, size.height - 60);
+    var secondEndPoint = Offset(size.width, size.height - 150);
+
+    path.quadraticBezierTo(
+        firstControlPoint.dx, firstControlPoint.dy, firstEndPoint.dx, firstEndPoint.dy);
+    path.quadraticBezierTo(
+        secondControlPoint.dx, secondControlPoint.dy, secondEndPoint.dx, secondEndPoint.dy);
+
+    path.lineTo(size.width, 0.0);
+    path.close();
+    return path;
+  }
+
+  @override
+  bool shouldReclip(CustomClipper<Path> oldClipper) => false;
 }

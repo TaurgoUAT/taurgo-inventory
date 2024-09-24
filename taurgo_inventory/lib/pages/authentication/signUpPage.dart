@@ -422,9 +422,9 @@ class _SignUpPageState extends State<SignUpPage> {
                   )),
                 ),
                 const SizedBox(height: 18),
-                Center(
-                  child: SocialMediaLogin(),
-                ),
+                // Center(
+                //   child: SocialMediaLogin(),
+                // ),
               ],
             )
           ],

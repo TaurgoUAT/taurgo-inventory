@@ -6,6 +6,7 @@ import 'package:taurgo_inventory/pages/edit_details_page.dart';
 import 'package:taurgo_inventory/pages/edit_report_page.dart';
 import 'package:taurgo_inventory/pages/home_page.dart';
 import 'package:taurgo_inventory/pages/view_pdf.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../constants/AppColors.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -28,6 +29,11 @@ class _PropertyDetailsViewPageState extends State<PropertyDetailsViewPage> {
   bool isLoading = true;
   List<Map<String, dynamic>> properties = [];
   File? _imageFile; // File to store the selected image
+  String? propertyAddressLineOne;
+  String? propertyAddressLineTwo;
+  String? propertyCity;
+  String? propertyCountry;
+  String? address;
 
   // Method to pick an image from the camera
   Future<void> _pickImage() async {
@@ -148,6 +154,12 @@ class _PropertyDetailsViewPageState extends State<PropertyDetailsViewPage> {
           properties =
               data.map((item) => item as Map<String, dynamic>).toList();
           print(properties[0]['inspectionType']);
+          propertyAddressLineOne = properties[0]['addressLineOne'];
+          propertyAddressLineTwo = properties[0]['addressLineTwo'];
+          propertyCity = properties[0]['city'];
+          propertyCountry = properties[0]['country'];
+          address = "$propertyAddressLineTwo,$propertyCity,$propertyCountry";
+          print(address);
           isLoading = false;
         });
       } else {
@@ -165,6 +177,19 @@ class _PropertyDetailsViewPageState extends State<PropertyDetailsViewPage> {
         isLoading = false;
       });
       // Display error message
+    }
+  }
+
+  void _openMap() async {
+    print("Address in Map : Taurgo $address");
+    String googleMapsUrl = "https://www.google"
+        ".com/maps/search/?api=1&query=$address";
+    Uri uri = Uri.parse(googleMapsUrl);
+
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+    } else {
+      throw 'Could not launch $googleMapsUrl';
     }
   }
 
@@ -196,7 +221,7 @@ class _PropertyDetailsViewPageState extends State<PropertyDetailsViewPage> {
                     color: kPrimaryColor,
                   ),
                   onPressed: () {
-                    Navigator.pushReplacement(
+                    Navigator.push(
                       context,
                       MaterialPageRoute(
                           builder: (context) =>
@@ -376,93 +401,12 @@ class _PropertyDetailsViewPageState extends State<PropertyDetailsViewPage> {
                                               0xFFC2C2C2), // Divider color
                                         ),
                                       ),
-                                      ElevatedButton(
+                                      Padding(padding: EdgeInsets.all(0),
+                                      child: properties[0]['status'] != 'Completed'
+                                          ''?  ElevatedButton(
                                         onPressed: () {
                                           // Check if the status is completed
-                                          if (properties[0]['status'] == "Completed") {
-                                            // Navigate to InfoPage
-                                            showDialog(
-                                              context: context,
-                                              builder: (BuildContext context) {
-                                                return AlertDialog(
-                                                  shape: RoundedRectangleBorder(
-                                                    borderRadius: BorderRadius.circular(20),
-                                                  ),
-                                                  elevation: 10,
-                                                  backgroundColor: Colors.white,
-                                                  title: Row(
-                                                    children: [
-                                                      Icon(Icons.info_outline, color: kPrimaryColor),
-                                                      SizedBox(width: 10),
-                                                      Text(
-                                                        'Completed',
-                                                        style: TextStyle(
-                                                          color: kPrimaryColor,
-                                                          fontSize: 18,
-                                                          fontWeight: FontWeight.bold,
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  content: Text(
-                                                    'You have already '
-                                                        'completed this '
-                                                        'inspection ',
-                                                    textAlign: TextAlign.left,
-                                                    style: TextStyle(
-                                                      color: Colors.grey[800],
-                                                      fontSize: 14,
-                                                      fontWeight: FontWeight.w400,
-                                                      height: 1.5,
-                                                    ),
-                                                  ),
-                                                  actions: <Widget>[
-                                                    TextButton(
-                                                      child: Text(
-                                                        'Cancel',
-                                                        style: TextStyle(
-                                                          color: kPrimaryColor,
-                                                          fontSize: 16,
-                                                        ),
-                                                      ),
-                                                      onPressed: () {
-                                                        Navigator.of(context).pop(); // Close the dialog
-                                                      },
-                                                    ),
-                                                    TextButton(
-                                                      onPressed: () {
-                                                        print(propertyId);
-                                                        Navigator.pushReplacement(
-                                                          context,
-                                                          MaterialPageRoute(
-                                                            builder:
-                                                                (context) =>
-                                                                    ViewPdf(
-                                                                      propertyId: propertyId),
-                                                          ),
-                                                        ); // Close the dialog
-                                                      },
-                                                      style: TextButton.styleFrom(
-                                                        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                                                        backgroundColor: kPrimaryColor,
-                                                        shape: RoundedRectangleBorder(
-                                                          borderRadius: BorderRadius.circular(10),
-                                                        ),
-                                                      ),
-                                                      child: Text(
-                                                        'View',
-                                                        style: TextStyle(
-                                                          color: Colors.white,
-                                                          fontSize: 16,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ],
-                                                );
-                                              },
-                                            );
-                                          }
-                                          else if (properties[0]['inspectionType'] == "Inventory & Schedule of Condition" ||
+                                          if (properties[0]['inspectionType'] == "Inventory & Schedule of Condition" ||
                                               properties[0]['inspectionType'] == "Check In" ||
                                               properties[0]['inspectionType'] == "Checkout" ||
                                               properties[0]['inspectionType'] == "Inventory & Check In" ||
@@ -709,6 +653,34 @@ class _PropertyDetailsViewPageState extends State<PropertyDetailsViewPage> {
                                           ),
                                         ),
                                       )
+                                      :ElevatedButton(
+                                        onPressed: () {
+
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    ViewPdf(propertyId: widget.propertyId)), // Replace 
+                                            // HomePage
+                                            // with your home page
+                                            // widget
+                                          );
+
+                                        },
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(7.5),
+                                          child: Text('View Report', style:
+                                          TextStyle(fontSize: 12)),
+                                        ),
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: kPrimaryColor,
+                                          foregroundColor: Colors.white,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(10),
+                                          ),
+                                        ),
+                                      ),)
+
 
                                     ],
                                   ),
@@ -725,12 +697,10 @@ class _PropertyDetailsViewPageState extends State<PropertyDetailsViewPage> {
                                 Padding(
                                   padding: EdgeInsets.all(0),
                                   child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: <Widget>[
                                       Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
                                           Text(
                                             "Address",
@@ -742,8 +712,7 @@ class _PropertyDetailsViewPageState extends State<PropertyDetailsViewPage> {
                                           ),
                                           SizedBox(height: 3.0),
                                           Text(
-                                            properties[0]['addressLineOne'] ??
-                                                'No address',
+                                            properties[0]['addressLineOne'] ?? 'No address',
                                             style: TextStyle(
                                               fontSize: 12.0,
                                               fontWeight: FontWeight.w700,
@@ -751,7 +720,7 @@ class _PropertyDetailsViewPageState extends State<PropertyDetailsViewPage> {
                                             ),
                                           ),
                                           Text(
-                                            properties[0]['addressLineTwo'],
+                                            properties[0]['addressLineTwo'] ?? '',
                                             style: TextStyle(
                                               fontSize: 12.0,
                                               fontWeight: FontWeight.w700,
@@ -761,12 +730,11 @@ class _PropertyDetailsViewPageState extends State<PropertyDetailsViewPage> {
                                           Row(
                                             children: [
                                               Text(
-                                                properties[0]['city'],
+                                                properties[0]['city'] ?? '',
                                                 style: TextStyle(
                                                   fontSize: 12.0,
                                                   fontWeight: FontWeight.w700,
-                                                  color:
-                                                      kSecondaryTextColourTwo,
+                                                  color: kSecondaryTextColourTwo,
                                                 ),
                                               ),
                                               Text(
@@ -774,26 +742,22 @@ class _PropertyDetailsViewPageState extends State<PropertyDetailsViewPage> {
                                                 style: TextStyle(
                                                   fontSize: 12.0,
                                                   fontWeight: FontWeight.w700,
-                                                  color:
-                                                      kSecondaryTextColourTwo,
+                                                  color: kSecondaryTextColourTwo,
                                                 ),
                                               ),
-                                              SizedBox(
-                                                width: 2,
-                                              ),
+                                              SizedBox(width: 2),
                                               Text(
-                                                properties[0]['state'],
+                                                properties[0]['state'] ?? '',
                                                 style: TextStyle(
                                                   fontSize: 12.0,
                                                   fontWeight: FontWeight.w700,
-                                                  color:
-                                                      kSecondaryTextColourTwo,
+                                                  color: kSecondaryTextColourTwo,
                                                 ),
                                               ),
                                             ],
                                           ),
                                           Text(
-                                            properties[0]['country'],
+                                            properties[0]['country'] ?? '',
                                             style: TextStyle(
                                               fontSize: 12.0,
                                               fontWeight: FontWeight.w700,
@@ -801,7 +765,7 @@ class _PropertyDetailsViewPageState extends State<PropertyDetailsViewPage> {
                                             ),
                                           ),
                                           Text(
-                                            properties[0]['postalCode'],
+                                            properties[0]['postalCode'] ?? '',
                                             style: TextStyle(
                                               fontSize: 12.0,
                                               fontWeight: FontWeight.w700,
@@ -810,19 +774,23 @@ class _PropertyDetailsViewPageState extends State<PropertyDetailsViewPage> {
                                           ),
                                         ],
                                       ),
-                                      IconButton(
+                                      // Check if the status is not 'completed' before showing the navigation icon
+                                      properties[0]['status'] != 'Completed'
+                                          ? IconButton(
                                         icon: Icon(
                                           Icons.navigation,
                                           size: 36,
                                           color: kPrimaryColor,
                                         ),
                                         onPressed: () {
-                                          // _showFilterOptions(context);
+                                          _openMap();
                                         },
-                                      ),
+                                      )
+                                          : Container(), // Empty container if the status is 'completed'
                                     ],
                                   ),
                                 ),
+
 
                                 Padding(
                                   padding: const EdgeInsets.symmetric(
@@ -1089,37 +1057,31 @@ class _PropertyDetailsViewPageState extends State<PropertyDetailsViewPage> {
 
                                 // Save Button
                                 Center(
-                                  child: GestureDetector(
+                                  child: properties[0]['status'] != 'Completed'
+                                      '' //
+                                  // Check if the status is not 'Completed'
+                                      ? GestureDetector(
                                     onTap: () {
-                                      // AuthController.instance.logOut();
                                       Navigator.pushReplacement(
                                         context,
                                         MaterialPageRoute(
-                                            builder: (context) =>
-                                                EditDetailsPage(
-                                                  propertyId: widget.propertyId,
-                                                )), // Replace HomePage
-                                        // with your home page
-                                        // widget
+                                          builder: (context) => EditDetailsPage(
+                                            propertyId: widget.propertyId,
+                                          ),
+                                        ),
                                       );
                                     },
                                     child: Container(
                                       width: double.maxFinite,
                                       decoration: BoxDecoration(
-                                        color: kPrimaryColor,
-                                        // Background color of the container
-                                        borderRadius:
-                                            BorderRadius.circular(10.0),
-                                        // Rounded corners
+                                        color: kPrimaryColor, // Background color of the container
+                                        borderRadius: BorderRadius.circular(10.0), // Rounded corners
                                         boxShadow: [
                                           BoxShadow(
-                                            color:
-                                                Colors.black.withOpacity(0.1),
-                                            // Shadow color
+                                            color: Colors.black.withOpacity(0.1), // Shadow color
                                             spreadRadius: 2,
                                             blurRadius: 5,
-                                            offset:
-                                                Offset(0, 3), // Shadow position
+                                            offset: Offset(0, 3), // Shadow position
                                           ),
                                         ],
                                         border: Border.all(
@@ -1132,31 +1094,29 @@ class _PropertyDetailsViewPageState extends State<PropertyDetailsViewPage> {
                                         horizontal: 16.0,
                                       ), // Padding inside the container
                                       child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
+                                        mainAxisAlignment: MainAxisAlignment.center,
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
                                           Icon(
                                             Icons.update_outlined,
-                                            color:
-                                                bWhite, // Customize the icon color
+                                            color: bWhite, // Customize the icon color
                                           ),
-                                          SizedBox(width: 8.0),
-                                          // Space between the icon and the text
+                                          SizedBox(width: 8.0), // Space between the icon and the text
                                           Text(
                                             "Edit Info", // Customize the text
                                             style: TextStyle(
                                               color: bWhite, // Text color
                                               fontSize: 16.0, // Font size
-                                              fontWeight: FontWeight
-                                                  .bold, // Font weight
+                                              fontWeight: FontWeight.bold, // Font weight
                                             ),
                                           ),
                                         ],
                                       ),
                                     ),
-                                  ),
+                                  )
+                                      : SizedBox.shrink(), // If status is 'Completed', show nothing
                                 )
+
                               ],
                             ),
                           ),

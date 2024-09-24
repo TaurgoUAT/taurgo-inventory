@@ -1,11 +1,16 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:taurgo_inventory/pages/home_page.dart';
 import '../../constants/AppColors.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:taurgo_inventory/constants/UrlConstants.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+
 class EditProfile extends StatefulWidget {
   const EditProfile({super.key});
 
@@ -31,6 +36,129 @@ class _EditProfileState extends State<EditProfile> {
   }
 
   late String firebaseId;
+  late File image; // List to store selected images
+
+  final ImagePicker _picker = ImagePicker(); // Image picker instance
+
+// Function to open gallery and select a single image
+  Future<void> pickImageFromGallery() async {
+    PermissionStatus status = await Permission.storage.request();
+
+    if (status.isGranted) {
+      final XFile? imageFile = await _picker.pickImage(source: ImageSource.gallery); // Pick a single image
+      if (imageFile != null) {
+        setState(() {
+          image = File(imageFile.path); // Store the selected image
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: kPrimaryColor,
+            content: Text(
+              'Image selected from gallery',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: bWhite,
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                fontFamily: "Inter",
+              ),
+            ),
+          ),
+        );
+      }
+    } else {
+      print('Gallery permission not granted');
+    }
+  }
+  // Function to open the camera and capture an image
+  Future<void> captureMultipleImagesWithCamera() async {
+    bool continueCapturing = true;
+
+    while (continueCapturing) {
+      final XFile? capturedImage =
+          await _picker.pickImage(source: ImageSource.camera);
+      if (capturedImage != null) {
+        setState(() {
+          image = File(capturedImage.path);
+        });
+
+        // Show a dialog asking if the user wants to capture another image
+        bool? shouldContinue = await showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              backgroundColor: bWhite,
+              title: Row(
+                children: [
+                  Icon(Icons.flip_camera_ios, color: kPrimaryColor),
+                  SizedBox(width: 10),
+                  Text(
+                    'Capture another image?',
+                    style: TextStyle(
+                      color: kPrimaryColor,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+              content: Text(
+                'Do you want to capture another image with the camera?',
+                textAlign: TextAlign.left,
+                style: TextStyle(
+                  color: Colors.grey[800],
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                  height: 1.5,
+                ),
+              ),
+              actions: <Widget>[
+                TextButton(
+                  child: Text(
+                    'No',
+                    style: TextStyle(
+                      color: kPrimaryColor,
+                      fontSize: 16,
+                    ),
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).pop(false); // Close the dialog
+                  },
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(true); // Continue capturing
+                  },
+                  style: TextButton.styleFrom(
+                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    backgroundColor: kPrimaryColor,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  child: Text(
+                    'Yes',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+
+        if (shouldContinue == false) {
+          continueCapturing = false; // Stop the loop
+        }
+      } else {
+        // User canceled capturing, exit the loop
+        continueCapturing = false;
+      }
+    }
+  }
 
   Future<void> getFirebaseUserId() async {
     try {
@@ -40,7 +168,6 @@ class _EditProfileState extends State<EditProfile> {
         setState(() {
           firebaseId = user!.uid;
         });
-
       } else {
         print("No user is currently signed in.");
       }
@@ -52,7 +179,7 @@ class _EditProfileState extends State<EditProfile> {
   Future<void> fetchUserDetails() async {
     try {
       final response =
-      await http.get(Uri.parse('$baseURL/user/firebaseId/$firebaseId'));
+          await http.get(Uri.parse('$baseURL/user/firebaseId/$firebaseId'));
 
       if (response.statusCode == 200) {
         print(response.statusCode);
@@ -64,21 +191,17 @@ class _EditProfileState extends State<EditProfile> {
             userDetails =
                 userData.map((item) => item as Map<String, dynamic>).toList();
             print(userDetails.length);
-            if(userDetails.isNotEmpty){
+            if (userDetails.isNotEmpty) {
               print("Hello");
               print(userDetails.length);
-              userNameController = TextEditingController(
-                  text: userDetails[0]['userName'] ?? ''
-              );
+              userNameController =
+                  TextEditingController(text: userDetails[0]['userName'] ?? '');
               firstNameController = TextEditingController(
-                  text: userDetails[0]['firstName'] ?? ''
-              );
-              lastNameController = TextEditingController(
-                  text: userDetails[0]['lastName'] ?? ''
-              );
-              locationController = TextEditingController(
-                  text: userDetails[0]['location'] ?? ''
-              );
+                  text: userDetails[0]['firstName'] ?? '');
+              lastNameController =
+                  TextEditingController(text: userDetails[0]['lastName'] ?? '');
+              locationController =
+                  TextEditingController(text: userDetails[0]['location'] ?? '');
             }
             isLoading = false;
           });
@@ -106,9 +229,8 @@ class _EditProfileState extends State<EditProfile> {
     }
   }
 
-  Future<void> _updateProfile(String userName, String firstName, String
-  lastName, String location) async {
-
+  Future<void> _updateProfile(String userName, String firstName,
+      String lastName, String location) async {
     // Show loading indicator
     showDialog(
       context: context,
@@ -166,7 +288,7 @@ class _EditProfileState extends State<EditProfile> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) =>HomePage(),
+              builder: (context) => HomePage(),
             ),
           );
         });
@@ -209,6 +331,163 @@ class _EditProfileState extends State<EditProfile> {
     }
   }
 
+  XFile? _selectedLogo; // Store the selected image
+  Future<void> _pickImage() async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+
+    if (image != null) {
+      setState(() {
+        _selectedLogo = image;
+      });
+    }
+  }
+
+  void _showDeviceSelection() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          elevation: 10,
+          backgroundColor: Colors.white,
+          title: Row(
+            children: [
+              Container(
+                width: 20, // Adjust width and height for the circular icon
+                height: 20,
+                decoration: BoxDecoration(
+                  color: kPrimaryColor, // Green background for the circle
+                  shape: BoxShape.circle, // Circular shape
+                ),
+                child: Icon(
+                  Icons.done, // Done icon
+                  color: bWhite, // White icon color
+                  size: 12, // Adjust the icon size
+                ),
+              ),
+              SizedBox(width: 10),
+              Text(
+                'Select your Media',
+                style: TextStyle(
+                  color: kPrimaryColor,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min, // Adjust the dialog height
+            children: [
+              Text(
+                'Please Select your Media before continue',
+                textAlign: TextAlign.left,
+                style: TextStyle(
+                  color: Colors.grey[800],
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                  height: 1.5,
+                ),
+              ),
+              SizedBox(height: 20),
+              // Add some space between the text and buttons
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 12, // Adjust width and height for the circular icon
+                    decoration: BoxDecoration(
+                      color: kPrimaryColor, // Green background for the circle
+                      shape: BoxShape.circle, // Circular shape
+                    ),
+                    child: Icon(
+                      Icons.camera_alt_outlined, // Done icon
+                      color: bWhite, // White icon color
+                      size: 14, // Adjust the icon size
+                    ),
+                  ),
+                  const SizedBox(width: 12,),
+                  Text(
+                    'Camera',
+                    style: TextStyle(
+                      color: bWhite,
+                      fontSize: 14,
+                    ),
+                  ),
+                ],
+              ),
+              style: TextButton.styleFrom(
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                backgroundColor: kPrimaryColor,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              onPressed: () {
+                captureMultipleImagesWithCamera();
+                Navigator.of(context).pop(); // Close the dialog
+              },
+            ),
+            TextButton(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 12, // Adjust width and height for the circular icon
+                    decoration: BoxDecoration(
+                      color: kPrimaryColor, // Green background for the circle
+                      shape: BoxShape.circle, // Circular shape
+                    ),
+                    child: Icon(
+                      Icons.image_outlined, // Done icon
+                      color: bWhite, // White icon color
+                      size: 14, // Adjust the icon size
+                    ),
+                  ),
+                  const SizedBox(width: 12,),
+                  Text(
+                    'Gallery',
+                    style: TextStyle(
+                      color: bWhite,
+                      fontSize: 14,
+                    ),
+                  ),
+                ],
+              ),
+              style: TextButton.styleFrom(
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                backgroundColor: kPrimaryColor,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              onPressed: () {
+                pickImageFromGallery();
+                Navigator.of(context).pop(); // Close the dialog
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+// Function to select an image from the gallery
+  void _selectImageFromGallery() {
+    // Implement your gallery selection logic here
+  }
+
+// Function to capture an image using the camera
+  void _captureImageWithCamera() {
+    // Implement your camera capture logic here
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -228,7 +507,8 @@ class _EditProfileState extends State<EditProfile> {
           backgroundColor: bWhite,
           leading: GestureDetector(
             onTap: () {
-              Navigator.pop(context); // Close EditProfile and go back to HomePage
+              Navigator.pop(
+                  context); // Close EditProfile and go back to HomePage
               HomePage.homePageKey.currentState?.navigateToPage(1);
             },
             child: Icon(
@@ -255,8 +535,37 @@ class _EditProfileState extends State<EditProfile> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // UserName Text Field
-                SizedBox(height: 30),
+                // Center(
+                //   child: Padding(
+                //     padding: const EdgeInsets.all(0),
+                //     child: GestureDetector(
+                //       onTap: _showDeviceSelection,
+                //       child: image !=  null
+                //           ? ClipOval(
+                //         child: Image.file(
+                //           image!, // Use '!' to indicate that image is not null
+                //           height: 150, // Adjust the height for a larger circular image
+                //           width: 150, // Adjust the width for a larger circular image
+                //           fit: BoxFit.cover, // Ensure the image covers the circular area
+                //         ),
+                //       )
+                //           : Container(
+                //         height: 150,
+                //         width: 150,
+                //         decoration: BoxDecoration(
+                //           color: Colors.grey[200],
+                //           shape: BoxShape.circle, // Make the container circular
+                //         ),
+                //         child: Icon(
+                //           Icons.add_a_photo,
+                //           color: Colors.grey[700],
+                //         ),
+                //       ),
+                //     ),
+                //   ),
+                // ),
+                // // UserName Text Field
+                SizedBox(height: 20),
                 TextField(
                   cursorColor: kPrimaryColor,
                   controller: userNameController,
@@ -264,18 +573,20 @@ class _EditProfileState extends State<EditProfile> {
                     labelText: 'Username',
                     labelStyle: TextStyle(
                         color: kPrimaryColor,
-                        fontSize: 14// Change the label text color
-                    ),
+                        fontSize: 14 // Change the label text color
+                        ),
                     enabledBorder: OutlineInputBorder(
                       borderSide: BorderSide(
-                        color: kPrimaryColor, // Change the border color when not focused
+                        color: kPrimaryColor,
+                        // Change the border color when not focused
                         width: 1.0,
                       ),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderSide: BorderSide(
-                        color: kPrimaryColor, // Change the border color when focused
+                        color: kPrimaryColor,
+                        // Change the border color when focused
                         width: 2.0,
                       ),
                       borderRadius: BorderRadius.circular(8),
@@ -283,8 +594,8 @@ class _EditProfileState extends State<EditProfile> {
                   ),
                   style: TextStyle(
                       color: kSecondaryTextColourTwo,
-                      fontSize: 12// Change the text color inside the TextField
-                  ),
+                      fontSize: 12 // Change the text color inside the TextField
+                      ),
                 ),
                 SizedBox(height: 30),
 
@@ -295,28 +606,30 @@ class _EditProfileState extends State<EditProfile> {
                   decoration: InputDecoration(
                     labelText: 'First Name',
                     labelStyle: TextStyle(
-                      color: kPrimaryColor,
-                      fontSize: 14// Change the label text color
-                    ),
+                        color: kPrimaryColor,
+                        fontSize: 14 // Change the label text color
+                        ),
                     enabledBorder: OutlineInputBorder(
                       borderSide: BorderSide(
-                        color: kPrimaryColor, // Change the border color when not focused
+                        color: kPrimaryColor,
+                        // Change the border color when not focused
                         width: 1.0,
                       ),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderSide: BorderSide(
-                        color: kPrimaryColor, // Change the border color when focused
+                        color: kPrimaryColor,
+                        // Change the border color when focused
                         width: 2.0,
                       ),
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
                   style: TextStyle(
-                    color: kSecondaryTextColourTwo,
-                    fontSize: 12// Change the text color inside the TextField
-                  ),
+                      color: kSecondaryTextColourTwo,
+                      fontSize: 12 // Change the text color inside the TextField
+                      ),
                 ),
 
                 SizedBox(height: 30),
@@ -329,18 +642,20 @@ class _EditProfileState extends State<EditProfile> {
                     labelText: 'Last Name',
                     labelStyle: TextStyle(
                         color: kPrimaryColor,
-                        fontSize: 14// Change the label text color
-                    ),
+                        fontSize: 14 // Change the label text color
+                        ),
                     enabledBorder: OutlineInputBorder(
                       borderSide: BorderSide(
-                        color: kPrimaryColor, // Change the border color when not focused
+                        color: kPrimaryColor,
+                        // Change the border color when not focused
                         width: 1.0,
                       ),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderSide: BorderSide(
-                        color: kPrimaryColor, // Change the border color when focused
+                        color: kPrimaryColor,
+                        // Change the border color when focused
                         width: 2.0,
                       ),
                       borderRadius: BorderRadius.circular(8),
@@ -348,8 +663,8 @@ class _EditProfileState extends State<EditProfile> {
                   ),
                   style: TextStyle(
                       color: kSecondaryTextColourTwo,
-                      fontSize: 12// Change the text color inside the TextField
-                  ),
+                      fontSize: 12 // Change the text color inside the TextField
+                      ),
                 ),
                 SizedBox(height: 30),
 
@@ -361,18 +676,20 @@ class _EditProfileState extends State<EditProfile> {
                     labelText: 'Location',
                     labelStyle: TextStyle(
                         color: kPrimaryColor,
-                        fontSize: 14// Change the label text color
-                    ),
+                        fontSize: 14 // Change the label text color
+                        ),
                     enabledBorder: OutlineInputBorder(
                       borderSide: BorderSide(
-                        color: kPrimaryColor, // Change the border color when not focused
+                        color: kPrimaryColor,
+                        // Change the border color when not focused
                         width: 1.0,
                       ),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderSide: BorderSide(
-                        color: kPrimaryColor, // Change the border color when focused
+                        color: kPrimaryColor,
+                        // Change the border color when focused
                         width: 2.0,
                       ),
                       borderRadius: BorderRadius.circular(8),
@@ -380,8 +697,8 @@ class _EditProfileState extends State<EditProfile> {
                   ),
                   style: TextStyle(
                       color: kSecondaryTextColourTwo,
-                      fontSize: 12// Change the text color inside the TextField
-                  ),
+                      fontSize: 12 // Change the text color inside the TextField
+                      ),
                 ),
                 Spacer(),
 
@@ -395,8 +712,7 @@ class _EditProfileState extends State<EditProfile> {
                           builder: (BuildContext context) {
                             return AlertDialog(
                               shape: RoundedRectangleBorder(
-                                borderRadius:
-                                BorderRadius.circular(20),
+                                borderRadius: BorderRadius.circular(20),
                               ),
                               elevation: 10,
                               backgroundColor: Colors.white,
@@ -441,19 +757,18 @@ class _EditProfileState extends State<EditProfile> {
                                 ),
                                 TextButton(
                                   onPressed: () {
-                                    _updateProfile(userNameController.text.trim(),
-                                        firstNameController.text.trim(), lastNameController
-                                            .text.trim(),
+                                    _updateProfile(
+                                        userNameController.text.trim(),
+                                        firstNameController.text.trim(),
+                                        lastNameController.text.trim(),
                                         locationController.text.trim());
                                   },
                                   style: TextButton.styleFrom(
                                     padding: EdgeInsets.symmetric(
-                                        horizontal: 16,
-                                        vertical: 8),
+                                        horizontal: 16, vertical: 8),
                                     backgroundColor: kPrimaryColor,
                                     shape: RoundedRectangleBorder(
-                                      borderRadius:
-                                      BorderRadius.circular(10),
+                                      borderRadius: BorderRadius.circular(10),
                                     ),
                                   ),
                                   child: Text(
@@ -466,17 +781,19 @@ class _EditProfileState extends State<EditProfile> {
                                 ),
                               ],
                             );
-                          }
-                      );
+                          });
                     },
                     child: Container(
                       width: double.maxFinite,
                       decoration: BoxDecoration(
-                        color: kPrimaryColor, // Background color of the container
-                        borderRadius: BorderRadius.circular(10.0), // Rounded corners
+                        color: kPrimaryColor,
+                        // Background color of the container
+                        borderRadius: BorderRadius.circular(10.0),
+                        // Rounded corners
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.1), // Shadow color
+                            color: Colors.black.withOpacity(0.1),
+                            // Shadow color
                             spreadRadius: 2,
                             blurRadius: 5,
                             offset: Offset(0, 3), // Shadow position
@@ -499,7 +816,8 @@ class _EditProfileState extends State<EditProfile> {
                             Icons.update_outlined,
                             color: bWhite, // Customize the icon color
                           ),
-                          SizedBox(width: 8.0), // Space between the icon and the text
+                          SizedBox(width: 8.0),
+                          // Space between the icon and the text
                           Text(
                             "Update", // Customize the text
                             style: TextStyle(
@@ -513,7 +831,6 @@ class _EditProfileState extends State<EditProfile> {
                     ),
                   ),
                 )
-
               ],
             ),
           ),

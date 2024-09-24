@@ -9,16 +9,24 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9cfeb956-5354-4366-ab84-34804ef25cb7" name="Changes" comment="Midterm Inspespection Added">
-      <change afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/view_pdf.dart" afterDir="false" />
+    <list default="true" id="9cfeb956-5354-4366-ab84-34804ef25cb7" name="Changes" comment="Project Improvements Added">
       <change beforePath="$PROJECT_DIR$/.idea/libraries/Dart_Packages.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/Dart_Packages.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/libraries/Flutter_Plugins.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/Flutter_Plugins.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/taurgo_inventory/ios/Podfile.lock" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/ios/Podfile.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/taurgo_inventory/ios/Runner.xcodeproj/project.pbxproj" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/ios/Runner.xcodeproj/project.pbxproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/GoogleService-Info.plist" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/GoogleService-Info.plist" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/Info.plist" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/Info.plist" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/constants/UrlConstants.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/constants/UrlConstants.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/InspectionReportsPages/preview_inspection_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/InspectionReportsPages/preview_inspection_page.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/account_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/account_page.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/add_property_details_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/add_property_details_page.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/deatails_confirmation_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/deatails_confirmation_page.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/authentication/controller/authController.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/authentication/controller/authController.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/authentication/signInPage.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/authentication/signInPage.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/landing_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/landing_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/profile-pages/edit_profile.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/profile-pages/edit_profile.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/property_details_view_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/property_details_view_page.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/view_pdf.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/view_pdf.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/taurgo_inventory/macos/Flutter/GeneratedPluginRegistrant.swift" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/macos/Flutter/GeneratedPluginRegistrant.swift" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/taurgo_inventory/pubspec.lock" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/pubspec.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/taurgo_inventory/pubspec.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/pubspec.yaml" afterDir="false" />
     </list>
@@ -391,7 +399,15 @@
       <option name="project" value="LOCAL" />
       <updated>1727099066936</updated>
     </task>
-    <option name="localTasksCounter" value="42" />
+    <task id="LOCAL-00042" summary="Project Improvements Added">
+      <option name="closed" value="true" />
+      <created>1727110947845</created>
+      <option name="number" value="00042" />
+      <option name="presentableId" value="LOCAL-00042" />
+      <option name="project" value="LOCAL" />
+      <updated>1727110947846</updated>
+    </task>
+    <option name="localTasksCounter" value="43" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -407,7 +423,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="Reporting Pages Added" />
     <MESSAGE value="Backend Integrated" />
     <MESSAGE value="Delete Property Integrated" />
     <MESSAGE value="Gesture Navigation Disabled" />
@@ -432,7 +447,8 @@
     <MESSAGE value="Final Draft 1.2" />
     <MESSAGE value="Improvisation Added" />
     <MESSAGE value="Midterm Inspespection Added" />
-    <option name="LAST_COMMIT_MESSAGE" value="Midterm Inspespection Added" />
+    <MESSAGE value="Project Improvements Added" />
+    <option name="LAST_COMMIT_MESSAGE" value="Project Improvements Added" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -469,7 +485,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="Dart">
           <url>file://$PROJECT_DIR$/taurgo_inventory/lib/pages/landing_screen.dart</url>
-          <line>158</line>
+          <line>159</line>
           <option name="timeStamp" value="15" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="Dart">
@@ -489,7 +505,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="Dart">
           <url>file://$PROJECT_DIR$/taurgo_inventory/lib/pages/landing_screen.dart</url>
-          <line>423</line>
+          <line>419</line>
           <option name="timeStamp" value="26" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="Dart">

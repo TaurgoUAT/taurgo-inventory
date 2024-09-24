@@ -20,7 +20,7 @@ class _LandingScreenState extends State<LandingScreen> with TickerProviderStateM
   List<Map<String, dynamic>> completedProperties = [];
   List<Map<String, dynamic>> pendingProperties = [];
   bool isLoading = true;
-  String filterOption = 'All'; // Initial filter option
+  String filterStatus = 'All'; // Default filter is 'All'
   List<Map<String, dynamic>> filteredProperties = [];
   List<Map<String, dynamic>> properties = [];
   List<Map<String, dynamic>> userDetails= [];
@@ -37,6 +37,7 @@ class _LandingScreenState extends State<LandingScreen> with TickerProviderStateM
       vsync: this,
       duration: Duration(seconds: 2),
     )..repeat();
+    filteredProperties = properties; // Initially, all properties are shown
   }
 
   Future<void> fetchProperties() async {
@@ -177,24 +178,24 @@ class _LandingScreenState extends State<LandingScreen> with TickerProviderStateM
               ),
               Divider(),
               ListTile(
-                title: Text("Active"),
+                title: Text("Assigned"),
                 onTap: () {
-                  // applyFilter('Completed');
-                  // Navigator.pop(context);
+                  _applyFilter('Assigned'); // Apply 'Assigned' filter
+                  Navigator.pop(context); // Close the modal
                 },
               ),
               ListTile(
                 title: Text("Completed"),
                 onTap: () {
-                  // applyFilter('Pending');
-                  // Navigator.pop(context);
+                  _applyFilter('Completed'); // Apply 'Completed' filter
+                  Navigator.pop(context); // Close the modal
                 },
               ),
               ListTile(
                 title: Text("All"),
                 onTap: () {
-                  // applyFilter('All');
-                  // Navigator.pop(context);
+                  _applyFilter('All'); // Apply 'All' filter
+                  Navigator.pop(context); // Close the modal
                 },
               ),
             ],
@@ -203,29 +204,24 @@ class _LandingScreenState extends State<LandingScreen> with TickerProviderStateM
       },
     );
   }
-  int _selectedIndex = 0;
-  static const TextStyle optionStyle =
-  TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
-  static const List<Widget> _widgetOptions = <Widget>[
-    Text(
-      'Index 0: Home',
-      style: optionStyle,
-    ),
-    Text(
-      'Index 1: Business',
-      style: optionStyle,
-    ),
-    Text(
-      'Index 2: School',
-      style: optionStyle,
-    ),
-  ];
 
-  void _onItemTapped(int index) {
+  void _applyFilter(String status) {
     setState(() {
-      _selectedIndex = index;
+      filterStatus = status; // Update the filter status
+
+      if (status == 'All') {
+        // Show all properties if 'All' is selected
+        filteredProperties = properties;
+      } else {
+        // Filter properties based on the selected status
+        filteredProperties = properties
+            .where((property) => property['status'] == status)
+            .toList();
+      }
     });
   }
+
+
   @override
   void dispose() {
     _controller.dispose();
@@ -511,6 +507,7 @@ class _LandingScreenState extends State<LandingScreen> with TickerProviderStateM
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+
               SizedBox(
                 height: 20,
               ),
@@ -594,24 +591,24 @@ class _LandingScreenState extends State<LandingScreen> with TickerProviderStateM
                     ),
                     Row(
                       children: [
-                        GestureDetector(
-                          onTap: () {
-                            _showFilterOptions(context);
-                          },
-                          child: Text(
-                            "Filter",
-                            style: TextStyle(
-                              fontSize: 12.0,
-                              fontWeight: FontWeight.w700,
-                              color: kSecondaryTextColourTwo,
-                            ),
-                          ),
-                        ),
+                        // GestureDetector(
+                        //   onTap: () {
+                        //     _showFilterOptions(context);
+                        //   },
+                        //   child: Text(
+                        //     "Filter",
+                        //     style: TextStyle(
+                        //       fontSize: 12.0,
+                        //       fontWeight: FontWeight.w700,
+                        //       color: kSecondaryTextColourTwo,
+                        //     ),
+                        //   ),
+                        // ),
                         IconButton(
                           icon: Icon(
-                            Icons.filter_alt_outlined,
+                            Icons.tune_outlined,
                             size: 24,
-                            color: kSecondaryTextColourTwo,
+                            color: kPrimaryColor,
                           ),
                           onPressed: () {
                             _showFilterOptions(context);

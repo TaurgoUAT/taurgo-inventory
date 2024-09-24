@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/services.dart';
 import 'package:taurgo_inventory/constants/UrlConstants.dart';
@@ -51,79 +52,6 @@ class AuthController extends GetxController {
       Get.offAll(() => HomePage());
     }
   }
-
-  // void registerUser(String email, password, String userName,String firstName,
-  //     lastName, String location) async {
-  //   isLoading(true);
-  //   final loadingDialog = Get.dialog(
-  //     Center(
-  //       child: Column(
-  //         mainAxisAlignment: MainAxisAlignment.center,
-  //         children: [
-  //           const SizedBox(
-  //             width: 60.0,
-  //             height: 60.0,
-  //             child: CircularProgressIndicator(
-  //               color: kPrimaryColor, // Set the color to your primary color
-  //               strokeWidth: 3.0,
-  //               strokeCap: StrokeCap.square, // Set the stroke cap
-  //             ),
-  //           ),
-  //         ],
-  //       ),
-  //     ),
-  //     barrierDismissible: false, // Prevent the user from dismissing the dialog
-  //   );
-  //   try {
-  //     UserCredential userCredential = await auth.createUserWithEmailAndPassword(
-  //         email: email, password: password);
-  //
-  //     User? user = userCredential.user;
-  //     print(user?.email);
-  //     // print(name);
-  //     print(user?.email);
-  //     // Get.to(() => SubscriptionPage());
-  //
-  //     var uri = Uri.parse('$baseURL/user/new-user');
-  //     final request = http.MultipartRequest('POST', uri)
-  //       ..fields['firebaseId'] = user!.uid
-  //       ..fields['firstName'] = firstName
-  //       ..fields['lastName'] = lastName
-  //       ..fields['userName'] = userName
-  //       ..fields['email'] = email
-  //       ..fields['location'] = location;
-  //
-  //     var response = await request.send();
-  //     print('Response status: ${response.statusCode}');
-  //
-  //     if (response.statusCode == 200) {
-  //       print('Request successful');
-  //     }
-  //     else{
-  //       print('${response.statusCode}');
-  //     }
-  //     print(userName);
-  //     print(user?.email);
-  //     // Get.to(() => SubscriptionPage());
-  //
-  //
-  //   } catch (e) {
-  //     Get.snackbar(
-  //       "Account Creation failed",
-  //       e.toString(),
-  //       snackPosition: SnackPosition.BOTTOM,
-  //       backgroundColor: Colors.redAccent,
-  //       colorText: Colors.white,
-  //     );
-  //   }
-  //   finally {
-  //     // Hide the loading dialog
-  //     isLoading(false);
-  //     if (loadingDialog != null) {
-  //       Get.back(); // Close the loading dialog
-  //     }
-  //   }
-  // }
 
   void registerUser(String email, password, String userName, String firstName,
       lastName, String location) async {
@@ -309,42 +237,169 @@ class AuthController extends GetxController {
     }
   }
 
-  Future<UserCredential?> signInWithGoogle() async {
-    // try {
-    //   // Trigger the authentication flow
-    //   final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-    //
-    //   // If the user cancels the sign-in, return null
-    //   if (googleUser == null) {
-    //     return null;
-    //   }
-    //
-    //   // Obtain the auth details from the request
-    //   final GoogleSignInAuthentication? googleAuth = await googleUser.authentication;
-    //
-    //   // Create a new credential using the auth details
-    //   final credential = GoogleAuthProvider.credential(
-    //     accessToken: googleAuth?.accessToken,
-    //     idToken: googleAuth?.idToken,
-    //   );
-    //
-    //   // Once signed in, get the UserCredential
-    //   final userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
-    //
-    //   // Get the current user
-    //   User? user = userCredential.user;
-    //
-    //   if (user != null) {
-    //     // Send user details to your backend
-    //     await sendUserDetailsToBackend(user.uid, googleUser.displayName!, user.email!);
-    //   }
-    //
-    //   return userCredential;
-    // } catch (e) {
-    //   print('Error signing in with Google: $e');
-    //   return null;
-    // }
+  void _forgotPassword(BuildContext context, String email) async {
+    if (email.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Please enter your email")),
+      );
+      return;
+    }
+
+    try {
+      await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Password reset email sent!")),
+      );
+    } catch (e) {
+      String message = "An error occurred. Please try again.";
+      if (e is FirebaseAuthException) {
+        switch (e.code) {
+          case 'user-not-found':
+            message = "No user found for that email.";
+            break;
+          case 'invalid-email':
+            message = "The email address is not valid.";
+            break;
+        // Add more cases as needed
+        }
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message)),
+      );
+    }
   }
+
+  void resetPassword(BuildContext context, String email) async {
+    if (email.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: kPrimaryColor,
+          content: Text(
+            'Please enter your email',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+              fontFamily: "Inter",
+            ),
+          ),
+        ),
+      );
+
+      return;
+    }
+    try {
+      await auth.sendPasswordResetEmail(email: email);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: kPrimaryColor,
+          content: Text(
+            'Password reset email sent!',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+              fontFamily: "Inter",
+            ),
+          ),
+        ),
+      );
+
+    } catch (e) {
+      String message = "An error occurred. Please try again.";
+      if (e is FirebaseAuthException) {
+        switch (e.code) {
+          case 'user-not-found':
+            message = "No user found for that email.";
+            break;
+          case 'invalid-email':
+            message = "The email address is not valid.";
+            break;
+        // Add more cases as needed
+        }
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: kPrimaryColor,
+          content: Text(
+            message,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+              fontFamily: "Inter",
+            ),
+          ),
+        ),
+      );
+    }
+  }
+
+  Future<UserCredential?> signInWithGoogle() async {
+    try {
+      print("Starting Google Sign-In process");
+
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+      if (googleUser == null) {
+        print("Google sign-in was canceled");
+        return null;
+      }
+      print("Google user obtained: ${googleUser.displayName}");
+
+      final GoogleSignInAuthentication? googleAuth = await googleUser.authentication;
+      if (googleAuth == null) {
+        print("Google authentication details are null");
+        return null;
+      }
+
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      final userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
+      User? user = userCredential.user;
+
+      if (user != null) {
+        print("User signed in: ${user.displayName}");
+        await sendUserDetailsToBackend(user.uid, googleUser.displayName!, user.email!);
+      } else {
+        print("User is null after sign-in");
+      }
+
+      return userCredential;
+    } catch (e) {
+      print('Error signing in with Google: $e');
+      return null;
+    }
+  }
+
+
+  Future<void> sendUserDetailsToBackend(String firebaseId, String name, String email) async {
+    try {
+      var uri = Uri.parse('$baseURL/user/new-user'); // Backend API endpoint
+      final request = http.MultipartRequest('POST', uri)
+        ..fields['firebaseId'] = firebaseId
+        ..fields['userName'] = name
+        ..fields['email'] = email;
+
+      // Send the request
+      var response = await request.send();
+      print('Response status: ${response.statusCode}');
+
+      if (response.statusCode == 200) {
+        print('User details successfully sent to the backend');
+      } else {
+        print('Failed to send user details to backend: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error sending user details to backend: $e');
+    }
+  }
+
+
+
 
 
 }
