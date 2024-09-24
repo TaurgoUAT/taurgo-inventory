@@ -623,23 +623,50 @@ class _DetailsConfirmationPageState extends State<DetailsConfirmationPage> {
                 child: GestureDetector(
                   onTap: _saveDetails,
                   child: Container(
-                    height: 50,
-                    width: double.infinity,
-                    margin: EdgeInsets.only(bottom: 0.0, top: 0),
+
+                    width: double.maxFinite,
+                      padding: EdgeInsets.symmetric(
+                        vertical: 12.0,
+                        horizontal: 16.0,
+                      ),
                     decoration: BoxDecoration(
                       color: kPrimaryColor,
-                      borderRadius: BorderRadius.circular(30.0),
-                    ),
-                    child: Center(
-                      child: Text(
-                        "Save",
-                        // The text you want to display
-                        style: TextStyle(
-                          color: Colors.white, // Text color
-                          fontSize: 16.0, // Font size
-                          fontWeight: FontWeight.bold, // Font weight
+                      // Background color of the container
+                      borderRadius: BorderRadius.circular(10.0),
+                      // Rounded corners
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          // Shadow color
+                          spreadRadius: 2,
+                          blurRadius: 5,
+                          offset: Offset(0, 3), // Shadow position
                         ),
+                      ],
+                      border: Border.all(
+                        color: kPrimaryColor, // Border color
+                        width: 2.0, // Border width
                       ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.save_outlined,
+                          color: bWhite, // Customize the icon color
+                        ),
+                        SizedBox(width: 8.0),
+                        // Space between the icon and the text
+                        Text(
+                          "Save", // Customize the text
+                          style: TextStyle(
+                            color: bWhite, // Text color
+                            fontSize: 16.0, // Font size
+                            fontWeight: FontWeight.bold, // Font weight
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),

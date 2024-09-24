@@ -5,6 +5,7 @@ import 'package:camera/camera.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart'; // Import shared_preferences
 import 'package:taurgo_inventory/pages/conditions/condition_details.dart';
 import 'package:taurgo_inventory/pages/edit_report_page.dart';
@@ -21,58 +22,9 @@ class EntranceHallway extends StatefulWidget {
   @override
   State<EntranceHallway> createState() => _EntranceHallwayState();
 }
-Future<String?> uploadImageToFirebase(File imageFile, String propertyId, String collectionName, String documentId) async {
-  try {
-    // Step 1: Upload the image to Firebase Storage
-    String fileName = '${documentId}_${DateTime.now().millisecondsSinceEpoch}.jpg';
-    Reference storageReference = FirebaseStorage.instance
-        .ref()
-        .child('$propertyId/$collectionName/$documentId/$fileName');
 
-    UploadTask uploadTask = storageReference.putFile(imageFile);
-    TaskSnapshot snapshot = await uploadTask.whenComplete(() => null);
 
-    // Step 2: Get the download URL of the uploaded image
-    String downloadURL = await snapshot.ref.getDownloadURL();
-    print("Uploaded to Firebase: $downloadURL");
-
-    // Step 3: Save the download URL to Firestore
-    await FirebaseFirestore.instance
-        .collection('properties')
-        .doc(propertyId)
-        .collection(collectionName)
-        .doc(documentId)
-        .set({
-          'images': FieldValue.arrayUnion([downloadURL])
-        }, SetOptions(merge: true));
-
-    return downloadURL;
-  } catch (e) {
-    print("Error uploading image: $e");
-    return null;
-  }
-}
-
-Stream<List<String>> _getImagesFromFirestore(String propertyId, String imageType) {
-    return FirebaseFirestore.instance
-        .collection('properties')
-        .doc(propertyId)
-        .collection('entranceHallway')
-        .doc(imageType)
-        .snapshots()
-        .map((snapshot) {
-      print("Firestore snapshot data for $imageType: ${snapshot.data()}");
-      if (snapshot.exists && snapshot.data() != null) {
-        return List<String>.from(snapshot.data()!['images'] ?? []);
-      }
-      return [];
-    });
-  }
-  Future<void> _savePreference(
-      String propertyId, String key, String value) async {
-    final prefs = await SharedPreferences.getInstance();
-    prefs.setString('${key}_$propertyId', value);
-  }
+  
 
 class _EntranceHallwayState extends State<EntranceHallway> {
   String? entranceDoorCondition;
@@ -143,7 +95,67 @@ class _EntranceHallwayState extends State<EntranceHallway> {
   }
 
   // Function to load preferences
-  
+  Future<String?> uploadImageToFirebase(XFile imageFile, String propertyId,
+      String collectionName, String documentId) async {
+    try {
+      // Step 1: Upload the image to Firebase Storage
+      String fileName =
+          '${documentId}_${DateTime.now().millisecondsSinceEpoch}.jpg';
+      Reference storageReference = FirebaseStorage.instance
+          .ref()
+          .child('$propertyId/$collectionName/$documentId/$fileName');
+
+      UploadTask uploadTask = storageReference.putFile(File(imageFile.path));
+      TaskSnapshot snapshot = await uploadTask;
+
+      // Step 2: Get the download URL of the uploaded image
+      String downloadURL = await snapshot.ref.getDownloadURL();
+      print("Uploaded to Firebase: $downloadURL");
+
+      // Step 3: Save the download URL to Firestore
+      await FirebaseFirestore.instance
+          .collection('properties')
+          .doc(propertyId)
+          .collection(collectionName)
+          .doc(documentId)
+          .set({
+        'images': FieldValue.arrayUnion([downloadURL])
+      }, SetOptions(merge: true));
+
+      return downloadURL;
+    } catch (e) {
+      print("Error uploading image: $e");
+      return null;
+    }
+  }
+
+  Stream<List<String>> _getImagesFromFirestore(
+      String propertyId, String imageType) {
+    return FirebaseFirestore.instance
+        .collection('properties')
+        .doc(propertyId)
+        .collection('entranceHallway')
+        .doc(imageType)
+        .snapshots()
+        .map((snapshot) {
+      print("Firestore snapshot data for $imageType: ${snapshot.data()}");
+      if (snapshot.exists && snapshot.data() != null) {
+        return List<String>.from(snapshot.data()!['images'] ?? []);
+      }
+      return [];
+    });
+  }
+
+  Future<void> _handleImageAdded(XFile imageFile, String documentId) async {
+    String propertyId = widget.propertyId;
+    String? downloadUrl = await uploadImageToFirebase(
+        imageFile, propertyId, 'entranceHallway', documentId);
+
+    if (downloadUrl != null) {
+      print("Adding image URL to Firestore: $downloadUrl");
+      // The image URL has already been added inside uploadImageToFirebase
+    }
+  }
 
   // Function to save a preference
  Future<void> _savePreference(String propertyId, String key, String value)
@@ -386,24 +398,9 @@ class _EntranceHallwayState extends State<EntranceHallway> {
                         });
                         _savePreference(propertyId, 'entranceDoorCondition', description!);
                       },
-                        onImageAdded: (imagePath) async {
-                          File imageFile = File(imagePath);
-                          String? downloadUrl = await uploadImageToFirebase(
-                              imageFile, propertyId,'entranceHallway', 'entranceDoorImages');
-
-                          if (downloadUrl != null) {
-                            print(
-                                "Adding image URL to Firestore: $downloadUrl");
-                            FirebaseFirestore.instance
-                                .collection('properties')
-                                .doc(propertyId)
-                                .collection('entranceHallway')
-                                .doc('entranceDoorImages')
-                                .update({
-                              'images': FieldValue.arrayUnion([downloadUrl]),
-                            });
-                          }
-                        });
+                        onImageAdded: (XFile image) async {
+                        await _handleImageAdded(image, 'entranceDoorImages');
+                      });
                   },
                 ),
 
@@ -435,24 +432,9 @@ class _EntranceHallwayState extends State<EntranceHallway> {
                         });
                         _savePreference(propertyId, 'entranceDoorFrameCondition', description!);
                       },
-                        onImageAdded: (imagePath) async {
-                          File imageFile = File(imagePath);
-                          String? downloadUrl = await uploadImageToFirebase(
-                              imageFile, propertyId,'entranceHallway', 'entranceDoorFrameImages');
-
-                          if (downloadUrl != null) {
-                            print(
-                                "Adding image URL to Firestore: $downloadUrl");
-                            FirebaseFirestore.instance
-                                .collection('properties')
-                                .doc(propertyId)
-                                .collection('entranceHallway')
-                                .doc('entranceDoorFrameImages')
-                                .update({
-                              'images': FieldValue.arrayUnion([downloadUrl]),
-                            });
-                          }
-                        });
+                        onImageAdded: (XFile image) async {
+                        await _handleImageAdded(image, 'entranceDoorFrameImages');
+                      });
                   },
                 ),
 
@@ -484,24 +466,9 @@ class _EntranceHallwayState extends State<EntranceHallway> {
                         });
                         _savePreference(propertyId, 'entranceCeilingCondition', description!);
                       },
-                        onImageAdded: (imagePath) async {
-                          File imageFile = File(imagePath);
-                          String? downloadUrl = await uploadImageToFirebase(
-                              imageFile, propertyId,'entranceHallway', 'entranceCeilingImages');
-
-                          if (downloadUrl != null) {
-                            print(
-                                "Adding image URL to Firestore: $downloadUrl");
-                            FirebaseFirestore.instance
-                                .collection('properties')
-                                .doc(propertyId)
-                                .collection('entranceHallway')
-                                .doc('entranceCeilingImages')
-                                .update({
-                              'images': FieldValue.arrayUnion([downloadUrl]),
-                            });
-                          }
-                        });
+                        onImageAdded: (XFile image) async {
+                        await _handleImageAdded(image, 'entranceCeilingImages');
+                      });
                   },
                 ),
 
@@ -533,24 +500,9 @@ class _EntranceHallwayState extends State<EntranceHallway> {
                         });
                         _savePreference(propertyId, 'entranceDoorBellCondition', description!);
                       },
-                        onImageAdded: (imagePath) async {
-                          File imageFile = File(imagePath);
-                          String? downloadUrl = await uploadImageToFirebase(
-                              imageFile, propertyId,'entranceHallway', 'entranceDoorBellImages');
-
-                          if (downloadUrl != null) {
-                            print(
-                                "Adding image URL to Firestore: $downloadUrl");
-                            FirebaseFirestore.instance
-                                .collection('properties')
-                                .doc(propertyId)
-                                .collection('entranceHallway')
-                                .doc('entranceDoorBellImages')
-                                .update({
-                              'images': FieldValue.arrayUnion([downloadUrl]),
-                            });
-                          }
-                        });
+                        onImageAdded: (XFile image) async {
+                        await _handleImageAdded(image, 'entranceDoorBellImages');
+                      });
                   },
                 ),
 
@@ -583,24 +535,9 @@ class _EntranceHallwayState extends State<EntranceHallway> {
                         });
                         _savePreference(propertyId, 'entranceLightingCondition', description!);
                       },
-                        onImageAdded: (imagePath) async {
-                          File imageFile = File(imagePath);
-                          String? downloadUrl = await uploadImageToFirebase(
-                              imageFile, propertyId,'entranceHallway', 'entranceLightingImages');
-
-                          if (downloadUrl != null) {
-                            print(
-                                "Adding image URL to Firestore: $downloadUrl");
-                            FirebaseFirestore.instance
-                                .collection('properties')
-                                .doc(propertyId)
-                                .collection('entranceHallway')
-                                .doc('entranceLightingImages')
-                                .update({
-                              'images': FieldValue.arrayUnion([downloadUrl]),
-                            });
-                          }
-                        });
+                        onImageAdded: (XFile image) async {
+                        await _handleImageAdded(image, 'entranceLightingImages');
+                      });
                   },
                 ),
 
@@ -632,24 +569,9 @@ class _EntranceHallwayState extends State<EntranceHallway> {
                         });
                         _savePreference(propertyId, 'entranceWallsCondition', description!);
                       },
-                        onImageAdded: (imagePath) async {
-                          File imageFile = File(imagePath);
-                          String? downloadUrl = await uploadImageToFirebase(
-                              imageFile, propertyId,'entranceHallway', 'entranceWallsImages');
-
-                          if (downloadUrl != null) {
-                            print(
-                                "Adding image URL to Firestore: $downloadUrl");
-                            FirebaseFirestore.instance
-                                .collection('properties')
-                                .doc(propertyId)
-                                .collection('entranceHallway')
-                                .doc('entranceWallsImages')
-                                .update({
-                              'images': FieldValue.arrayUnion([downloadUrl]),
-                            });
-                          }
-                        });
+                        onImageAdded: (XFile image) async {
+                        await _handleImageAdded(image, 'entranceWallsImages');
+                      });
                   },
                 ),
 
@@ -681,24 +603,9 @@ class _EntranceHallwayState extends State<EntranceHallway> {
                         });
                         _savePreference(propertyId, 'entranceSkirtingCondition', description!);
                       },
-                        onImageAdded: (imagePath) async {
-                          File imageFile = File(imagePath);
-                          String? downloadUrl = await uploadImageToFirebase(
-                              imageFile, propertyId,'entranceHallway', 'entranceSkirtingImages');
-
-                          if (downloadUrl != null) {
-                            print(
-                                "Adding image URL to Firestore: $downloadUrl");
-                            FirebaseFirestore.instance
-                                .collection('properties')
-                                .doc(propertyId)
-                                .collection('entranceHallway')
-                                .doc('entranceSkirtingImages')
-                                .update({
-                              'images': FieldValue.arrayUnion([downloadUrl]),
-                            });
-                          }
-                        });
+                        onImageAdded: (XFile image) async {
+                        await _handleImageAdded(image, 'entranceSkirtingImages');
+                      });
                   },
                 ),
 
@@ -730,24 +637,9 @@ class _EntranceHallwayState extends State<EntranceHallway> {
                         });
                         _savePreference(propertyId, 'entranceWindowSillCondition', description!);
                       },
-                        onImageAdded: (imagePath) async {
-                          File imageFile = File(imagePath);
-                          String? downloadUrl = await uploadImageToFirebase(
-                              imageFile, propertyId,'entranceHallway', 'entranceWindowSillImages');
-
-                          if (downloadUrl != null) {
-                            print(
-                                "Adding image URL to Firestore: $downloadUrl");
-                            FirebaseFirestore.instance
-                                .collection('properties')
-                                .doc(propertyId)
-                                .collection('entranceHallway')
-                                .doc('entranceWindowSillImages')
-                                .update({
-                              'images': FieldValue.arrayUnion([downloadUrl]),
-                            });
-                          }
-                        });
+                        onImageAdded: (XFile image) async {
+                        await _handleImageAdded(image, 'entranceWindowSillImages');
+                      });
                   },
                 ),
 
@@ -779,24 +671,9 @@ class _EntranceHallwayState extends State<EntranceHallway> {
                         });
                         _savePreference(propertyId, 'entranceCurtainsCondition', description!);
                       },
-                        onImageAdded: (imagePath) async {
-                          File imageFile = File(imagePath);
-                          String? downloadUrl = await uploadImageToFirebase(
-                              imageFile, propertyId,'entranceHallway', 'entranceCurtainsImages');
-
-                          if (downloadUrl != null) {
-                            print(
-                                "Adding image URL to Firestore: $downloadUrl");
-                            FirebaseFirestore.instance
-                                .collection('properties')
-                                .doc(propertyId)
-                                .collection('entranceHallway')
-                                .doc('entranceCurtainsImages')
-                                .update({
-                              'images': FieldValue.arrayUnion([downloadUrl]),
-                            });
-                          }
-                        });
+                        onImageAdded: (XFile image) async {
+                        await _handleImageAdded(image, 'entranceCurtainsImages');
+                      });
                   },
                 ),
 
@@ -828,24 +705,9 @@ class _EntranceHallwayState extends State<EntranceHallway> {
                         });
                         _savePreference(propertyId, 'entranceBlindsCondition', description!);
                       },
-                        onImageAdded: (imagePath) async {
-                          File imageFile = File(imagePath);
-                          String? downloadUrl = await uploadImageToFirebase(
-                              imageFile, propertyId,'entranceHallway', 'entranceBlindsImages');
-
-                          if (downloadUrl != null) {
-                            print(
-                                "Adding image URL to Firestore: $downloadUrl");
-                            FirebaseFirestore.instance
-                                .collection('properties')
-                                .doc(propertyId)
-                                .collection('entranceHallway')
-                                .doc('entranceBlindsImages')
-                                .update({
-                              'images': FieldValue.arrayUnion([downloadUrl]),
-                            });
-                          }
-                        });
+                        onImageAdded: (XFile image) async {
+                        await _handleImageAdded(image, 'entranceBlindsImages');
+                      });
                   },
                 ),
 
@@ -877,24 +739,9 @@ class _EntranceHallwayState extends State<EntranceHallway> {
                         });
                         _savePreference(propertyId, 'entranceLightSwitchesCondition', description!);
                       },
-                        onImageAdded: (imagePath) async {
-                          File imageFile = File(imagePath);
-                          String? downloadUrl = await uploadImageToFirebase(
-                              imageFile, propertyId,'entranceHallway', 'entranceLightSwitchesImages');
-
-                          if (downloadUrl != null) {
-                            print(
-                                "Adding image URL to Firestore: $downloadUrl");
-                            FirebaseFirestore.instance
-                                .collection('properties')
-                                .doc(propertyId)
-                                .collection('entranceHallway')
-                                .doc('entranceLightSwitchesImages')
-                                .update({
-                              'images': FieldValue.arrayUnion([downloadUrl]),
-                            });
-                          }
-                        });
+                        onImageAdded: (XFile image) async {
+                        await _handleImageAdded(image, 'entranceLightSwitchesImages');
+                      });
                   },
                 ),
 
@@ -926,24 +773,9 @@ class _EntranceHallwayState extends State<EntranceHallway> {
                         });
                         _savePreference(propertyId, 'entranceSocketsCondition', description!);
                       },
-                        onImageAdded: (imagePath) async {
-                          File imageFile = File(imagePath);
-                          String? downloadUrl = await uploadImageToFirebase(
-                              imageFile, propertyId,'entranceHallway', 'entranceSocketsImages');
-
-                          if (downloadUrl != null) {
-                            print(
-                                "Adding image URL to Firestore: $downloadUrl");
-                            FirebaseFirestore.instance
-                                .collection('properties')
-                                .doc(propertyId)
-                                .collection('entranceHallway')
-                                .doc('entranceSocketsImages')
-                                .update({
-                              'images': FieldValue.arrayUnion([downloadUrl]),
-                            });
-                          }
-                        });
+                        onImageAdded: (XFile image) async {
+                        await _handleImageAdded(image, 'entranceSocketsImages');
+                      });
                   },
                 ),
                 StreamBuilder<List<String>>(
@@ -973,24 +805,9 @@ class _EntranceHallwayState extends State<EntranceHallway> {
                         });
                         _savePreference(propertyId, 'entranceHeatingCondition', description!);
                       },
-                        onImageAdded: (imagePath) async {
-                          File imageFile = File(imagePath);
-                          String? downloadUrl = await uploadImageToFirebase(
-                              imageFile, propertyId,'entranceHallway', 'entranceHeatingImages');
-
-                          if (downloadUrl != null) {
-                            print(
-                                "Adding image URL to Firestore: $downloadUrl");
-                            FirebaseFirestore.instance
-                                .collection('properties')
-                                .doc(propertyId)
-                                .collection('entranceHallway')
-                                .doc('entranceHeatingImages')
-                                .update({
-                              'images': FieldValue.arrayUnion([downloadUrl]),
-                            });
-                          }
-                        });
+                        onImageAdded: (XFile image) async {
+                        await _handleImageAdded(image, 'entranceHeatingImages');
+                      });
                   },
                 ),
               // Flooring
@@ -1021,24 +838,9 @@ class _EntranceHallwayState extends State<EntranceHallway> {
                         });
                         _savePreference(propertyId, 'entranceFlooringCondition', description!);
                       },
-                        onImageAdded: (imagePath) async {
-                          File imageFile = File(imagePath);
-                          String? downloadUrl = await uploadImageToFirebase(
-                              imageFile, propertyId,'entranceHallway', 'entranceFlooringImages');
-
-                          if (downloadUrl != null) {
-                            print(
-                                "Adding image URL to Firestore: $downloadUrl");
-                            FirebaseFirestore.instance
-                                .collection('properties')
-                                .doc(propertyId)
-                                .collection('entranceHallway')
-                                .doc('entranceFlooringImages')
-                                .update({
-                              'images': FieldValue.arrayUnion([downloadUrl]),
-                            });
-                          }
-                        });
+                        onImageAdded: (XFile image) async {
+                        await _handleImageAdded(image, 'entranceFlooringImages');
+                      });
                   },
                 ),
 
@@ -1070,24 +872,9 @@ class _EntranceHallwayState extends State<EntranceHallway> {
                         });
                         _savePreference(propertyId, 'entranceAdditionalItemsCondition', description!);
                       },
-                        onImageAdded: (imagePath) async {
-                          File imageFile = File(imagePath);
-                          String? downloadUrl = await uploadImageToFirebase(
-                              imageFile, propertyId,'entranceHallway', 'entranceAdditionalItemsImages');
-
-                          if (downloadUrl != null) {
-                            print(
-                                "Adding image URL to Firestore: $downloadUrl");
-                            FirebaseFirestore.instance
-                                .collection('properties')
-                                .doc(propertyId)
-                                .collection('entranceHallway')
-                                .doc('entranceAdditionalItemsImages')
-                                .update({
-                              'images': FieldValue.arrayUnion([downloadUrl]),
-                            });
-                          }
-                        });
+                        onImageAdded: (XFile image) async {
+                        await _handleImageAdded(image, 'entranceAdditionalItemsImages');
+                      });
                   },
                 ),
             ],
@@ -1105,7 +892,7 @@ class ConditionItem extends StatelessWidget {
   final List<String> images;
   final Function(String?) onConditionSelected;
   final Function(String?) onDescriptionSelected;
-  final Function(String) onImageAdded;
+  final Function(XFile) onImageAdded;
 
   const ConditionItem({
     Key? key,
@@ -1117,7 +904,18 @@ class ConditionItem extends StatelessWidget {
     required this.onDescriptionSelected,
     required this.onImageAdded,
   }) : super(key: key);
-
+Future<List<XFile>?> _pickImages() async {
+    final ImagePicker _picker = ImagePicker();
+    try {
+      final List<XFile>? images = await _picker.pickMultiImage(
+        imageQuality: 80, // Adjust the quality as needed
+      );
+      return images;
+    } catch (e) {
+      print("Error picking images: $e");
+      return null;
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -1183,11 +981,26 @@ class ConditionItem extends StatelessWidget {
                             builder: (context) => CameraPreviewPage(
                               camera: cameras.first,
                               onPictureTaken: (imagePath) {
-                                onImageAdded(imagePath);
+                                onImageAdded(XFile(imagePath));
                               },
                             ),
                           ),
                         );
+                      }
+                    },
+                  ),
+                  IconButton(
+                    icon: Icon(
+                      Icons.photo_library_outlined,
+                      size: 24,
+                      color: kSecondaryTextColourTwo,
+                    ),
+                    onPressed: () async {
+                      final List<XFile>? selectedImages = await _pickImages();
+                      if (selectedImages != null && selectedImages.isNotEmpty) {
+                        for (var image in selectedImages) {
+                          onImageAdded(image);
+                        }
                       }
                     },
                   ),

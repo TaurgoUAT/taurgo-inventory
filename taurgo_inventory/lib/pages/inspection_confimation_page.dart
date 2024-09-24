@@ -126,16 +126,27 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
 
   //Keys Handed Over
   String? yale;
+  String? yaleDescription;
   String? mortice;
+  String? morticeDescription;
   String? other;
+  String? otherDescription;
   List<String> keysHandOverYaleImages = [];
   List<String> keysHandOverMorticeImages = [];
   List<String> keysHandOverOtherImages = [];
+
   List<String> evChargerImages = [];
   String? evChargerDescription;
+  String? evChargerCondition;
 
   //Meter Readings
   String? GasMeterReading;
+  String? GasMeterReadingDescription;
+  String? electricMeterReadingDescription;
+  String? waterMeterReadingDescription;
+  String? oilMeterReadingDescription;
+  String? otherMeterReadingDescription;
+
   String? electricMeterReading;
   String? waterMeterReading;
   String? oilMeterReading;
@@ -147,9 +158,13 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
   List<String> otherMeterImages = [];
 
   String? yaleLocation;
+  String? yaleReading;
   String? morticeLocation;
+  String? morticeReading;
   String? windowLockLocation;
+  String? windowLockReading;
   String? gasMeterLocation;
+  String? gasMeterReading;
   String? carPassLocation;
   String? carPassReading;
   String? remoteLocation;
@@ -263,6 +278,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
 
   //Front Garden
   String? gardenDescription;
+  String? gardenCondition;
   String? driveWayCondition;
   String? driveWayDescription;
   String? outsideLightingCondition;
@@ -1428,6 +1444,13 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
       yale = prefs.getString('yale_${propertyId}');
       mortice = prefs.getString('mortice_${propertyId}');
       other = prefs.getString('other_${propertyId}');
+      yaleDescription = prefs.getString('yaleDescription_${propertyId}');
+      morticeDescription = prefs.getString('morticeDescription_${propertyId}');
+      otherDescription = prefs.getString('otherDescription_${propertyId}');
+
+
+
+
 
       keysHandOverYaleImages =
           prefs.getStringList('yaleImages_${propertyId}') ?? [];
@@ -1438,7 +1461,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
 
       evChargerDescription =
           prefs.getString('evChargerDescription_${propertyId}');
-
+      evChargerCondition = prefs.getString('evChargerCondition_${propertyId}');
       evChargerImages =
           prefs.getStringList('evChargerImages_${propertyId}') ?? [];
 
@@ -1449,6 +1472,20 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
       waterMeterReading = prefs.getString('waterMeterReading_${propertyId}');
       oilMeterReading = prefs.getString('oilMeterReading_${propertyId}');
       otherMeterReading = prefs.getString('otherMeterReading_${propertyId}');
+      GasMeterReadingDescription =
+          prefs.getString('GasMeterReadingDescription_${propertyId}');
+      electricMeterReadingDescription =
+          prefs.getString('electricMeterReadingDescription_${propertyId}');
+      waterMeterReadingDescription =
+          prefs.getString('waterMeterReadingDescription_${propertyId}');
+      oilMeterReadingDescription =
+          prefs.getString('oilMeterReadingDescription_${propertyId}');
+      otherMeterReadingDescription =
+          prefs.getString('otherMeterReadingDescription_${propertyId}');
+
+
+
+      gasMeterImages = prefs.getStringList('gasMeterImages_${propertyId}') ?? [];
 
       waterMeterImages =
           prefs.getStringList('waterMeterImages_${propertyId}') ?? [];
@@ -1461,15 +1498,22 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
       otherMeterImages =
           prefs.getStringList('otherMeterImages_${propertyId}') ?? [];
 
+
       yaleLocation = prefs.getString('yaleLocation_${propertyId}');
+      yaleReading = prefs.getString('yaleReading_${propertyId}');
       morticeLocation = prefs.getString('morticeLocation_${propertyId}');
+      morticeReading = prefs.getString('morticeReading_${propertyId}');
       windowLockLocation = prefs.getString('windowLockLocation_${propertyId}');
+      windowLockReading = prefs.getString('windowLockReading_${propertyId}');
       gasMeterLocation = prefs.getString('gasMeterLocation_${propertyId}');
+      gasMeterReading = prefs.getString('gasMeterReading_${propertyId}');
       // keygasMeterImages = prefs.getString('gasMeterImages_${propertyId}');
       carPassLocation = prefs.getString('carPassLocation_${propertyId}');
       carPassReading = prefs.getString('carPassReading_${propertyId}');
       remoteLocation = prefs.getString('remoteLocation_${propertyId}');
+      remoteLocation = prefs.getString('remoteLocation_${propertyId}');
       remoteReading = prefs.getString('remoteReading_${propertyId}');
+
       otherLocation = prefs.getString('otherLocation_${propertyId}');
       otherReading = prefs.getString('otherReading_${propertyId}');
 
@@ -1621,6 +1665,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
 
       //Front Garden
       gardenDescription = prefs.getString('gardenDescription_${propertyId}');
+      gardenCondition = prefs.getString('gardenCondition_${propertyId}');
       driveWayCondition = prefs.getString('driveWayCondition_${propertyId}');
       driveWayDescription =
           prefs.getString('driveWayDescription_${propertyId}');
@@ -2778,7 +2823,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
                 subTypeName: 'Yale',
                 images: keysHandOverYaleImages,
                 comments: yale ?? 'N/A',
-                feedback: yale ?? 'N/A',
+                feedback: yaleDescription ?? 'N/A',
                 conditionImages: [],
               ),
 
@@ -2788,7 +2833,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
                 subTypeName: 'Mortice',
                 images: keysHandOverMorticeImages,
                 comments: mortice ?? 'N/A',
-                feedback: mortice ?? 'N/A',
+                feedback: morticeDescription ?? 'N/A',
                 conditionImages: [],
               ),
 
@@ -2799,7 +2844,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
                 subTypeName: 'Other',
                 images: keysHandOverOtherImages,
                 comments: other ?? 'N/A',
-                feedback: other ?? 'N/A',
+                feedback: otherDescription ?? 'N/A',
                 conditionImages: [],
               ),
             ],
@@ -2815,7 +2860,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
                 subTypeId: 'subType001',
                 subTypeName: 'EV Charger',
                 images: evChargerImages,
-                comments: evChargerDescription ?? 'N/A',
+                comments: evChargerCondition ?? 'N/A',
                 feedback: evChargerDescription ?? 'N/A',
                 conditionImages: [],
               ),
@@ -2833,7 +2878,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
                 subTypeName: 'Gas Meter',
                 images: gasMeterImages,
                 comments: GasMeterReading ?? 'N/A',
-                feedback: GasMeterReading ?? 'N/A',
+                feedback:   GasMeterReadingDescription ?? 'N/A',
                 conditionImages: [],
               ),
 
@@ -2843,7 +2888,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
                 subTypeName: 'Electric Meter',
                 images: electricMeterImages,
                 comments: electricMeterReading ?? 'N/A',
-                feedback: electricMeterReading ?? 'N/A',
+                feedback: electricMeterReadingDescription ?? 'N/A',
                 conditionImages: [],
               ),
 
@@ -2853,7 +2898,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
                 subTypeName: 'Water Meter',
                 images: waterMeterImages,
                 comments: waterMeterReading ?? 'N/A',
-                feedback: waterMeterReading ?? 'N/A',
+                feedback: waterMeterReadingDescription ?? 'N/A',
                 conditionImages: [],
               ),
 
@@ -2863,7 +2908,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
                 subTypeName: 'Oil Meter',
                 images: oilMeterImages,
                 comments: oilMeterReading ?? 'N/A',
-                feedback: oilMeterReading ?? 'N/A',
+                feedback:   oilMeterReadingDescription ?? 'N/A',
                 conditionImages: [],
               ),
 
@@ -2873,7 +2918,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
                 subTypeName: 'Other Meter',
                 images: otherMeterImages,
                 comments: otherMeterReading ?? 'N/A',
-                feedback: otherMeterReading ?? 'N/A',
+                feedback:   otherMeterReadingDescription ?? 'N/A',
                 conditionImages: [],
               ),
             ],
@@ -2890,7 +2935,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
                 subTypeName: 'Yale',
                 images: yaleImages,
                 comments: yaleLocation ?? 'N/A',
-                feedback: yaleLocation ?? 'N/A',
+                feedback: yaleReading ?? 'N/A',
                 conditionImages: [],
               ),
 
@@ -2900,7 +2945,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
                 subTypeName: 'Mortice',
                 images: morticeImages,
                 comments: morticeLocation ?? 'N/A',
-                feedback: morticeLocation ?? 'N/A',
+                feedback:  morticeReading ?? 'N/A',
                 conditionImages: [],
               ),
 
@@ -2910,7 +2955,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
                 subTypeName: 'Window Lock',
                 images: windowLockImages,
                 comments: windowLockLocation ?? 'N/A',
-                feedback: windowLockLocation ?? 'N/A',
+                feedback: windowLockReading ?? 'N/A',
                 conditionImages: [],
               ),
 
@@ -2920,7 +2965,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
                 subTypeName: 'Gas Meter',
                 images: keygasMeterImages,
                 comments: gasMeterLocation ?? 'N/A',
-                feedback: gasMeterLocation ?? 'N/A',
+                feedback:   gasMeterReading ?? 'N/A',
                 conditionImages: [],
               ),
 
@@ -2930,7 +2975,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
                 subTypeName: 'Car Pass',
                 images: carPassImages,
                 comments: carPassLocation ?? 'N/A',
-                feedback: carPassLocation ?? 'N/A',
+                feedback:   carPassReading ?? 'N/A',
                 conditionImages: [],
               ),
 
@@ -2940,7 +2985,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
                 subTypeName: 'Remote',
                 images: remoteImages,
                 comments: remoteLocation ?? 'N/A',
-                feedback: remoteLocation ?? 'N/A',
+                feedback:   remoteReading ?? 'N/A',
                 conditionImages: [],
               ),
 
@@ -2950,7 +2995,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
                 subTypeName: 'Other',
                 images: otherImages,
                 comments: otherLocation ?? 'N/A',
-                feedback: otherLocation ?? 'N/A',
+                feedback:   otherReading ?? 'N/A',
                 conditionImages: [],
               ),
             ],
@@ -2967,7 +3012,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
                 subTypeName: 'Heat Sensor',
                 images: heatSensorImages,
                 comments: heatSensorCondition ?? 'N/A',
-                feedback: heatSensorCondition ?? 'N/A',
+                feedback: heatSensorDescription ?? 'N/A',
                 conditionImages: [],
               ),
 
@@ -2977,7 +3022,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
                 subTypeName: 'Smoke Alarm',
                 images: smokeAlarmImages,
                 comments: smokeAlarmCondition ?? 'N/A',
-                feedback: smokeAlarmCondition ?? 'N/A',
+                feedback: smokeAlarmDescription ?? 'N/A',
                 conditionImages: [],
               ),
 
@@ -2987,7 +3032,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
                 subTypeName: 'Other',
                 images: carbonMonxideImages,
                 comments: carbonMonoxideCondition ?? 'N/A',
-                feedback: carbonMonoxideCondition ?? 'N/A',
+                feedback: carbonMonoxideDescription ?? 'N/A',
                 conditionImages: [],
               ),
             ],
@@ -3004,7 +3049,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
                 subTypeName: 'Door',
                 images: bathroomdoorImages,
                 comments: bathroomdoorCondition ?? 'N/A',
-                feedback: bathroomdoorCondition ?? 'N/A',
+                feedback: bathroomdoorDescription ?? 'N/A',
                 conditionImages: [],
               ),
 
@@ -3014,7 +3059,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
                 subTypeName: 'Door Frame',
                 images: bathroomdoorFrameImages,
                 comments: bathroomdoorFrameCondition ?? 'N/A',
-                feedback: bathroomdoorFrameCondition ?? 'N/A',
+                feedback: bathroomdoorFrameDescription ?? 'N/A',
                 conditionImages: [],
               ),
 
@@ -3024,7 +3069,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
                 subTypeName: 'Ceilings',
                 images: bathroomceilingImages,
                 comments: bathroomceilingCondition ?? 'N/A',
-                feedback: bathroomceilingCondition ?? 'N/A',
+                feedback: bathroomceilingDescription ?? 'N/A',
                 conditionImages: [],
               ),
 
@@ -3034,7 +3079,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
                 subTypeName: 'Lighting',
                 images: bathroomlightingImages,
                 comments: bathroomlightingCondition ?? 'N/A',
-                feedback: bathroomlightingCondition ?? 'N/A',
+                feedback: bathroomlightingDescription ?? 'N/A',
                 conditionImages: [],
               ),
 
@@ -3044,7 +3089,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
                 subTypeName: 'Wall',
                 images: bathroomwallsImages,
                 comments: bathroomwallsCondition ?? 'N/A',
-                feedback: bathroomwallsCondition ?? 'N/A',
+                feedback: bathroomwallsDescription ?? 'N/A',
                 conditionImages: [],
               ),
 
@@ -3054,7 +3099,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
                 subTypeName: 'Skirting',
                 images: bathroomskirtingImages,
                 comments: bathroomskirtingCondition ?? 'N/A',
-                feedback: bathroomskirtingCondition ?? 'N/A',
+                feedback: bathroomskirtingDescription ?? 'N/A',
                 conditionImages: [],
               ),
 
@@ -3064,7 +3109,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
                 subTypeName: 'Window Sill',
                 images: bathroomwindowSillImages,
                 comments: bathroomwindowSillCondition ?? 'N/A',
-                feedback: bathroomwindowSillCondition ?? 'N/A',
+                feedback: bathroomwindowSillDescription ?? 'N/A',
                 conditionImages: [],
               ),
 
@@ -3074,7 +3119,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
                 subTypeName: 'Curtains',
                 images: bathroomcurtainsImages,
                 comments: bathroomcurtainsCondition ?? 'N/A',
-                feedback: bathroomcurtainsCondition ?? 'N/A',
+                feedback: bathroomcurtainsDescription ?? 'N/A',
                 conditionImages: [],
               ),
 
@@ -3084,7 +3129,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
                 subTypeName: 'Blinds',
                 images: bathroomblindsImages,
                 comments: bathroomblindsCondition ?? 'N/A',
-                feedback: bathroomblindsCondition ?? 'N/A',
+                feedback: bathroomblindsDescription ?? 'N/A',
                 conditionImages: [],
               ),
 
@@ -3104,7 +3149,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
                 subTypeName: 'Sockets',
                 images: bathroomsocketImages,
                 comments: bathroomsocketCondition ?? 'N/A',
-                feedback: bathroomsocketCondition ?? 'N/A',
+                feedback: bathroomsocketDescription ?? 'N/A',
                 conditionImages: [],
               ),
 
@@ -3114,7 +3159,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
                 subTypeName: 'Flooring',
                 images: bathroomflooringImages,
                 comments: bathroomflooringCondition ?? 'N/A',
-                feedback: bathroomflooringCondition ?? 'N/A',
+                feedback: bathroomflooringDescription ?? 'N/A',
                 conditionImages: [],
               ),
 
@@ -3124,7 +3169,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
                 subTypeName: 'Additional Items',
                 images: bathroomadditionItemsImages,
                 comments: bathroomadditionItemsCondition ?? 'N/A',
-                feedback: bathroomadditionItemsCondition ?? 'N/A',
+                feedback: bathroomadditionItemsDescription ?? 'N/A',
                 conditionImages: [],
               ),
             ],
@@ -3140,8 +3185,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
                 subTypeId: 'subType001',
                 subTypeName: 'Garden',
                 images: gardenImages,
-                comments: gardenDescription ?? 'N/A',
-                feedback: gardenDescription ?? 'N/A',
+                comments: gardenCondition ?? 'N/A',
+                feedback:   gardenDescription ?? 'N/A',
                 conditionImages: [],
               ),
               SubTypeDto(
@@ -3149,7 +3194,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
                 subTypeName: 'Drive Way',
                 images: driveWayImages,
                 comments: driveWayCondition ?? 'N/A',
-                feedback: driveWayCondition ?? 'N/A',
+                feedback:   driveWayDescription ?? 'N/A',
                 conditionImages: [],
               ),
 
@@ -3158,7 +3203,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
                 subTypeId: 'subType001',
                 subTypeName: 'Outside Lighting',
                 images: outsideLightingImages,
-                comments: outsideLightingDescription ?? 'N/A',
+                comments:   outsideLightingCondition ?? 'N/A',
                 feedback: outsideLightingDescription ?? 'N/A',
                 conditionImages: [],
               ),
@@ -3169,7 +3214,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
                 subTypeName: 'Additional Items',
                 images: additionalItemsImages,
                 comments: additionalItemsCondition ?? 'N/A',
-                feedback: additionalItemsCondition ?? 'N/A',
+                feedback:   additionalItemsDescription ?? 'N/A',
                 conditionImages: [],
               ),
             ],
@@ -4765,6 +4810,8 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
             ],
             additionalComments: 'All areas in good condition.',
           ),
+
+
           // Add more InspectionReportDto items as needed
         ]),
   );
@@ -5276,6 +5323,10 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
             'details': [
               {
                 'label': 'Condition',
+                'value': evChargerCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
                 'value': evChargerDescription ?? 'N/A',
               },
             ],
@@ -5295,6 +5346,10 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
                 'label': 'Condition',
                 'value': GasMeterReading ?? 'N/A',
               },
+              {
+                'label': 'Additional Comments',
+                'value':  GasMeterReadingDescription ?? 'N/A',
+              },
             ],
             'images': gasMeterImages
             // Use image paths or URLs
@@ -5305,6 +5360,10 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               {
                 'label': 'Condition',
                 'value': electricMeterReading ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value':  electricMeterReadingDescription ?? 'N/A',
               },
             ],
             'images': electricMeterImages
@@ -5317,6 +5376,10 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
                 'label': 'Condition',
                 'value': waterMeterReading ?? 'N/A',
               },
+              {
+                'label': 'Additional Comments',
+                'value': waterMeterReadingDescription ?? 'N/A',
+              },
             ],
             'images': waterMeterImages
             // Use image paths or URLs
@@ -5327,6 +5390,10 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               {
                 'label': 'Condition',
                 'value': oilMeterReading ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
+                'value': oilMeterReadingDescription ?? 'N/A',
               },
             ],
             'images': oilMeterImages
@@ -5339,6 +5406,10 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
                 'label': 'Condition',
                 'value': otherMeterReading ?? 'N/A',
               },
+              {
+                'label': 'Additional Comments',
+                'value': otherMeterReadingDescription ?? 'N/A',
+              }
             ],
             'images': otherMeterImages
             // Use image paths or URLs
@@ -5359,7 +5430,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               },
               {
                 'label': 'Additional Comments',
-                'value': yaleLocation ?? 'N/A',
+                'value': yaleReading ?? 'N/A',
               },
             ],
             'images': yaleImages
@@ -5374,7 +5445,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               },
               {
                 'label': 'Additional Comments',
-                'value': morticeLocation ?? 'N/A',
+                'value':  morticeReading ?? 'N/A',
               },
             ],
             'images': morticeImages
@@ -5389,7 +5460,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               },
               {
                 'label': 'Additional Comments',
-                'value': windowLockLocation ?? 'N/A',
+                'value':  windowLockReading ?? 'N/A',
               },
             ],
             'images': windowLockImages
@@ -5404,7 +5475,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               },
               {
                 'label': 'Additional Comments',
-                'value': gasMeterLocation ?? 'N/A',
+                'value':  gasMeterReading ?? 'N/A',
               },
             ],
             'images': keygasMeterImages
@@ -5419,7 +5490,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               },
               {
                 'label': 'Additional Comments',
-                'value': carPassReading ?? 'N/A',
+                'value':  carPassReading ?? 'N/A',
               },
             ],
             'images': carPassImages
@@ -5434,7 +5505,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               },
               {
                 'label': 'Additional Comments',
-                'value': remoteReading ?? 'N/A',
+                'value':  remoteReading ?? 'N/A',
               },
             ],
             'images': remoteImages
@@ -5449,7 +5520,7 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
               },
               {
                 'label': 'Additional Comments',
-                'value': otherReading ?? 'N/A',
+                'value':  otherReading ?? 'N/A',
               },
             ],
             'images': otherImages
@@ -5516,7 +5587,11 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
           {
             'title': '8.1 Garden Discritpion',
             'details': [
-              {'label': 'Condition', 'value': gardenDescription ?? 'N/A'},
+              {'label': 'Condition', 'value': gardenCondition ?? 'N/A'},
+              {
+                'label': 'Additional Comments',
+                'value': gardenDescription ?? 'N/A',
+              },
             ],
             'images': gardenImages,
             // Use image paths or URLs
@@ -5526,12 +5601,12 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
             'details': [
               {
                 'label': 'Condition',
-                'value': driveWayDescription ?? 'N/A',
+                'value': driveWayCondition ?? 'N/A',
               },
-              // {
-              //   'label': 'Additional Comments',
-              //   'value':  ?? 'N/A',
-              // },
+              {
+                'label': 'Additional Comments',
+                'value': driveWayDescription  ?? 'N/A',
+              },
             ],
             'images': driveWayImages
             // Use image paths or URLs
@@ -5541,12 +5616,12 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
             'details': [
               {
                 'label': 'Condition',
+                'value': outsideLightingCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
                 'value': outsideLightingDescription ?? 'N/A',
               },
-              // {
-              //   'label': 'Additional Comments',
-              //   'value':  ?? 'N/A',
-              // },
             ],
             'images': outsideLightingImages
             // Use image paths or URLs
@@ -5556,12 +5631,12 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
             'details': [
               {
                 'label': 'Condition',
+                'value': additionalItemsCondition ?? 'N/A',
+              },
+              {
+                'label': 'Additional Comments',
                 'value': additionalItemsDescription ?? 'N/A',
               },
-              // {
-              //   'label': 'Additional Comments',
-              //   'value':  ?? 'N/A',
-              // },
             ],
             'images': additionalItemsImages
             // Use image paths or URLs
@@ -6722,20 +6797,21 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
         ],
       }, // Add more headings here
       {
-        'title': '19. Bedroom ',
+        'title': '15. Bedroom ',
         'icon': Icons.meeting_room,
         'subItems': [
           {
-            'title': '5.4 Door',
+            'title': '15.1 Door',
             'details': [
-              {
-                'label': 'Location',
-                'value': bedRoomDoorLocation ?? 'N/A',
-              },
               {
                 'label': 'Condition',
                 'value': bedRoomDoorCondition ?? 'N/A',
               },
+              {
+                'label': 'Description',
+                'value': bedRoomDoorLocation ?? 'N/A',
+              },
+
             ],
             'images': bedRoomDoorImages,
           },
@@ -6743,13 +6819,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
             'title': '5.5 DoorFrame',
             'details': [
               {
-                'label': 'Location',
-                'value': bedRoomDoorFrameLocation ?? 'N/A',
-              },
-              {
                 'label': 'Condition',
                 'value': bedRoomDoorFrameCondition ?? 'N/A',
               },
+              {
+                'label': 'Description',
+                'value': bedRoomDoorFrameLocation ?? 'N/A',
+              },
+
             ],
             'images': bedRoomDoorFrameImages,
           },
@@ -6757,13 +6834,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
             'title': '5.6 Ceiling',
             'details': [
               {
-                'label': 'Location',
-                'value': bedRoomCeilingLocation ?? 'N/A',
-              },
-              {
                 'label': 'Condition',
                 'value': bedRoomCeilingCondition ?? 'N/A',
               },
+              {
+                'label': 'Description',
+                'value': bedRoomCeilingLocation ?? 'N/A',
+              },
+
             ],
             'images': bedRoomCeilingImages,
           },
@@ -6771,13 +6849,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
             'title': '5.7 Lighting',
             'details': [
               {
-                'label': 'Location',
-                'value': bedRoomLightingLocation ?? 'N/A',
-              },
-              {
                 'label': 'Condition',
                 'value': bedRoomLightingCondition ?? 'N/A',
               },
+              {
+                'label': 'Description',
+                'value': bedRoomLightingLocation ?? 'N/A',
+              },
+
             ],
             'images': bedRoomlLightingImages,
           },
@@ -6785,13 +6864,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
             'title': '5.8 Walls',
             'details': [
               {
-                'label': 'Location',
-                'value': bedRoomWallsLocation ?? 'N/A',
-              },
-              {
                 'label': 'Condition',
                 'value': bedRoomWallsCondition ?? 'N/A',
               },
+              {
+                'label': 'Description',
+                'value': bedRoomWallsLocation ?? 'N/A',
+              },
+
             ],
             'images': bedRoomwWallsImages,
           },
@@ -6799,13 +6879,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
             'title': '5.9 Skirting',
             'details': [
               {
-                'label': 'Location',
-                'value': bedRoomSkirtingLocation ?? 'N/A',
-              },
-              {
                 'label': 'Condition',
                 'value': bedRoomsSkirtingCondition ?? 'N/A',
               },
+              {
+                'label': 'Description',
+                'value': bedRoomSkirtingLocation ?? 'N/A',
+              },
+
             ],
             'images': bedRoomSkirtingImages,
           },
@@ -6813,13 +6894,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
             'title': '5.10 Window Sill',
             'details': [
               {
-                'label': 'Location',
-                'value': bedRoomWindowSillLocation ?? 'N/A',
-              },
-              {
                 'label': 'Condition',
                 'value': bedRoomWindowSillCondition ?? 'N/A',
               },
+              {
+                'label': 'Description',
+                'value': bedRoomWindowSillLocation ?? 'N/A',
+              },
+
             ],
             'images': bedRoomWindowSillImages,
           },
@@ -6827,13 +6909,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
             'title': '5.11 Curtains',
             'details': [
               {
-                'label': 'Location',
-                'value': bedRoomCurtainsLocation ?? 'N/A',
-              },
-              {
                 'label': 'Condition',
                 'value': bedRoomCurtainsCondition ?? 'N/A',
               },
+              {
+                'label': 'Description',
+                'value': bedRoomCurtainsLocation ?? 'N/A',
+              },
+
             ],
             'images': bedRoomCurtainsImages,
           },
@@ -6841,13 +6924,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
             'title': '5.12 Blinds',
             'details': [
               {
-                'label': 'Location',
-                'value': bedRoomBlindsLocation ?? 'N/A',
-              },
-              {
                 'label': 'Condition',
                 'value': bedRoomBlindsCondition ?? 'N/A',
               },
+              {
+                'label': 'Description',
+                'value': bedRoomBlindsLocation ?? 'N/A',
+              },
+
             ],
             'images': bedRoomBlindsImages,
           },
@@ -6855,13 +6939,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
             'title': '5.13 Light Switches',
             'details': [
               {
-                'label': 'Location',
-                'value': bedRoomLightSwitchesLocation ?? 'N/A',
-              },
-              {
                 'label': 'Condition',
                 'value': bedRoomLightSwitchesCondition ?? 'N/A',
               },
+              {
+                'label': 'Description',
+                'value': bedRoomLightSwitchesLocation ?? 'N/A',
+              },
+
             ],
             'images': bedRoomLightSwitchesImages,
           },
@@ -6869,13 +6954,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
             'title': '5.14 Sockets',
             'details': [
               {
-                'label': 'Location',
-                'value': bedRoomSocketsLocation ?? 'N/A',
-              },
-              {
                 'label': 'Condition',
                 'value': bedRoomSocketsCondition ?? 'N/A',
               },
+              {
+                'label': 'Description',
+                'value': bedRoomSocketsLocation ?? 'N/A',
+              },
+
             ],
             'images': bedRoomSocketsImages,
           },
@@ -6883,13 +6969,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
             'title': '5.15 Flooring',
             'details': [
               {
-                'label': 'Location',
-                'value': bedRoomFlooringLocation ?? 'N/A',
-              },
-              {
                 'label': 'Condition',
                 'value': bedRoomFlooringCondition ?? 'N/A',
               },
+              {
+                'label': 'Description',
+                'value': bedRoomFlooringLocation ?? 'N/A',
+              },
+
             ],
             'images': bedRoomFlooringImages,
           },
@@ -6897,13 +6984,14 @@ class _InspectionConfimationPageState extends State<InspectionConfimationPage> {
             'title': '5.16 Additional Items',
             'details': [
               {
-                'label': 'Location',
-                'value': bedRoomAdditionalItemsLocation ?? 'N/A',
-              },
-              {
                 'label': 'Condition',
                 'value': bedRoomAdditionalItemsCondition ?? 'N/A',
               },
+              {
+                'label': 'Description',
+                'value': bedRoomAdditionalItemsLocation ?? 'N/A',
+              },
+
             ],
             'images': bedRoomAdditionalItemsImages,
           },

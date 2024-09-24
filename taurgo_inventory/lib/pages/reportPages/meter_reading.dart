@@ -4,11 +4,12 @@ import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart'; // Import shared_preferences
+import 'package:image_picker/image_picker.dart'; // Import image_picker
+import 'package:cloud_firestore/cloud_firestore.dart'; // Firestore
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:taurgo_inventory/pages/conditions/condition_details.dart';
 import 'package:taurgo_inventory/pages/edit_report_page.dart';
 import 'package:taurgo_inventory/pages/reportPages/camera_preview_page.dart';
-import 'package:cloud_firestore/cloud_firestore.dart'; // Firestore
-import 'package:firebase_storage/firebase_storage.dart';
 import '../../constants/AppColors.dart';
 import '../../widgets/add_action.dart';
 
@@ -16,67 +17,40 @@ class MeterReading extends StatefulWidget {
   final List<File>? capturedImages;
   final String propertyId;
 
-  const MeterReading({super.key, this.capturedImages, required this.propertyId});
+  const MeterReading({Key? key, this.capturedImages, required this.propertyId})
+      : super(key: key);
 
   @override
   State<MeterReading> createState() => _MeterReadingState();
 }
 
-Future<String?> uploadImageToFirebase(File imageFile, String propertyId, String collectionName, String documentId) async {
-  try {
-    // Step 1: Upload the image to Firebase Storage
-    String fileName = '${documentId}_${DateTime.now().millisecondsSinceEpoch}.jpg';
-    Reference storageReference = FirebaseStorage.instance
-        .ref()
-        .child('$propertyId/$collectionName/$documentId/$fileName');
-
-    UploadTask uploadTask = storageReference.putFile(imageFile);
-    TaskSnapshot snapshot = await uploadTask.whenComplete(() => null);
-
-    // Step 2: Get the download URL of the uploaded image
-    String downloadURL = await snapshot.ref.getDownloadURL();
-    print("Uploaded to Firebase: $downloadURL");
-
-    // Step 3: Save the download URL to Firestore
-    await FirebaseFirestore.instance
-        .collection('properties')
-        .doc(propertyId)
-        .collection(collectionName)
-        .doc(documentId)
-        .set({
-          'images': FieldValue.arrayUnion([downloadURL])
-        }, SetOptions(merge: true));
-
-    return downloadURL;
-  } catch (e) {
-    print("Error uploading image: $e");
-    return null;
-  }
-}
-
 class _MeterReadingState extends State<MeterReading> {
   String? GasMeterReading;
+  String? GasMeterReadingDescription;
   String? electricMeterReading;
+  String? electricMeterReadingDescription;
   String? waterMeterReading;
+  String? waterMeterReadingDescription;
   String? oilMeterReading;
+  String? oilMeterReadingDescription;
   String? otherMeterReading;
-
+  String? otherMeterReadingDescription;
   List<String> gasMeterImages = [];
   List<String> electricMeterImages = [];
   List<String> waterMeterImages = [];
   List<String> oilMeterImages = [];
   List<String> otherMeterImages = [];
 
-  late List<File> capturedImages;
 
   @override
   void initState() {
     super.initState();
     print("Property Id - SOC${widget.propertyId}");
-    // Load the saved preferences when the state is initialized
   }
 
- Stream<List<String>> _getImagesFromFirestore(String propertyId, String imageType) {
+  // Fetch images from Firestore
+  Stream<List<String>> _getImagesFromFirestore(
+      String propertyId, String imageType) {
     return FirebaseFirestore.instance
         .collection('properties')
         .doc(propertyId)
@@ -92,472 +66,443 @@ class _MeterReadingState extends State<MeterReading> {
     });
   }
 
-
-  // Function to save a preference
-  Future<void> _savePreference(String propertyId, String key, String value)
-  async {
+  Future<void> _savePreference(
+      String propertyId, String key, String value) async {
     final prefs = await SharedPreferences.getInstance();
     prefs.setString('${key}_$propertyId', value);
   }
 
+  Future<void> _handleImageAdded(XFile imageFile, String documentId) async {
+    String propertyId = widget.propertyId;
+    String? downloadUrl = await uploadImageToFirebase(
+        imageFile, propertyId, 'meter_reading', documentId);
+
+    if (downloadUrl != null) {
+      print("Adding image URL to Firestore: $downloadUrl");
+      // The image URL has already been added inside uploadImageToFirebase
+    }
+  }
+
+  Future<String?> uploadImageToFirebase(XFile imageFile, String propertyId,
+      String collectionName, String documentId) async {
+    try {
+      // Step 1: Upload the image to Firebase Storage
+      String fileName =
+          '${documentId}_${DateTime.now().millisecondsSinceEpoch}.jpg';
+      Reference storageReference = FirebaseStorage.instance
+          .ref()
+          .child('$propertyId/$collectionName/$documentId/$fileName');
+
+      UploadTask uploadTask = storageReference.putFile(File(imageFile.path));
+      TaskSnapshot snapshot = await uploadTask;
+
+      // Step 2: Get the download URL of the uploaded image
+      String downloadURL = await snapshot.ref.getDownloadURL();
+      print("Uploaded to Firebase: $downloadURL");
+
+      // Step 3: Save the download URL to Firestore
+      await FirebaseFirestore.instance
+          .collection('properties')
+          .doc(propertyId)
+          .collection(collectionName)
+          .doc(documentId)
+          .set({
+        'images': FieldValue.arrayUnion([downloadURL])
+      }, SetOptions(merge: true));
+
+      return downloadURL;
+    } catch (e) {
+      print("Error uploading image: $e");
+      return null;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     String propertyId = widget.propertyId;
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Meter Reading',
-          style: TextStyle(
-            color: kPrimaryColor,
-            fontSize: 14,
-            fontFamily: "Inter",
+    return WillPopScope(
+      onWillPop: () async => false, // Disable back button
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(
+            'Meter Reading',
+            style: TextStyle(
+              color: kPrimaryColor,
+              fontSize: 14,
+              fontFamily: "Inter",
+            ),
           ),
-        ),
-        centerTitle: true,
-        backgroundColor: bWhite,
-        leading: GestureDetector(
-          onTap: (){
-            showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return AlertDialog(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  elevation: 10,
-                  backgroundColor: Colors.white,
-                  title: Row(
-                    children: [
-                      Icon(Icons.info_outline, color: kPrimaryColor),
-                      SizedBox(width: 10),
-                      Text(
-                        'Exit',
-                        style: TextStyle(
-                          color: kPrimaryColor,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                  content: Text(
-                    'You may lost your data if you exit the process '
-                        'without saving',
-                    style: TextStyle(
-                      color: Colors.grey[800],
-                      fontSize: 14,
-                      fontWeight: FontWeight.w400,
-                      height: 1.5,
-                    ),
-                  ),
-                  actions: <Widget>[
-                    TextButton(
-                      child: Text('Cancel',
-                        style: TextStyle(
-                          color: kPrimaryColor,
-                          fontSize: 16,
-                        ),
-                      ),
-                      onPressed: () {
-                        Navigator.of(context).pop(); // Close the dialog
-                      },
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        print("SOC -> EP ${widget.propertyId}");
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) =>
-                                  EditReportPage(propertyId: widget.propertyId)), // Replace HomePage with your
-                          // home page
-                          // widget
-                        );
-                      },
-                      style: TextButton.styleFrom(
-                        padding: EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 8),
-                        backgroundColor: kPrimaryColor,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                      child: Text(
-                        'Exit',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                        ),
-                      ),
-                    ),
-                  ],
-                );
-              },
-            );
-          },
-          child: Icon(
-            Icons.arrow_back_ios_new,
-            color: kPrimaryColor,
-            size: 24,
-          ),
-        ),
-        actions: [
-          GestureDetector(
-            onTap: (){
-              showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return AlertDialog(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    elevation: 10,
-                    backgroundColor: Colors.white,
-                    title: Row(
-                      children: [
-                        Icon(Icons.info_outline, color: kPrimaryColor),
-                        SizedBox(width: 10),
-                        Text(
-                          'Continue Saving',
-                          style: TextStyle(
-                            color: kPrimaryColor,
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                    content: Text(
-                      'Please Make Sure You Have Added All the Necessary '
-                          'Information',
-                      style: TextStyle(
-                        color: Colors.grey[800],
-                        fontSize: 14,
-                        fontWeight: FontWeight.w400,
-                        height: 1.5,
-                      ),
-                    ),
-                    actions: <Widget>[
-                      TextButton(
-                        child: Text('Cancel',
-                          style: TextStyle(
-                            color: kPrimaryColor,
-                            fontSize: 16,
-                          ),
-                        ),
-                        onPressed: () {
-                          Navigator.of(context).pop(); // Close the dialog
-                        },
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          print("SOC -> EP ${widget.propertyId}");
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) =>
-                                    EditReportPage(propertyId: widget.propertyId)), // Replace HomePage with your
-                            // home page
-                            // widget
-                          );
-                        },
-                        style: TextButton.styleFrom(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 8),
-                          backgroundColor: kPrimaryColor,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                        child: Text(
-                          'Save',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                          ),
-                        ),
-                      ),
-                    ],
-                  );
-                },
-              );
+          centerTitle: true,
+          backgroundColor: bWhite,
+          leading: GestureDetector(
+            onTap: () {
+              _showExitDialog(context);
             },
-            child: Container(
-              margin: EdgeInsets.all(16),
-              child: Text(
-                'Save', // Replace with the actual location
-                style: TextStyle(
-                  color: kPrimaryColor,
-                  fontSize: 14, // Adjust the font size
-                  fontFamily: "Inter",
+            child: Icon(
+              Icons.arrow_back_ios_new,
+              color: kPrimaryColor,
+              size: 24,
+            ),
+          ),
+          actions: [
+            GestureDetector(
+              onTap: () {
+                _showSaveDialog(context);
+              },
+              child: Container(
+                margin: EdgeInsets.all(16),
+                child: Text(
+                  'Save',
+                  style: TextStyle(
+                    color: kPrimaryColor,
+                    fontSize: 14,
+                    fontFamily: "Inter",
+                  ),
                 ),
               ),
-            ),
-          )
-        ],
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Gas Meter
-              StreamBuilder<List<String>>(
+            )
+          ],
+        ),
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Door
+                StreamBuilder<List<String>>(
                   stream: _getImagesFromFirestore(propertyId, 'gasMeterImages'),
                   builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
+                    if (snapshot.connectionState ==
+                        ConnectionState.waiting) {
                       return CircularProgressIndicator();
                     }
                     if (snapshot.hasError) {
-                      return Text('Error loading Yale images');
+                      return Text('Error loading Gas Meter Reading images');
                     }
                     final gasMeterImages = snapshot.data ?? [];
                     return ConditionItem(
-                        name: "Gas Meter",
-                        condition: GasMeterReading,
-                        description: GasMeterReading,
-                        images: gasMeterImages,
-                        onConditionSelected: (condition) {
+                      name: "Gas Meter Reading",
+                      condition: GasMeterReading,
+                      description: GasMeterReadingDescription,
+                      images: gasMeterImages,
+                      onConditionSelected: (condition) {
                         setState(() {
                           GasMeterReading = condition;
                         });
                         _savePreference(propertyId, 'GasMeterReading', condition!);
                       },
-                        onDescriptionSelected: (description) {
+                      onDescriptionSelected: (description) {
                         setState(() {
-                          GasMeterReading = description;
+                          GasMeterReadingDescription = description;
                         });
-                        _savePreference(propertyId, 'GasMeterReading', description!);
+                        _savePreference(propertyId, 'GasMeterReadingDescription', description!);
                       },
-                        onImageAdded: (imagePath) async {
-                          File imageFile = File(imagePath);
-                          String? downloadUrl = await uploadImageToFirebase(
-                              imageFile, propertyId,'meter_reading', 'gasMeterImages');
-
-                          if (downloadUrl != null) {
-                            print(
-                                "Adding image URL to Firestore: $downloadUrl");
-                            FirebaseFirestore.instance
-                                .collection('properties')
-                                .doc(propertyId)
-                                .collection('meter_reading')
-                                .doc('gasMeterImages')
-                                .update({
-                              'images': FieldValue.arrayUnion([downloadUrl]),
-                            });
-                          }
-                        });
+                      onImageAdded: (XFile image) async {
+                        await _handleImageAdded(image, 'gasMeterImages');
+                      },
+                    );
                   },
                 ),
-
-
-              // Electric Meter
-              StreamBuilder<List<String>>(
-                  stream: _getImagesFromFirestore(propertyId, 'electricMeterImages'),
+                // Electric Meter Reading
+                StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(
+                      propertyId, 'electricMeterImages'),
                   builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
+                    if (snapshot.connectionState ==
+                        ConnectionState.waiting) {
                       return CircularProgressIndicator();
                     }
                     if (snapshot.hasError) {
-                      return Text('Error loading Yale images');
+                      return Text('Error loading Electric Meter Reading images');
                     }
-                    final electricMeterImages= snapshot.data ?? [];
+                    final electricMeterImages = snapshot.data ?? [];
                     return ConditionItem(
-                        name: "Electric Meter",
-                        condition: electricMeterReading,
-                        description:  electricMeterReading,
-                        images: electricMeterImages,
-                        onConditionSelected: (condition) {
+                      name: "Electric Meter Reading",
+                      condition: electricMeterReading,
+                      description: electricMeterReadingDescription,
+                      images: electricMeterImages,
+                      onConditionSelected: (condition) {
                         setState(() {
                           electricMeterReading = condition;
                         });
                         _savePreference(propertyId, 'electricMeterReading', condition!);
                       },
-                        onDescriptionSelected: (description) {
+                      onDescriptionSelected: (description) {
                         setState(() {
-                            electricMeterReading = description;
+                          electricMeterReadingDescription = description;
                         });
-                        _savePreference(propertyId, 'electricMeterReading', description!);
+                        _savePreference(propertyId, 'electricMeterReadingDescription', description!);
                       },
-                        onImageAdded: (imagePath) async {
-                          File imageFile = File(imagePath);
-                          String? downloadUrl = await uploadImageToFirebase(
-                              imageFile, propertyId,'meter_reading', 'electricMeterImages');
-
-                          if (downloadUrl != null) {
-                            print(
-                                "Adding image URL to Firestore: $downloadUrl");
-                            FirebaseFirestore.instance
-                                .collection('properties')
-                                .doc(propertyId)
-                                .collection('meter_reading')
-                                .doc('electricMeterImages')
-                                .update({
-                              'images': FieldValue.arrayUnion([downloadUrl]),
-                            });
-                          }
-                        });
+                      onImageAdded: (XFile image) async {
+                        await _handleImageAdded(image, 'electricMeterImages');
+                      },
+                    );
                   },
                 ),
-
-
-              // Water Meter
-              StreamBuilder<List<String>>(
+                // Water Meter Reading
+                StreamBuilder<List<String>>(
                   stream: _getImagesFromFirestore(propertyId, 'waterMeterImages'),
                   builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
+                    if (snapshot.connectionState ==
+                        ConnectionState.waiting) {
                       return CircularProgressIndicator();
                     }
                     if (snapshot.hasError) {
-                      return Text('Error loading Yale images');
+                      return Text('Error loading Water Meter Reading images');
                     }
                     final waterMeterImages = snapshot.data ?? [];
                     return ConditionItem(
-                        name: "Water Meter",
-                        condition: waterMeterReading,
-                        description:  waterMeterReading,
-                        images: waterMeterImages,
-                        onConditionSelected: (condition) {
+                      name: "Water Meter Reading",
+                      condition: waterMeterReading,
+                      description: waterMeterReadingDescription,
+                      images: waterMeterImages,
+                      onConditionSelected: (condition) {
                         setState(() {
                           waterMeterReading = condition;
                         });
                         _savePreference(propertyId, 'waterMeterReading', condition!);
                       },
-                        onDescriptionSelected: (description) {
+                      onDescriptionSelected: (description) {
                         setState(() {
-                            waterMeterReading = description;
+                          waterMeterReadingDescription = description;
                         });
-                        _savePreference(propertyId, 'waterMeterReading', description!);
+                        _savePreference(propertyId, 'waterMeterReadingDescription', description!);
                       },
-                        onImageAdded: (imagePath) async {
-                          File imageFile = File(imagePath);
-                          String? downloadUrl = await uploadImageToFirebase(
-                              imageFile, propertyId,'meter_reading', 'waterMeterImages');
-
-                          if (downloadUrl != null) {
-                            print(
-                                "Adding image URL to Firestore: $downloadUrl");
-                            FirebaseFirestore.instance
-                                .collection('properties')
-                                .doc(propertyId)
-                                .collection('meter_reading')
-                                .doc('waterMeterImages')
-                                .update({
-                              'images': FieldValue.arrayUnion([downloadUrl]),
-                            });
-                          }
-                        });
+                      onImageAdded: (XFile image) async {
+                        await _handleImageAdded(image, 'waterMeterImages');
+                      },
+                    );
                   },
                 ),
-
-
-              // Oil Meter
-              StreamBuilder<List<String>>(
+                // Oil Meter Reading
+                StreamBuilder<List<String>>(
                   stream: _getImagesFromFirestore(propertyId, 'oilMeterImages'),
                   builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
+                    if (snapshot.connectionState ==
+                        ConnectionState.waiting) {
                       return CircularProgressIndicator();
                     }
                     if (snapshot.hasError) {
-                      return Text('Error loading Yale images');
+                      return Text('Error loading Oil Meter Reading images');
                     }
                     final oilMeterImages = snapshot.data ?? [];
                     return ConditionItem(
-                        name: "Oil Meter",
-                        condition: oilMeterReading,
-                        description: oilMeterReading,
-                        images: oilMeterImages,
-                        onConditionSelected: (condition) {
+                      name: "Oil Meter Reading",
+                      condition: oilMeterReading,
+                      description: oilMeterReadingDescription,
+                      images: oilMeterImages,
+                      onConditionSelected: (condition) {
                         setState(() {
                           oilMeterReading = condition;
                         });
                         _savePreference(propertyId, 'oilMeterReading', condition!);
                       },
-                        onDescriptionSelected: (description) {
+                      onDescriptionSelected: (description) {
                         setState(() {
-                          oilMeterReading = description;
+                          oilMeterReadingDescription = description;
                         });
-                        _savePreference(propertyId, 'oilMeterReading', description!);
+                        _savePreference(propertyId, 'oilMeterReadingDescription', description!);
                       },
-                        onImageAdded: (imagePath) async {
-                          File imageFile = File(imagePath);
-                          String? downloadUrl = await uploadImageToFirebase(
-                              imageFile, propertyId,'meter_reading', 'oilMeterImages');
-
-                          if (downloadUrl != null) {
-                            print(
-                                "Adding image URL to Firestore: $downloadUrl");
-                            FirebaseFirestore.instance
-                                .collection('properties')
-                                .doc(propertyId)
-                                .collection('meter_reading')
-                                .doc('oilMeterImages')
-                                .update({
-                              'images': FieldValue.arrayUnion([downloadUrl]),
-                            });
-                          }
-                        });
+                      onImageAdded: (XFile image) async {
+                        await _handleImageAdded(image, 'oilMeterImages');
+                      },
+                    );
                   },
                 ),
-
-
-              // Other Meter
-              StreamBuilder<List<String>>(
+                // Other Meter Reading
+                StreamBuilder<List<String>>(
                   stream: _getImagesFromFirestore(propertyId, 'otherMeterImages'),
                   builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
+                    if (snapshot.connectionState ==
+                        ConnectionState.waiting) {
                       return CircularProgressIndicator();
                     }
                     if (snapshot.hasError) {
-                      return Text('Error loading Yale images');
+                      return Text('Error loading Other Meter Reading images');
                     }
                     final otherMeterImages = snapshot.data ?? [];
                     return ConditionItem(
-                        name: "Other Meter",
-                        condition: otherMeterReading,
-                        description:  otherMeterReading,
-                        images: otherMeterImages,
-                        onConditionSelected: (condition) {
+                      name: "Other Meter Reading",
+                      condition: otherMeterReading,
+                      description: otherMeterReadingDescription,
+                      images: otherMeterImages,
+                      onConditionSelected: (condition) {
                         setState(() {
                           otherMeterReading = condition;
                         });
                         _savePreference(propertyId, 'otherMeterReading', condition!);
                       },
-                        onDescriptionSelected: (description) {
+                      onDescriptionSelected: (description) {
                         setState(() {
-                            otherMeterReading = description;
+                          otherMeterReadingDescription = description;
                         });
-                        _savePreference(propertyId, 'otherMeterReading', description!);
+                        _savePreference(propertyId, 'otherMeterReadingDescription', description!);
                       },
-                        onImageAdded: (imagePath) async {
-                          File imageFile = File(imagePath);
-                          String? downloadUrl = await uploadImageToFirebase(
-                              imageFile, propertyId,'meter_reading', 'otherMeterImages');
-
-                          if (downloadUrl != null) {
-                            print(
-                                "Adding image URL to Firestore: $downloadUrl");
-                            FirebaseFirestore.instance
-                                .collection('properties')
-                                .doc(propertyId)
-                                .collection('meter_reading')
-                                .doc('otherMeterImages')
-                                .update({
-                              'images': FieldValue.arrayUnion([downloadUrl]),
-                            });
-                          }
-                        });
+                      onImageAdded: (XFile image) async {
+                        await _handleImageAdded(image, 'otherMeterImages');
+                      },
+                    );
                   },
                 ),
 
-
-              // Add more ConditionItem widgets as needed
-            ],
+              ],
+            ),
           ),
         ),
       ),
+    );
+  }
+
+  void _showExitDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          elevation: 10,
+          backgroundColor: Colors.white,
+          title: Row(
+            children: [
+              Icon(Icons.info_outline, color: kPrimaryColor),
+              SizedBox(width: 10),
+              Text(
+                'Exit',
+                style: TextStyle(
+                  color: kPrimaryColor,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+          content: Text(
+            'You may lose your data if you exit the process without saving',
+            style: TextStyle(
+              color: Colors.grey[800],
+              fontSize: 14,
+              fontWeight: FontWeight.w400,
+              height: 1.5,
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text(
+                'Cancel',
+                style: TextStyle(
+                  color: kPrimaryColor,
+                  fontSize: 16,
+                ),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          EditReportPage(propertyId: widget.propertyId)),
+                );
+              },
+              style: TextButton.styleFrom(
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                backgroundColor: kPrimaryColor,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              child: Text(
+                'Exit',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showSaveDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          elevation: 10,
+          backgroundColor: Colors.white,
+          title: Row(
+            children: [
+              Icon(Icons.info_outline, color: kPrimaryColor),
+              SizedBox(width: 10),
+              Text(
+                'Continue Saving',
+                style: TextStyle(
+                  color: kPrimaryColor,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+          content: Text(
+            'Please make sure you have added all the necessary information',
+            style: TextStyle(
+              color: Colors.grey[800],
+              fontSize: 14,
+              fontWeight: FontWeight.w400,
+              height: 1.5,
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text(
+                'Cancel',
+                style: TextStyle(
+                  color: kPrimaryColor,
+                  fontSize: 16,
+                ),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          EditReportPage(propertyId: widget.propertyId)),
+                );
+              },
+              style: TextButton.styleFrom(
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                backgroundColor: kPrimaryColor,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              child: Text(
+                'Save',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }
@@ -569,7 +514,7 @@ class ConditionItem extends StatelessWidget {
   final List<String> images;
   final Function(String?) onConditionSelected;
   final Function(String?) onDescriptionSelected;
-  final Function(String) onImageAdded;
+  final Function(XFile) onImageAdded;
 
   const ConditionItem({
     Key? key,
@@ -582,16 +527,32 @@ class ConditionItem extends StatelessWidget {
     required this.onImageAdded,
   }) : super(key: key);
 
+  Future<List<XFile>?> _pickImages() async {
+    final ImagePicker _picker = ImagePicker();
+    try {
+      final List<XFile>? images = await _picker.pickMultiImage(
+        imageQuality: 80, // Adjust the quality as needed
+      );
+      return images;
+    } catch (e) {
+      print("Error picking images: $e");
+      return null;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
+      // ... your existing padding and layout code
       padding: const EdgeInsets.only(bottom: 10.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Key Type and Action Icons Row
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
+              // Key Type Column
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -614,8 +575,8 @@ class ConditionItem extends StatelessWidget {
                   ),
                 ],
               ),
+              // Action Icons Row
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   IconButton(
                     icon: Icon(
@@ -632,7 +593,7 @@ class ConditionItem extends StatelessWidget {
                             builder: (context) => CameraPreviewPage(
                               camera: cameras.first,
                               onPictureTaken: (imagePath) {
-                                onImageAdded(imagePath);
+                                onImageAdded(XFile(imagePath));
                               },
                             ),
                           ),
@@ -640,42 +601,28 @@ class ConditionItem extends StatelessWidget {
                       }
                     },
                   ),
+                  IconButton(
+                    icon: Icon(
+                      Icons.photo_library_outlined,
+                      size: 24,
+                      color: kSecondaryTextColourTwo,
+                    ),
+                    onPressed: () async {
+                      final List<XFile>? selectedImages = await _pickImages();
+                      if (selectedImages != null &&
+                          selectedImages.isNotEmpty) {
+                        for (var image in selectedImages) {
+                          onImageAdded(image);
+                        }
+                      }
+                    },
+                  ),
                 ],
               ),
             ],
           ),
-          SizedBox(
-            height: 12,
-          ),
-          // GestureDetector(
-          //   onTap: () async {
-          //     final result = await Navigator.push(
-          //       context,
-          //       MaterialPageRoute(
-          //         builder: (context) => ConditionDetails(
-          //           initialCondition: location,
-          //           type: name,
-          //         ),
-          //       ),
-          //     );
-          //
-          //     if (result != null) {
-          //       onLocationSelected(result);
-          //     }
-          //   },
-          //   child: Text(
-          //     location?.isNotEmpty == true ? location! : "Location",
-          //     style: TextStyle(
-          //       fontSize: 12.0,
-          //       fontWeight: FontWeight.w700,
-          //       color: kPrimaryTextColourTwo,
-          //       fontStyle: FontStyle.italic,
-          //     ),
-          //   ),
-          // ),
-          // SizedBox(
-          //   height: 12,
-          // ),
+          SizedBox(height: 12),
+          // Description Section
           GestureDetector(
             onTap: () async {
               final result = await Navigator.push(
@@ -693,7 +640,9 @@ class ConditionItem extends StatelessWidget {
               }
             },
             child: Text(
-              description?.isNotEmpty == true ? description! : "Description",
+              description?.isNotEmpty == true
+                  ? description!
+                  : "Description",
               style: TextStyle(
                 fontSize: 12.0,
                 fontWeight: FontWeight.w700,
@@ -702,40 +651,8 @@ class ConditionItem extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(
-            height: 12,
-          ),
-          // GestureDetector(
-          //   onTap: () async {
-          //     final result = await Navigator.push(
-          //       context,
-          //       MaterialPageRoute(
-          //         builder: (context) => ConditionDetails(
-          //           initialCondition: serialNumber,
-          //           type: name,
-          //         ),
-          //       ),
-          //     );
-          //
-          //     if (result != null) {
-          //       onSerialNumberSelected(result);
-          //     }
-          //   },
-          //   child: Text(
-          //     serialNumber?.isNotEmpty == true
-          //         ? serialNumber!
-          //         : "Serial Number",
-          //     style: TextStyle(
-          //       fontSize: 12.0,
-          //       fontWeight: FontWeight.w700,
-          //       color: kPrimaryTextColourTwo,
-          //       fontStyle: FontStyle.italic,
-          //     ),
-          //   ),
-          // ),
-          // SizedBox(
-          //   height: 12,
-          // ),
+          SizedBox(height: 12),
+          // Images Section
           images.isNotEmpty
               ? Wrap(
                   spacing: 8.0,

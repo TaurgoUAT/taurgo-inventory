@@ -22,37 +22,6 @@ class EvCharger extends StatefulWidget {
 }
 
 
-Future<String?> uploadImageToFirebase(File imageFile, String propertyId, String collectionName, String documentId) async {
-  try {
-    // Step 1: Upload the image to Firebase Storage
-    String fileName = '${documentId}_${DateTime.now().millisecondsSinceEpoch}.jpg';
-    Reference storageReference = FirebaseStorage.instance
-        .ref()
-        .child('$propertyId/$collectionName/$documentId/$fileName');
-
-    UploadTask uploadTask = storageReference.putFile(imageFile);
-    TaskSnapshot snapshot = await uploadTask.whenComplete(() => null);
-
-    // Step 2: Get the download URL of the uploaded image
-    String downloadURL = await snapshot.ref.getDownloadURL();
-    print("Uploaded to Firebase: $downloadURL");
-
-    // Step 3: Save the download URL to Firestore
-    await FirebaseFirestore.instance
-        .collection('properties')
-        .doc(propertyId)
-        .collection(collectionName)
-        .doc(documentId)
-        .set({
-          'images': FieldValue.arrayUnion([downloadURL])
-        }, SetOptions(merge: true));
-
-    return downloadURL;
-  } catch (e) {
-    print("Error uploading image: $e");
-    return null;
-  }
-}
 
 
 
@@ -62,6 +31,7 @@ Future<String?> uploadImageToFirebase(File imageFile, String propertyId, String 
 class _EvChargerState extends State<EvCharger> {
   
  String? evChargerDescription;
+ String? evChargerCondition;
   List<File> images = []; // List to store selected images
   List<String> imageNames = []; // List to hold image names
 
@@ -80,7 +50,41 @@ class _EvChargerState extends State<EvCharger> {
   }
 
   
-   Stream<List<String>> _getImagesFromFirestore(
+   Future<String?> uploadImageToFirebase(XFile imageFile, String propertyId,
+      String collectionName, String documentId) async {
+    try {
+      // Step 1: Upload the image to Firebase Storage
+      String fileName =
+          '${documentId}_${DateTime.now().millisecondsSinceEpoch}.jpg';
+      Reference storageReference = FirebaseStorage.instance
+          .ref()
+          .child('$propertyId/$collectionName/$documentId/$fileName');
+
+      UploadTask uploadTask = storageReference.putFile(File(imageFile.path));
+      TaskSnapshot snapshot = await uploadTask;
+
+      // Step 2: Get the download URL of the uploaded image
+      String downloadURL = await snapshot.ref.getDownloadURL();
+      print("Uploaded to Firebase: $downloadURL");
+
+      // Step 3: Save the download URL to Firestore
+      await FirebaseFirestore.instance
+          .collection('properties')
+          .doc(propertyId)
+          .collection(collectionName)
+          .doc(documentId)
+          .set({
+        'images': FieldValue.arrayUnion([downloadURL])
+      }, SetOptions(merge: true));
+
+      return downloadURL;
+    } catch (e) {
+      print("Error uploading image: $e");
+      return null;
+    }
+  }
+
+  Stream<List<String>> _getImagesFromFirestore(
       String propertyId, String imageType) {
     return FirebaseFirestore.instance
         .collection('properties')
@@ -97,6 +101,16 @@ class _EvChargerState extends State<EvCharger> {
     });
   }
 
+  Future<void> _handleImageAdded(XFile imageFile, String documentId) async {
+    String propertyId = widget.propertyId;
+    String? downloadUrl = await uploadImageToFirebase(
+        imageFile, propertyId, 'EvCharger', documentId);
+
+    if (downloadUrl != null) {
+      print("Adding image URL to Firestore: $downloadUrl");
+      // The image URL has already been added inside uploadImageToFirebase
+    }
+  }
 
   // Function to save a preference
   Future<void> _savePreference(String propertyId, String key, String value)
@@ -322,14 +336,14 @@ class _EvChargerState extends State<EvCharger> {
                     final EvChargerImages = snapshot.data ?? [];
                     return ConditionItem(
                         name: "Ev Charger",
-                        condition: evChargerDescription ,
+                        condition: evChargerCondition ,
                         description: evChargerDescription,
                         images: EvChargerImages,
                         onConditionSelected: (condition) {
                         setState(() {
-                          evChargerDescription = condition;
+                          evChargerCondition = condition;
                         });
-                        _savePreference(propertyId, 'evChargerDescription', condition!);
+                        _savePreference(propertyId, 'evChargerCondition', condition!);
                       },
                         onDescriptionSelected: (description) {
                         setState(() {
@@ -337,24 +351,9 @@ class _EvChargerState extends State<EvCharger> {
                         });
                         _savePreference(propertyId, 'evChargerDescription', description!);
                       },
-                        onImageAdded: (imagePath) async {
-                          File imageFile = File(imagePath);
-                          String? downloadUrl = await uploadImageToFirebase(
-                              imageFile, propertyId, 'EvCharger','EvCharger');
-
-                          if (downloadUrl != null) {
-                            print(
-                                "Adding image URL to Firestore: $downloadUrl");
-                            FirebaseFirestore.instance
-                                .collection('properties')
-                                .doc(propertyId)
-                                .collection('EvCharger')
-                                .doc('EvCharger')
-                                .update({
-                              'images': FieldValue.arrayUnion([downloadUrl]),
-                            });
-                          }
-                        });
+                        onImageAdded: (XFile image) async {
+                        await _handleImageAdded(image, 'EvCharger');
+                      });
                   },
                 ),
 
@@ -374,7 +373,7 @@ class ConditionItem extends StatelessWidget {
   final List<String> images;
   final Function(String?) onConditionSelected;
   final Function(String?) onDescriptionSelected;
-  final Function(String) onImageAdded;
+  final Function(XFile) onImageAdded;
 
   const ConditionItem({
     Key? key,
@@ -386,7 +385,18 @@ class ConditionItem extends StatelessWidget {
     required this.onDescriptionSelected,
     required this.onImageAdded,
   }) : super(key: key);
-
+Future<List<XFile>?> _pickImages() async {
+    final ImagePicker _picker = ImagePicker();
+    try {
+      final List<XFile>? images = await _picker.pickMultiImage(
+        imageQuality: 80, // Adjust the quality as needed
+      );
+      return images;
+    } catch (e) {
+      print("Error picking images: $e");
+      return null;
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -452,11 +462,26 @@ class ConditionItem extends StatelessWidget {
                             builder: (context) => CameraPreviewPage(
                               camera: cameras.first,
                               onPictureTaken: (imagePath) {
-                                onImageAdded(imagePath);
+                                onImageAdded(XFile(imagePath));
                               },
                             ),
                           ),
                         );
+                      }
+                    },
+                  ),
+                  IconButton(
+                    icon: Icon(
+                      Icons.photo_library_outlined,
+                      size: 24,
+                      color: kSecondaryTextColourTwo,
+                    ),
+                    onPressed: () async {
+                      final List<XFile>? selectedImages = await _pickImages();
+                      if (selectedImages != null && selectedImages.isNotEmpty) {
+                        for (var image in selectedImages) {
+                          onImageAdded(image);
+                        }
                       }
                     },
                   ),
@@ -467,32 +492,32 @@ class ConditionItem extends StatelessWidget {
           SizedBox(
             height: 12,
           ),
-          // GestureDetector(
-          //   onTap: () async {
-          //     final result = await Navigator.push(
-          //       context,
-          //       MaterialPageRoute(
-          //         builder: (context) => ConditionDetails(
-          //           initialCondition: condition,
-          //           type: name,
-          //         ),
-          //       ),
-          //     );
-          //
-          //     if (result != null) {
-          //       onConditionSelected(result);
-          //     }
-          //   },
-          //   child: Text(
-          //     condition?.isNotEmpty == true ? condition! : "Condition",
-          //     style: TextStyle(
-          //       fontSize: 12.0,
-          //       fontWeight: FontWeight.w700,
-          //       color: kPrimaryTextColourTwo,
-          //       fontStyle: FontStyle.italic,
-          //     ),
-          //   ),
-          // ),
+          GestureDetector(
+            onTap: () async {
+              final result = await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ConditionDetails(
+                    initialCondition: condition,
+                    type: name,
+                  ),
+                ),
+              );
+          
+              if (result != null) {
+                onConditionSelected(result);
+              }
+            },
+            child: Text(
+              condition?.isNotEmpty == true ? condition! : "Condition",
+              style: TextStyle(
+                fontSize: 12.0,
+                fontWeight: FontWeight.w700,
+                color: kPrimaryTextColourTwo,
+                fontStyle: FontStyle.italic,
+              ),
+            ),
+          ),
           SizedBox(
             height: 12,
           ),

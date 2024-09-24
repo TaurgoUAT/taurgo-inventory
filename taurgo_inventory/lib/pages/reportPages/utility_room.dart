@@ -2,10 +2,11 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:camera/camera.dart';
-import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart'; // Import shared_preferences
 import 'package:cloud_firestore/cloud_firestore.dart'; // Firestore
 import 'package:firebase_storage/firebase_storage.dart'; // Firebase Storage
+import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart'; // Image Picker
+import 'package:shared_preferences/shared_preferences.dart'; // SharedPreferences
 import 'package:taurgo_inventory/pages/conditions/condition_details.dart';
 import 'package:taurgo_inventory/pages/edit_report_page.dart';
 import 'package:taurgo_inventory/pages/reportPages/camera_preview_page.dart';
@@ -14,50 +15,21 @@ import '../../constants/AppColors.dart';
 import '../../widgets/add_action.dart';
 
 class UtilityRoom extends StatefulWidget {
-  final List<File>? utilitycapturedImages;
+  final List<File>? utilityCapturedImages;
   final String propertyId;
-  const UtilityRoom(
-      {super.key, this.utilitycapturedImages, required this.propertyId});
+
+  const UtilityRoom({
+    Key? key,
+    this.utilityCapturedImages,
+    required this.propertyId,
+  }) : super(key: key);
 
   @override
   State<UtilityRoom> createState() => _UtilityRoomState();
 }
 
-Future<String?> uploadImageToFirebase(File imageFile, String propertyId, String collectionName, String documentId) async {
-  try {
-    // Step 1: Upload the image to Firebase Storage
-    String fileName = '${documentId}_${DateTime.now().millisecondsSinceEpoch}.jpg';
-    Reference storageReference = FirebaseStorage.instance
-        .ref()
-        .child('$propertyId/$collectionName/$documentId/$fileName');
-
-    UploadTask uploadTask = storageReference.putFile(imageFile);
-    TaskSnapshot snapshot = await uploadTask.whenComplete(() => null);
-
-    // Step 2: Get the download URL of the uploaded image
-    String downloadURL = await snapshot.ref.getDownloadURL();
-    print("Uploaded to Firebase: $downloadURL");
-
-    // Step 3: Save the download URL to Firestore
-    await FirebaseFirestore.instance
-        .collection('properties')
-        .doc(propertyId)
-        .collection(collectionName)
-        .doc(documentId)
-        .set({
-          'images': FieldValue.arrayUnion([downloadURL])
-        }, SetOptions(merge: true));
-
-    return downloadURL;
-  } catch (e) {
-    print("Error uploading image: $e");
-    return null;
-  }
-}
-
-
 class _UtilityRoomState extends State<UtilityRoom> {
-  String? utilityNewdoor;
+  // Variables for Door
   String? utilityDoorCondition;
   String? utilityDoorDescription;
   String? utilityDoorFrameCondition;
@@ -97,19 +69,21 @@ class _UtilityRoomState extends State<UtilityRoom> {
   List<String> utilitysocketsImages = [];
   List<String> utilityflooringImages = [];
   List<String> utilityadditionalItemsImages = [];
-  late List<File> utilitycapturedImages;
+
+  List<String> utilityDoorImages = [];
+
+  late List<File> utilityCapturedImages;
 
   @override
   void initState() {
     super.initState();
-    utilitycapturedImages = widget.utilitycapturedImages ?? [];
+    utilityCapturedImages = widget.utilityCapturedImages ?? [];
     print("Property Id - SOC${widget.propertyId}");
-    // Load the saved preferences when the state is initialized
+    // Optionally, load saved preferences here
   }
 
   // Fetch images from Firestore
-  Stream<List<String>> _getImagesFromFirestore(
-      String propertyId, String imageType) {
+  Stream<List<String>> _getImagesFromFirestore(String propertyId, String imageType) {
     return FirebaseFirestore.instance
         .collection('properties')
         .doc(propertyId)
@@ -125,237 +99,294 @@ class _UtilityRoomState extends State<UtilityRoom> {
     });
   }
 
-  //
   // Function to save a preference
-  Future<void> _savePreference(
-      String propertyId, String key, String value) async {
+  Future<void> _savePreference(String propertyId, String key, String value) async {
     final prefs = await SharedPreferences.getInstance();
     prefs.setString('${key}_$propertyId', value);
+  }
+
+  // Handle Image Added
+  Future<void> _handleImageAdded(XFile imageFile, String documentId) async {
+    String propertyId = widget.propertyId;
+    String? downloadUrl = await uploadImageToFirebase(
+      imageFile,
+      propertyId,
+      'utility_room',
+      documentId,
+    );
+
+    if (downloadUrl != null) {
+      print("Image uploaded and URL added to Firestore: $downloadUrl");
+      // The image URL is already added to Firestore within uploadImageToFirebase
+      // No need to manually update the images list here
+      setState(() {
+        // Trigger UI update if necessary
+      });
+    }
+  }
+
+  // Upload Image to Firebase
+  Future<String?> uploadImageToFirebase(
+    XFile imageFile,
+    String propertyId,
+    String collectionName,
+    String documentId,
+  ) async {
+    try {
+      // Step 1: Upload the image to Firebase Storage
+      String fileName = '${documentId}_${DateTime.now().millisecondsSinceEpoch}.jpg';
+      Reference storageReference = FirebaseStorage.instance
+          .ref()
+          .child('$propertyId/$collectionName/$documentId/$fileName');
+
+      UploadTask uploadTask = storageReference.putFile(File(imageFile.path));
+      TaskSnapshot snapshot = await uploadTask.whenComplete(() => null);
+
+      // Step 2: Get the download URL of the uploaded image
+      String downloadURL = await snapshot.ref.getDownloadURL();
+      print("Uploaded to Firebase: $downloadURL");
+
+      // Step 3: Save the download URL to Firestore
+      await FirebaseFirestore.instance
+          .collection('properties')
+          .doc(propertyId)
+          .collection(collectionName)
+          .doc(documentId)
+          .set({
+        'images': FieldValue.arrayUnion([downloadURL])
+      }, SetOptions(merge: true));
+
+      return downloadURL;
+    } catch (e) {
+      print("Error uploading image: $e");
+      return null;
+    }
+  }
+
+  // Dialogs for Exit and Save
+  void _showExitDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          elevation: 10,
+          backgroundColor: Colors.white,
+          title: Row(
+            children: [
+              Icon(Icons.info_outline, color: kPrimaryColor),
+              SizedBox(width: 10),
+              Text(
+                'Exit',
+                style: TextStyle(
+                  color: kPrimaryColor,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+          content: Text(
+            'You may lose your data if you exit the process without saving',
+            style: TextStyle(
+              color: Colors.grey[800],
+              fontSize: 14,
+              fontWeight: FontWeight.w400,
+              height: 1.5,
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text(
+                'Cancel',
+                style: TextStyle(
+                  color: kPrimaryColor,
+                  fontSize: 16,
+                ),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+            ),
+            TextButton(
+              onPressed: () {
+                print("SOC -> EP ${widget.propertyId}");
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => EditReportPage(propertyId: widget.propertyId),
+                  ),
+                );
+              },
+              style: TextButton.styleFrom(
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                backgroundColor: kPrimaryColor,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              child: Text(
+                'Exit',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showSaveDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          elevation: 10,
+          backgroundColor: Colors.white,
+          title: Row(
+            children: [
+              Icon(Icons.info_outline, color: kPrimaryColor),
+              SizedBox(width: 10),
+              Text(
+                'Continue Saving',
+                style: TextStyle(
+                  color: kPrimaryColor,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+          content: Text(
+            'Please make sure you have added all the necessary information',
+            style: TextStyle(
+              color: Colors.grey[800],
+              fontSize: 14,
+              fontWeight: FontWeight.w400,
+              height: 1.5,
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text(
+                'Cancel',
+                style: TextStyle(
+                  color: kPrimaryColor,
+                  fontSize: 16,
+                ),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+            ),
+            TextButton(
+              onPressed: () {
+                print("SOC -> EP ${widget.propertyId}");
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => EditReportPage(propertyId: widget.propertyId),
+                  ),
+                );
+              },
+              style: TextButton.styleFrom(
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                backgroundColor: kPrimaryColor,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              child: Text(
+                'Save',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     String propertyId = widget.propertyId;
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Utility Room',
-          style: TextStyle(
-            color: kPrimaryColor,
-            fontSize: 14,
-            fontFamily: "Inter",
+
+    return WillPopScope(
+      onWillPop: () async => false, // Disable back button
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(
+            'Utility Room',
+            style: TextStyle(
+              color: kPrimaryColor,
+              fontSize: 14,
+              fontFamily: "Inter",
+            ),
           ),
-        ),
-        centerTitle: true,
-        backgroundColor: bWhite,
-        leading: GestureDetector(
-          onTap: () {
-            showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return AlertDialog(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  elevation: 10,
-                  backgroundColor: Colors.white,
-                  title: Row(
-                    children: [
-                      Icon(Icons.info_outline, color: kPrimaryColor),
-                      SizedBox(width: 10),
-                      Text(
-                        'Exit',
-                        style: TextStyle(
-                          color: kPrimaryColor,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                  content: Text(
-                    'You may lost your data if you exit the process '
-                    'without saving',
-                    style: TextStyle(
-                      color: Colors.grey[800],
-                      fontSize: 14,
-                      fontWeight: FontWeight.w400,
-                      height: 1.5,
-                    ),
-                  ),
-                  actions: <Widget>[
-                    TextButton(
-                      child: Text(
-                        'Cancel',
-                        style: TextStyle(
-                          color: kPrimaryColor,
-                          fontSize: 16,
-                        ),
-                      ),
-                      onPressed: () {
-                        Navigator.of(context).pop(); // Close the dialog
-                      },
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        print("SOC -> EP ${widget.propertyId}");
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => EditReportPage(
-                                  propertyId: widget
-                                      .propertyId)), // Replace HomePage with your
-                          // home page
-                          // widget
-                        );
-                      },
-                      style: TextButton.styleFrom(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                        backgroundColor: kPrimaryColor,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                      child: Text(
-                        'Exit',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                        ),
-                      ),
-                    ),
-                  ],
-                );
-              },
-            );
-          },
-          child: Icon(
-            Icons.arrow_back_ios_new,
-            color: kPrimaryColor,
-            size: 24,
-          ),
-        ),
-        actions: [
-          GestureDetector(
+          centerTitle: true,
+          backgroundColor: bWhite,
+          leading: GestureDetector(
             onTap: () {
-              showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return AlertDialog(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    elevation: 10,
-                    backgroundColor: Colors.white,
-                    title: Row(
-                      children: [
-                        Icon(Icons.info_outline, color: kPrimaryColor),
-                        SizedBox(width: 10),
-                        Text(
-                          'Continue Saving',
-                          style: TextStyle(
-                            color: kPrimaryColor,
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                    content: Text(
-                      'Please Make Sure You Have Added All the Necessary '
-                      'Information',
-                      style: TextStyle(
-                        color: Colors.grey[800],
-                        fontSize: 14,
-                        fontWeight: FontWeight.w400,
-                        height: 1.5,
-                      ),
-                    ),
-                    actions: <Widget>[
-                      TextButton(
-                        child: Text(
-                          'Cancel',
-                          style: TextStyle(
-                            color: kPrimaryColor,
-                            fontSize: 16,
-                          ),
-                        ),
-                        onPressed: () {
-                          Navigator.of(context).pop(); // Close the dialog
-                        },
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          print("SOC -> EP ${widget.propertyId}");
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => EditReportPage(
-                                    propertyId: widget
-                                        .propertyId)), // Replace HomePage with your
-                            // home page
-                            // widget
-                          );
-                        },
-                        style: TextButton.styleFrom(
-                          padding:
-                              EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                          backgroundColor: kPrimaryColor,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                        child: Text(
-                          'Save',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                          ),
-                        ),
-                      ),
-                    ],
-                  );
-                },
-              );
+              _showExitDialog(context);
             },
-            child: Container(
-              margin: EdgeInsets.all(16),
-              child: Text(
-                'Save', // Replace with the actual location
-                style: TextStyle(
-                  color: kPrimaryColor,
-                  fontSize: 14, // Adjust the font size
-                  fontFamily: "Inter",
+            child: Icon(
+              Icons.arrow_back_ios_new,
+              color: kPrimaryColor,
+              size: 24,
+            ),
+          ),
+          actions: [
+            GestureDetector(
+              onTap: () {
+                _showSaveDialog(context);
+              },
+              child: Container(
+                margin: EdgeInsets.all(16),
+                child: Text(
+                  'Save',
+                  style: TextStyle(
+                    color: kPrimaryColor,
+                    fontSize: 14,
+                    fontFamily: "Inter",
+                  ),
                 ),
               ),
-            ),
-          )
-        ],
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Door
-              StreamBuilder<List<String>>(
-                stream:
-                    _getImagesFromFirestore(propertyId, 'utilitydoorImages'),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return CircularProgressIndicator();
-                  }
-                  if (snapshot.hasError) {
-                    return Text('Error loading Door images');
-                  }
-                  final utilitydoorImages = snapshot.data ?? [];
-                  return ConditionItem(
+            )
+          ],
+        ),
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Door Condition Item
+                StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'utilitydoorImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(child: CircularProgressIndicator());
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Door images');
+                    }
+                    final utilityDoorImages = snapshot.data ?? [];
+                    return ConditionItem(
                       name: "Door",
                       condition: utilityDoorCondition,
                       description: utilityDoorDescription,
-                      images: utilitydoorImages,
+                      images: utilityDoorImages,
                       onConditionSelected: (condition) {
                         setState(() {
                           utilityDoorCondition = condition;
@@ -370,657 +401,448 @@ class _UtilityRoomState extends State<UtilityRoom> {
                         _savePreference(
                             propertyId, 'utilityDoorDescription', description!);
                       },
-                      onImageAdded: (imagePath) async {
-                        File imageFile = File(imagePath);
-                        String? downloadUrl = await uploadImageToFirebase(
-                            imageFile,
-                            propertyId,
-                            'utility_room',
-                            'utilitydoorImages');
-
-                        if (downloadUrl != null) {
-                          print("Adding image URL to Firestore: $downloadUrl");
-                          FirebaseFirestore.instance
-                              .collection('properties')
-                              .doc(propertyId)
-                              .collection('utility_room')
-                              .doc('utilitydoorImages')
-                              .update({
-                            'images': FieldValue.arrayUnion([downloadUrl]),
-                          });
-                        }
-                      });
-                },
-              ),
-              // Door Frame
-              StreamBuilder<List<String>>(
-                stream: _getImagesFromFirestore(
-                    propertyId, 'utilitydoorFrameImages'),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return CircularProgressIndicator();
-                  }
-                  if (snapshot.hasError) {
-                    return Text('Error loading Door Frame images');
-                  }
-                  final utilitydoorFrameImages = snapshot.data ?? [];
-                  return ConditionItem(
-                    name: "Door Frame",
-                    condition: utilityDoorFrameCondition,
-                    description: utilityDoorFrameDescription,
-                    images: utilitydoorFrameImages,
-                    onConditionSelected: (condition) {
-                      setState(() {
-                        utilityDoorFrameCondition = condition;
-                      });
-                      _savePreference(
-                          propertyId, 'utilityDoorFrameCondition', condition!);
-                    },
-                    onDescriptionSelected: (description) {
-                      setState(() {
-                        utilityDoorFrameDescription = description;
-                      });
-                      _savePreference(propertyId, 'utilityDoorFrameDescription',
-                          description!);
-                    },
-                    onImageAdded: (imagePath) async {
-                      File imageFile = File(imagePath);
-                      String? downloadUrl = await uploadImageToFirebase(
-                          imageFile,
-                          propertyId,
-                          'utility_room',
-                          'utilitydoorFrameImages');
-
-                      if (downloadUrl != null) {
-                        print("Adding image URL to Firestore: $downloadUrl");
-                        FirebaseFirestore.instance
-                            .collection('properties')
-                            .doc(propertyId)
-                            .collection('ulitity_room')
-                            .doc('utilitydoorFrameImages')
-                            .update({
-                          'images': FieldValue.arrayUnion([downloadUrl]),
+                      onImageAdded: (XFile image) async {
+                        await _handleImageAdded(image, 'utilitydoorImages');
+                      },
+                    );
+                  },
+                ),
+                // Door Frame 
+                StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'utilitydoorFrameImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(child: CircularProgressIndicator());
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Door Frame images');
+                    }
+                    final utilityDoorFrameImages = snapshot.data ?? [];
+                    return ConditionItem(
+                      name: "Door Frame",
+                      condition: utilityDoorFrameCondition,
+                      description: utilityDoorFrameDescription,
+                      images: utilityDoorFrameImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          utilityDoorFrameCondition = condition;
                         });
-                      }
-                    },
-                  );
-                },
-              ),
-
-              // Ceiling
-              StreamBuilder<List<String>>(
-                stream:
-                    _getImagesFromFirestore(propertyId, 'utilityceilingImages'),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return CircularProgressIndicator();
-                  }
-                  if (snapshot.hasError) {
-                    return Text('Error loading Celling images');
-                  }
-                  final utilityceilingImages = snapshot.data ?? [];
-                  return ConditionItem(
-                    name: "Ceiling",
-                    condition: utilityCeilingCondition,
-                    description: utilityCeilingDescription,
-                    images: utilityceilingImages,
-                    onConditionSelected: (condition) {
-                      setState(() {
-                        utilityCeilingCondition = condition;
-                      });
-                      _savePreference(
-                          propertyId, 'utilityCeilingCondition', condition!);
-                    },
-                    onDescriptionSelected: (description) {
-                      setState(() {
-                        utilityCeilingDescription = description;
-                      });
-                      _savePreference(propertyId, 'utilityCeilingDescription',
-                          description!);
-                    },
-                    onImageAdded: (imagePath) async {
-                      File imageFile = File(imagePath);
-                      String? downloadUrl = await uploadImageToFirebase(
-                          imageFile,
-                          propertyId,
-                          'utility_room',
-                          'utilityceilingImages');
-
-                      if (downloadUrl != null) {
-                        print("Adding image URL to Firestore: $downloadUrl");
-                        FirebaseFirestore.instance
-                            .collection('properties')
-                            .doc(propertyId)
-                            .collection('uliity_room')
-                            .doc('utilityceilingImages')
-                            .update({
-                          'images': FieldValue.arrayUnion([downloadUrl]),
+                        _savePreference(
+                            propertyId, 'utilityDoorFrameCondition', condition!);
+                      },
+                      onDescriptionSelected: (description) {
+                        setState(() {
+                          utilityDoorFrameDescription = description;
                         });
-                      }
-                    },
-                  );
-                },
-              ),
-
-              // Lighting
-              StreamBuilder<List<String>>(
-                stream: _getImagesFromFirestore(
-                    propertyId, 'utilitylightingImages'),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return CircularProgressIndicator();
-                  }
-                  if (snapshot.hasError) {
-                    return Text('Error loading Lighting images');
-                  }
-                  final utilitylightingImages = snapshot.data ?? [];
-                  return ConditionItem(
-                    name: " Lighting",
-                    condition: utilityLightingCondition,
-                    description: utilitylightingDescription,
-                    images: utilitylightingImages,
-                    onConditionSelected: (condition) {
-                      setState(() {
-                        utilityLightingCondition = condition;
-                      });
-                      _savePreference(
-                          propertyId, 'utilityLightingCondition', condition!);
-                    },
-                    onDescriptionSelected: (description) {
-                      setState(() {
-                        utilitylightingDescription = description;
-                      });
-                      _savePreference(propertyId, 'utilitylightingDescription',
-                          description!);
-                    },
-                    onImageAdded: (imagePath) async {
-                      File imageFile = File(imagePath);
-                      String? downloadUrl = await uploadImageToFirebase(
-                          imageFile,
-                          propertyId,
-                          'utility_room',
-                          'utilitylightingImages');
-
-                      if (downloadUrl != null) {
-                        print("Adding image URL to Firestore: $downloadUrl");
-                        FirebaseFirestore.instance
-                            .collection('properties')
-                            .doc(propertyId)
-                            .collection('utility_room')
-                            .doc('utilitylightingImages')
-                            .update({
-                          'images': FieldValue.arrayUnion([downloadUrl]),
+                        _savePreference(
+                            propertyId, 'utilityDoorFrameDescription', description!);
+                      },
+                      onImageAdded: (XFile image) async {
+                        await _handleImageAdded(image, 'utilitydoorFrameImages');
+                      },
+                    );
+                  },
+                ),
+                // Ceiling
+                StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'utilityceilingImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(child: CircularProgressIndicator());
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Ceiling images');
+                    }
+                    final utilityCeilingImages = snapshot.data ?? [];
+                    return ConditionItem(
+                      name: "Ceiling",
+                      condition: utilityCeilingCondition,
+                      description: utilityCeilingDescription,
+                      images: utilityCeilingImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          utilityCeilingCondition = condition;
                         });
-                      }
-                    },
-                  );
-                },
-              ),
-              // Walls
-              StreamBuilder<List<String>>(
-                stream: _getImagesFromFirestore(propertyId, 'utilitywallsImages'),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return CircularProgressIndicator();
-                  }
-                  if (snapshot.hasError) {
-                    return Text('Error loading Mortice images');
-                  }
-                  final utilitywallsImages = snapshot.data ?? [];
-                  return ConditionItem(
-                    name: "Walls",
-                    condition: utilitywallsCondition,
-                    description: utilitywallsDescription,
-                    images: utilitywallsImages,
-                    onConditionSelected: (condition) {
-                      setState(() {
-                        utilitywallsCondition= condition;
-                      });
-                      _savePreference(propertyId, 'utilitywallsCondition', condition!);
-                    },
-                    onDescriptionSelected: (description) {
-                      setState(() {
-                        utilitywallsDescription = description;
-                      });
-                      _savePreference(propertyId, 'utilitywallsDescription', description!);
-                    },
-                    onImageAdded: (imagePath) async {
-                      File imageFile = File(imagePath);
-                      String? downloadUrl = await uploadImageToFirebase(
-                          imageFile,
-                          propertyId,
-                          'ultility_room',
-                          'utilitywallsImages');
-
-                      if (downloadUrl != null) {
-                        print("Adding image URL to Firestore: $downloadUrl");
-                        FirebaseFirestore.instance
-                            .collection('properties')
-                            .doc(propertyId)
-                            .collection('utility_room')
-                            .doc('utilitywallsImages')
-                            .update({
-                          'images': FieldValue.arrayUnion([downloadUrl]),
+                        _savePreference(
+                            propertyId, 'utilityCeilingCondition', condition!);
+                      },
+                      onDescriptionSelected: (description) {
+                        setState(() {
+                          utilityCeilingDescription = description;
                         });
-                      }
-                    },
-                  );
-                },
-              ),
-              // Skirting
-              StreamBuilder<List<String>>(
-                stream: _getImagesFromFirestore(propertyId, 'utilityskirtingImages'),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return CircularProgressIndicator();
-                  }
-                  if (snapshot.hasError) {
-                    return Text('Error loading Skirting images');
-                  }
-                  final utilityskirtingImages = snapshot.data ?? [];
-                  return ConditionItem(
-                    name: "Skirting",
-                    condition: utilityskirtingCondition,
-                    description: utilityskirtingDescription,
-                    images: utilityskirtingImages,
-                    onConditionSelected: (condition) {
-                      setState(() {
-                        utilityskirtingCondition = condition;
-                      });
-                      _savePreference(
-                          propertyId, 'utilityskirtingCondition', condition!);
-                    },
-                    onDescriptionSelected: (description) {
-                      setState(() {
-                        utilityskirtingDescription = description;
-                      });
-                      _savePreference(
-                          propertyId, 'utilityskirtingDescription,', description!);
-                    },
-                    onImageAdded: (imagePath) async {
-                      File imageFile = File(imagePath);
-                      String? downloadUrl = await uploadImageToFirebase(
-                          imageFile,
-                          propertyId,
-                          'ultility_room',
-                          'utilityskirtingImages');
-
-                      if (downloadUrl != null) {
-                        print("Adding image URL to Firestore: $downloadUrl");
-                        FirebaseFirestore.instance
-                            .collection('properties')
-                            .doc(propertyId)
-                            .collection('ultility_room')
-                            .doc('utilityskirtingImages')
-                            .update({
-                          'images': FieldValue.arrayUnion([downloadUrl]),
+                        _savePreference(
+                            propertyId, 'utilityCeilingDescription', description!);
+                      },
+                      onImageAdded: (XFile image) async {
+                        await _handleImageAdded(image, 'utilityceilingImages');
+                      },
+                    );
+                  },
+                ),
+                // Lighting
+                StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'utilitylightingImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(child: CircularProgressIndicator());
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Lighting images');
+                    }
+                    final utilityLightingImages = snapshot.data ?? [];
+                    return ConditionItem(
+                      name: "Lighting",
+                      condition: utilityLightingCondition,
+                      description: utilitylightingDescription,
+                      images: utilityLightingImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          utilityLightingCondition = condition;
                         });
-                      }
-                    },
-                  );
-                },
-              ),
-           // Window Sill
-              StreamBuilder<List<String>>(
-                stream: _getImagesFromFirestore(propertyId, 'utilitywindowSillImages'),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return CircularProgressIndicator();
-                  }
-                  if (snapshot.hasError) {
-                    return Text('Error loading Window Sill images');
-                  }
-                  final utilitywindowSillImages = snapshot.data ?? [];
-                  return ConditionItem(
-                    name: "Window Sill",
-                    condition: utilitywindowSillCondition,
-                    description: utilitywindowSillDescription,
-                    images: utilitywindowSillImages,
-                    onConditionSelected: (condition) {
-                      setState(() {
-                        utilitywindowSillCondition = condition;
-                      });
-                      _savePreference(
-                          propertyId, 'utilitywindowSillCondition', condition!);
-                    },
-                    onDescriptionSelected: (description) {
-                      setState(() {
-                        utilitywindowSillDescription = description;
-                      });
-                      _savePreference(
-                          propertyId, 'utilitywindowSillDescription,', description!);
-                    },
-                    onImageAdded: (imagePath) async {
-                      File imageFile = File(imagePath);
-                      String? downloadUrl = await uploadImageToFirebase(
-                          imageFile,
-                          propertyId,
-                          'keys_handover',
-                          'utilitywindowSillImages');
-
-                      if (downloadUrl != null) {
-                        print("Adding image URL to Firestore: $downloadUrl");
-                        FirebaseFirestore.instance
-                            .collection('properties')
-                            .doc(propertyId)
-                            .collection('keys_handover')
-                            .doc('utilitywindowSillImages')
-                            .update({
-                          'images': FieldValue.arrayUnion([downloadUrl]),
+                        _savePreference(
+                            propertyId, 'utilityLightingCondition', condition!);
+                      },
+                      onDescriptionSelected: (description) {
+                        setState(() {
+                          utilitylightingDescription = description;
                         });
-                      }
-                    },
-                  );
-                },
-              ),
-            // Curtains
-              StreamBuilder<List<String>>(
-                stream: _getImagesFromFirestore(propertyId, 'utilitycurtainsImages'),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return CircularProgressIndicator();
-                  }
-                  if (snapshot.hasError) {
-                    return Text('Error loading Curtains images');
-                  }
-                  final utilitycurtainsImages = snapshot.data ?? [];
-                  return ConditionItem(
-                    name: "Curtains",
-                    condition: utilitycurtainsCondition,
-                    description: utilitycurtainsDescription,
-                    images: utilitycurtainsImages,
-                    onConditionSelected: (condition) {
-                      setState(() {
-                        utilitycurtainsCondition= condition;
-                      });
-                      _savePreference(
-                          propertyId, 'utilitycurtainsCondition', condition!);
-                    },
-                    onDescriptionSelected: (description) {
-                      setState(() {
-                        utilitycurtainsDescription= description;
-                      });
-                      _savePreference(
-                          propertyId, 'utilitycurtainsDescription', description!);
-                    },
-                   onImageAdded: (imagePath) async {
-                      File imageFile = File(imagePath);
-                      String? downloadUrl = await uploadImageToFirebase(
-                          imageFile,
-                          propertyId,
-                          'keys_handover',
-                          'utilitycurtainsImages');
-
-                      if (downloadUrl != null) {
-                        print("Adding image URL to Firestore: $downloadUrl");
-                        FirebaseFirestore.instance
-                            .collection('properties')
-                            .doc(propertyId)
-                            .collection('utiliy_room')
-                            .doc('utilitycurtainsImages')
-                            .update({
-                          'images': FieldValue.arrayUnion([downloadUrl]),
+                        _savePreference(
+                            propertyId, 'utilitylightingDescription', description!);
+                      },
+                      onImageAdded: (XFile image) async {
+                        await _handleImageAdded(image, 'utilitylightingImages');
+                      },
+                    );
+                  },
+                ),
+                // Walls
+                StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'utilitywallsImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(child: CircularProgressIndicator());
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Walls images');
+                    }
+                    final utilityWallsImages = snapshot.data ?? [];
+                    return ConditionItem(
+                      name: "Walls",
+                      condition: utilitywallsCondition,
+                      description: utilitywallsDescription,
+                      images: utilityWallsImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          utilitywallsCondition = condition;
                         });
-                      }
-                    },
-                  );
-                },
-              ),
-              // Blinds
-              StreamBuilder<List<String>>(
-                stream: _getImagesFromFirestore(propertyId, 'utilityblindsImages'),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return CircularProgressIndicator();
-                  }
-                  if (snapshot.hasError) {
-                    return Text('Error loading Blinds images');
-                  }
-                  final utilityblindsImages = snapshot.data ?? [];
-                  return ConditionItem(
-                    name: "Blinds",
-                    condition: utilityblindsCondition,
-                    description: utilityblindsDescription,
-                    images: utilityblindsImages,
-                    onConditionSelected: (condition) {
-                      setState(() {
-                        utilityblindsCondition = condition;
-                      });
-                      _savePreference(
-                          propertyId, 'utilityblindsCondition', condition!);
-                    },
-                    onDescriptionSelected: (description) {
-                      setState(() {
-                        utilityblindsDescription = description;
-                      });
-                      _savePreference(
-                          propertyId, 'utilityblindsDescription,', description!);
-                    },
-                    onImageAdded: (imagePath) async {
-                      File imageFile = File(imagePath);
-                      String? downloadUrl = await uploadImageToFirebase(
-                          imageFile,
-                          propertyId,
-                          'ultility_room',
-                          'utilityblindsImages');
-
-                      if (downloadUrl != null) {
-                        print("Adding image URL to Firestore: $downloadUrl");
-                        FirebaseFirestore.instance
-                            .collection('properties')
-                            .doc(propertyId)
-                            .collection('ultility_room')
-                            .doc('utilityblindsImages')
-                            .update({
-                          'images': FieldValue.arrayUnion([downloadUrl]),
+                        _savePreference(
+                            propertyId, 'utilitywallsCondition', condition!);
+                      },
+                      onDescriptionSelected: (description) {
+                        setState(() {
+                          utilitywallsDescription = description;
                         });
-                      }
-                    },
-                  );
-                },
-              ),
-             // Light Switches
-              StreamBuilder<List<String>>(
-                stream:
-                    _getImagesFromFirestore(propertyId, 'utilitylightSwitchesImages'),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return CircularProgressIndicator();
-                  }
-                  if (snapshot.hasError) {
-                    return Text('Error loading Light Switches images');
-                  }
-                  final utilitylightSwitchesImages = snapshot.data ?? [];
-                  return ConditionItem(
-                    name: "Light Switches",
-                    condition: utilitylightSwitchesCondition,
-                    description: utilitylightSwitchesDescription,
-                    images: utilitylightSwitchesImages,
-                    onConditionSelected: (condition) {
-                      setState(() {
-                        utilitylightSwitchesCondition = condition;
-                      });
-                      _savePreference(
-                          propertyId, 'utilitylightSwitchesCondition', condition!);
-                    },
-                    onDescriptionSelected: (description) {
-                      setState(() {
-                        utilitylightSwitchesDescription = description;
-                      });
-                      _savePreference(
-                          propertyId, 'utilitylightSwitchesDescription', description!);
-                    },
-                    onImageAdded: (imagePath) async {
-                      File imageFile = File(imagePath);
-                      String? downloadUrl = await uploadImageToFirebase(
-                          imageFile,
-                          propertyId,
-                          'ulitity_room',
-                          'utilitylightSwitchesImages');
-
-                      if (downloadUrl != null) {
-                        print("Adding image URL to Firestore: $downloadUrl");
-                        FirebaseFirestore.instance
-                            .collection('properties')
-                            .doc(propertyId)
-                            .collection('ulitity_room')
-                            .doc('utilitylightSwitchesImages')
-                            .update({
-                          'images': FieldValue.arrayUnion([downloadUrl]),
+                        _savePreference(
+                            propertyId, 'utilitywallsDescription', description!);
+                      },
+                      onImageAdded: (XFile image) async {
+                        await _handleImageAdded(image, 'utilitywallsImages');
+                      },
+                    );
+                  },
+                ),
+                // Skirting
+                StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'utilityskirtingImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(child: CircularProgressIndicator());
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Skirting images');
+                    }
+                    final utilitySkirtingImages = snapshot.data ?? [];
+                    return ConditionItem(
+                      name: "Skirting",
+                      condition: utilityskirtingCondition,
+                      description: utilityskirtingDescription,
+                      images: utilitySkirtingImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          utilityskirtingCondition = condition;
                         });
-                      }
-                    },
-                  );
-                },
-              ),
-              // Sockets
-              StreamBuilder<List<String>>(
+                        _savePreference(
+                            propertyId, 'utilityskirtingCondition', condition!);
+                      },
+                      onDescriptionSelected: (description) {
+                        setState(() {
+                          utilityskirtingDescription = description;
+                        });
+                        _savePreference(
+                            propertyId, 'utilityskirtingDescription', description!);
+                      },
+                      onImageAdded: (XFile image) async {
+                        await _handleImageAdded(image, 'utilityskirtingImages');
+                      },
+                    );
+                  },
+                ),
+                // Window Sill
+                StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'utilitywindowSillImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(child: CircularProgressIndicator());
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Window Sill images');
+                    }
+                    final utilityWindowSillImages = snapshot.data ?? [];
+                    return ConditionItem(
+                      name: "Window Sill",
+                      condition: utilitywindowSillCondition,
+                      description: utilitywindowSillDescription,
+                      images: utilityWindowSillImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          utilitywindowSillCondition = condition;
+                        });
+                        _savePreference(
+                            propertyId, 'utilitywindowSillCondition', condition!);
+                      },
+                      onDescriptionSelected: (description) {
+                        setState(() {
+                          utilitywindowSillDescription = description;
+                        });
+                        _savePreference(
+                            propertyId, 'utilitywindowSillDescription', description!);
+                      },
+                      onImageAdded: (XFile image) async {
+                        await _handleImageAdded(image, 'utilitywindowSillImages');
+                      },
+                    );
+                  },
+                ),
+                // Curtains
+                StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'utilitycurtainsImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(child: CircularProgressIndicator());
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Curtains images');
+                    }
+                    final utilityCurtainsImages = snapshot.data ?? [];
+                    return ConditionItem(
+                      name: "Curtains",
+                      condition: utilitycurtainsCondition,
+                      description: utilitycurtainsDescription,
+                      images: utilityCurtainsImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          utilitycurtainsCondition = condition;
+                        });
+                        _savePreference(
+                            propertyId, 'utilitycurtainsCondition', condition!);
+                      },
+                      onDescriptionSelected: (description) {
+                        setState(() {
+                          utilitycurtainsDescription = description;
+                        });
+                        _savePreference(
+                            propertyId, 'utilitycurtainsDescription', description!);
+                      },
+                      onImageAdded: (XFile image) async {
+                        await _handleImageAdded(image, 'utilitycurtainsImages');
+                      },
+                    );
+                  },
+                ),
+                // Blinds
+                StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'utilityblindsImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(child: CircularProgressIndicator());
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Blinds images');
+                    }
+                    final utilityBlindsImages = snapshot.data ?? [];
+                    return ConditionItem(
+                      name: "Blinds",
+                      condition: utilityblindsCondition,
+                      description: utilityblindsDescription,
+                      images: utilityBlindsImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          utilityblindsCondition = condition;
+                        });
+                        _savePreference(
+                            propertyId, 'utilityblindsCondition', condition!);
+                      },
+                      onDescriptionSelected: (description) {
+                        setState(() {
+                          utilityblindsDescription = description;
+                        });
+                        _savePreference(
+                            propertyId, 'utilityblindsDescription', description!);
+                      },
+                      onImageAdded: (XFile image) async {
+                        await _handleImageAdded(image, 'utilityblindsImages');
+                      },
+                    );
+                  },
+                ),
+                // Light Switches
+                StreamBuilder<List<String>>(
+                  stream: _getImagesFromFirestore(propertyId, 'utilitylightSwitchesImages'),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(child: CircularProgressIndicator());
+                    }
+                    if (snapshot.hasError) {
+                      return Text('Error loading Light Switches images');
+                    }
+                    final utilityLightSwitchesImages = snapshot.data ?? [];
+                    return ConditionItem(
+                      name: "Light Switches",
+                      condition: utilitylightSwitchesCondition,
+                      description: utilitylightSwitchesDescription,
+                      images: utilityLightSwitchesImages,
+                      onConditionSelected: (condition) {
+                        setState(() {
+                          utilitylightSwitchesCondition = condition;
+                        });
+                        _savePreference(
+                            propertyId, 'utilitylightSwitchesCondition', condition!);
+                      },
+                      onDescriptionSelected: (description) {
+                        setState(() {
+                          utilitylightSwitchesDescription = description;
+                        });
+                        _savePreference(
+                            propertyId, 'utilitylightSwitchesDescription', description!);
+                      },
+                      onImageAdded: (XFile image) async {
+                        await _handleImageAdded(image, 'utilitylightSwitchesImages');
+                      },
+                    );
+                  },
+                ),
+                // Sockets
+                StreamBuilder<List<String>>(
                   stream: _getImagesFromFirestore(propertyId, 'utilitysocketsImages'),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return CircularProgressIndicator();
+                      return Center(child: CircularProgressIndicator());
                     }
                     if (snapshot.hasError) {
-                      return Text('Error loading Yale images');
+                      return Text('Error loading Sockets images');
                     }
-                    final utilitysocketsImages = snapshot.data ?? [];
+                    final utilitySocketsImages = snapshot.data ?? [];
                     return ConditionItem(
-                        name: "Sockets",
-                        condition: utilitysocketsCondition,
-                        description: utilitysocketsDescription,
-                        images: utilitysocketsImages,
-                        onConditionSelected: (condition) {
+                      name: "Sockets",
+                      condition: utilitysocketsCondition,
+                      description: utilitysocketsDescription,
+                      images: utilitySocketsImages,
+                      onConditionSelected: (condition) {
                         setState(() {
                           utilitysocketsCondition = condition;
                         });
-                        _savePreference(propertyId, 'utilitysocketsCondition', condition!);
+                        _savePreference(
+                            propertyId, 'utilitysocketsCondition', condition!);
                       },
-                        onDescriptionSelected: (description) {
+                      onDescriptionSelected: (description) {
                         setState(() {
                           utilitysocketsDescription = description;
                         });
-                        _savePreference(propertyId, 'utilitysocketsDescription', description!);
+                        _savePreference(
+                            propertyId, 'utilitysocketsDescription', description!);
                       },
-                        onImageAdded: (imagePath) async {
-                          File imageFile = File(imagePath);
-                          String? downloadUrl = await uploadImageToFirebase(
-                              imageFile, propertyId,'utility_room', 'utilitysocketsImages');
-
-                          if (downloadUrl != null) {
-                            print(
-                                "Adding image URL to Firestore: $downloadUrl");
-                            FirebaseFirestore.instance
-                                .collection('properties')
-                                .doc(propertyId)
-                                .collection('utility_room')
-                                .doc('utilitysocketsImages')
-                                .update({
-                              'images': FieldValue.arrayUnion([downloadUrl]),
-                            });
-                          }
-                        });
+                      onImageAdded: (XFile image) async {
+                        await _handleImageAdded(image, 'utilitysocketsImages');
+                      },
+                    );
                   },
                 ),
-              // Flooring
-              StreamBuilder<List<String>>(
+                // Flooring
+                StreamBuilder<List<String>>(
                   stream: _getImagesFromFirestore(propertyId, 'utilityflooringImages'),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return CircularProgressIndicator();
+                      return Center(child: CircularProgressIndicator());
                     }
                     if (snapshot.hasError) {
-                      return Text('Error loading Yale images');
+                      return Text('Error loading Flooring images');
                     }
-                    final utilityflooringImages = snapshot.data ?? [];
+                    final utilityFlooringImages = snapshot.data ?? [];
                     return ConditionItem(
-                        name: "Flooring",
-                        condition: utilityflooringCondition,
-                        description: utilityflooringDescription,
-                        images: utilityflooringImages,
-                        onConditionSelected: (condition) {
+                      name: "Flooring",
+                      condition: utilityflooringCondition,
+                      description: utilityflooringDescription,
+                      images: utilityFlooringImages,
+                      onConditionSelected: (condition) {
                         setState(() {
                           utilityflooringCondition = condition;
                         });
-                        _savePreference(propertyId, 'utilityflooringCondition', condition!);
+                        _savePreference(
+                            propertyId, 'utilityflooringCondition', condition!);
                       },
-                        onDescriptionSelected: (description) {
+                      onDescriptionSelected: (description) {
                         setState(() {
                           utilityflooringDescription = description;
                         });
-                        _savePreference(propertyId, 'utilityflooringDescription', description!);
+                        _savePreference(
+                            propertyId, 'utilityflooringDescription', description!);
                       },
-                        onImageAdded: (imagePath) async {
-                          File imageFile = File(imagePath);
-                          String? downloadUrl = await uploadImageToFirebase(
-                              imageFile, propertyId,'utility_room', 'utilityflooringImages');
-
-                          if (downloadUrl != null) {
-                            print(
-                                "Adding image URL to Firestore: $downloadUrl");
-                            FirebaseFirestore.instance
-                                .collection('properties')
-                                .doc(propertyId)
-                                .collection('utility_room')
-                                .doc('utilityflooringImages')
-                                .update({
-                              'images': FieldValue.arrayUnion([downloadUrl]),
-                            });
-                          }
-                        });
+                      onImageAdded: (XFile image) async {
+                        await _handleImageAdded(image, 'utilityflooringImages');
+                      },
+                    );
                   },
                 ),
-              // Additional Items
-              StreamBuilder<List<String>>(
+                // Additional Items
+                StreamBuilder<List<String>>(
                   stream: _getImagesFromFirestore(propertyId, 'utilityadditionalItemsImages'),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return CircularProgressIndicator();
+                      return Center(child: CircularProgressIndicator());
                     }
                     if (snapshot.hasError) {
-                      return Text('Error loading Yale images');
+                      return Text('Error loading Additional Items images');
                     }
-                    final utilityadditionalItemsImages = snapshot.data ?? [];
+                    final utilityAdditionalItemsImages = snapshot.data ?? [];
                     return ConditionItem(
-                        name: "Additional Items",
-                        condition: utilityadditionalItemsCondition,
-                        description: utilityadditionalItemsDescription,
-                        images: utilityadditionalItemsImages,
-                        onConditionSelected: (condition) {
+                      name: "Additional Items",
+                      condition: utilityadditionalItemsCondition,
+                      description: utilityadditionalItemsDescription,
+                      images: utilityAdditionalItemsImages,
+                      onConditionSelected: (condition) {
                         setState(() {
                           utilityadditionalItemsCondition = condition;
                         });
-                        _savePreference(propertyId, 'utilityadditionalItemsCondition', condition!);
+                        _savePreference(
+                            propertyId, 'utilityadditionalItemsCondition', condition!);
                       },
-                        onDescriptionSelected: (description) {
+                      onDescriptionSelected: (description) {
                         setState(() {
                           utilityadditionalItemsDescription = description;
                         });
-                        _savePreference(propertyId, 'utilityadditionalItemsDescription', description!);
+                        _savePreference(
+                            propertyId, 'utilityadditionalItemsDescription', description!);
                       },
-                        onImageAdded: (imagePath) async {
-                          File imageFile = File(imagePath);
-                          String? downloadUrl = await uploadImageToFirebase(
-                              imageFile, propertyId,'utility_room', 'utilityadditionalItemsImages');
-
-                          if (downloadUrl != null) {
-                            print(
-                                "Adding image URL to Firestore: $downloadUrl");
-                            FirebaseFirestore.instance
-                                .collection('properties')
-                                .doc(propertyId)
-                                .collection('utility_room')
-                                .doc('utilityadditionalItemsImages')
-                                .update({
-                              'images': FieldValue.arrayUnion([downloadUrl]),
-                            });
-                          }
-                        });
+                      onImageAdded: (XFile image) async {
+                        await _handleImageAdded(image, 'utilityadditionalItemsImages');
+                      },
+                    );
                   },
                 ),
 
-
-              // Add more ConditionItem widgets as needed
-            ],
+                // Add more ConditionItem widgets as needed for other utility room components
+              ],
+            ),
           ),
         ),
       ),
@@ -1028,6 +850,7 @@ class _UtilityRoomState extends State<UtilityRoom> {
   }
 }
 
+// Refactored ConditionItem Widget
 class ConditionItem extends StatelessWidget {
   final String name;
   final String? condition;
@@ -1035,7 +858,7 @@ class ConditionItem extends StatelessWidget {
   final List<String> images;
   final Function(String?) onConditionSelected;
   final Function(String?) onDescriptionSelected;
-  final Function(String) onImageAdded;
+  final Function(XFile) onImageAdded;
 
   const ConditionItem({
     Key? key,
@@ -1048,6 +871,20 @@ class ConditionItem extends StatelessWidget {
     required this.onImageAdded,
   }) : super(key: key);
 
+  // Function to pick images from the gallery
+  Future<List<XFile>?> _pickImages() async {
+    final ImagePicker _picker = ImagePicker();
+    try {
+      final List<XFile>? selectedImages = await _picker.pickMultiImage(
+        imageQuality: 80, // Adjust the quality as needed
+      );
+      return selectedImages;
+    } catch (e) {
+      print("Error picking images: $e");
+      return null;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -1055,9 +892,11 @@ class ConditionItem extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Component Type and Action Icons Row
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
+              // Component Type Column
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -1080,24 +919,9 @@ class ConditionItem extends StatelessWidget {
                   ),
                 ],
               ),
+              // Action Icons Row
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // IconButton(
-                  //   icon: Icon(
-                  //     Icons.warning_amber,
-                  //     size: 24,
-                  //     color: kAccentColor,
-                  //   ),
-                  //   onPressed: () {
-                  //     Navigator.push(
-                  //       context,
-                  //       MaterialPageRoute(
-                  //         builder: (context) => AddAction(),
-                  //       ),
-                  //     );
-                  //   },
-                  // ),
                   IconButton(
                     icon: Icon(
                       Icons.camera_alt_outlined,
@@ -1113,7 +937,7 @@ class ConditionItem extends StatelessWidget {
                             builder: (context) => CameraPreviewPage(
                               camera: cameras.first,
                               onPictureTaken: (imagePath) {
-                                onImageAdded(imagePath);
+                                onImageAdded(XFile(imagePath));
                               },
                             ),
                           ),
@@ -1121,13 +945,27 @@ class ConditionItem extends StatelessWidget {
                       }
                     },
                   ),
+                  IconButton(
+                    icon: Icon(
+                      Icons.photo_library_outlined,
+                      size: 24,
+                      color: kSecondaryTextColourTwo,
+                    ),
+                    onPressed: () async {
+                      final List<XFile>? selectedImages = await _pickImages();
+                      if (selectedImages != null && selectedImages.isNotEmpty) {
+                        for (var image in selectedImages) {
+                          onImageAdded(image);
+                        }
+                      }
+                    },
+                  ),
                 ],
               ),
             ],
           ),
-          SizedBox(
-            height: 12,
-          ),
+          SizedBox(height: 12),
+          // Condition Section
           GestureDetector(
             onTap: () async {
               final result = await Navigator.push(
@@ -1154,9 +992,8 @@ class ConditionItem extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(
-            height: 12,
-          ),
+          SizedBox(height: 12),
+          // Description Section
           GestureDetector(
             onTap: () async {
               final result = await Navigator.push(
@@ -1183,9 +1020,8 @@ class ConditionItem extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(
-            height: 12,
-          ),
+          SizedBox(height: 12),
+          // Images Section
           images.isNotEmpty
               ? Wrap(
                   spacing: 8.0,

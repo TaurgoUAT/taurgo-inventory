@@ -5,6 +5,7 @@ import 'package:camera/camera.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart'; // Import shared_preferences
 import 'package:taurgo_inventory/pages/conditions/condition_details.dart';
 import 'package:taurgo_inventory/pages/edit_report_page.dart';
@@ -21,39 +22,10 @@ class FrontGarden extends StatefulWidget {
   @override
   State<FrontGarden> createState() => _FrontGardenState();
 }
-Future<String?> uploadImageToFirebase(File imageFile, String propertyId, String collectionName, String documentId) async {
-  try {
-    // Step 1: Upload the image to Firebase Storage
-    String fileName = '${documentId}_${DateTime.now().millisecondsSinceEpoch}.jpg';
-    Reference storageReference = FirebaseStorage.instance
-        .ref()
-        .child('$propertyId/$collectionName/$documentId/$fileName');
 
-    UploadTask uploadTask = storageReference.putFile(imageFile);
-    TaskSnapshot snapshot = await uploadTask.whenComplete(() => null);
-
-    // Step 2: Get the download URL of the uploaded image
-    String downloadURL = await snapshot.ref.getDownloadURL();
-    print("Uploaded to Firebase: $downloadURL");
-
-    // Step 3: Save the download URL to Firestore
-    await FirebaseFirestore.instance
-        .collection('properties')
-        .doc(propertyId)
-        .collection(collectionName)
-        .doc(documentId)
-        .set({
-          'images': FieldValue.arrayUnion([downloadURL])
-        }, SetOptions(merge: true));
-
-    return downloadURL;
-  } catch (e) {
-    print("Error uploading image: $e");
-    return null;
-  }
-}
 class _FrontGardenState extends State<FrontGarden> {
   String? gardenDescription;
+  String? gardenCondition;
   String? driveWayCondition;
   String? driveWayDescription;
   String? outsideLightingCondition;
@@ -74,7 +46,42 @@ class _FrontGardenState extends State<FrontGarden> {
     // Load the saved preferences when the state is initialized
   }
 
- Stream<List<String>> _getImagesFromFirestore(String propertyId, String imageType) {
+ Future<String?> uploadImageToFirebase(XFile imageFile, String propertyId,
+      String collectionName, String documentId) async {
+    try {
+      // Step 1: Upload the image to Firebase Storage
+      String fileName =
+          '${documentId}_${DateTime.now().millisecondsSinceEpoch}.jpg';
+      Reference storageReference = FirebaseStorage.instance
+          .ref()
+          .child('$propertyId/$collectionName/$documentId/$fileName');
+
+      UploadTask uploadTask = storageReference.putFile(File(imageFile.path));
+      TaskSnapshot snapshot = await uploadTask;
+
+      // Step 2: Get the download URL of the uploaded image
+      String downloadURL = await snapshot.ref.getDownloadURL();
+      print("Uploaded to Firebase: $downloadURL");
+
+      // Step 3: Save the download URL to Firestore
+      await FirebaseFirestore.instance
+          .collection('properties')
+          .doc(propertyId)
+          .collection(collectionName)
+          .doc(documentId)
+          .set({
+        'images': FieldValue.arrayUnion([downloadURL])
+      }, SetOptions(merge: true));
+
+      return downloadURL;
+    } catch (e) {
+      print("Error uploading image: $e");
+      return null;
+    }
+  }
+
+  Stream<List<String>> _getImagesFromFirestore(
+      String propertyId, String imageType) {
     return FirebaseFirestore.instance
         .collection('properties')
         .doc(propertyId)
@@ -90,6 +97,16 @@ class _FrontGardenState extends State<FrontGarden> {
     });
   }
 
+  Future<void> _handleImageAdded(XFile imageFile, String documentId) async {
+    String propertyId = widget.propertyId;
+    String? downloadUrl = await uploadImageToFirebase(
+        imageFile, propertyId, 'front_garden', documentId);
+
+    if (downloadUrl != null) {
+      print("Adding image URL to Firestore: $downloadUrl");
+      // The image URL has already been added inside uploadImageToFirebase
+    }
+  }
   // Function to save a preference
   Future<void> _savePreference(String propertyId, String key, String value)
   async {
@@ -314,14 +331,14 @@ class _FrontGardenState extends State<FrontGarden> {
                     final gardenImages = snapshot.data ?? [];
                     return ConditionItem(
                         name: "Garden",
-                        condition: gardenDescription,
+                        condition: gardenCondition,
                         description: gardenDescription,
                         images: gardenImages,
                         onConditionSelected: (condition) {
                         setState(() {
-                          gardenDescription = condition;
+                          gardenCondition = condition;
                         });
-                        _savePreference(propertyId, 'gardenDescription', condition!);
+                        _savePreference(propertyId, 'gardenCondition', condition!);
                       },
                         onDescriptionSelected: (description) {
                         setState(() {
@@ -329,24 +346,9 @@ class _FrontGardenState extends State<FrontGarden> {
                         });
                         _savePreference(propertyId, 'gardenDescription', description!);
                       },
-                        onImageAdded: (imagePath) async {
-                          File imageFile = File(imagePath);
-                          String? downloadUrl = await uploadImageToFirebase(
-                              imageFile, propertyId,'front_garden', 'gardenImages');
-
-                          if (downloadUrl != null) {
-                            print(
-                                "Adding image URL to Firestore: $downloadUrl");
-                            FirebaseFirestore.instance
-                                .collection('properties')
-                                .doc(propertyId)
-                                .collection('front_garden')
-                                .doc('gardenImages')
-                                .update({
-                              'images': FieldValue.arrayUnion([downloadUrl]),
-                            });
-                          }
-                        });
+                        onImageAdded: (XFile image) async {
+                        await _handleImageAdded(image, 'gardenImages');
+                      });
                   },
                 ),
               // Drive Way
@@ -377,24 +379,9 @@ class _FrontGardenState extends State<FrontGarden> {
                         });
                         _savePreference(propertyId, 'driveWayDescription', description!);
                       },
-                        onImageAdded: (imagePath) async {
-                          File imageFile = File(imagePath);
-                          String? downloadUrl = await uploadImageToFirebase(
-                              imageFile, propertyId,'front_garden', 'driveWayImages');
-
-                          if (downloadUrl != null) {
-                            print(
-                                "Adding image URL to Firestore: $downloadUrl");
-                            FirebaseFirestore.instance
-                                .collection('properties')
-                                .doc(propertyId)
-                                .collection('front_garden')
-                                .doc('driveWayImages')
-                                .update({
-                              'images': FieldValue.arrayUnion([downloadUrl]),
-                            });
-                          }
-                        });
+                        onImageAdded: (XFile image) async {
+                        await _handleImageAdded(image, 'driveWayImages');
+                      });
                   },
                 ),
 
@@ -411,14 +398,14 @@ class _FrontGardenState extends State<FrontGarden> {
                     final outsideLightingImages  = snapshot.data ?? [];
                     return ConditionItem(
                         name: "Outside Lighting",
-                        condition:  outsideLightingDescription,
+                        condition:  outsideLightingCondition,
                         description: outsideLightingDescription,
                         images: outsideLightingImages ,
                         onConditionSelected: (condition) {
                         setState(() {
-                          outsideLightingDescription = condition;
+                          outsideLightingCondition = condition;
                         });
-                        _savePreference(propertyId, ' outsideLightingDescription', condition!);
+                        _savePreference(propertyId, ' outsideLightingCondition', condition!);
                       },
                         onDescriptionSelected: (description) {
                         setState(() {
@@ -426,24 +413,9 @@ class _FrontGardenState extends State<FrontGarden> {
                         });
                         _savePreference(propertyId, ' outsideLightingDescription', description!);
                       },
-                        onImageAdded: (imagePath) async {
-                          File imageFile = File(imagePath);
-                          String? downloadUrl = await uploadImageToFirebase(
-                              imageFile, propertyId,'front_garden', 'outsideLightingImages ');
-
-                          if (downloadUrl != null) {
-                            print(
-                                "Adding image URL to Firestore: $downloadUrl");
-                            FirebaseFirestore.instance
-                                .collection('properties')
-                                .doc(propertyId)
-                                .collection('front_garden')
-                                .doc('outsideLightingImages ')
-                                .update({
-                              'images': FieldValue.arrayUnion([downloadUrl]),
-                            });
-                          }
-                        });
+                        onImageAdded: (XFile image) async {
+                        await _handleImageAdded(image, 'outsideLightingImages');
+                      });
                   },
                 ),
 
@@ -475,24 +447,9 @@ class _FrontGardenState extends State<FrontGarden> {
                         });
                         _savePreference(propertyId, 'additionalItemsDescription', description!);
                       },
-                        onImageAdded: (imagePath) async {
-                          File imageFile = File(imagePath);
-                          String? downloadUrl = await uploadImageToFirebase(
-                              imageFile, propertyId,'front_garden', 'additionalItemsImages');
-
-                          if (downloadUrl != null) {
-                            print(
-                                "Adding image URL to Firestore: $downloadUrl");
-                            FirebaseFirestore.instance
-                                .collection('properties')
-                                .doc(propertyId)
-                                .collection('front_garden')
-                                .doc('additionalItemsImages')
-                                .update({
-                              'images': FieldValue.arrayUnion([downloadUrl]),
-                            });
-                          }
-                        });
+                        onImageAdded: (XFile image) async {
+                        await _handleImageAdded(image, 'additionalItemsImages');
+                      });
                   },
                 ),
 
@@ -512,7 +469,7 @@ class ConditionItem extends StatelessWidget {
   final List<String> images;
   final Function(String?) onConditionSelected;
   final Function(String?) onDescriptionSelected;
-  final Function(String) onImageAdded;
+  final Function(XFile) onImageAdded;
 
   const ConditionItem({
     Key? key,
@@ -524,7 +481,18 @@ class ConditionItem extends StatelessWidget {
     required this.onDescriptionSelected,
     required this.onImageAdded,
   }) : super(key: key);
-
+Future<List<XFile>?> _pickImages() async {
+    final ImagePicker _picker = ImagePicker();
+    try {
+      final List<XFile>? images = await _picker.pickMultiImage(
+        imageQuality: 80, // Adjust the quality as needed
+      );
+      return images;
+    } catch (e) {
+      print("Error picking images: $e");
+      return null;
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -590,11 +558,26 @@ class ConditionItem extends StatelessWidget {
                             builder: (context) => CameraPreviewPage(
                               camera: cameras.first,
                               onPictureTaken: (imagePath) {
-                                onImageAdded(imagePath);
+                                onImageAdded(XFile(imagePath));
                               },
                             ),
                           ),
                         );
+                      }
+                    },
+                  ),
+                  IconButton(
+                    icon: Icon(
+                      Icons.photo_library_outlined,
+                      size: 24,
+                      color: kSecondaryTextColourTwo,
+                    ),
+                    onPressed: () async {
+                      final List<XFile>? selectedImages = await _pickImages();
+                      if (selectedImages != null && selectedImages.isNotEmpty) {
+                        for (var image in selectedImages) {
+                          onImageAdded(image);
+                        }
                       }
                     },
                   ),
