@@ -197,7 +197,7 @@ class _SignInPageState extends State<SignInPage> {
                               recognizer: TapGestureRecognizer()
                                 ..onTap = () {
                                   // Step 3: Call the forgot password function
-                                  AuthController.instance.resetPassword
+                                  AuthController.instance.forgotPassword
                                     (context,emailController.text);
                                 },
                             ),
@@ -284,9 +284,9 @@ class _SignInPageState extends State<SignInPage> {
                   ),
                 ),
                 const SizedBox(height: 18),
-                // Center(
-                //   child: SocialMediaLogin(),
-                // ),
+                Center(
+                  child: SocialMediaLogin(),
+                ),
               ],
             )
           ],

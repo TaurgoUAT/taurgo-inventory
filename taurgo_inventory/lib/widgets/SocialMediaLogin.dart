@@ -1,65 +1,86 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:taurgo_inventory/pages/authentication/controller/authController.dart';
 
-import '../pages/authentication/controller/authController.dart';
 
+
+class SocialIconButton extends StatelessWidget {
+  final IconData icon;
+  final Color color;
+  final VoidCallback onPressed;
+
+  const SocialIconButton({
+    Key? key,
+    required this.icon,
+    required this.color,
+    required this.onPressed,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: color.withOpacity(0.1),
+      ),
+      child: IconButton(
+        icon: FaIcon(icon),
+        color: color,
+        iconSize: 30.0,
+        onPressed: onPressed,
+      ),
+    );
+  }
+}
 
 class SocialMediaLogin extends StatelessWidget {
-  const SocialMediaLogin({super.key});
+  const SocialMediaLogin({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      // crossAxisAlignment: CrossAxisAlignment.start,// Center the icons horizontally
       children: [
-        // Google Icon with Rounded Container
-        Container(
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,                 // Rounded shape
-            color: Colors.red.withOpacity(0.1),     // Light red background color
-          ),
-          child: IconButton(
-            icon: const FaIcon(FontAwesomeIcons.google),   // Google icon
-            color: Colors.red,                       // Google brand color
-            iconSize: 30.0,                          // Icon size
-            onPressed: () async {
+        // Google Sign-In Button
+        SocialIconButton(
+          icon: FontAwesomeIcons.google,
+          color: Colors.red,
+          onPressed: () async {
+            try {
               await AuthController.instance.signInWithGoogle();
-              print("Google login");
-            },
-          ),
+              print("Google login successful");
+              // Navigate to the next screen or update the UI accordingly
+            } catch (e) {
+              print("Google login failed: $e");
+              // Optionally, display an error message to the user
+            }
+          },
         ),
 
-        // Facebook Icon with Rounded Container
-        Container(
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,                 // Rounded shape
-            color: Colors.blue.withOpacity(0.1),    // Light blue background color
-          ),
-          child: IconButton(
-            icon: const FaIcon(FontAwesomeIcons.facebook), // Facebook icon
-            color: Colors.blue,                      // Facebook brand color
-            iconSize: 30.0,                          // Icon size
-            onPressed: () {
-              print("Facebook login");
-            },
-          ),
+        // Facebook Sign-In Button
+        SocialIconButton(
+          icon: FontAwesomeIcons.facebook,
+          color: Colors.blue,
+          onPressed: () {
+            print("Facebook login");
+            // Implement Facebook login functionality
+          },
         ),
 
-        // Apple Icon with Rounded Container
-        Container(
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,                 // Rounded shape
-            color: Colors.black.withOpacity(0.1),   // Light black background color
-          ),
-          child: IconButton(
-            icon: const FaIcon(FontAwesomeIcons.apple),    // Apple icon
-            color: Colors.black,                     // Apple brand color
-            iconSize: 30.0,                          // Icon size
-            onPressed: () {
-              print("Apple login");
-            },
-          ),
+        // Apple Sign-In Button
+        SocialIconButton(
+          icon: FontAwesomeIcons.apple,
+          color: Colors.black,
+          onPressed: () async {
+            try {
+              await AuthController.instance.signInWithApple();
+              print("Apple login successful");
+              // Navigate to the next screen or update the UI accordingly
+            } catch (e) {
+              print("Apple login failed: $e");
+              // Optionally, display an error message to the user
+            }
+          },
         ),
       ],
     );

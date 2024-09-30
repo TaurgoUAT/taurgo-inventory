@@ -1,10 +1,12 @@
-// import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
+import 'dart:io' show Platform;
 import 'package:flutter/services.dart';
 import 'package:taurgo_inventory/constants/UrlConstants.dart';
 import 'package:taurgo_inventory/pages/authentication/signInPage.dart';
@@ -13,30 +15,21 @@ import 'package:taurgo_inventory/pages/landing_screen.dart';
 import '../../../constants/AppColors.dart';
 
 class AuthController extends GetxController {
-  //Where should I need this Auth Controller
-  //
-  /**
-   * SignUp Page,
-   * LogIn Page,
-   * Landing Page,
-   * Account Page
-   */
+  // Where should I need this Auth Controller
+  // SignUp Page, LogIn Page, Landing Page, Account Page
 
-  //Instance of Auth Controller Class
+  // Instance of Auth Controller Class
   static AuthController instance = Get.find();
-  // final FirebaseFirestore firestore = FirebaseFirestore.instance; // Access Firestore
-
-  //Email, Password, UserName
+  final FirebaseFirestore firestore = FirebaseFirestore.instance; // Access Firestore
   late Rx<User?> _user;
+  FirebaseAuth auth = FirebaseAuth.instance;
   var isLoading = false.obs;
 
-  FirebaseAuth auth = FirebaseAuth.instance;
-  // final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   @override
   void onReady() {
     super.onReady();
     _user = Rx<User?>(auth.currentUser);
-    //user Would be Notified
+    // User would be notified
     _user.bindStream(auth.userChanges());
     ever(_user, _initialScreen);
   }
@@ -47,81 +40,77 @@ class AuthController extends GetxController {
       Get.offAll(() => SignInPage());
     } else {
       print("Home Page");
-      //TODO: Have to check whether I can navigate from saplash screen to
-      // welcome Page
+      // TODO: Have to check whether I can navigate from splash screen to welcome Page
       Get.offAll(() => HomePage());
     }
   }
 
-  void registerUser(String email, password, String userName, String firstName,
-      lastName, String location) async {
-
+  void registerUser(String email, String password, String name, String trim, String trim1, String trim2) async {
+    // Show loading dialog
+    isLoading(true);
+    final loadingDialog = Get.dialog(
+      Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const SizedBox(
+              width: 60.0,
+              height: 60.0,
+              child: CircularProgressIndicator(
+                color: kPrimaryColor, // Set the color to your primary color
+                strokeWidth: 3.0,
+                strokeCap: StrokeCap.square, // Set the stroke cap
+              ),
+            ),
+          ],
+        ),
+      ),
+      barrierDismissible: false, // Prevent the user from dismissing the dialog
+    );
 
     try {
-      isLoading(true); // Show loading state
-      // Show loading dialog
-      Get.dialog(
-        Center(
-          child: SizedBox(
-            width: 60.0,
-            height: 60.0,
-            child: CircularProgressIndicator(
-              color: kPrimaryColor, // Set the color to your primary color
-              strokeWidth: 3.0,
-              strokeCap: StrokeCap.square, // Set the stroke cap
-            ),
-          ),
-        ),
-        barrierDismissible: false, // Prevent the user from dismissing the dialog
+      // Perform registration
+      UserCredential userCredential = await auth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
       );
 
-      await Future.delayed(Duration(seconds: 2));
-      // Firebase user creation
-      UserCredential userCredential = await auth.createUserWithEmailAndPassword(
-          email: email, password: password);
-
       User? user = userCredential.user;
-      if (user == null) {
-        throw Exception("User creation failed, please try again.");
-      }
+      print(user?.email);
 
-      // Send data to your backend
-      var uri = Uri.parse('$baseURL/user/new-user');
+      // Send user details to server
+      var uri = Uri.parse('$baseURL/user-details/new-user');
       final request = http.MultipartRequest('POST', uri)
-        ..fields['firebaseId'] = user.uid
-        ..fields['firstName'] = firstName
-        ..fields['lastName'] = lastName
-        ..fields['userName'] = userName
-        ..fields['email'] = email
-        ..fields['location'] = location;
+        ..fields['firebaseId'] = user!.uid
+        ..fields['userName'] = name
+        ..fields['email'] = user.email!;
 
       var response = await request.send();
+      print('Response status: ${response.statusCode}');
+
       if (response.statusCode == 200) {
         print('Request successful');
-        // Optionally navigate to SubscriptionPage or another screen here
-        // Get.to(() => SubscriptionPage());
       } else {
-        print('Request failed with status: ${response.statusCode}');
-        throw Exception("Failed to register user. Please try again.");
+        print('${response.statusCode}');
       }
-      isLoading(false); // Stop loading
-      Get.back(); // Close the loading dialog
-      // Navigate to home page
-      Get.offAll(() => HomePage());
 
+      // Successful registration
+      // Get.offAll(() => HomePage());
     } catch (e) {
-      // Show error snackbar
+      // Handle errors and show snackbar
       Get.snackbar(
-        "Account Creation Failed",
+        "Account Creation failed",
         e.toString(),
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.redAccent,
         colorText: Colors.white,
       );
     } finally {
-      // Hide the loading state and dialog
+      // Hide the loading dialog
       isLoading(false);
-      Get.back(); // Close the loading dialog
+      if (loadingDialog != null) {
+        Get.back(); // Close the loading dialog
+      }
     }
   }
 
@@ -146,7 +135,7 @@ class AuthController extends GetxController {
           ),
         ),
         barrierDismissible:
-        false, // Prevents the user from dismissing the dialog
+            false, // Prevents the user from dismissing the dialog
       );
       await Future.delayed(Duration(seconds: 2));
       await auth.signInWithEmailAndPassword(email: email, password: password);
@@ -170,30 +159,6 @@ class AuthController extends GetxController {
   }
 
   void logOut() async {
-    Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        SizedBox(
-          width: 60.0,
-          height: 60.0,
-          child: CircularProgressIndicator(
-            color: kPrimaryColor, // Set the color to your primary color
-            strokeWidth: 3.0,
-            strokeCap: StrokeCap.square, // Set the stroke width
-          ),
-        ),
-        SizedBox(height: 16.0), // Add some space between the progress indicator and the text
-        Text(
-          "Loading...",
-          style: TextStyle(
-            color: kPrimaryColor, // You can set the text color to match your theme
-            fontSize: 14.0,
-            fontWeight: FontWeight.w500,
-            fontFamily: "Inter",
-          ),
-        ),
-      ],
-    );
     await auth.signOut();
   }
 
@@ -203,7 +168,7 @@ class AuthController extends GetxController {
 
       // Delete user's data from Firestore
       if (user != null) {
-        // await firestore.collection('users-deatils').doc(user.uid).delete();
+        await firestore.collection('users-deatils').doc(user.uid).delete();
 
         // Delete the user account
         await user.delete();
@@ -211,11 +176,11 @@ class AuthController extends GetxController {
         // Sign out the user
         await auth.signOut();
 
-        Get.snackbar("Account Deleted", "Your account has been deleted successfully",
+        Get.snackbar(
+            "Account Deleted", "Your account has been deleted successfully",
             snackPosition: SnackPosition.BOTTOM,
             backgroundColor: Colors.green,
-            titleText: Text("Success",
-                style: TextStyle(color: Colors.white)),
+            titleText: Text("Success", style: TextStyle(color: Colors.white)),
             messageText: Text(
               "Your account has been deleted successfully.",
               style: TextStyle(color: Colors.white),
@@ -237,7 +202,114 @@ class AuthController extends GetxController {
     }
   }
 
-  void _forgotPassword(BuildContext context, String email) async {
+  Future<UserCredential?> signInWithGoogle() async {
+    try {
+      // Trigger the authentication flow
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+
+      // If the user cancels the sign-in, return null
+      if (googleUser == null) {
+        return null;
+      }
+
+      // Obtain the auth details from the request
+      final GoogleSignInAuthentication? googleAuth = await googleUser.authentication;
+
+      // Create a new credential using the auth details
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth?.accessToken,
+        idToken: googleAuth?.idToken,
+      );
+
+      // Once signed in, get the UserCredential
+      final userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
+
+      // Get the current user
+      User? user = userCredential.user;
+
+      if (user != null) {
+        // Send user details to your backend
+        await sendUserDetailsToBackend(user.uid, googleUser.displayName ?? '', user.email ?? '');
+      }
+
+      return userCredential;
+    } catch (e) {
+      print('Error signing in with Google: $e');
+      return null;
+    }
+  }
+
+  Future<void> sendUserDetailsToBackend(String firebaseId, String name, String email) async {
+    try {
+      var uri = Uri.parse('$baseURL/user-details/new-user'); // Backend API endpoint
+      final request = http.MultipartRequest('POST', uri)
+        ..fields['firebaseId'] = firebaseId
+        ..fields['userName'] = name
+        ..fields['email'] = email;
+
+      // Send the request
+      var response = await request.send();
+      print('Response status: ${response.statusCode}');
+
+      if (response.statusCode == 200) {
+        print('User details successfully sent to the backend');
+      } else {
+        print('Failed to send user details to backend: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error sending user details to backend: $e');
+    }
+  }
+
+  Future<UserCredential?> signInWithApple() async {
+    try {
+      // Check if the platform supports Sign in with Apple
+      if (Platform.isIOS || Platform.isMacOS) {
+        // Request credential from Apple
+        final appleCredential = await SignInWithApple.getAppleIDCredential(
+          scopes: [AppleIDAuthorizationScopes.email, AppleIDAuthorizationScopes.fullName],
+        );
+
+        // Create an OAuth credential using the obtained credential
+        final oauthCredential = OAuthProvider('apple.com').credential(
+          idToken: appleCredential.identityToken,
+          accessToken: appleCredential.authorizationCode,
+        );
+
+        // Sign in with Firebase using the OAuth credential
+        final userCredential = await auth.signInWithCredential(oauthCredential);
+
+        // Get the current user
+        User? user = userCredential.user;
+
+        if (user != null) {
+          // Update the user's display name if it's available
+          if (appleCredential.givenName != null && appleCredential.familyName != null) {
+            String displayName = '${appleCredential.givenName} ${appleCredential.familyName}';
+            await user.updateDisplayName(displayName);
+          }
+
+          // Send user details to your backend
+          await sendUserDetailsToBackend(
+            user.uid,
+            user.displayName ?? '',
+            user.email ?? '',
+          );
+        }
+
+        return userCredential;
+      } else {
+        // Handle other platforms, e.g., Android or Web
+        print('Sign in with Apple is not supported on this platform.');
+        return null;
+      }
+    } catch (e) {
+      print('Error signing in with Apple: $e');
+      return null;
+    }
+  }
+
+  void forgotPassword(BuildContext context, String email) async {
     if (email.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Please enter your email")),
@@ -260,7 +332,6 @@ class AuthController extends GetxController {
           case 'invalid-email':
             message = "The email address is not valid.";
             break;
-        // Add more cases as needed
         }
       }
       ScaffoldMessenger.of(context).showSnackBar(
@@ -268,138 +339,8 @@ class AuthController extends GetxController {
       );
     }
   }
-
-  void resetPassword(BuildContext context, String email) async {
-    if (email.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          backgroundColor: kPrimaryColor,
-          content: Text(
-            'Please enter your email',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-              fontFamily: "Inter",
-            ),
-          ),
-        ),
-      );
-
-      return;
-    }
-    try {
-      await auth.sendPasswordResetEmail(email: email);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          backgroundColor: kPrimaryColor,
-          content: Text(
-            'Password reset email sent!',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-              fontFamily: "Inter",
-            ),
-          ),
-        ),
-      );
-
-    } catch (e) {
-      String message = "An error occurred. Please try again.";
-      if (e is FirebaseAuthException) {
-        switch (e.code) {
-          case 'user-not-found':
-            message = "No user found for that email.";
-            break;
-          case 'invalid-email':
-            message = "The email address is not valid.";
-            break;
-        // Add more cases as needed
-        }
-      }
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          backgroundColor: kPrimaryColor,
-          content: Text(
-            message,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-              fontFamily: "Inter",
-            ),
-          ),
-        ),
-      );
-    }
-  }
-
-  Future<UserCredential?> signInWithGoogle() async {
-    try {
-      print("Starting Google Sign-In process");
-
-      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-      if (googleUser == null) {
-        print("Google sign-in was canceled");
-        return null;
-      }
-      print("Google user obtained: ${googleUser.displayName}");
-
-      final GoogleSignInAuthentication? googleAuth = await googleUser.authentication;
-      if (googleAuth == null) {
-        print("Google authentication details are null");
-        return null;
-      }
-
-      final credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
-
-      final userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
-      User? user = userCredential.user;
-
-      if (user != null) {
-        print("User signed in: ${user.displayName}");
-        await sendUserDetailsToBackend(user.uid, googleUser.displayName!, user.email!);
-      } else {
-        print("User is null after sign-in");
-      }
-
-      return userCredential;
-    } catch (e) {
-      print('Error signing in with Google: $e');
-      return null;
-    }
-  }
-
-
-  Future<void> sendUserDetailsToBackend(String firebaseId, String name, String email) async {
-    try {
-      var uri = Uri.parse('$baseURL/user/new-user'); // Backend API endpoint
-      final request = http.MultipartRequest('POST', uri)
-        ..fields['firebaseId'] = firebaseId
-        ..fields['userName'] = name
-        ..fields['email'] = email;
-
-      // Send the request
-      var response = await request.send();
-      print('Response status: ${response.statusCode}');
-
-      if (response.statusCode == 200) {
-        print('User details successfully sent to the backend');
-      } else {
-        print('Failed to send user details to backend: ${response.statusCode}');
-      }
-    } catch (e) {
-      print('Error sending user details to backend: $e');
-    }
-  }
-
-
-
-
-
 }
+
+
+
+

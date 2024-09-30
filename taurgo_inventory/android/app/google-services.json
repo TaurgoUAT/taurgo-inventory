@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "568871054473",
+    "firebase_url": "https://taurgo-inventory-default-rtdb.asia-southeast1.firebasedatabase.app",
     "project_id": "taurgo-inventory",
     "storage_bucket": "taurgo-inventory.appspot.com"
   },
@@ -12,7 +13,12 @@
           "package_name": "com.taurgo360.taurgoinventory"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "568871054473-0hgss7h2ju2uavqe7aruprunq2jj30ea.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyCsJUluWZbo8rCE3OyPBEXezUSk3OSR3BM"
@@ -20,7 +26,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "568871054473-0hgss7h2ju2uavqe7aruprunq2jj30ea.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "568871054473-c54n27agh9n2pvcetm563eq09t73qr74.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.taurgo360.taurgoinventory"
+              }
+            }
+          ]
         }
       }
     }
