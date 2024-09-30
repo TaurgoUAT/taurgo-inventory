@@ -656,20 +656,20 @@ class _PropertyDetailsViewPageState extends State<PropertyDetailsViewPage> {
                                       :ElevatedButton(
                                         onPressed: () {
 
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    ViewPdf(propertyId: widget.propertyId)), // Replace 
-                                            // HomePage
-                                            // with your home page
-                                            // widget
-                                          );
+                                          // Navigator.push(
+                                          //   context,
+                                          //   MaterialPageRoute(
+                                          //       builder: (context) =>
+                                          //           ViewPdf(propertyId: widget.propertyId)), // Replace
+                                          //   // HomePage
+                                          //   // with your home page
+                                          //   // widget
+                                          // );
 
                                         },
                                         child: Padding(
                                           padding: const EdgeInsets.all(7.5),
-                                          child: Text('View Report', style:
+                                          child: Text('Completed', style:
                                           TextStyle(fontSize: 12)),
                                         ),
                                         style: ElevatedButton.styleFrom(

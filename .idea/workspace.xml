@@ -9,8 +9,13 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9cfeb956-5354-4366-ab84-34804ef25cb7" name="Changes" comment="PDF view Added, Map Enabled, along with UI and logical improvements">
+    <list default="true" id="9cfeb956-5354-4366-ab84-34804ef25cb7" name="Changes" comment="Select from Gallery is Implemented">
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Dart_Packages.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/Dart_Packages.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Flutter_Plugins.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/Flutter_Plugins.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/taurgo_inventory/ios/Runner.xcodeproj/project.pbxproj" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/ios/Runner.xcodeproj/project.pbxproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/constants/UrlConstants.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/constants/UrlConstants.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/taurgo_inventory/pubspec.lock" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/pubspec.lock" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -30,6 +35,26 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+  "history": [
+    {
+      "state": "OPEN",
+      "assignee": "TaurgoUAT",
+      "author": "Sandunil77"
+    }
+  ],
+  "lastFilter": {
+    "state": "OPEN",
+    "assignee": "TaurgoUAT",
+    "author": "Sandunil77"
+  }
+}]]></component>
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/TaurgoUAT/taurgo-inventory.git",
+    "accountId": "d3dec88c-2b5e-488e-a466-daef12028037"
+  }
+}]]></component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
@@ -59,15 +84,15 @@
     &quot;dart.analysis.tool.window.visible&quot;: &quot;false&quot;,
     &quot;io.flutter.reload.alreadyRun&quot;: &quot;true&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/Users/abishan/Desktop/Taurgo/Taurgo Inventory/taurgo-inventory/taurgo_inventory/assets/images&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/abishan/Desktop/Taurgo/Taurgo Inventory/taurgo-inventory/taurgo_inventory/lib/pages&quot;,
     &quot;settings.editor.selected.configurable&quot;: &quot;editor.preferences.tabs&quot;,
     &quot;show.migrate.to.gradle.popup&quot;: &quot;false&quot;
   }
 }</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/taurgo_inventory/assets/images" />
       <recent name="$PROJECT_DIR$/taurgo_inventory/lib/pages" />
+      <recent name="$PROJECT_DIR$/taurgo_inventory/assets/images" />
       <recent name="$PROJECT_DIR$/taurgo_inventory/lib/pages/reportPages" />
       <recent name="$PROJECT_DIR$/taurgo_inventory/lib/pages/authentication" />
       <recent name="$PROJECT_DIR$/taurgo_inventory/lib/pages/authentication/controller" />
@@ -397,7 +422,15 @@
       <option name="project" value="LOCAL" />
       <updated>1727187061908</updated>
     </task>
-    <option name="localTasksCounter" value="44" />
+    <task id="LOCAL-00044" summary="Select from Gallery is Implemented">
+      <option name="closed" value="true" />
+      <created>1727190195159</created>
+      <option name="number" value="00044" />
+      <option name="presentableId" value="LOCAL-00044" />
+      <option name="project" value="LOCAL" />
+      <updated>1727190195159</updated>
+    </task>
+    <option name="localTasksCounter" value="45" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -413,7 +446,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="Delete Property Integrated" />
     <MESSAGE value="Gesture Navigation Disabled" />
     <MESSAGE value="Bottom Nav BAr Added" />
     <MESSAGE value="Profile Page Modified" />
@@ -438,14 +470,15 @@
     <MESSAGE value="Midterm Inspespection Added" />
     <MESSAGE value="Project Improvements Added" />
     <MESSAGE value="PDF view Added, Map Enabled, along with UI and logical improvements" />
-    <option name="LAST_COMMIT_MESSAGE" value="PDF view Added, Map Enabled, along with UI and logical improvements" />
+    <MESSAGE value="Select from Gallery is Implemented" />
+    <option name="LAST_COMMIT_MESSAGE" value="Select from Gallery is Implemented" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="Dart">
           <url>file://$PROJECT_DIR$/taurgo_inventory/lib/pages/deatails_confirmation_page.dart</url>
-          <line>706</line>
+          <line>733</line>
           <option name="timeStamp" value="9" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="Dart">

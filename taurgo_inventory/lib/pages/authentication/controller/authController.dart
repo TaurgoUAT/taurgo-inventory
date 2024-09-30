@@ -241,7 +241,7 @@ class AuthController extends GetxController {
 
   Future<void> sendUserDetailsToBackend(String firebaseId, String name, String email) async {
     try {
-      var uri = Uri.parse('$baseURL/user-details/new-user'); // Backend API endpoint
+      var uri = Uri.parse('$baseURL/user/new-user'); // Backend API endpoint
       final request = http.MultipartRequest('POST', uri)
         ..fields['firebaseId'] = firebaseId
         ..fields['userName'] = name
