@@ -1,12 +1,14 @@
 import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:taurgo_inventory/constants/UrlConstants.dart';
 import 'package:taurgo_inventory/pages/add_property_details_page.dart';
 import 'package:taurgo_inventory/pages/property_details_view_page.dart';
 import '../constants/AppColors.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import '../widgets/HexagonLoadingWidget.dart';
 import 'authentication/controller/authController.dart';
 
 class LandingScreen extends StatefulWidget {
@@ -392,30 +394,11 @@ class _LandingScreenState extends State<LandingScreen> with TickerProviderStateM
           ),
           body: isLoading
               ? Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SizedBox(
-                  width: 60.0,
-                  height: 60.0,
-                  child: CircularProgressIndicator(
-                    color: kPrimaryColor, // Set the color to your primary color
-                    strokeWidth: 3.0,
-                    strokeCap: StrokeCap.square, // Set the stroke width
-                  ),
-                ),
-                SizedBox(height: 16.0), // Add some space between the progress indicator and the text
-                Text(
-                  "Loading...",
-                  style: TextStyle(
-                    color: kPrimaryColor, // You can set the text color to match your theme
-                    fontSize: 14.0,
-                    fontWeight: FontWeight.w500,
-                    fontFamily: "Inter",
-                  ),
-                ),
-              ],
+            child: HexagonLoadingWidget(
+              color: kPrimaryColor, // Use your custom color
+              size: 120,            // Specify the size you want
             ),
+
           )
               : Container(
             color: bWhite,

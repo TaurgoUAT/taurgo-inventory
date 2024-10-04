@@ -10,6 +10,8 @@ import '../../constants/AppColors.dart';
 import 'package:http/http.dart' as http;
 import 'package:firebase_auth/firebase_auth.dart';
 
+import '../widgets/HexagonLoadingWidget.dart';
+
 class DetailsConfirmationPage extends StatefulWidget {
 
   final String? lineOneAddress;
@@ -89,14 +91,9 @@ class _DetailsConfirmationPageState extends State<DetailsConfirmationPage> {
       context: context,
       builder: (BuildContext context) {
         return Center(
-          child: SizedBox(
-            width: 60.0,
-            height: 60.0,
-            child: CircularProgressIndicator(
-              color: kPrimaryColor,
-              strokeWidth: 3.0,
-              strokeCap: StrokeCap.square,
-            ),
+          child: HexagonLoadingWidget(
+            color: kPrimaryColor, // Use your custom color
+            size: 120,            // Specify the size you want
           ),
         );
       },
@@ -653,7 +650,7 @@ class _DetailsConfirmationPageState extends State<DetailsConfirmationPage> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(
-                          Icons.save_outlined,
+                          Icons.bookmark_border_outlined,
                           color: bWhite, // Customize the icon color
                         ),
                         SizedBox(width: 8.0),

@@ -1,8 +1,6 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:taurgo_inventory/pages/add_property_details_page_second.dart';
 import 'package:taurgo_inventory/pages/home_page.dart';
-import 'package:taurgo_inventory/pages/landing_screen.dart';
 import '../constants/AppColors.dart';
 
 class AddPropertyDetailsPage extends StatefulWidget {
@@ -288,22 +286,22 @@ class _AddPropertyDetailsPageState extends State<AddPropertyDetailsPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Padding(
-                  padding: EdgeInsets.all(0),
-                  child: Text(
-                    "Create Property",
-                    style: TextStyle(
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.w700,
-                      color: kPrimaryColor,
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 0.0),
-                  child: Divider(thickness: 1, color: Color(0xFFC2C2C2)),
-                ),
-                SizedBox(height: 12.0),
+                // Padding(
+                //   padding: EdgeInsets.all(0),
+                //   child: Text(
+                //     "Create Property",
+                //     style: TextStyle(
+                //       fontSize: 16.0,
+                //       fontWeight: FontWeight.w700,
+                //       color: kPrimaryColor,
+                //     ),
+                //   ),
+                // ),
+                // Padding(
+                //   padding: const EdgeInsets.symmetric(horizontal: 0.0),
+                //   child: Divider(thickness: 1, color: Color(0xFFC2C2C2)),
+                // ),
+                // SizedBox(height: 12.0),
 
                 Padding(
                   padding: EdgeInsets.all(0),
@@ -316,11 +314,11 @@ class _AddPropertyDetailsPageState extends State<AddPropertyDetailsPage> {
                     ),
                   ),
                 ),
-
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 0.0),
-                  child: Divider(thickness: 1, color: Color(0xFFC2C2C2)),
-                ),
+                //
+                // Padding(
+                //   padding: const EdgeInsets.symmetric(horizontal: 0.0),
+                //   child: Divider(thickness: 1, color: Color(0xFFC2C2C2)),
+                // ),
                 SizedBox(height: 12.0),
 
                 // Padding(
@@ -339,6 +337,7 @@ class _AddPropertyDetailsPageState extends State<AddPropertyDetailsPage> {
                 TextField(
                   cursorColor: kPrimaryColor,
                   controller: addressLineOneController,
+                  textInputAction: TextInputAction.next,
                   decoration: InputDecoration(
                     labelText: 'Line 1 *',
                     labelStyle: TextStyle(
@@ -370,6 +369,7 @@ class _AddPropertyDetailsPageState extends State<AddPropertyDetailsPage> {
                 TextField(
                   cursorColor: kPrimaryColor,
                   controller: addressLineTwoController,
+                  textInputAction: TextInputAction.next,
                   decoration: InputDecoration(
                     labelText: 'Line 2 *',
                     labelStyle: TextStyle(
@@ -401,6 +401,7 @@ class _AddPropertyDetailsPageState extends State<AddPropertyDetailsPage> {
                 TextField(
                   cursorColor: kPrimaryColor,
                   controller: cityController,
+                  textInputAction: TextInputAction.next,
                   decoration: InputDecoration(
                     labelText: 'City *',
                     labelStyle: TextStyle(
@@ -432,6 +433,7 @@ class _AddPropertyDetailsPageState extends State<AddPropertyDetailsPage> {
                 TextField(
                   cursorColor: kPrimaryColor,
                   controller: stateController,
+                  textInputAction: TextInputAction.next,
                   decoration: InputDecoration(
                     labelText: 'State',
                     labelStyle: TextStyle(
@@ -463,6 +465,7 @@ class _AddPropertyDetailsPageState extends State<AddPropertyDetailsPage> {
                 TextField(
                   cursorColor: kPrimaryColor,
                   controller: countryController,
+                  textInputAction: TextInputAction.next,
                   decoration: InputDecoration(
                     labelText: 'Country *',
                     labelStyle: TextStyle(
@@ -494,6 +497,7 @@ class _AddPropertyDetailsPageState extends State<AddPropertyDetailsPage> {
                 TextField(
                   cursorColor: kPrimaryColor,
                   controller: postCodeController,
+                  textInputAction: TextInputAction.next,
                   decoration: InputDecoration(
                     labelText: 'Postal Code *',
                     labelStyle: TextStyle(
@@ -534,15 +538,16 @@ class _AddPropertyDetailsPageState extends State<AddPropertyDetailsPage> {
                   ),
                 ),
 
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 0.0),
-                  child: Divider(thickness: 1, color: Color(0xFFC2C2C2)),
-                ),
+                // Padding(
+                //   padding: const EdgeInsets.symmetric(horizontal: 0.0),
+                //   child: Divider(thickness: 1, color: Color(0xFFC2C2C2)),
+                // ),
                 const SizedBox(height: 12.0),
                 //Refernece
                 TextField(
                   cursorColor: kPrimaryColor,
                   controller: referenceController,
+                  textInputAction: TextInputAction.next,
                   decoration: InputDecoration(
                     labelText: 'Reference',
                     labelStyle: TextStyle(
@@ -574,6 +579,7 @@ class _AddPropertyDetailsPageState extends State<AddPropertyDetailsPage> {
                 TextField(
                   cursorColor: kPrimaryColor,
                   controller: clientController,
+                  textInputAction: TextInputAction.done,
                   decoration: InputDecoration(
                     labelText: 'Client',
                     labelStyle: TextStyle(
@@ -907,37 +913,37 @@ class _AddPropertyDetailsPageState extends State<AddPropertyDetailsPage> {
                   ),
                 ),
 
-                //Notes
-                TextField(
-                  cursorColor: kPrimaryColor,
-                  controller: notesController,
-                  maxLines: 5,
-                  decoration: InputDecoration(
-                    hintText: 'Note',
-                    hintStyle: TextStyle(
-                        color: kPrimaryColor,
-                        fontSize: 14// Change the label text color
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: kPrimaryColor, // Change the border color when not focused
-                        width: 1.0,
-                      ),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: kPrimaryColor, // Change the border color when focused
-                        width: 2.0,
-                      ),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  style: TextStyle(
-                      color: kSecondaryTextColourTwo,
-                      fontSize: 12// Change the text color inside the TextField
-                  ),
-                ),
+                // //Notes
+                // TextField(
+                //   cursorColor: kPrimaryColor,
+                //   controller: notesController,
+                //   maxLines: 5,
+                //   decoration: InputDecoration(
+                //     hintText: 'Note',
+                //     hintStyle: TextStyle(
+                //         color: kPrimaryColor,
+                //         fontSize: 14// Change the label text color
+                //     ),
+                //     enabledBorder: OutlineInputBorder(
+                //       borderSide: BorderSide(
+                //         color: kPrimaryColor, // Change the border color when not focused
+                //         width: 1.0,
+                //       ),
+                //       borderRadius: BorderRadius.circular(8),
+                //     ),
+                //     focusedBorder: OutlineInputBorder(
+                //       borderSide: BorderSide(
+                //         color: kPrimaryColor, // Change the border color when focused
+                //         width: 2.0,
+                //       ),
+                //       borderRadius: BorderRadius.circular(8),
+                //     ),
+                //   ),
+                //   style: TextStyle(
+                //       color: kSecondaryTextColourTwo,
+                //       fontSize: 12// Change the text color inside the TextField
+                //   ),
+                // ),
 
                 SizedBox(height: 30.0),
               ],

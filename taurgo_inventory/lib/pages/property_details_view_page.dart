@@ -11,6 +11,7 @@ import '../constants/AppColors.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../constants/UrlConstants.dart';
+import '../widgets/HexagonLoadingWidget.dart';
 
 class PropertyDetailsViewPage extends StatefulWidget {
   final String propertyId;
@@ -251,32 +252,9 @@ class _PropertyDetailsViewPageState extends State<PropertyDetailsViewPage> {
           ),
           body: isLoading
               ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SizedBox(
-                        width: 60.0,
-                        height: 60.0,
-                        child: CircularProgressIndicator(
-                          color:
-                              kPrimaryColor, // Set the color to your primary color
-                          strokeWidth: 3.0,
-                          strokeCap: StrokeCap.square, // Set the stroke width
-                        ),
-                      ),
-                      SizedBox(height: 16.0),
-                      // Add some space between the progress indicator and the text
-                      Text(
-                        "Loading...",
-                        style: TextStyle(
-                          color: kPrimaryColor,
-                          // You can set the text color to match your theme
-                          fontSize: 14.0,
-                          fontWeight: FontWeight.w500,
-                          fontFamily: "Inter",
-                        ),
-                      ),
-                    ],
+                  child: HexagonLoadingWidget(
+                    color: kPrimaryColor, // Use your custom color
+                    size: 120,            // Specify the size you want
                   ),
                 )
               : Container(

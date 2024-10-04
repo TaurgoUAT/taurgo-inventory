@@ -73,7 +73,7 @@ class SocialMediaLogin extends StatelessWidget {
           color: Colors.black,
           onPressed: () async {
             try {
-              await AuthController.instance.signInWithApple();
+              // await AuthController.instance.signInWithApple();
               print("Apple login successful");
               // Navigate to the next screen or update the UI accordingly
             } catch (e) {

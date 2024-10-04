@@ -5,14 +5,16 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
-import 'package:sign_in_with_apple/sign_in_with_apple.dart';
+// import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'dart:io' show Platform;
 import 'package:flutter/services.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:taurgo_inventory/constants/UrlConstants.dart';
 import 'package:taurgo_inventory/pages/authentication/signInPage.dart';
 import 'package:taurgo_inventory/pages/home_page.dart';
 import 'package:taurgo_inventory/pages/landing_screen.dart';
 import '../../../constants/AppColors.dart';
+import '../../../widgets/HexagonLoadingWidget.dart';
 
 class AuthController extends GetxController {
   // Where should I need this Auth Controller
@@ -50,19 +52,9 @@ class AuthController extends GetxController {
     isLoading(true);
     final loadingDialog = Get.dialog(
       Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const SizedBox(
-              width: 60.0,
-              height: 60.0,
-              child: CircularProgressIndicator(
-                color: kPrimaryColor, // Set the color to your primary color
-                strokeWidth: 3.0,
-                strokeCap: StrokeCap.square, // Set the stroke cap
-              ),
-            ),
-          ],
+        child: HexagonLoadingWidget(
+          color: kPrimaryColor, // Use your custom color
+          size: 120,            // Specify the size you want
         ),
       ),
       barrierDismissible: false, // Prevent the user from dismissing the dialog
@@ -119,20 +111,10 @@ class AuthController extends GetxController {
       isLoading(true); // Show loading indicator
       Get.dialog(
         Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const SizedBox(
-                width: 60.0,
-                height: 60.0,
-                child: CircularProgressIndicator(
-                  color: kPrimaryColor, // Set the color to your primary color
-                  strokeWidth: 3.0,
-                  strokeCap: StrokeCap.square, // Set the stroke width
-                ),
-              ),
-            ],
-          ),
+          child: HexagonLoadingWidget(
+            color: kPrimaryColor, // Use your custom color
+            size: 120,            // Specify the size you want
+          )
         ),
         barrierDismissible:
             false, // Prevents the user from dismissing the dialog
@@ -261,53 +243,53 @@ class AuthController extends GetxController {
     }
   }
 
-  Future<UserCredential?> signInWithApple() async {
-    try {
-      // Check if the platform supports Sign in with Apple
-      if (Platform.isIOS || Platform.isMacOS) {
-        // Request credential from Apple
-        final appleCredential = await SignInWithApple.getAppleIDCredential(
-          scopes: [AppleIDAuthorizationScopes.email, AppleIDAuthorizationScopes.fullName],
-        );
-
-        // Create an OAuth credential using the obtained credential
-        final oauthCredential = OAuthProvider('apple.com').credential(
-          idToken: appleCredential.identityToken,
-          accessToken: appleCredential.authorizationCode,
-        );
-
-        // Sign in with Firebase using the OAuth credential
-        final userCredential = await auth.signInWithCredential(oauthCredential);
-
-        // Get the current user
-        User? user = userCredential.user;
-
-        if (user != null) {
-          // Update the user's display name if it's available
-          if (appleCredential.givenName != null && appleCredential.familyName != null) {
-            String displayName = '${appleCredential.givenName} ${appleCredential.familyName}';
-            await user.updateDisplayName(displayName);
-          }
-
-          // Send user details to your backend
-          await sendUserDetailsToBackend(
-            user.uid,
-            user.displayName ?? '',
-            user.email ?? '',
-          );
-        }
-
-        return userCredential;
-      } else {
-        // Handle other platforms, e.g., Android or Web
-        print('Sign in with Apple is not supported on this platform.');
-        return null;
-      }
-    } catch (e) {
-      print('Error signing in with Apple: $e');
-      return null;
-    }
-  }
+  // Future<UserCredential?> signInWithApple() async {
+  //   try {
+  //     // Check if the platform supports Sign in with Apple
+  //     if (Platform.isIOS || Platform.isMacOS) {
+  //       // Request credential from Apple
+  //       final appleCredential = await SignInWithApple.getAppleIDCredential(
+  //         scopes: [AppleIDAuthorizationScopes.email, AppleIDAuthorizationScopes.fullName],
+  //       );
+  //
+  //       // Create an OAuth credential using the obtained credential
+  //       final oauthCredential = OAuthProvider('apple.com').credential(
+  //         idToken: appleCredential.identityToken,
+  //         accessToken: appleCredential.authorizationCode,
+  //       );
+  //
+  //       // Sign in with Firebase using the OAuth credential
+  //       final userCredential = await auth.signInWithCredential(oauthCredential);
+  //
+  //       // Get the current user
+  //       User? user = userCredential.user;
+  //
+  //       if (user != null) {
+  //         // Update the user's display name if it's available
+  //         if (appleCredential.givenName != null && appleCredential.familyName != null) {
+  //           String displayName = '${appleCredential.givenName} ${appleCredential.familyName}';
+  //           await user.updateDisplayName(displayName);
+  //         }
+  //
+  //         // Send user details to your backend
+  //         await sendUserDetailsToBackend(
+  //           user.uid,
+  //           user.displayName ?? '',
+  //           user.email ?? '',
+  //         );
+  //       }
+  //
+  //       return userCredential;
+  //     } else {
+  //       // Handle other platforms, e.g., Android or Web
+  //       print('Sign in with Apple is not supported on this platform.');
+  //       return null;
+  //     }
+  //   } catch (e) {
+  //     print('Error signing in with Apple: $e');
+  //     return null;
+  //   }
+  // }
 
   void forgotPassword(BuildContext context, String email) async {
     if (email.isEmpty) {

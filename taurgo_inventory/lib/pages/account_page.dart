@@ -401,7 +401,6 @@ class _AccountPageState extends State<AccountPage> {
                   padding: const EdgeInsets.only(right: 16, left: 16),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    // Adjust spacing between containers
                     children: [
                       ButtonSquare(
                           width: 100,

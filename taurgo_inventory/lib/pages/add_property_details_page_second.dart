@@ -76,6 +76,7 @@ class _AddPropertyDetailsPageSecondState extends State<AddPropertyDetailsPageSec
       context: context,
       builder: (BuildContext builder) {
         return Container(
+          color: bWhite,
           height: MediaQuery.of(context).size.height / 3,
           child: Column(
             children: [
@@ -137,6 +138,7 @@ class _AddPropertyDetailsPageSecondState extends State<AddPropertyDetailsPageSec
       context: context,
       builder: (BuildContext builder) {
         return Container(
+          color: bWhite,
           height: MediaQuery.of(context).size.height / 3,
           child: Column(
             children: [
@@ -490,10 +492,10 @@ class _AddPropertyDetailsPageSecondState extends State<AddPropertyDetailsPageSec
                     ),
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 0.0),
-                  child: Divider(thickness: 1, color: Color(0xFFC2C2C2)),
-                ),
+                // Padding(
+                //   padding: const EdgeInsets.symmetric(horizontal: 0.0),
+                //   child: Divider(thickness: 1, color: Color(0xFFC2C2C2)),
+                // ),
                 SizedBox(height: 12.0),
 
 
@@ -757,6 +759,8 @@ class _AddPropertyDetailsPageSecondState extends State<AddPropertyDetailsPageSec
                 TextField(
                   cursorColor: kPrimaryColor,
                   controller: internalNotesController,
+                  textInputAction: TextInputAction.done,
+
                   maxLines: 5,
                   decoration: InputDecoration(
                     hintText: 'Additional Notes',

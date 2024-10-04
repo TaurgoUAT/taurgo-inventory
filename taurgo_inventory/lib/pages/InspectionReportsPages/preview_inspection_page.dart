@@ -11,6 +11,7 @@ import 'package:taurgo_inventory/pages/home_page.dart';
 import '../../constants/AppColors.dart';
 import 'package:http/http.dart' as http;
 import '../../constants/UrlConstants.dart';
+import '../../widgets/HexagonLoadingWidget.dart';
 
 class PreviewInspectionPage extends StatefulWidget {
   final String propertyId;
@@ -207,19 +208,9 @@ class _PreviewInspectionPageState extends State<PreviewInspectionPage> {
       barrierDismissible: false, // Prevent dismissing the dialog by tapping outside
       builder: (BuildContext context) {
         return Center(
-          child: SizedBox(
-            width: 120.0,
-            height: 100.0,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                CircularProgressIndicator(
-                  color: kPrimaryColor,
-                  strokeWidth: 3.0,
-                ),
-                // DotLoadingText(), // A custom widget to show animated text with three dots
-              ],
-            ),
+          child: HexagonLoadingWidget(
+            color: kPrimaryColor, // Use your custom color
+            size: 120,            // Specify the size you want
           ),
         );
       },
@@ -352,6 +343,7 @@ class _PreviewInspectionPageState extends State<PreviewInspectionPage> {
   Widget buildCommentsField() {
     return TextField(
       cursorColor: kPrimaryColor,
+      textInputAction: TextInputAction.done,
       controller: notesController,
       maxLines: 5,
       decoration: InputDecoration(
