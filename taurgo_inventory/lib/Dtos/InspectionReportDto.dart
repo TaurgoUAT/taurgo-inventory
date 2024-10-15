@@ -134,6 +134,9 @@ class PropertySummaryDto {
   UserDto userDto;
   InspectionSumamryDto inspectionDto;
   List<String> images; // List of base64 strings
+  String maintaineceCondition;
+  String propertyCondition;
+  String propertyCleanliness;
   String comment;
   String signature; // Base64 string
 
@@ -143,6 +146,9 @@ class PropertySummaryDto {
     required this.userDto,
     required this.inspectionDto,
     required this.images,
+    required this.maintaineceCondition,
+    required this.propertyCondition,
+    required this.propertyCleanliness,
     required this.comment,
     required this.signature,
   });
@@ -156,6 +162,9 @@ class PropertySummaryDto {
       images: List<String>.from(json['images'] ?? []), // Ensure this is a List<String>
       comment: json['comment'],
       signature: json['signature'],
+      maintaineceCondition: json['maintaineceCondition'],
+      propertyCondition: json['propertyCondition'],
+      propertyCleanliness: json['propertyCleanliness'],
     );
 
   }
@@ -166,6 +175,9 @@ class PropertySummaryDto {
       'userDto': userDto.toJson(),
       'inspectionDto': inspectionDto.toJson(),
       'images': images, // Ensure this field is included
+      'maintaineceCondition': maintaineceCondition,
+      'propertyCondition': propertyCondition,
+      'propertyCleanliness': propertyCleanliness,
       'comment': comment,
       'signature': signature,
     };

@@ -7,6 +7,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:taurgo_inventory/pages/InspectionReportsPages/preview_inspection_page.dart';
 import 'package:taurgo_inventory/pages/home_page.dart';
 import '../../constants/AppColors.dart';
+import '../../widgets/HexagonLoadingWidget.dart';
 
 class InspectionOnlyPage extends StatefulWidget {
   final String propertyId;
@@ -23,39 +24,58 @@ class _InspectionOnlyPageState extends State<InspectionOnlyPage> {
   final ImagePicker _picker = ImagePicker(); // Image picker instance
 
   // Function to open gallery and select images
+  bool _isLoading = false; // Add a variable to track the loading state
+
   Future<void> pickImageFromGallery() async {
+    setState(() {
+      _isLoading = true; // Start loading when the function begins
+    });
+
     PermissionStatus status = await Permission.storage.request();
 
     if (status.isGranted) {
-      final List<XFile>? imageFiles = await _picker.pickMultiImage();
-      if (imageFiles != null && imageFiles.isNotEmpty) {
-        List<File> newImages =
-            imageFiles.map((XFile image) => File(image.path)).toList();
+      try {
+        final List<XFile>? imageFiles = await _picker.pickMultiImage();
 
-        setState(() {
-          images.addAll(newImages);
-        });
+        if (imageFiles != null && imageFiles.isNotEmpty) {
+          List<File> newImages =
+          imageFiles.map((XFile image) => File(image.path)).toList();
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            backgroundColor: kPrimaryColor,
-            content: Text(
-              '${imageFiles.length} image(s) selected from gallery',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: bWhite,
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-                fontFamily: "Inter",
+          setState(() {
+            images.addAll(newImages);
+          });
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              backgroundColor: kPrimaryColor,
+              content: Text(
+                '${imageFiles.length} image(s) selected from gallery',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: bWhite,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                  fontFamily: "Inter",
+                ),
               ),
             ),
-          ),
-        );
+          );
+        }
+      } catch (e) {
+        print('Error picking images: $e');
+      } finally {
+        setState(() {
+          _isLoading = false; // Stop loading when the function completes
+        });
       }
     } else {
       print('Gallery permission not granted');
+      setState(() {
+        _isLoading = false; // Stop loading if permission is not granted
+      });
     }
   }
+
 
   // Function to open the camera and capture an image
   Future<void> captureMultipleImagesWithCamera() async {

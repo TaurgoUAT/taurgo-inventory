@@ -634,15 +634,15 @@ class _PropertyDetailsViewPageState extends State<PropertyDetailsViewPage> {
                                       :ElevatedButton(
                                         onPressed: () {
 
-                                          // Navigator.push(
-                                          //   context,
-                                          //   MaterialPageRoute(
-                                          //       builder: (context) =>
-                                          //           ViewPdf(propertyId: widget.propertyId)), // Replace
-                                          //   // HomePage
-                                          //   // with your home page
-                                          //   // widget
-                                          // );
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    ViewPdf(propertyId: widget.propertyId)), // Replace
+                                            // HomePage
+                                            // with your home page
+                                            // widget
+                                          );
 
                                         },
                                         child: Padding(

@@ -12,6 +12,7 @@ import '../../constants/AppColors.dart';
 import 'package:http/http.dart' as http;
 import '../../constants/UrlConstants.dart';
 import '../../widgets/HexagonLoadingWidget.dart';
+import '../../widgets/PropertyConditionRadioButton.dart';
 
 class PreviewInspectionPage extends StatefulWidget {
   final String propertyId;
@@ -27,6 +28,7 @@ class PreviewInspectionPage extends StatefulWidget {
 class _PreviewInspectionPageState extends State<PreviewInspectionPage> {
   late List<File> images;
   final notesController = TextEditingController();
+  final TextEditingController commentsController = TextEditingController();
   SignatureController? controller;
   Uint8List? signature;
   List<Map<String, dynamic>> properties = [];
@@ -126,7 +128,7 @@ class _PreviewInspectionPageState extends State<PreviewInspectionPage> {
       showLoadingDialog(context);
 
       List<String> base64Images = await Future.wait(images.map(fileToBase64));
-      String comment = notesController.text;
+      String comment = commentsController.text;
       // String base64Signature =
       //     signature != null ? base64Encode(signature!) : '';
 
@@ -162,8 +164,12 @@ class _PreviewInspectionPageState extends State<PreviewInspectionPage> {
         images: base64Images,
         // Set the base64 images
         comment: comment,
+
         // Set the comment
-        signature: '', // Set the signature
+        signature: '',
+        maintaineceCondition: selectedMainatainece.toString(),
+        propertyCondition: selectedConditionProperty.toString(),
+        propertyCleanliness: selectedConditionCleaness.toString(),
       );
 
       print(
@@ -205,17 +211,41 @@ class _PreviewInspectionPageState extends State<PreviewInspectionPage> {
   void showLoadingDialog(BuildContext context) {
     showDialog(
       context: context,
-      barrierDismissible: false, // Prevent dismissing the dialog by tapping outside
+      barrierDismissible: false,
+      // Prevent dismissing the dialog by tapping outside
       builder: (BuildContext context) {
         return Center(
           child: HexagonLoadingWidget(
             color: kPrimaryColor, // Use your custom color
-            size: 120,            // Specify the size you want
+            size: 120, // Specify the size you want
           ),
         );
       },
     );
   }
+
+  String? selectedConditionProperty;
+  String? selectedConditionCleaness;
+  String? selectedMainatainece;
+
+  // String? selectedConditionCleaness;
+  List<String> maintainance = const [
+    "Required",
+    "Not Required",
+  ];
+
+  List<String> conditionProperty = const [
+    "Good",
+    "Fair",
+    "Poor"
+  ];
+
+  List<String> cleanlinessProperty = const [
+    "Good",
+    "Fair",
+    "Poor"
+  ];
+
   @override
   Widget build(BuildContext context) {
     return PopScope(
@@ -223,7 +253,8 @@ class _PreviewInspectionPageState extends State<PreviewInspectionPage> {
       child: Scaffold(
         appBar: AppBar(
           scrolledUnderElevation: 0,
-          title: Text('Preview',
+          title: Text(
+            'Preview',
             style: TextStyle(
               color: kPrimaryColor,
               fontSize: 14, // Adjust the font size
@@ -253,9 +284,257 @@ class _PreviewInspectionPageState extends State<PreviewInspectionPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 buildImageGrid(),
-                SizedBox(height: 12.0),
-                buildCommentsField(),
+                // SizedBox(height: 12.0),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 0.0),
+                  child: Divider(thickness: 1, color: Color(0xFFC2C2C2)),
+                ),
+                Text(
+                  "Property Condition",
+                  style: TextStyle(
+                      color: kPrimaryColor, fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+
+                Row(
+                  children: conditionProperty.map((condition) {
+                    return Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Radio<String>(
+                          value: condition,
+                          groupValue: selectedConditionProperty,
+                          onChanged: (newCondition) {
+                            setState(() {
+                              selectedConditionProperty = newCondition;
+                            });
+                          },
+                          activeColor: kPrimaryColor,
+                        ),
+                        Text(condition),
+                        SizedBox(width: 8), // Space between each radio button
+                      ],
+                    );
+                  }).toList(),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 0.0),
+                  child: Divider(thickness: 1, color: Color(0xFFC2C2C2)),
+                ),
+                Text(
+                  "Property Cleanliness",
+                  style: TextStyle(
+                      color: kPrimaryColor, fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+
+                Row(
+                  children: cleanlinessProperty.map((condition) {
+                    return Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Radio<String>(
+                          value: condition,
+                          groupValue: selectedConditionCleaness,
+                          onChanged: (newCondition) {
+                            setState(() {
+                              selectedConditionCleaness = newCondition;
+                            });
+                          },
+                          activeColor: kPrimaryColor,
+                        ),
+                        Text(condition),
+                        SizedBox(width: 8), // Space between each radio button
+                      ],
+                    );
+                  }).toList(),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 0.0),
+                  child: Divider(thickness: 1, color: Color(0xFFC2C2C2)),
+                ),
+
+                Text(
+                  "Maintenance",
+                  style: TextStyle(
+                      color: kPrimaryColor, fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+
+                Row(
+                  children: maintainance.map((condition) {
+                    return Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Radio<String>(
+                          value: condition,
+                          groupValue: selectedMainatainece,
+                          onChanged: (newCondition) {
+                            setState(() {
+                              selectedMainatainece = newCondition;
+                            });
+                          },
+                          activeColor: kPrimaryColor,
+                        ),
+                        Text(condition),
+                        SizedBox(width: 8), // Space between each radio button
+                      ],
+                    );
+                  }).toList(),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 0.0),
+                  child: Divider(thickness: 1, color: Color(0xFFC2C2C2)),
+                ),
+
+                if (selectedMainatainece == "Required")
+                  Padding(
+                    padding: const EdgeInsets.only(top: 10),
+                    child: TextField(
+                      controller: commentsController,
+                      cursorColor: kPrimaryColor,
+                      textInputAction: TextInputAction.done,
+                      maxLines: 5,
+                      decoration: InputDecoration(
+                        hintText: 'Add Maintenance Notes',
+                        hintStyle: TextStyle(color: kPrimaryColor, fontSize: 14),
+                        enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: kPrimaryColor, width: 1.0),
+                            borderRadius: BorderRadius.circular(8)),
+                        focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: kPrimaryColor, width: 2.0),
+                            borderRadius: BorderRadius.circular(8)),
+                      ),
+                      style: TextStyle(color: kPrimaryColor, fontSize: 12),
+                    ),
+                  ),
                 const SizedBox(height: 15),
+
+                // buildCommentsField(),
+                // const SizedBox(height: 15),
+
+                Center(
+                  child: GestureDetector(
+                    onTap: () {
+                      // AuthController.instance.logOut();
+                      showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              elevation: 10,
+                              backgroundColor: Colors.white,
+                              title: Row(
+                                children: [
+                                  Icon(Icons.cloud_upload_outlined,
+                                      color: kPrimaryColor),
+                                  SizedBox(width: 10),
+                                  Text(
+                                    'Submit',
+                                    style: TextStyle(
+                                      color: kPrimaryColor,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              content: Text(
+                                'Make sure you have all the details',
+                                textAlign: TextAlign.left,
+                                style: TextStyle(
+                                  color: Colors.grey[800],
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w400,
+                                  height: 1.5,
+                                ),
+                              ),
+                              actions: <Widget>[
+                                TextButton(
+                                  child: Text(
+                                    'Cancel',
+                                    style: TextStyle(
+                                      color: kPrimaryColor,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                  onPressed: () {
+                                    Navigator.of(context)
+                                        .pop(); // Close the dialog
+                                  },
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    submitData(context);
+                                  },
+                                  style: TextButton.styleFrom(
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 16, vertical: 8),
+                                    backgroundColor: kPrimaryColor,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    'Submit',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            );
+                          });
+                    },
+                    child: Container(
+                      width: double.maxFinite,
+                      decoration: BoxDecoration(
+                        color: kPrimaryColor,
+                        // Background color of the container
+                        borderRadius: BorderRadius.circular(10.0),
+                        // Rounded corners
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            // Shadow color
+                            spreadRadius: 2,
+                            blurRadius: 5,
+                            offset: Offset(0, 3), // Shadow position
+                          ),
+                        ],
+                        border: Border.all(
+                          color: kPrimaryColor, // Border color
+                          width: 2.0, // Border width
+                        ),
+                      ),
+                      padding: EdgeInsets.symmetric(
+                        vertical: 12.0,
+                        horizontal: 16.0,
+                      ), // Padding inside the container
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.cloud_upload_outlined,
+                            color: bWhite, // Customize the icon color
+                          ),
+                          SizedBox(width: 8.0),
+                          // Space between the icon and the text
+                          Text(
+                            "Submit", // Customize the text
+                            style: TextStyle(
+                              color: bWhite, // Text color
+                              fontSize: 16.0, // Font size
+                              fontWeight: FontWeight.bold, // Font weight
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                )
+
                 // buildDeclarationText(),
                 // const SizedBox(height: 15),
                 // buildSignatureSection(),
@@ -360,51 +639,52 @@ class _PreviewInspectionPageState extends State<PreviewInspectionPage> {
     );
   }
 
-  // Widget buildDeclarationText() {
-  //   return Column(
-  //     crossAxisAlignment: CrossAxisAlignment.start,
-  //     children: [
-  //       Text('Declaration',
-  //           style: TextStyle(color: kPrimaryColor, fontSize: 14)),
-  //       const Text(
-  //           'I/We the undersigned, affirm  that if I/we do not'
-  //           ' comment on the inventory in writing within seven days '
-  //           'of receipt of this inventory I/We accept the inventory '
-  //           'as being an accurate record of the contents and '
-  //           'conditions of the property',
-  //           textAlign: TextAlign.justify,
-  //           style: TextStyle(
-  //             color: kPrimaryTextColourTwo,
-  //             fontSize: 12, // Adjust the font size
-  //             fontFamily: "Inter",
-  //           )),
-  //     ],
-  //   );
-  // }
-  //
-  // Widget buildSignatureSection() {
-  //   return Column(
-  //     crossAxisAlignment: CrossAxisAlignment.start,
-  //     children: [
-  //       Text('Signature', style: TextStyle(color: kPrimaryColor, fontSize: 14)),
-  //       Container(
-  //         height: 200,
-  //         child: Signature(
-  //           controller: controller!,
-  //           height: 200,
-  //           backgroundColor: Colors.grey[200]!,
-  //         ),
-  //       ),
-  //       IconButton(
-  //         icon: Icon(Icons.clear),
-  //         onPressed: () {
-  //           controller?.clear();
-  //         },
-  //       ),
-  //     ],
-  //   );
-  // }
+// Widget buildDeclarationText() {
+//   return Column(
+//     crossAxisAlignment: CrossAxisAlignment.start,
+//     children: [
+//       Text('Declaration',
+//           style: TextStyle(color: kPrimaryColor, fontSize: 14)),
+//       const Text(
+//           'I/We the undersigned, affirm  that if I/we do not'
+//           ' comment on the inventory in writing within seven days '
+//           'of receipt of this inventory I/We accept the inventory '
+//           'as being an accurate record of the contents and '
+//           'conditions of the property',
+//           textAlign: TextAlign.justify,
+//           style: TextStyle(
+//             color: kPrimaryTextColourTwo,
+//             fontSize: 12, // Adjust the font size
+//             fontFamily: "Inter",
+//           )),
+//     ],
+//   );
+// }
+//
+// Widget buildSignatureSection() {
+//   return Column(
+//     crossAxisAlignment: CrossAxisAlignment.start,
+//     children: [
+//       Text('Signature', style: TextStyle(color: kPrimaryColor, fontSize: 14)),
+//       Container(
+//         height: 200,
+//         child: Signature(
+//           controller: controller!,
+//           height: 200,
+//           backgroundColor: Colors.grey[200]!,
+//         ),
+//       ),
+//       IconButton(
+//         icon: Icon(Icons.clear),
+//         onPressed: () {
+//           controller?.clear();
+//         },
+//       ),
+//     ],
+//   );
+// }
 }
+
 class DotLoadingText extends StatefulWidget {
   @override
   _DotLoadingTextState createState() => _DotLoadingTextState();
@@ -440,7 +720,8 @@ class _DotLoadingTextState extends State<DotLoadingText> {
 
   @override
   Widget build(BuildContext context) {
-    return Flexible( // Allow text to resize properly
+    return Flexible(
+      // Allow text to resize properly
       child: Text(
         "Generating Report$_dots",
         style: const TextStyle(

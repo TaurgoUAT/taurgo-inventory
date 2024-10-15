@@ -9,55 +9,14 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9cfeb956-5354-4366-ab84-34804ef25cb7" name="Changes" comment="Minor Changes Implemented">
-      <change afterPath="$PROJECT_DIR$/taurgo_inventory/ios/build/XCBuildData/55b39dbf4fe6ca37a67f56848ce99ce1.xcbuilddata/attachments/0024058ac83852dbe438b9139983b965" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/taurgo_inventory/ios/build/XCBuildData/55b39dbf4fe6ca37a67f56848ce99ce1.xcbuilddata/attachments/195aef0da31b92663d97eec288dc53bb" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/taurgo_inventory/ios/build/XCBuildData/55b39dbf4fe6ca37a67f56848ce99ce1.xcbuilddata/attachments/1b7ac61b8ecc62c8e69b213f182eca6b" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/taurgo_inventory/ios/build/XCBuildData/55b39dbf4fe6ca37a67f56848ce99ce1.xcbuilddata/attachments/2f0da49ec3b6348c92add6f492d81185" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/taurgo_inventory/ios/build/XCBuildData/55b39dbf4fe6ca37a67f56848ce99ce1.xcbuilddata/attachments/2f2d5a1f17546a2307ba5aa00d52a4a9" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/taurgo_inventory/ios/build/XCBuildData/55b39dbf4fe6ca37a67f56848ce99ce1.xcbuilddata/attachments/52eb40d226c7812a77cdf59e23e0d864" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/taurgo_inventory/ios/build/XCBuildData/55b39dbf4fe6ca37a67f56848ce99ce1.xcbuilddata/attachments/65bd0fb0a8cd2dcc125fee6d7267a6e4" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/taurgo_inventory/ios/build/XCBuildData/55b39dbf4fe6ca37a67f56848ce99ce1.xcbuilddata/attachments/6ca3a32e9bda37b9e655b3f3e7126469" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/taurgo_inventory/ios/build/XCBuildData/55b39dbf4fe6ca37a67f56848ce99ce1.xcbuilddata/attachments/7d182dfc6517b141429da2016cdef249" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/taurgo_inventory/ios/build/XCBuildData/55b39dbf4fe6ca37a67f56848ce99ce1.xcbuilddata/attachments/81aad5c4225565e7ad153eecd0545b8b" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/taurgo_inventory/ios/build/XCBuildData/55b39dbf4fe6ca37a67f56848ce99ce1.xcbuilddata/attachments/8bba4233626f64a7ea772bb94a08a1a9" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/taurgo_inventory/ios/build/XCBuildData/55b39dbf4fe6ca37a67f56848ce99ce1.xcbuilddata/attachments/97e354fb311cac25a61af14b6664f7af" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/taurgo_inventory/ios/build/XCBuildData/55b39dbf4fe6ca37a67f56848ce99ce1.xcbuilddata/attachments/adc80dc8a18302881d471e1e661b1486" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/taurgo_inventory/ios/build/XCBuildData/55b39dbf4fe6ca37a67f56848ce99ce1.xcbuilddata/attachments/b5c347a1c14733177577aaf3a8bce392" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/taurgo_inventory/ios/build/XCBuildData/55b39dbf4fe6ca37a67f56848ce99ce1.xcbuilddata/attachments/bb94fc515189b00485bc317eaf2afb41" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/taurgo_inventory/ios/build/XCBuildData/55b39dbf4fe6ca37a67f56848ce99ce1.xcbuilddata/attachments/bf96d30bed64c7a106b439569e2eb281" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/taurgo_inventory/ios/build/XCBuildData/55b39dbf4fe6ca37a67f56848ce99ce1.xcbuilddata/attachments/e02be532faff8f3c1b923f65115409d2" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/taurgo_inventory/ios/build/XCBuildData/55b39dbf4fe6ca37a67f56848ce99ce1.xcbuilddata/attachments/e316d4524e76b79e16bb607886cb5290" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/taurgo_inventory/ios/build/XCBuildData/55b39dbf4fe6ca37a67f56848ce99ce1.xcbuilddata/attachments/ed472c6f62960d593c8a6c31ca00c227" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/taurgo_inventory/ios/build/XCBuildData/55b39dbf4fe6ca37a67f56848ce99ce1.xcbuilddata/attachments/eda4b73929a362defe00e475f6b3feb8" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/taurgo_inventory/ios/build/XCBuildData/55b39dbf4fe6ca37a67f56848ce99ce1.xcbuilddata/attachments/f7dc7d6dafc2f6cd32f7ba92e56e76bf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/taurgo_inventory/ios/build/XCBuildData/55b39dbf4fe6ca37a67f56848ce99ce1.xcbuilddata/attachments/fd8314defc70a8778956f026c0ddfd19" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/taurgo_inventory/ios/build/XCBuildData/55b39dbf4fe6ca37a67f56848ce99ce1.xcbuilddata/build-request.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/taurgo_inventory/ios/build/XCBuildData/55b39dbf4fe6ca37a67f56848ce99ce1.xcbuilddata/description.msgpack" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/taurgo_inventory/ios/build/XCBuildData/55b39dbf4fe6ca37a67f56848ce99ce1.xcbuilddata/manifest.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/taurgo_inventory/ios/build/XCBuildData/55b39dbf4fe6ca37a67f56848ce99ce1.xcbuilddata/target-graph.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/taurgo_inventory/ios/build/XCBuildData/55b39dbf4fe6ca37a67f56848ce99ce1.xcbuilddata/task-store.msgpack" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/taurgo_inventory/lib/model/TypeModel.dart" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/taurgo_inventory/lib/widgets/HexagonLoadingWidget.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Dart_Packages.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/Dart_Packages.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Flutter_Plugins.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/Flutter_Plugins.xml" afterDir="false" />
+    <list default="true" id="9cfeb956-5354-4366-ab84-34804ef25cb7" name="Changes" comment="Loading Indicator is Added">
+      <change afterPath="$PROJECT_DIR$/taurgo_inventory/lib/widgets/PropertyConditionRadioButton.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/ios/Podfile.lock" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/ios/Podfile.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/ios/Runner.xcodeproj/project.pbxproj" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/ios/Runner.xcodeproj/project.pbxproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/Runner.entitlements" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/ios/Runner/Runner.entitlements" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/Dtos/InspectionReportDto.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/Dtos/InspectionReportDto.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/constants/UrlConstants.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/constants/UrlConstants.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/InspectionReportsPages/inspection_only_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/InspectionReportsPages/inspection_only_page.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/InspectionReportsPages/preview_inspection_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/InspectionReportsPages/preview_inspection_page.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/account_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/account_page.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/add_property_details_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/add_property_details_page.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/add_property_details_page_second.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/add_property_details_page_second.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/authentication/controller/authController.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/authentication/controller/authController.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/deatails_confirmation_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/deatails_confirmation_page.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/landing_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/landing_screen.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/pages/property_details_view_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/pages/property_details_view_page.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/lib/widgets/SocialMediaLogin.dart" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/lib/widgets/SocialMediaLogin.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/macos/Flutter/GeneratedPluginRegistrant.swift" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/macos/Flutter/GeneratedPluginRegistrant.swift" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/pubspec.lock" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/pubspec.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/taurgo_inventory/pubspec.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/taurgo_inventory/pubspec.yaml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -480,7 +439,15 @@
       <option name="project" value="LOCAL" />
       <updated>1727709975058</updated>
     </task>
-    <option name="localTasksCounter" value="46" />
+    <task id="LOCAL-00046" summary="Loading Indicator is Added">
+      <option name="closed" value="true" />
+      <created>1728018858971</created>
+      <option name="number" value="00046" />
+      <option name="presentableId" value="LOCAL-00046" />
+      <option name="project" value="LOCAL" />
+      <updated>1728018858971</updated>
+    </task>
+    <option name="localTasksCounter" value="47" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -496,7 +463,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="Bottom Nav BAr Added" />
     <MESSAGE value="Profile Page Modified" />
     <MESSAGE value="Profile Pages added" />
     <MESSAGE value="Authentication Part Integrated" />
@@ -521,7 +487,8 @@
     <MESSAGE value="PDF view Added, Map Enabled, along with UI and logical improvements" />
     <MESSAGE value="Select from Gallery is Implemented" />
     <MESSAGE value="Minor Changes Implemented" />
-    <option name="LAST_COMMIT_MESSAGE" value="Minor Changes Implemented" />
+    <MESSAGE value="Loading Indicator is Added" />
+    <option name="LAST_COMMIT_MESSAGE" value="Loading Indicator is Added" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
