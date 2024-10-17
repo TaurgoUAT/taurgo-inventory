@@ -123,89 +123,175 @@ class _PreviewInspectionPageState extends State<PreviewInspectionPage> {
     return base64Encode(bytes);
   }
 
-  Future<void> submitData(BuildContext context) async {
-    try {
+  // Future<void> submitData(BuildContext context) async {
+  //   try {
+  //     showLoadingDialog(context);
+  //
+  //     List<String> base64Images = await Future.wait(images.map(fileToBase64));
+  //     String comment = commentsController.text;
+  //     // String base64Signature =
+  //     //     signature != null ? base64Encode(signature!) : '';
+  //
+  //     // Update the DTO with the collected data
+  //     PropertySummaryDto inspectionReportDtoDto = PropertySummaryDto(
+  //       propertyId: widget.propertyId,
+  //       addressDto: AddressDto(
+  //         addressLineOne: properties[0]['addressLineOne'] ?? 'No address',
+  //         addressLineTwo: properties[0]['addressLineTwo'] ?? 'No address',
+  //         city: properties[0]['city'] ?? 'No address',
+  //         state: properties[0]['state'] ?? 'No address',
+  //         country: properties[0]['country'] ?? 'No address',
+  //         postalCode: properties[0]['postalCode'] ?? 'No address',
+  //       ),
+  //       userDto: UserDto(
+  //         firebaseId: 'user001',
+  //         firstName: 'Abishan',
+  //         lastName: 'Ananthan',
+  //         userName: userDetails[0]['userName'] ?? 'Taurgo',
+  //         email: userDetails[0]['email'] ?? 'info@taurgo.co.uk',
+  //         location: 'Vavuniya',
+  //       ),
+  //       inspectionDto: InspectionSumamryDto(
+  //         inspectionId: 'insp001',
+  //         inspectorName: properties[0]['client'] ?? 'No address',
+  //         inspectionType: properties[0]['inspectionType'] ?? 'No address',
+  //         date: properties[0]['date'] ?? 'No address',
+  //         time: properties[0]['time'] ?? 'No address',
+  //         keyLocation: properties[0]['keyLocation'] ?? 'No address',
+  //         keyReference: properties[0]['keyLocation'] ?? 'No address',
+  //         internalNotes: properties[0]['keyLocation'] ?? 'No address',
+  //       ),
+  //       images: base64Images,
+  //       // Set the base64 images
+  //       comment: comment,
+  //
+  //       // Set the comment
+  //       signature: '',
+  //       maintaineceCondition: selectedMainatainece.toString(),
+  //       propertyCondition: selectedConditionProperty.toString(),
+  //       propertyCleanliness: selectedConditionCleaness.toString(),
+  //     );
+  //
+  //     print(
+  //         "Summary DTO: ${inspectionReportDtoDto.toJson()}"); // Debug statement
+  //
+  //     final url = '$baseURL/summary/inspection-report';
+  //     var response = await http.post(
+  //       Uri.parse(url),
+  //       headers: {'Content-Type': 'application/json'},
+  //       body: jsonEncode(
+  //           inspectionReportDtoDto.toJson()), // Use the toJson method
+  //     );
+  //     Navigator.of(context).pop();
+  //     if (response.statusCode == 200) {
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         SnackBar(
+  //           backgroundColor: kPrimaryColor,
+  //           content: Text(
+  //             'Report Has been Sent to your Email',
+  //             textAlign: TextAlign.center,
+  //             style: TextStyle(
+  //               fontSize: 12,
+  //               fontWeight: FontWeight.w500,
+  //               fontFamily: "Inter",
+  //             ),
+  //           ),
+  //         ),
+  //       );
+  //       Navigator.pushReplacement(
+  //           context, MaterialPageRoute(builder: (context) => HomePage()));
+  //     } else {
+  //       handleError(response);
+  //     }
+  //   } catch (e) {
+  //     handleError(e);
+  //   }
+  // }
+
+
+
+  Future<void> submitData() async {
+    try{
       showLoadingDialog(context);
+      var uri = Uri.parse('$baseURL/summary/inspection-report');
+      var request = http.MultipartRequest('POST', uri);
 
-      List<String> base64Images = await Future.wait(images.map(fileToBase64));
-      String comment = commentsController.text;
-      // String base64Signature =
-      //     signature != null ? base64Encode(signature!) : '';
+      // Add form data
+      request.fields['propertyId'] = widget.propertyId;
+      request.fields['userDto'] = jsonEncode({
+        "firebaseId": firebaseId,
+        "firstName": userDetails[0]['firstName'],
+        "lastName": userDetails[0]['lastName'],
+        "userName": userDetails[0]['userName'],
+        "email": userDetails[0]['email'],
+        "location": userDetails[0]['location'],
+      });
+      request.fields['addressDto'] = jsonEncode({
+        "addressLineOne": properties[0]['addressLineOne'],
+        "addressLineTwo": properties[0]['addressLineTwo'],
+        "city": properties[0]['city'],
+        "state": properties[0]['state'],
+        "country": properties[0]['country'],
+        "postalCode": properties[0]['postalCode'],
+      });
+      request.fields['inspectionDto'] = jsonEncode({
+        "inspectionId": "001",
+        "inspectorName": properties[0]['client'],
+        "inspectionType": properties[0]['inspectionType'],
+        "date": properties[0]['date'],
+        "time": properties[0]['time'],
+        "keyLocation": properties[0]['keyLocation'],
+        "keyReference": properties[0]['keyLocation'],
+        "internalNotes": properties[0]['keyLocation'],
+      });
+      request.fields['maintaineceCondition'] = selectedMainatainece!;
+      request.fields['propertyCondition'] = selectedConditionProperty!;
+      request.fields['propertyCleanliness'] = selectedConditionCleaness!;
+      request.fields['comment'] = commentsController.text;
 
-      // Update the DTO with the collected data
-      PropertySummaryDto inspectionReportDtoDto = PropertySummaryDto(
-        propertyId: widget.propertyId,
-        addressDto: AddressDto(
-          addressLineOne: properties[0]['addressLineOne'] ?? 'No address',
-          addressLineTwo: properties[0]['addressLineTwo'] ?? 'No address',
-          city: properties[0]['city'] ?? 'No address',
-          state: properties[0]['state'] ?? 'No address',
-          country: properties[0]['country'] ?? 'No address',
-          postalCode: properties[0]['postalCode'] ?? 'No address',
-        ),
-        userDto: UserDto(
-          firebaseId: 'user001',
-          firstName: 'Abishan',
-          lastName: 'Ananthan',
-          userName: userDetails[0]['userName'] ?? 'Taurgo',
-          email: userDetails[0]['email'] ?? 'info@taurgo.co.uk',
-          location: 'Vavuniya',
-        ),
-        inspectionDto: InspectionSumamryDto(
-          inspectionId: 'insp001',
-          inspectorName: properties[0]['client'] ?? 'No address',
-          inspectionType: properties[0]['inspectionType'] ?? 'No address',
-          date: properties[0]['date'] ?? 'No address',
-          time: properties[0]['time'] ?? 'No address',
-          keyLocation: properties[0]['keyLocation'] ?? 'No address',
-          keyReference: properties[0]['keyLocation'] ?? 'No address',
-          internalNotes: properties[0]['keyLocation'] ?? 'No address',
-        ),
-        images: base64Images,
-        // Set the base64 images
-        comment: comment,
-
-        // Set the comment
-        signature: '',
-        maintaineceCondition: selectedMainatainece.toString(),
-        propertyCondition: selectedConditionProperty.toString(),
-        propertyCleanliness: selectedConditionCleaness.toString(),
-      );
-
-      print(
-          "Summary DTO: ${inspectionReportDtoDto.toJson()}"); // Debug statement
-
-      final url = '$baseURL/summary/inspection-report';
-      var response = await http.post(
-        Uri.parse(url),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(
-            inspectionReportDtoDto.toJson()), // Use the toJson method
-      );
-      Navigator.of(context).pop();
-      if (response.statusCode == 200) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            backgroundColor: kPrimaryColor,
-            content: Text(
-              'Report Has been Sent to your Email',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-                fontFamily: "Inter",
-              ),
-            ),
-          ),
+      // Add images
+      for (File image in widget.images) {
+        var multipartFile = await http.MultipartFile.fromPath(
+          'images',
+          image.path,
         );
-        Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => HomePage()));
-      } else {
-        handleError(response);
+        request.files.add(multipartFile);
       }
-    } catch (e) {
+
+      // Send the request
+      var response = await request.send();
+
+      // Handle the response
+      if (response.statusCode == 200) {
+        print("Report submitted successfully!");
+        var responseData = await http.Response.fromStream(response);
+        ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    backgroundColor: kPrimaryColor,
+                    content: Text(
+                      'Report Has been Sent to your Email',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        fontFamily: "Inter",
+                      ),
+                    ),
+                  ),
+                );
+                Navigator.pushReplacement(
+                    context, MaterialPageRoute(builder: (context) => HomePage()));
+
+        print(responseData.body);
+      } else {
+        print("Failed to submit the report. Status code: ${response.statusCode}");
+      }
+    }
+
+    catch(e){
       handleError(e);
     }
+
   }
 
   void showLoadingDialog(BuildContext context) {
@@ -269,7 +355,7 @@ class _PreviewInspectionPageState extends State<PreviewInspectionPage> {
           ),
           actions: [
             GestureDetector(
-              onTap: () => submitData(context),
+              onTap: () => submitData(),
               child: Container(
                   margin: EdgeInsets.all(16),
                   child: Text('Submit',
@@ -464,7 +550,7 @@ class _PreviewInspectionPageState extends State<PreviewInspectionPage> {
                                 ),
                                 TextButton(
                                   onPressed: () {
-                                    submitData(context);
+                                    submitData();
                                   },
                                   style: TextButton.styleFrom(
                                     padding: EdgeInsets.symmetric(

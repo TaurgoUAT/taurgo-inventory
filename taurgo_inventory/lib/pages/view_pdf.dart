@@ -8,6 +8,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:taurgo_inventory/pages/property_details_view_page.dart';
 import '../constants/AppColors.dart';
 import '../constants/UrlConstants.dart';
+import '../widgets/HexagonLoadingWidget.dart';
 import 'home_page.dart';
 import 'dart:convert';
 class ViewPdf extends StatefulWidget {
@@ -81,21 +82,49 @@ class _ViewPdfState extends State<ViewPdf> {
   //
 
 
+  // Future<void> fetchPdf() async {
+  //   String propertyId = widget.propertyId;
+  //   final response =
+  //       await http.get(Uri.parse('$baseURL/report/fetch/$propertyId'));
+  //   if (response.statusCode == 200) {
+  //     // Save the PDF to a temporary file
+  //     final directory = await getTemporaryDirectory();
+  //     final file = File('${directory.path}/${widget.propertyId}.pdf');
+  //     await file.writeAsBytes(response.bodyBytes);
+  //     setState(() {
+  //       pdfPath = file.path; // Update the path to the file
+  //     });
+  //   } else {
+  //     // Handle errors
+  //     print('Error fetching PDF: ${response.statusCode}');
+  //   }
+  // }
+
   Future<void> fetchPdf() async {
     String propertyId = widget.propertyId;
-    final response =
-        await http.get(Uri.parse('$baseURL/report/fetch/$propertyId'));
+    final response = await http.get(Uri.parse('$baseURL/report/fetch/$propertyId'));
+
     if (response.statusCode == 200) {
-      // Save the PDF to a temporary file
-      final directory = await getTemporaryDirectory();
-      final file = File('${directory.path}/${widget.propertyId}.pdf');
-      await file.writeAsBytes(response.bodyBytes);
-      setState(() {
-        pdfPath = file.path; // Update the path to the file
-      });
+      final Map<String, dynamic> data = json.decode(response.body);
+      String pdfUrl = data['downloadUrl']; // Get the download URL
+
+      // Now download the PDF from the AWS URL
+      final pdfResponse = await http.get(Uri.parse(pdfUrl));
+
+      if (pdfResponse.statusCode == 200) {
+        // Save the PDF to a temporary file
+        final directory = await getTemporaryDirectory();
+        final file = File('${directory.path}/${widget.propertyId}.pdf');
+        await file.writeAsBytes(pdfResponse.bodyBytes);
+
+        setState(() {
+          pdfPath = file.path; // Update the path to the file
+        });
+      } else {
+        print('Error downloading PDF from AWS: ${pdfResponse.statusCode}');
+      }
     } else {
-      // Handle errors
-      print('Error fetching PDF: ${response.statusCode}');
+      print('Error fetching PDF URL: ${response.statusCode}');
     }
   }
 
@@ -222,25 +251,15 @@ class _ViewPdfState extends State<ViewPdf> {
                     SizedBox(
                       width: 60.0,
                       height: 60.0,
-                      child: CircularProgressIndicator(
-                        color:
-                            kPrimaryColor, // Set the color to your primary color
-                        strokeWidth: 3.0,
-                        strokeCap: StrokeCap.square, // Set the stroke width
+                      child: Center(
+                        child: HexagonLoadingWidget(
+                          color: kPrimaryColor, // Use your custom color
+                          size: 120,            // Specify the size you want
+                        ),
+
                       ),
                     ),
-                    SizedBox(height: 16.0),
-                    // Add some space between the progress indicator and the text
-                    Text(
-                      "Loading...",
-                      style: TextStyle(
-                        color: kPrimaryColor,
-                        // You can set the text color to match your theme
-                        fontSize: 14.0,
-                        fontWeight: FontWeight.w500,
-                        fontFamily: "Inter",
-                      ),
-                    ),
+
                   ],
                 ),
               )
